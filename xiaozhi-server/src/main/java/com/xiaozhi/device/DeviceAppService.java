@@ -35,13 +35,13 @@ import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 设备领域应用服务。
+ * Serviço de aplicação do domínio de dispositivos.
  * <p>
- * 职责：编排 Controller → Domain Service 之间的流程，包括：
+ * Responsabilidade: orquestra o fluxo entre o Controller e o Domain Service, incluindo:
  * <ul>
- *   <li>Req/Resp ↔ BO 转换</li>
- *   <li>跨领域校验（角色归属验证）</li>
- *   <li>副作用协调（Redis 广播设备会话变更、角色切换）</li>
+ *   <li>Conversão Req/Resp ↔ BO</li>
+ *   <li>Validações entre domínios (verificação de posse do papel)</li>
+ *   <li>Coordenação de efeitos colaterais (broadcast de mudança de sessão do dispositivo e troca de papel via Redis)</li>
  * </ul>
  */
 @Slf4j
@@ -77,66 +77,66 @@ public class DeviceAppService {
     @Transactional
     public DeviceResp create(DeviceCreateReq req, Integer userId) {
         VerifyCode verifyCode = deviceRepository.findVerifyCode(req.getCode(), null, null)
-                .orElseThrow(() -> new IllegalArgumentException("无效验证码"));
+                .orElseThrow(() -> new IllegalArgumentException("Código de verificação inválido"));
 
         if (!StringUtils.hasText(verifyCode.deviceId())) {
-            throw new IllegalArgumentException("无效验证码");
+            throw new IllegalArgumentException("Código de verificação inválido");
         }
 
-        // 设备已存在：幂等返回（同一用户）或抛出冲突
+        // Dispositivo já existe: retorno idempotente (mesmo usuário) ou lança conflito
         java.util.Optional<Device> existingDevice = deviceRepository.findById(verifyCode.deviceId());
         if (existingDevice.isPresent()) {
             Device d = existingDevice.get();
             if (userId != null && userId.equals(d.getUserId())) {
                 DeviceResp result = deviceService.get(d.getDeviceId());
-                if (result == null) throw new IllegalStateException("查询设备失败");
+                if (result == null) throw new IllegalStateException("Falha ao consultar dispositivo");
                 return result;
             }
-            throw new IllegalStateException("设备已被其他用户绑定");
+            throw new IllegalStateException("O dispositivo já está vinculado a outro usuário");
         }
 
         RoleBO selectedRole = roleService.getDefaultOrFirstBO(userId);
         if (selectedRole == null) {
-            throw new IllegalStateException("没有配置角色");
+            throw new IllegalStateException("Nenhum papel configurado");
         }
 
-        String name = StringUtils.hasText(verifyCode.type()) ? verifyCode.type() : "小智";
+        String name = StringUtils.hasText(verifyCode.type()) ? verifyCode.type() : "Xiaozhi";
         Device device = Device.newDevice(verifyCode.deviceId(), name, verifyCode.type(),
                 userId, selectedRole.getRoleId());
         deviceRepository.save(device);
 
         DeviceResp result = deviceService.get(device.getDeviceId());
-        if (result == null) throw new IllegalStateException("添加设备失败");
+        if (result == null) throw new IllegalStateException("Falha ao adicionar dispositivo");
         return result;
     }
 
     @Transactional
     public DeviceResp update(String deviceId, DeviceUpdateReq req) {
         Device device = deviceRepository.findById(deviceId)
-                .orElseThrow(() -> new ResourceNotFoundException("设备不存在或无权访问"));
+                .orElseThrow(() -> new ResourceNotFoundException("Dispositivo não encontrado ou sem permissão de acesso"));
 
         if (req.getRoleId() != null) {
             RoleBO role = roleService.getBO(req.getRoleId());
-            if (role == null) throw new IllegalArgumentException("角色不存在或无权访问");
+            if (role == null) throw new IllegalArgumentException("Papel não encontrado ou sem permissão de acesso");
             if (!Objects.equals(role.getUserId(), device.getUserId()))
-                throw new IllegalArgumentException("角色不属于设备所属用户");
+                throw new IllegalArgumentException("O papel não pertence ao usuário dono do dispositivo");
         }
 
         device.update(req.getDeviceName(), req.getRoleId(), req.getLocation());
         deviceRepository.save(device);
 
         DeviceResp result = deviceService.get(deviceId);
-        if (result == null) throw new IllegalStateException("更新设备失败");
+        if (result == null) throw new IllegalStateException("Falha ao atualizar dispositivo");
         return result;
     }
 
     @Transactional
     public Map<String, Object> batchUpdate(DeviceBatchUpdateReq req) {
         if (!StringUtils.hasText(req.getDeviceIds()) || req.getRoleId() == null) {
-            throw new IllegalArgumentException("更新失败，请检查设备ID是否正确");
+            throw new IllegalArgumentException("Falha ao atualizar, verifique se o ID do dispositivo está correto");
         }
         if (roleService.getBO(req.getRoleId()) == null) {
-            throw new IllegalArgumentException("角色不存在或无权访问");
+            throw new IllegalArgumentException("Papel não encontrado ou sem permissão de acesso");
         }
 
         int successCount = 0;
@@ -152,7 +152,7 @@ public class DeviceAppService {
             successCount++;
         }
         if (successCount <= 0) {
-            throw new IllegalArgumentException("更新失败，请检查设备ID是否正确");
+            throw new IllegalArgumentException("Falha ao atualizar, verifique se o ID do dispositivo está correto");
         }
 
         Map<String, Object> data = new HashMap<>();
@@ -186,21 +186,21 @@ public class DeviceAppService {
     @Transactional
     public void delete(String deviceId) {
         if (deviceRepository.findById(deviceId).isEmpty()) {
-            throw new ResourceNotFoundException("设备不存在或无权访问");
+            throw new ResourceNotFoundException("Dispositivo não encontrado ou sem permissão de acesso");
         }
         deviceRepository.delete(deviceId);
     }
 
     /**
-     * 处理 OTA 请求的核心业务逻辑。
+     * Lógica de negócio principal para processar a solicitação OTA.
      *
-     * @param req 由 Controller 从 HTTP 请求解析出的设备信息
-     * @return OTA 响应数据（firmware / activation / websocket 等）
-     * @throws IllegalArgumentException 设备ID不正确
-     * @throws IllegalStateException    生成验证码失败等内部错误
+     * @param req informações do dispositivo extraídas da requisição HTTP pelo Controller
+     * @return dados de resposta OTA (firmware / activation / websocket, etc.)
+     * @throws IllegalArgumentException ID do dispositivo incorreto
+     * @throws IllegalStateException    erro interno, como falha ao gerar o código de verificação
      */
     public Map<String, Object> handleOta(OtaReq req) {
-        // --- IP 地理位置解析 ---
+        // --- Resolução de geolocalização por IP ---
         if (StringUtils.hasText(req.getIp())) {
             var ipInfo = CmsUtils.getIPInfoByAddress(req.getIp());
             if (ipInfo != null && StringUtils.hasText(ipInfo.getLocation())) {
@@ -209,14 +209,14 @@ public class DeviceAppService {
         }
 
         if (!StringUtils.hasText(req.getDeviceId()) || !CommonUtils.isMacAddressValid(req.getDeviceId())) {
-            throw new IllegalArgumentException("设备ID不正确");
+            throw new IllegalArgumentException("ID do dispositivo incorreto");
         }
 
         String deviceId = req.getDeviceId();
         DeviceResp boundDevice = getResp(deviceId);
         Map<String, Object> otaResponse = new HashMap<>();
 
-        // --- 固件信息 ---
+        // --- Informações de firmware ---
         Map<String, Object> firmwareInfo = new HashMap<>();
         firmwareInfo.put("url", serverAddressProvider.getOtaAddress());
         firmwareInfo.put("version", "1.0.0");
@@ -227,10 +227,10 @@ public class DeviceAppService {
         ));
 
         if (boundDevice == null) {
-            // --- 未绑定设备：生成验证码 ---
+            // --- Dispositivo não vinculado: gera código de verificação ---
             DeviceResp codeResult = generateCode(deviceId, null, req.getType());
             if (codeResult == null || !StringUtils.hasText(codeResult.getCode())) {
-                throw new IllegalStateException("生成验证码失败");
+                throw new IllegalStateException("Falha ao gerar código de verificação");
             }
             otaResponse.put("activation", Map.of(
                 "code", codeResult.getCode(),
@@ -238,12 +238,12 @@ public class DeviceAppService {
                 "challenge", deviceId
             ));
         } else {
-            // --- 已绑定设备：返回通信地址 ---
+            // --- Dispositivo já vinculado: retorna o endereço de comunicação ---
             DialogueServerInfo selectedServer = null;
             try {
                 selectedServer = dialogueServerRegistry.selectServer();
             } catch (RuntimeException e) {
-                log.warn("选择对话服务器失败，回退默认地址, deviceId={}", deviceId, e);
+                log.warn("Falha ao selecionar o servidor de diálogo, revertendo para o endereço padrão, deviceId={}", deviceId, e);
             }
             String websocketAddress = selectedServer != null ? selectedServer.getWebsocketAddress() : serverAddressProvider.getWebsocketAddress();
 
@@ -252,7 +252,7 @@ public class DeviceAppService {
             websocketData.put("token", "");
             otaResponse.put("websocket", websocketData);
 
-            // --- 同步设备信息 ---
+            // --- Sincroniza informações do dispositivo ---
             DeviceBO syncData = new DeviceBO();
             syncData.setDeviceId(boundDevice.getDeviceId());
             syncData.setDeviceName(boundDevice.getDeviceName());
@@ -265,7 +265,7 @@ public class DeviceAppService {
             try {
                 sync(syncData);
             } catch (RuntimeException e) {
-                log.warn("同步设备信息失败，不影响OTA返回, deviceId={}", deviceId, e);
+                log.warn("Falha ao sincronizar informações do dispositivo (não afeta a resposta OTA), deviceId={}", deviceId, e);
             }
         }
 
@@ -273,9 +273,9 @@ public class DeviceAppService {
     }
 
     /**
-     * 检查 OTA 激活状态。
+     * Verifica o status de ativação OTA.
      *
-     * @return true 表示设备已激活，false 表示未激活或设备ID无效
+     * @return true se o dispositivo estiver ativado, false se não estiver ativado ou o ID for inválido
      */
     public boolean checkOtaActivation(String deviceId) {
         if (!StringUtils.hasText(deviceId) || !CommonUtils.isMacAddressValid(deviceId)) {
@@ -285,7 +285,7 @@ public class DeviceAppService {
         if (device == null) {
             return false;
         }
-        log.info("OTA激活结果查询成功, deviceId: {} 激活时间: {}", deviceId, device.getCreateTime());
+        log.info("Consulta do resultado de ativação OTA concluída, deviceId: {} horário de ativação: {}", deviceId, device.getCreateTime());
         return true;
     }
 }

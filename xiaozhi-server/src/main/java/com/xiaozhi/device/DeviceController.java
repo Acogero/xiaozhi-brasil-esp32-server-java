@@ -38,7 +38,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 /**
- * 设备管理
+ * Gerenciamento de dispositivos
  * 
  * @author Joey
  * 
@@ -47,84 +47,84 @@ import jakarta.validation.Valid;
 @Slf4j
 @RestController
 @RequestMapping("/api/device")
-@Tag(name = "设备管理", description = "设备相关操作")
+@Tag(name = "Gerenciamento de dispositivos", description = "Operações relacionadas a dispositivos")
 public class DeviceController extends BaseController {
 
     @Resource
     private DeviceAppService deviceAppService;
 
     /**
-     * 设备查询
+     * Consulta de dispositivos
      */
     @GetMapping("")
     @ResponseBody
     @SaCheckPermission("system:device:api:list")
-    @Operation(summary = "根据条件查询设备", description = "返回设备信息列表")
+    @Operation(summary = "Consulta dispositivos de acordo com os filtros", description = "Retorna a lista de dispositivos")
     public ApiResponse<?> list(@Valid DevicePageReq req) {
         return ApiResponse.success(deviceAppService.page(req, StpUtil.getLoginIdAsInt()));
     }
 
     /**
-     * 批量更新设备
+     * Atualizar dispositivos em lote
      */
     @PostMapping("/batchUpdate")
     @ResponseBody
     @SaCheckPermission("system:device:api:batch-update")
-    @AuditLog(module = "设备管理", operation = "批量更新设备")
+    @AuditLog(module = "Gerenciamento de dispositivos", operation = "Atualizar dispositivos em lote")
     @CheckOwner(resource = "device", id = "#param.deviceIds != null ? #param.deviceIds.split(',') : null")
     @CheckOwner(resource = "role", id = "#param.roleId")
-    @Operation(summary = "批量更新设备", description = "批量更新多个设备的角色")
+    @Operation(summary = "Atualizar dispositivos em lote", description = "Atualiza em lote o papel de vários dispositivos")
     public ApiResponse<?> batchUpdate(@Valid @RequestBody DeviceBatchUpdateReq param) {
         Map<String, Object> data = deviceAppService.batchUpdate(param);
-        return ApiResponse.success("成功更新" + data.get("successCount") + "个设备", data);
+        return ApiResponse.success("Atualização concluída, total de " + data.get("successCount") + " dispositivo(s) atualizado(s)", data);
     }
 
     /**
-     * 添加设备
+     * Adicionar dispositivo
      */
     @PostMapping("")
     @ResponseBody
     @SaCheckPermission("system:device:api:create")
-    @AuditLog(module = "设备管理", operation = "创建设备")
-    @Operation(summary = "添加设备", description = "使用设备验证码添加设备到当前用户账户")
+    @AuditLog(module = "Gerenciamento de dispositivos", operation = "Criar dispositivo")
+    @Operation(summary = "Adicionar dispositivo", description = "Adiciona o dispositivo à conta do usuário atual usando o código de verificação do dispositivo")
     public ApiResponse<?> create(@Valid @RequestBody DeviceCreateReq param) {
         return ApiResponse.success(deviceAppService.create(param, StpUtil.getLoginIdAsInt()));
     }
 
     /**
-     * 设备信息更新
+     * Atualização das informações do dispositivo
      */
     @PutMapping("/{deviceId}")
     @ResponseBody
     @SaCheckPermission("system:device:api:update")
     @CheckOwner(resource = "device", id = "#deviceId")
     @CheckOwner(resource = "role", id = "#param.roleId")
-    @AuditLog(module = "设备管理", operation = "更新设备")
-    @Operation(summary = "更新设备信息", description = "更新设备名称、角色、功能列表等信息")
+    @AuditLog(module = "Gerenciamento de dispositivos", operation = "Atualizar dispositivo")
+    @Operation(summary = "Atualizar informações do dispositivo", description = "Atualiza nome, papel, lista de funcionalidades e outras informações do dispositivo")
     public ApiResponse<?> update(@PathVariable String deviceId, @Valid @RequestBody DeviceUpdateReq param) {
         return ApiResponse.success(deviceAppService.update(deviceId, param));
     }
 
     /**
-     * 删除设备
+     * Excluir dispositivo
      */
     @DeleteMapping("/{deviceId}")
     @ResponseBody
     @SaCheckPermission("system:device:api:delete")
     @CheckOwner(resource = "device", id = "#deviceId")
-    @AuditLog(module = "设备管理", operation = "删除设备")
-    @Operation(summary = "删除设备", description = "从当前用户账户中删除指定设备")
+    @AuditLog(module = "Gerenciamento de dispositivos", operation = "Excluir dispositivo")
+    @Operation(summary = "Excluir dispositivo", description = "Remove o dispositivo informado da conta do usuário atual")
     public ApiResponse<?> delete(@PathVariable String deviceId) {
         deviceAppService.delete(deviceId);
-        return ApiResponse.success("删除成功");
+        return ApiResponse.success("Excluído com sucesso");
     }
 
     @SaIgnore
     @RequestMapping(value = "/ota", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
-    @Operation(summary = "处理OTA请求", description = "返回OTA结果")
+    @Operation(summary = "Processar solicitação OTA", description = "Retorna o resultado OTA")
     public ResponseEntity<byte[]> ota(
-        @Parameter(description = "设备ID") @RequestHeader(value = "Device-Id", required = false) String deviceIdHeader,
+        @Parameter(description = "ID do dispositivo") @RequestHeader(value = "Device-Id", required = false) String deviceIdHeader,
         @RequestBody(required = false) String requestBody,
         HttpServletRequest request) {
         try {
@@ -134,30 +134,30 @@ public class DeviceController extends BaseController {
         } catch (IllegalArgumentException e) {
             return buildJsonResponse(HttpStatus.BAD_REQUEST, Map.of("error", e.getMessage()));
         } catch (RuntimeException e) {
-            log.error("处理OTA请求失败", e);
-            return buildJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, Map.of("error", "处理请求失败"));
+            log.error("Falha ao processar solicitação OTA", e);
+            return buildJsonResponse(HttpStatus.INTERNAL_SERVER_ERROR, Map.of("error", "Falha ao processar a solicitação"));
         }
     }
 
     @SaIgnore
     @PostMapping("/ota/activate")
     @ResponseBody
-    @Operation(summary = "查询OTA激活状态", description = "返回OTA激活状态")
+    @Operation(summary = "Consultar status de ativação OTA", description = "Retorna o status de ativação OTA")
     public ResponseEntity<String> otaActivate(
-        @Parameter(name = "Device-Id", description = "设备唯一标识", in = ParameterIn.HEADER)
+        @Parameter(name = "Device-Id", description = "Identificador único do dispositivo", in = ParameterIn.HEADER)
         @RequestHeader(value = "Device-Id", required = false) String deviceId) {
         try {
             return deviceAppService.checkOtaActivation(deviceId)
                     ? ResponseEntity.ok("success")
                     : ResponseEntity.status(202).build();
         } catch (RuntimeException e) {
-            log.error("OTA激活失败", e);
+            log.error("Falha na ativação OTA", e);
             return ResponseEntity.status(202).build();
         }
     }
 
     /**
-     * 从 HTTP 请求中解析出 OTA 所需的设备信息。
+     * Extrai da requisição HTTP as informações do dispositivo necessárias para a OTA.
      */
     private OtaReq parseOtaRequest(String deviceIdHeader, String requestBody, HttpServletRequest request) {
         OtaReq req = new OtaReq();
@@ -166,11 +166,11 @@ public class DeviceController extends BaseController {
             try {
                 jsonData = JsonUtil.OBJECT_MAPPER.readValue(requestBody, new TypeReference<>() {});
             } catch (IOException e) {
-                log.debug("JSON解析失败: {}", e.getMessage());
+                log.debug("Falha ao analisar JSON: {}", e.getMessage());
             }
         }
 
-        // --- 设备ID：优先 Header，其次 Body ---
+        // --- ID do dispositivo: prioriza o Header, depois o Body ---
         if (StringUtils.isNotBlank(deviceIdHeader)) {
             req.setDeviceId(deviceIdHeader);
         } else {
@@ -182,7 +182,7 @@ public class DeviceController extends BaseController {
             }
         }
 
-        // --- 硬件 / 网络信息 ---
+        // --- Informações de hardware / rede ---
         if (jsonData.get("chip_model_name") instanceof String chipModel) {
             req.setChipModelName(chipModel);
         }
@@ -211,7 +211,7 @@ public class DeviceController extends BaseController {
             headers.setContentLength(responseBytes.length);
             return new ResponseEntity<>(responseBytes, headers, status);
         } catch (JsonProcessingException e) {
-            log.error("序列化OTA响应失败", e);
+            log.error("Falha ao serializar a resposta OTA", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
