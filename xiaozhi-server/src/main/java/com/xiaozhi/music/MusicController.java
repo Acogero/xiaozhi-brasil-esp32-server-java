@@ -15,7 +15,7 @@ import java.nio.file.Path;
 
 @RestController
 @RequestMapping("/api/file")
-@Tag(name = "音乐控制器", description = "音乐相关操作")
+@Tag(name = "Controller de música", description = "Operações relacionadas a música")
 @Slf4j
 public class MusicController {
 
@@ -24,26 +24,26 @@ public class MusicController {
 
     @PostMapping("/music")
     @ResponseBody
-    public String uploadMusic(@Parameter(description = "上传的音乐文件") @RequestParam("file") MultipartFile file) {
+    public String uploadMusic(@Parameter(description = "Arquivo de música enviado") @RequestParam("file") MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            return "上传失败";
+            return "Falha no upload";
         }
 
         String originalFilename = file.getOriginalFilename();
         if (!StringUtils.hasText(originalFilename)) {
-            return "上传失败";
+            return "Falha no upload";
         }
         if (!originalFilename.equals("playlist.txt") && !originalFilename.endsWith(".mp3")) {
-            return "上传失败";
+            return "Falha no upload";
         }
         try {
             Path musicPath = Path.of(runtimePathConfig.getMusicDir());
             Files.createDirectories(musicPath);
             file.transferTo(musicPath.resolve(originalFilename));
-            return originalFilename + "，上传成功";
+            return originalFilename + ", upload realizado com sucesso";
         } catch (IOException e) {
-            log.error("上传失败", e);
-            return "上传失败";
+            log.error("Falha no upload", e);
+            return "Falha no upload";
         }
     }
 }
