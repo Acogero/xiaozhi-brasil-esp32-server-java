@@ -76,7 +76,7 @@ class UserControllerTest extends ControllerTestSupport {
             mockMvc.perform(get("/api/user/check-token"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(ResultStatus.UNAUTHORIZED))
-                .andExpect(jsonPath("$.message").value("Token无效或已过期"));
+                .andExpect(jsonPath("$.message").value("Token inválido ou expirado"));
         }
     }
 
@@ -108,7 +108,7 @@ class UserControllerTest extends ControllerTestSupport {
                     {"email":"nobody@example.com","type":"forget"}
                     """))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.message").value("该邮箱未注册"));
+            .andExpect(jsonPath("$.message").value("Este e-mail não está cadastrado"));
     }
 
     @Test
@@ -118,6 +118,6 @@ class UserControllerTest extends ControllerTestSupport {
         mockMvc.perform(get("/api/user/checkUser").param("tel", "13800138000"))
             .andExpect(status().isConflict())
             .andExpect(jsonPath("$.code").value(ResultStatus.CONFLICT))
-            .andExpect(jsonPath("$.message").value("手机已注册"));
+            .andExpect(jsonPath("$.message").value("Este número já está cadastrado"));
     }
 }

@@ -44,7 +44,7 @@ class MusicControllerTest extends ControllerTestSupport {
 
         mockMvc.perform(multipart("/api/file/music").file(file))
             .andExpect(status().isOk())
-            .andExpect(content().string("上传失败"));
+            .andExpect(content().string("Falha no upload"));
     }
 
     @Test
@@ -55,7 +55,7 @@ class MusicControllerTest extends ControllerTestSupport {
 
         mockMvc.perform(multipart("/api/file/music").file(file))
             .andExpect(status().isOk())
-            .andExpect(content().string(fileName + "，上传成功"));
+            .andExpect(content().string(fileName + ", upload realizado com sucesso"));
 
         assertThat(Files.exists(uploadedFile)).isTrue();
     }

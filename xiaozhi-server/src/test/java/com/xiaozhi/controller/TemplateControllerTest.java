@@ -50,7 +50,7 @@ class TemplateControllerTest extends ControllerTestSupport {
     void listReturnsPagedTemplatesForCurrentUser() throws Exception {
         TemplateResp resp = new TemplateResp();
         resp.setTemplateId(1);
-        resp.setTemplateName("欢迎词");
+        resp.setTemplateName("Mensagem de boas-vindas");
         PageResp<TemplateResp> pageResp = new PageResp<>(List.of(resp), 1L, 1, 10);
         when(templateAppService.page(any(TemplatePageReq.class), eq(7))).thenReturn(pageResp);
 
@@ -68,7 +68,7 @@ class TemplateControllerTest extends ControllerTestSupport {
     @Test
     void createReturnsBadRequestWhenTemplateNameMissing() throws Exception {
         TemplateCreateReq req = new TemplateCreateReq();
-        req.setTemplateContent("你好");
+        req.setTemplateContent("Olá");
         req.setCategory("system");
 
         try (var ignored = mockLoginUser(7)) {
@@ -77,17 +77,17 @@ class TemplateControllerTest extends ControllerTestSupport {
                     .content(toJson(req)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(ResultStatus.BAD_REQUEST))
-                .andExpect(jsonPath("$.message").value("模板名称不能为空"));
+                .andExpect(jsonPath("$.message").value("O nome do modelo não pode estar vazio"));
         }
     }
 
     @Test
     void deleteReturnsNotFoundWhenTemplateMissing() throws Exception {
-        doThrow(new ResourceNotFoundException("模板不存在或无权访问")).when(templateAppService).delete(7);
+        doThrow(new ResourceNotFoundException("Modelo não encontrado ou sem permissão de acesso")).when(templateAppService).delete(7);
 
         mockMvc.perform(delete("/api/template/7"))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.code").value(ResultStatus.NOT_FOUND))
-            .andExpect(jsonPath("$.message").value("模板不存在或无权访问"));
+            .andExpect(jsonPath("$.message").value("Modelo não encontrado ou sem permissão de acesso"));
     }
 }

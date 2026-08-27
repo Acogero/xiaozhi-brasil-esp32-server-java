@@ -53,12 +53,12 @@ abstract class ControllerTestSupport {
         MockedStatic<StpUtil> stpUtil = mockStatic(StpUtil.class);
         stpUtil.when(StpUtil::isLogin).thenReturn(false);
         stpUtil.when(StpUtil::getLoginId).thenReturn(null);
-        stpUtil.when(StpUtil::getLoginIdAsInt).thenThrow(new IllegalStateException("无法获取当前登录用户"));
+        stpUtil.when(StpUtil::getLoginIdAsInt).thenThrow(new IllegalStateException("Não foi possível obter o usuário logado no momento"));
         stpUtil.when(StpUtil::getTokenValue).thenReturn(null);
         return stpUtil;
     }
 
-    /** 反射注入 @Resource 字段，用于 standalone MockMvc 测试 */
+    /** Injeta campos @Resource via reflexão, para uso em testes MockMvc standalone */
     protected static void injectField(Object target, String fieldName, Object value) {
         try {
             Field field = target.getClass().getDeclaredField(fieldName);

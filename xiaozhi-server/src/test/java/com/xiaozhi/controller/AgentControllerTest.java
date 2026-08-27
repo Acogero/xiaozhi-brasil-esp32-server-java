@@ -44,7 +44,7 @@ class AgentControllerTest extends ControllerTestSupport {
     void listReturnsPagedAgentsForCurrentUser() throws Exception {
         AgentResp agentResp = new AgentResp();
         agentResp.setAgentId(1);
-        agentResp.setAgentName("讲解员");
+        agentResp.setAgentName("Narrador");
         PageResp<AgentResp> pageResp = new PageResp<>(List.of(agentResp), 1L, 1, 10);
         when(agentAppService.page(any(AgentPageReq.class), eq(7))).thenReturn(pageResp);
 
@@ -56,7 +56,7 @@ class AgentControllerTest extends ControllerTestSupport {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(ResultStatus.SUCCESS))
                 .andExpect(jsonPath("$.data.list[0].agentId").value(1))
-                .andExpect(jsonPath("$.data.list[0].agentName").value("讲解员"));
+                .andExpect(jsonPath("$.data.list[0].agentName").value("Narrador"));
         }
 
         verify(agentAppService).page(any(AgentPageReq.class), eq(7));

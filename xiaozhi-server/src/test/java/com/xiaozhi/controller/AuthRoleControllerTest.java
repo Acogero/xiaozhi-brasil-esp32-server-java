@@ -47,7 +47,7 @@ class AuthRoleControllerTest extends ControllerTestSupport {
     void listReturnsPagedAuthRoles() throws Exception {
         AuthRoleResp resp = new AuthRoleResp();
         resp.setAuthRoleId(1);
-        resp.setAuthRoleName("管理员");
+        resp.setAuthRoleName("Administrador");
         PageResp<AuthRoleResp> pageResp = new PageResp<>(List.of(resp), 1L, 1, 10);
         when(authRoleAppService.page(any(AuthRolePageReq.class))).thenReturn(pageResp);
 
