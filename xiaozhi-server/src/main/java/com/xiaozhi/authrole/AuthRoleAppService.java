@@ -11,12 +11,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * AuthRole 领域应用服务。
+ * Serviço de aplicação do domínio AuthRole.
  * <p>
- * 职责：编排 Controller → Domain Service 之间的流程，包括：
+ * Responsabilidade: orquestra o fluxo entre o Controller e o Domain Service, incluindo:
  * <ul>
- *   <li>Req/Resp ↔ BO 转换</li>
- *   <li>权限角色管理编排</li>
+ *   <li>Conversão Req/Resp ↔ BO</li>
+ *   <li>Orquestração do gerenciamento de papéis de permissão</li>
  * </ul>
  */
 @Service
