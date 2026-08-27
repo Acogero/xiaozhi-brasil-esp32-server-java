@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 /**
- * 配置管理
+ * Gerenciamento de configurações
  * 
  * @author Joey
  * 
@@ -28,14 +28,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/config")
-@Tag(name = "配置管理", description = "配置相关操作")
+@Tag(name = "Gerenciamento de configurações", description = "Operações relacionadas a configurações")
 public class ConfigController extends BaseController {
 
     @Resource
     private ConfigAppService configAppService;
 
     /**
-     * 配置查询
+     * Consulta de configurações
      *
      * @param config
      * @return configList
@@ -43,56 +43,56 @@ public class ConfigController extends BaseController {
     @GetMapping("")
     @ResponseBody
     @SaCheckPermission("system:config:api:list")
-    @Operation(summary = "根据条件查询配置", description = "返回配置信息列表")
+    @Operation(summary = "Consulta configurações de acordo com os filtros", description = "Retorna a lista de configurações")
     public ApiResponse<?> list(@Valid ConfigPageReq req) {
         return ApiResponse.success(configAppService.page(req, StpUtil.getLoginIdAsInt()));
     }
 
     /**
-     * 配置信息更新
+     * Atualização das informações de configuração
      *
-     * @param configId 配置ID
-     * @param param 更新参数
+     * @param configId ID da configuração
+     * @param param parâmetros de atualização
      * @return
      */
     @PutMapping("/{configId}")
     @ResponseBody
     @SaCheckPermission("system:config:api:update")
     @CheckOwner(resource = "config", id = "#configId")
-    @AuditLog(module = "配置管理", operation = "更新配置")
-    @Operation(summary = "更新配置信息", description = "更新LLM/STT/TTS配置")
+    @AuditLog(module = "Gerenciamento de configurações", operation = "Atualizar configuração")
+    @Operation(summary = "Atualizar informações de configuração", description = "Atualizar configuração de LLM/STT/TTS")
     public ApiResponse<?> update(@PathVariable Integer configId, @Valid @RequestBody ConfigUpdateReq req) {
         return ApiResponse.success(configAppService.update(configId, req));
     }
 
     /**
-     * 添加配置
+     * Adicionar configuração
      *
-     * @param param 添加参数
+     * @param param parâmetros de criação
      */
     @PostMapping("")
     @ResponseBody
     @SaCheckPermission("system:config:api:create")
-    @AuditLog(module = "配置管理", operation = "创建配置")
-    @Operation(summary = "添加配置信息", description = "添加新的LLM/STT/TTS配置")
+    @AuditLog(module = "Gerenciamento de configurações", operation = "Criar configuração")
+    @Operation(summary = "Adicionar informações de configuração", description = "Adiciona uma nova configuração de LLM/STT/TTS")
     public ApiResponse<?> create(@Valid @RequestBody ConfigCreateReq req) {
         return ApiResponse.success(configAppService.create(req, StpUtil.getLoginIdAsInt()));
     }
 
     /**
-     * 删除配置信息
+     * Excluir informações de configuração
      *
-     * @param configId 配置ID
+     * @param configId ID da configuração
      * @return
      */
     @DeleteMapping("/{configId}")
     @ResponseBody
     @SaCheckPermission("system:config:api:delete")
     @CheckOwner(resource = "config", id = "#configId")
-    @AuditLog(module = "配置管理", operation = "删除配置")
-    @Operation(summary = "删除配置信息", description = "软删除指定配置")
+    @AuditLog(module = "Gerenciamento de configurações", operation = "Excluir configuração")
+    @Operation(summary = "Excluir informações de configuração", description = "Exclui (de forma lógica) a configuração informada")
     public ApiResponse<?> delete(@PathVariable Integer configId) {
         configAppService.delete(configId);
-        return ApiResponse.success("删除成功");
+        return ApiResponse.success("Excluído com sucesso");
     }
 }
