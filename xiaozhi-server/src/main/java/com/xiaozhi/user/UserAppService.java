@@ -35,14 +35,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 用户领域应用服务。
+ * Serviço de aplicação do domínio de usuários.
  * <p>
- * 职责：编排 Controller → Domain Service 之间的流程，包括：
+ * Responsabilidade: orquestra o fluxo entre o Controller e o Domain Service, incluindo:
  * <ul>
- *   <li>Req/Resp ↔ BO 转换</li>
- *   <li>跨领域编排（注册时：复制角色模板、创建虚拟设备）</li>
- *   <li>认证协调（登录、密码加密、验证码校验）</li>
- *   <li>登录响应组装（Token、权限、角色信息）</li>
+ *   <li>Conversão Req/Resp ↔ BO</li>
+ *   <li>Orquestração entre domínios (no cadastro: copia o modelo de papel, cria dispositivo virtual)</li>
+ *   <li>Coordenação de autenticação (login, criptografia de senha, validação de código de verificação)</li>
+ *   <li>Montagem da resposta de login (Token, permissões, informações do papel)</li>
  * </ul>
  */
 @Service
@@ -82,7 +82,7 @@ public class UserAppService {
     @Resource
     private PermissionService permissionService;
 
-    // ==================== 查询 ====================
+    // ==================== Consulta ====================
 
     public PageResp<UserResp> page(UserPageReq req) {
         UserPageReq r = req == null ? new UserPageReq() : req;
@@ -94,16 +94,16 @@ public class UserAppService {
         return userConvert.toResp(userService.getBO(userId));
     }
 
-    // ==================== 注册 ====================
+    // ==================== Cadastro ====================
 
     @Transactional
     public UserResp register(UserRegisterReq req) {
         String account = StringUtils.hasText(req.getEmail()) ? req.getEmail() : req.getTel();
         if (!StringUtils.hasText(account)) {
-            throw new IllegalArgumentException("邮箱或手机号至少填写一个");
+            throw new IllegalArgumentException("Informe pelo menos o e-mail ou o número de celular");
         }
         if (!userService.checkCaptcha(account, req.getCode())) {
-            throw new IllegalArgumentException("无效验证码");
+            throw new IllegalArgumentException("Código de verificação inválido");
         }
 
         UserBO user = userConvert.toBO(req);
@@ -113,8 +113,8 @@ public class UserAppService {
     }
 
     /**
-     * 创建用户并初始化默认资源（角色、模板、虚拟设备）。
-     * 供注册、手机号登录自动注册、微信登录自动注册共用。
+     * Cria o usuário e inicializa os recursos padrão (papel, modelo, dispositivo virtual).
+     * Compartilhado pelo cadastro, pelo cadastro automático no login por celular e pelo cadastro automático no login com WeChat.
      */
     @Transactional
     public UserBO createUserWithDefaults(UserBO user) {
@@ -128,19 +128,19 @@ public class UserAppService {
         }
 
         Device virtualDevice = Device.newDevice(
-                "user_chat_" + userId, "网页聊天", "web", userId, defaultRoleId);
+                "user_chat_" + userId, "Chat via navegador", "web", userId, defaultRoleId);
         deviceRepository.save(virtualDevice);
 
         return created;
     }
 
-    // ==================== 更新 ====================
+    // ==================== Atualização ====================
 
     @Transactional
     public UserResp update(Integer userId, UserUpdateReq req) {
         UserBO existing = userService.getBO(userId);
         if (existing == null) {
-            throw new ResourceNotFoundException("无此用户，更新失败");
+            throw new ResourceNotFoundException("Usuário não encontrado, falha ao atualizar");
         }
         userConvert.updateBO(req, existing);
         if (StringUtils.hasText(req.getPassword())) {
@@ -151,16 +151,16 @@ public class UserAppService {
         return userConvert.toResp(userService.getBO(userId));
     }
 
-    // ==================== 密码重置 ====================
+    // ==================== Redefinição de senha ====================
 
     @Transactional
     public void resetPassword(UserResetPasswordReq req) {
         if (!userService.checkCaptcha(req.getEmail(), req.getCode())) {
-            throw new IllegalArgumentException("验证码错误或已过期");
+            throw new IllegalArgumentException("Código de verificação incorreto ou expirado");
         }
         UserBO user = userService.getByEmail(req.getEmail());
         if (user == null) {
-            throw new IllegalArgumentException("该邮箱未注册");
+            throw new IllegalArgumentException("Este e-mail não está cadastrado");
         }
 
         UserBO updateUser = new UserBO();
@@ -169,7 +169,7 @@ public class UserAppService {
         userService.update(updateUser);
     }
 
-    // ==================== 登录 ====================
+    // ==================== Login ====================
 
     public UserBO login(String username, String password) {
         UserBO user = userService.getByUsername(username);
