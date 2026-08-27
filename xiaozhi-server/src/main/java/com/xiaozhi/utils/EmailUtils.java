@@ -9,7 +9,7 @@ import static io.github.biezhi.ome.OhMyEmail.SMTP_QQ;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 邮件发送工具类
+ * Classe utilitária de envio de e-mail
  * 
  * @author Joey
  */
@@ -24,109 +24,109 @@ public class EmailUtils {
     private String emailPassword;
     
     /**
-     * 发送邮件
+     * Enviar e-mail
      * 
-     * @param to 收件人邮箱
-     * @param subject 邮件主题
-     * @param content 邮件内容
-     * @return 发送结果
+     * @param to e-mail do destinatário
+     * @param subject assunto do e-mail
+     * @param content conteúdo do e-mail
+     * @return resultado do envio
      */
     public boolean sendEmail(String to, String subject, String content) {
-        return sendEmail(to, subject, content, "小智物联网管理平台");
+        return sendEmail(to, subject, content, "Plataforma de gerenciamento IoT Xiaozhi");
     }
     
     /**
-     * 发送邮件
+     * Enviar e-mail
      * 
-     * @param to 收件人邮箱
-     * @param subject 邮件主题
-     * @param content 邮件内容
-     * @param fromName 发件人名称
-     * @return 发送结果
+     * @param to e-mail do destinatário
+     * @param subject assunto do e-mail
+     * @param content conteúdo do e-mail
+     * @param fromName nome do remetente
+     * @return resultado do envio
      */
     public boolean sendEmail(String to, String subject, String content, String fromName) {
         try {
-            // 验证邮箱格式
+            // Valida o formato do e-mail
             if (!isValidEmail(to)) {
-                log.error("邮箱格式不正确: {}", to);
+                log.error("Formato de e-mail inválido: {}", to);
                 return false;
             }
             
-            // 检查邮箱配置
+            // Verifica a configuração de e-mail
             if (!StringUtils.hasText(emailUsername) || !StringUtils.hasText(emailPassword)) {
-                log.error("未配置第三方邮箱认证信息");
+                log.error("Informações de autenticação de e-mail de terceiros não configuradas");
                 return false;
             }
             
-            // 配置邮件发送
+            // Configura o envio de e-mail
             OhMyEmail.config(SMTP_QQ(false), emailUsername, emailPassword);
             
-            // 发送邮件
+            // Envia o e-mail
             OhMyEmail.subject(subject)
                     .from(fromName)
                     .to(to)
                     .html(content)
                     .send();
             
-            log.info("邮件发送成功: {} -> {}", fromName, to);
+            log.info("E-mail enviado com sucesso: {} -> {}", fromName, to);
             return true;
             
         } catch (Exception e) {
             String errorMsg = getErrorMessage(e);
-            log.error("邮件发送失败: {} -> {}, 错误: {}", fromName, to, errorMsg, e);
+            log.error("Falha ao enviar e-mail: {} -> {}, erro: {}", fromName, to, errorMsg, e);
             return false;
         }
     }
     
     /**
-     * 发送验证码邮件
+     * Enviar e-mail de código de verificação
      * 
-     * @param to 收件人邮箱
-     * @param code 验证码
-     * @return 发送结果
+     * @param to e-mail do destinatário
+     * @param code código de verificação
+     * @return resultado do envio
      */
     public boolean sendCaptchaEmail(String to, String code) {
-        String subject = "小智ESP32-智能物联网管理平台";
-        String content = "尊敬的用户您好!您的验证码为:<h3>" + code + "</h3>如不是您操作,请忽略此邮件.(有效期10分钟)";
+        String subject = "Xiaozhi ESP32 - Plataforma de gerenciamento de IoT inteligente";
+        String content = "Prezado(a) usuário(a), olá! Seu código de verificação é: <h3>" + code + "</h3>Se não foi você quem solicitou, ignore este e-mail. (Válido por 10 minutos)";
         return sendEmail(to, subject, content);
     }
     
     /**
-     * 简单验证邮箱格式
+     * Valida o formato do e-mail de forma simples
      * 
-     * @param email 邮箱地址
-     * @return 是否有效
+     * @param email endereço de e-mail
+     * @return se é válido
      */
     private boolean isValidEmail(String email) {
         if (email == null || email.isEmpty()) {
             return false;
         }
-        // 简单的邮箱格式验证，包含@符号且@后面有.
+        // Validação simples do formato do e-mail: contém o símbolo @ e um ponto após o @
         return email.matches("^[^@]+@[^@]+\\.[^@]+$");
     }
     
     /**
-     * 根据异常类型获取错误信息
+     * Obtém a mensagem de erro de acordo com o tipo de exceção
      * 
-     * @param e 异常
-     * @return 错误信息
+     * @param e exceção
+     * @return mensagem de erro
      */
     private String getErrorMessage(Exception e) {
         if (e.getMessage() == null) {
-            return "发送失败";
+            return "Falha no envio";
         }
         
         String message = e.getMessage();
         if (message.contains("non-existent account") ||
                 message.contains("550") ||
                 message.contains("recipient")) {
-            return "邮箱地址不存在或无效";
+            return "Endereço de e-mail inexistente ou inválido";
         } else if (message.contains("Authentication failed")) {
-            return "邮箱服务认证失败，请联系管理员";
+            return "Falha na autenticação do serviço de e-mail, entre em contato com o administrador";
         } else if (message.contains("timed out")) {
-            return "邮件发送超时，请稍后重试";
+            return "Tempo limite ao enviar e-mail, tente novamente mais tarde";
         }
         
-        return "发送失败: " + message;
+        return "Falha no envio: " + message;
     }
 }

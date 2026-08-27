@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 短信工具类
+ * Classe utilitária de SMS
  *
  * @author Joey
  */
@@ -30,58 +30,58 @@ public class SmsUtils {
     private String templateCode;
 
     /**
-     * 发送验证码短信
+     * Enviar SMS com código de verificação
      * 
-     * @param phoneNumber 手机号
-     * @param verificationCode 验证码
-     * @return 是否发送成功
+     * @param phoneNumber número de celular
+     * @param verificationCode código de verificação
+     * @return se o envio foi bem-sucedido
      */
     public boolean sendVerificationCodeSms(String phoneNumber, String verificationCode) {
         try {
-            // 创建Aliyun客户端
+            // Cria o cliente da Aliyun
             Client client = createClient();
             
-            // 构建短信请求
+            // Monta a requisição de SMS
             SendSmsRequest sendSmsRequest = new SendSmsRequest()
                 .setSignName(signName)
                 .setTemplateCode(templateCode)
                 .setPhoneNumbers(phoneNumber)
                 .setTemplateParam(String.format("{\"code\":\"%s\"}", verificationCode));
             
-            // 发送短信
+            // Envia o SMS
             RuntimeOptions runtime = new RuntimeOptions();
             SendSmsResponse sendSmsResponse = client.sendSmsWithOptions(sendSmsRequest, runtime);
             
-            // 记录请求ID
-            log.info("发送短信响应的requestID: {}", sendSmsResponse.getBody().getRequestId());
+            // Registra o ID da requisição
+            log.info("requestID da resposta do envio de SMS: {}", sendSmsResponse.getBody().getRequestId());
             
-            // 检查发送结果
+            // Verifica o resultado do envio
             String code = sendSmsResponse.getBody().getCode();
             if ("OK".equals(code)) {
-                log.info("短信发送成功，手机号: {}", phoneNumber);
+                log.info("SMS enviado com sucesso, número: {}", phoneNumber);
                 return true;
             } else {
-                log.error("短信发送失败，错误码: {}, 错误信息: {}", code, sendSmsResponse.getBody().getMessage());
+                log.error("Falha no envio do SMS, código de erro: {}, mensagem de erro: {}", code, sendSmsResponse.getBody().getMessage());
                 return false;
             }
         } catch (Exception e) {
-            log.error("发送短信异常: {}", e.getMessage(), e);
+            log.error("Exceção ao enviar SMS: {}", e.getMessage(), e);
             return false;
         }
     }
 
     /**
-     * 创建阿里云短信客户端
+     * Cria o cliente de SMS da Alibaba Cloud
      * 
-     * @return 阿里云客户端
-     * @throws Exception 如果创建失败
+     * @return cliente da Alibaba Cloud
+     * @throws Exception se a criação falhar
      */
     private Client createClient() throws Exception {
         Config config = new Config()
             .setAccessKeyId(accessKeyId)
             .setAccessKeySecret(accessKeySecret);
         
-        // 配置 Endpoint
+        // Configura o Endpoint
         config.endpoint = "dysmsapi.aliyuncs.com";
         return new Client(config);
     }
