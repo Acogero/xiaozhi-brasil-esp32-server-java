@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/api/message")
-@Tag(name = "消息管理", description = "消息相关操作")
+@Tag(name = "Gerenciamento de mensagens", description = "Operações relacionadas a mensagens")
 public class MessageController extends BaseController {
 
     @Resource
@@ -36,7 +36,7 @@ public class MessageController extends BaseController {
     @GetMapping("")
     @ResponseBody
     @SaCheckPermission(value = {"system:role:memory:chat:api:list", "system:chat"}, mode = SaMode.OR)
-    @Operation(summary = "根据条件查询对话消息", description = "返回对话消息列表")
+    @Operation(summary = "Consulta mensagens de conversa de acordo com os filtros", description = "Retorna a lista de mensagens de conversa")
     public ApiResponse<?> list(@Valid MessagePageReq req) {
         return ApiResponse.success(messageAppService.page(req, StpUtil.getLoginIdAsInt()));
     }
@@ -44,7 +44,7 @@ public class MessageController extends BaseController {
     @GetMapping("/conversations")
     @ResponseBody
     @SaCheckPermission("system:chat")
-    @Operation(summary = "查询用户的会话列表", description = "返回当前用户的历史会话列表，基于sessionId聚合")
+    @Operation(summary = "Consulta a lista de sessões do usuário", description = "Retorna o histórico de sessões do usuário atual, agrupado por sessionId")
     public ApiResponse<?> conversations(@Valid ConversationPageReq req) {
         return ApiResponse.success(messageAppService.conversationPage(req, StpUtil.getLoginIdAsInt()));
     }
@@ -53,22 +53,22 @@ public class MessageController extends BaseController {
     @ResponseBody
     @SaCheckPermission("system:role:memory:chat:api:delete")
     @CheckOwner(resource = "message", id = "#messageId")
-    @AuditLog(module = "消息管理", operation = "删除消息")
-    @Operation(summary = "删除对话消息", description = "删除指定的对话消息，逻辑删除")
+    @AuditLog(module = "Gerenciamento de mensagens", operation = "Excluir mensagem")
+    @Operation(summary = "Excluir mensagem de conversa", description = "Exclui a mensagem de conversa informada (exclusão lógica)")
     public ApiResponse<?> delete(@PathVariable Integer messageId) {
         messageAppService.delete(messageId);
-        return ApiResponse.success("删除成功");
+        return ApiResponse.success("Excluído com sucesso");
     }
 
     @DeleteMapping("")
     @ResponseBody
     @SaCheckPermission("system:device:memory:api:delete")
     @CheckOwner(resource = "device", id = "#deviceId")
-    @AuditLog(module = "消息管理", operation = "批量删除设备消息")
-    @Operation(summary = "批量删除设备消息", description = "清除指定设备的所有聊天记录")
+    @AuditLog(module = "Gerenciamento de mensagens", operation = "Excluir mensagens de dispositivo em lote")
+    @Operation(summary = "Excluir mensagens de dispositivo em lote", description = "Limpa todo o histórico de chat do dispositivo informado")
     public ApiResponse<?> batchDelete(@RequestParam String deviceId) {
         int rows = messageAppService.deleteByDeviceId(deviceId);
-        log.info("清除设备记忆，删除聊天记录：{}行。", rows);
-        return ApiResponse.success("删除成功，共删除" + rows + "条消息");
+        log.info("Memória do dispositivo limpa, histórico de chat removido: {} linha(s).", rows);
+        return ApiResponse.success("Exclusão concluída, total de " + rows + " mensagem(ns) excluída(s)");
     }
 }
