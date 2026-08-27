@@ -1,15 +1,15 @@
 # ============================================================
-# 通用配置（所有环境共享）
+# Configuração comum (compartilhada por todos os ambientes)
 # ============================================================
 
 server:
   port: 8091
   tomcat:
     mbeanregistry:
-      enabled: true  # 启用 Tomcat MBean，自动获得 tomcat_global_sent/received_bytes_total
+      enabled: true  # Habilita o MBean do Tomcat, obtendo automaticamente tomcat_global_sent/received_bytes_total
 
 # ============================================================
-# MyBatis 配置
+# Configuração do MyBatis
 # ============================================================
 mybatis:
   mapper-locations: classpath*:mapper/*.xml,classpath*:mapper/**/*.xml
@@ -21,7 +21,7 @@ mybatis-plus:
     map-underscore-to-camel-case: false
 
 # ============================================================
-# 数据源配置
+# Configuração da fonte de dados
 # ============================================================
 spring:
   datasource:
@@ -40,11 +40,11 @@ spring:
       keepalive-time: 30000
       register-mbeans: true
 
-  # Redis 缓存配置
+  # Configuração de cache Redis
   cache:
     type: redis
 
-  # Flyway 数据库版本管理
+  # Gerenciamento de versão do banco de dados via Flyway
   flyway:
     enabled: true
     locations: classpath:db/migration
@@ -55,47 +55,47 @@ spring:
 
   data:
     redis:
-      # Redis 服务器地址（Spring Data Redis 和 Redisson 自动共享此配置）
+      # Endereço do servidor Redis (compartilhado automaticamente entre Spring Data Redis e Redisson)
       host: localhost
       port: 6379
       database: 0
-      # Lettuce 连接池配置（默认不开池，所有线程共享单连接，高并发下会成为瓶颈）
+      # Configuração do pool de conexões Lettuce (pool desativado por padrão; todas as threads compartilham uma única conexão, o que pode virar gargalo em alta concorrência)
       lettuce:
         pool:
-          max-active: 16    # 最大活跃连接数
-          max-idle: 8       # 最大空闲连接数
-          min-idle: 2       # 最小空闲连接数
-          max-wait: 3s      # 获取连接最大等待时间
-      # Redisson 高级配置文件（用于分布式锁、布隆过滤器等高级功能）
+          max-active: 16    # Número máximo de conexões ativas
+          max-idle: 8       # Número máximo de conexões ociosas
+          min-idle: 2       # Número mínimo de conexões ociosas
+          max-wait: 3s      # Tempo máximo de espera para obter uma conexão
+      # Arquivo de configuração avançada do Redisson (usado para lock distribuído, bloom filter e outros recursos avançados)
       redisson:
         config: classpath:redisson-config.yml
 
-  # 文件上传配置
+  # Configuração de upload de arquivos
   servlet:
     multipart:
       enabled: true
       max-file-size: 100MB
       max-request-size: 100MB
 
-  # JMX 配置
+  # Configuração do JMX
   jmx:
     enabled: false
 
-  # 虚拟线程
+  # Threads virtuais
   threads:
     virtual:
       enabled: true
 
-  # 静态资源配置
+  # Configuração de recursos estáticos
   web:
     resources:
       add-mappings: true
 
-  # 激活的配置文件（默认为开发环境）
+  # Perfil ativo (padrão: ambiente de desenvolvimento)
   profiles:
     active: dev
 
-  # MCP 客户端配置
+  # Configuração do cliente MCP
   ai:
     mcp:
       client:
@@ -104,7 +104,7 @@ spring:
         request-timeout: 60s
 
 # ============================================================
-# 日志配置
+# Configuração de log
 # ============================================================
 logging:
   level:
@@ -114,11 +114,11 @@ logging:
     io.netty.handler: ERROR
 
 # ============================================================
-# 小智扩展配置
+# Configurações específicas do Xiaozhi
 # ============================================================
 xiaozhi:
   runtime:
-    # 生产环境建议改成绝对路径，避免模型目录和原生库目录依赖启动工作目录
+    # Em produção, recomenda-se usar caminhos absolutos, para que os diretórios de modelos e bibliotecas nativas não dependam do diretório de trabalho na inicialização
     native-lib-dir: lib
     vosk-model-dir: models/vosk-model
     tts-models-dir: models/tts
@@ -130,7 +130,7 @@ xiaozhi:
       session: true
 
 # ============================================================
-# SpringDoc OpenAPI 配置
+# Configuração do SpringDoc OpenAPI
 # ============================================================
 springdoc:
   api-docs:
@@ -141,39 +141,39 @@ springdoc:
     url: /v3/api-docs
 
 # ============================================================
-# Sa-Token 认证框架配置
+# Configuração do framework de autenticação Sa-Token
 # ============================================================
 sa-token:
-  # Token名称 (同时也是cookie名称)
+  # Nome do Token (também usado como nome do cookie)
   token-name: Authorization
 
-  # Token有效期 (单位:秒) 30天 = 2592000秒, -1表示永不过期
+  # Validade do Token (em segundos); 30 dias = 2592000 segundos, -1 significa que nunca expira
   timeout: 2592000
 
-  # Token最低活跃频率 (单位:秒), 如果token超过此时间没有访问系统就会被冻结, -1 表示不限制
+  # Frequência mínima de atividade do Token (em segundos); se o token ficar sem acesso ao sistema por mais tempo que isso, é congelado; -1 significa sem limite
   active-timeout: -1
 
-  # 是否允许同一账号多地同时登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
+  # Se a mesma conta pode ficar logada em vários lugares ao mesmo tempo (true permite login simultâneo; false faz o novo login substituir o anterior)
   is-concurrent: true
 
-  # 在多人登录同一账号时,是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
+  # Quando várias sessões usam a mesma conta, se compartilham o mesmo token (true: todos os logins compartilham um único token; false: cada login gera um novo token)
   is-share: false
 
-  # Token风格 (uuid、simple-uuid、random-32、random-64、random-128、tik)
+  # Estilo do Token (uuid, simple-uuid, random-32, random-64, random-128, tik)
   token-style: uuid
 
-  # 是否输出操作日志
+  # Se deve registrar logs de operação
   is-log: false
 
-  # 是否从cookie中读取token
+  # Se o token deve ser lido do cookie
   is-read-cookie: true
 
-  # 是否从header中读取token
+  # Se o token deve ser lido do header
   is-read-header: true
 
-  # token前缀, 例如填写 Bearer 之后客户端应该发送: Bearer {token}
+  # Prefixo do token; por exemplo, ao definir "Bearer", o cliente deve enviar: Bearer {token}
   token-prefix: Bearer
 
-  # JWT秘钥 (使用JWT Simple模式时必须配置，至少32位)
+  # Chave secreta do JWT (obrigatória ao usar o modo JWT Simple; mínimo de 32 caracteres)
   jwt-secret-key: xiaozhi-esp32-server-java-jwt-secret-key
 

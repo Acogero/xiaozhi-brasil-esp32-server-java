@@ -1,43 +1,43 @@
-# Flyway 数据库迁移脚本
+# Scripts de migração do banco de dados (Flyway)
 
-## 说明
+## Descrição
 
-- Flyway 会在应用启动时自动执行未执行的迁移脚本
-- 脚本按版本号顺序执行（V1 → V2 → V3...）
-- 已执行的脚本会记录在 `flyway_schema_history` 表中
-- **禁止修改已执行的脚本**，否则校验失败
+- O Flyway executa automaticamente as migrações pendentes na inicialização da aplicação
+- Os scripts são executados em ordem de versão (V1 → V2 → V3...)
+- Os scripts já executados ficam registrados na tabela `flyway_schema_history`
+- **É proibido alterar um script já executado**, ou a validação falhará
 
-## 命名规则
+## Regra de nomenclatura
 
 ```
-V{版本号}__{描述}.sql
+V{número da versão}__{descrição}.sql
 ```
 
-示例：
-- `V1__init.sql` - 初始化数据库
-- `V2__add_xxx.sql` - 添加某个字段
+Exemplos:
+- `V1__init.sql` - inicialização do banco de dados
+- `V2__add_xxx.sql` - adição de um campo
 
-## 当前迁移
+## Migração atual
 
-- `V1__init.sql` - 完整数据库初始化（基线版本）
+- `V1__init.sql` - inicialização completa do banco de dados (versão base)
 
-## 新增迁移
+## Adicionando uma nova migração
 
-1. 创建新脚本，版本号从 V2 开始递增：`V2__description.sql`
-2. 编写 SQL（只包含变更，不要包含完整建表）
-3. 提交到 Git
-4. 启动应用，Flyway 自动执行
+1. Crie um novo script, incrementando o número da versão a partir de V2: `V2__description.sql`
+2. Escreva o SQL (apenas a mudança, sem repetir a criação completa das tabelas)
+3. Faça commit no Git
+4. Inicie a aplicação; o Flyway executa automaticamente
 
-## 已有数据库
+## Banco de dados já existente
 
-如果数据库已存在，Flyway 会：
-1. 创建 `flyway_schema_history` 表
-2. 标记 V0 为 baseline（因为配置了 `baseline-on-migrate: true`）
-3. 只执行版本号 > 0 的新脚本
+Se o banco de dados já existir, o Flyway irá:
+1. Criar a tabela `flyway_schema_history`
+2. Marcar V0 como baseline (pois `baseline-on-migrate: true` está configurado)
+3. Executar apenas os novos scripts com número de versão > 0
 
-> **注意**：如果旧数据库存在 `flyway_schema_history` 表，需要先清空该表再启动应用。
+> **Atenção**: se um banco de dados antigo já tiver a tabela `flyway_schema_history`, é necessário limpá-la antes de iniciar a aplicação.
 
-## 查看迁移历史
+## Consultando o histórico de migrações
 
 ```sql
 SELECT * FROM flyway_schema_history ORDER BY installed_rank;
