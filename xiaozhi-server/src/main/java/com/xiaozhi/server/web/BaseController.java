@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.util.StringUtils;
 
 /**
- * @description: 基础控制器
+ * @description: Controller base
  *
  * @author Joey
  *
@@ -13,7 +13,7 @@ import org.springframework.util.StringUtils;
 public class BaseController {
 
     /**
-     * 最大分页数量
+     * Quantidade máxima de itens por página
      */
     public static final int MAX_PAGE_SIZE = 1000;
 

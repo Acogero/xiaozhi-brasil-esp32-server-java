@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 系统日志拦截器
+ * Interceptor de log do sistema
  */
 @Slf4j
 @Component
