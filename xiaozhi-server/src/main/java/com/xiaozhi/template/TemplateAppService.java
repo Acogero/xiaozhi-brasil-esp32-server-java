@@ -14,12 +14,12 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 /**
- * Template 领域应用服务。
+ * Serviço de aplicação do domínio Template.
  * <p>
- * 职责：编排 Controller → Domain Service 之间的流程，包括：
+ * Responsabilidade: orquestra o fluxo entre o Controller e o Domain Service, incluindo:
  * <ul>
- *   <li>Req/Resp ↔ BO 转换</li>
- *   <li>模板管理编排</li>
+ *   <li>Conversão Req/Resp ↔ BO</li>
+ *   <li>Orquestração do gerenciamento de modelos</li>
  * </ul>
  */
 @Service
@@ -47,7 +47,7 @@ public class TemplateAppService {
 
     public TemplateResp update(Integer templateId, TemplateUpdateReq req) {
         Template template = templateRepository.findById(templateId)
-                .orElseThrow(() -> new ResourceNotFoundException("模板不存在或无权访问"));
+                .orElseThrow(() -> new ResourceNotFoundException("Modelo não encontrado ou sem permissão de acesso"));
         template.update(templateConvert.toBO(req));
         templateRepository.save(template);
         return templateConvert.toResp(templateService.getBO(templateId));
