@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
     "com.xiaozhi.common",
     "com.xiaozhi.communication",
     "com.xiaozhi.utils",
-    // xiaozhi-service (全量)
+    // xiaozhi-service (completo)
     "com.xiaozhi.agent",
     "com.xiaozhi.authrole",
     "com.xiaozhi.config",
@@ -77,7 +77,7 @@ public class XiaozhiApplication {
     @EventListener(ApplicationReadyEvent.class)
     public void onReady() {
         log.info("==========================================================");
-        log.info("OTA服务地址: {}", serverAddressProvider.getOtaAddress());
+        log.info("Endereço do serviço OTA: {}", serverAddressProvider.getOtaAddress());
         log.info("==========================================================");
     }
 }
