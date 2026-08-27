@@ -19,12 +19,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 角色领域应用服务。
+ * Serviço de aplicação do domínio de papéis.
  * <p>
- * 职责：编排 Controller → Domain Service 之间的流程，包括：
+ * Responsabilidade: orquestra o fluxo entre o Controller e o Domain Service, incluindo:
  * <ul>
- *   <li>Req/Resp ↔ BO 转换</li>
- *   <li>Req/Resp 转换与业务编排</li>
+ *   <li>Conversão Req/Resp ↔ BO</li>
+ *   <li>Conversão Req/Resp e orquestração de negócio</li>
  * </ul>
  */
 @Service
@@ -56,14 +56,14 @@ public class RoleAppService {
         roleRepository.save(role);
 
         RoleBO created = roleService.getBO(role.getRoleId());
-        if (created == null) throw new IllegalStateException("创建角色失败");
+        if (created == null) throw new IllegalStateException("Falha ao criar papel");
         return roleConvert.toResp(created);
     }
 
     @Transactional
     public RoleResp update(Integer roleId, RoleUpdateReq req) {
         Role role = roleRepository.findById(roleId)
-                .orElseThrow(() -> new com.xiaozhi.common.exception.ResourceNotFoundException("角色不存在或无权访问"));
+                .orElseThrow(() -> new com.xiaozhi.common.exception.ResourceNotFoundException("Papel não encontrado ou sem permissão de acesso"));
 
         role.update(req.getRoleName(), req.getRoleDesc(), req.getAvatar(),
                 new LlmConfig(req.getModelId(), req.getTemperature(), req.getTopP()),
@@ -74,7 +74,7 @@ public class RoleAppService {
         roleRepository.save(role);
 
         RoleBO updated = roleService.getBO(roleId);
-        if (updated == null) throw new IllegalStateException("更新角色失败");
+        if (updated == null) throw new IllegalStateException("Falha ao atualizar papel");
         return roleConvert.toResp(updated);
     }
 
