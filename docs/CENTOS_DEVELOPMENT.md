@@ -1,15 +1,15 @@
-# CentOS 部署指南
+# Guia de Implantação no CentOS
 
-## 系统要求
+## Requisitos do Sistema
 
-| 项目 | 要求 |
+| Item | Requisito |
 |------|------|
-| 系统 | CentOS 7/8 |
-| 内存 | ≥ 2GB（推荐 4GB） |
-| 磁盘 | ≥ 10GB |
-| 端口 | 8084、8091、8092、3306 |
+| Sistema | CentOS 7/8 |
+| Memória | ≥ 2GB (recomendado 4GB) |
+| Disco | ≥ 10GB |
+| Portas | 8084, 8091, 8092, 3306 |
 
-## 1. 安装依赖
+## 1. Instalar Dependências
 
 ```bash
 sudo yum install -y epel-release wget curl git vim unzip
@@ -18,24 +18,24 @@ curl -sL https://rpm.nodesource.com/setup_22.x | sudo bash -
 sudo yum install -y nodejs
 ```
 
-## 2. 配置防火墙
+## 2. Configurar o Firewall
 
 ```bash
 sudo firewall-cmd --permanent --add-port={8084,8091,8092,3306}/tcp
 sudo firewall-cmd --reload
 ```
 
-## 3. 安装 MySQL 8.0
+## 3. Instalar o MySQL 8.0
 
 ```bash
 sudo yum localinstall -y https://dev.mysql.com/get/mysql80-community-release-el7-7.noarch.rpm
 sudo yum install -y mysql-community-server
 sudo systemctl start mysqld && sudo systemctl enable mysqld
-sudo grep 'temporary password' /var/log/mysqld.log   # 获取临时密码
+sudo grep 'temporary password' /var/log/mysqld.log   # obter a senha temporária
 sudo mysql_secure_installation
 ```
 
-创建数据库：
+Criar o banco de dados:
 
 ```sql
 mysql -u root -p
@@ -45,58 +45,58 @@ GRANT ALL PRIVILEGES ON xiaozhi.* TO 'xiaozhi'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
-> 无需手动导入 SQL，项目集成 Flyway，首次启动自动建表。
+> Não é necessário importar o SQL manualmente — o projeto integra o Flyway, que cria as tabelas automaticamente na primeira inicialização.
 
-## 4. 下载模型和原生库
+## 4. Baixar Modelos e Bibliotecas Nativas
 
-使用第三方 STT/TTS 服务可只下载基础依赖。
-
-```bash
-./scripts/download_models.sh            # 下载全部（模型 + 原生库）
-./scripts/download_models.sh status     # 查看状态
-```
-
-也可按需单独下载：
+Se estiver usando serviços de STT/TTS de terceiros, é possível baixar somente as dependências básicas.
 
 ```bash
-./scripts/download_base.sh              # 基础依赖（VAD 模型 + 原生库）— 必须
-./scripts/download_stt.sh               # Vosk STT 模型（使用第三方 STT 可跳过）
-./scripts/download_tts.sh               # TTS 模型（使用第三方 TTS 可跳过）
+./scripts/download_models.sh            # baixa tudo (modelos + bibliotecas nativas)
+./scripts/download_models.sh status     # verifica o status
 ```
 
-## 5. 部署
+Também é possível baixar individualmente, conforme a necessidade:
 
-项目采用**双进程架构**：
+```bash
+./scripts/download_base.sh              # dependências básicas (modelo VAD + bibliotecas nativas) — obrigatório
+./scripts/download_stt.sh               # modelo Vosk STT (pode ser pulado se usar STT de terceiros)
+./scripts/download_tts.sh               # modelo TTS (pode ser pulado se usar TTS de terceiros)
+```
 
-| 服务 | 端口 | 说明 |
+## 5. Implantação
+
+O projeto adota uma **arquitetura de dois processos**:
+
+| Serviço | Porta | Descrição |
 |------|------|------|
-| xiaozhi-server | 8091 | 管理后台 API、用户/设备管理 |
-| xiaozhi-dialogue | 8092 | 设备对话、AI、WebSocket |
+| xiaozhi-server | 8091 | API do painel administrativo, gerenciamento de usuários/dispositivos |
+| xiaozhi-dialogue | 8092 | Diálogo com dispositivos, IA, WebSocket |
 
 ```bash
 git clone https://github.com/joey-zhou/xiaozhi-esp32-server-java
 cd xiaozhi-esp32-server-java
 
-# 一键编译并启动
+# Compilar e iniciar com um único comando
 bin/all.sh start
 
-# 查看状态
+# Verificar status
 bin/all.sh status
 
-# 停止 / 重启
+# Parar / reiniciar
 bin/all.sh stop
 bin/all.sh restart
 ```
 
-也可单独管理：`bin/server.sh start`、`bin/dialogue.sh start`
+Também é possível gerenciar cada processo separadamente: `bin/server.sh start`, `bin/dialogue.sh start`
 
-前端：
+Frontend:
 
 ```bash
 cd web && npm install && npm run build
 ```
 
-## 6. Nginx 反向代理（可选）
+## 6. Proxy Reverso Nginx (opcional)
 
 ```nginx
 server {
@@ -121,31 +121,31 @@ server {
 }
 ```
 
-## 7. 访问
+## 7. Acesso
 
-| 服务 | 地址 |
+| Serviço | Endereço |
 |------|------|
-| 前端 | http://your_server_ip:8084 |
-| 后台 API | http://your_server_ip:8091 |
+| Frontend | http://your_server_ip:8084 |
+| API do painel administrativo | http://your_server_ip:8091 |
 | WebSocket | ws://your_server_ip:8092/ws/xiaozhi/v1/ |
 
-默认管理员：admin / 123456
+Administrador padrão: admin / 123456
 
-## 维护
+## Manutenção
 
 ```bash
-bin/all.sh status                          # 查看状态
-tail -f logs/xiaozhi-server.log            # 查看日志
+bin/all.sh status                          # verificar status
+tail -f logs/xiaozhi-server.log            # verificar logs
 tail -f logs/xiaozhi-dialogue.log
-git pull origin main && bin/all.sh restart # 更新并重启
-mysqldump -u root -p xiaozhi > backup.sql  # 数据库备份
+git pull origin main && bin/all.sh restart # atualizar e reiniciar
+mysqldump -u root -p xiaozhi > backup.sql  # backup do banco de dados
 ```
 
-## 常见问题
+## Problemas Comuns
 
-| 问题 | 解决 |
+| Problema | Solução |
 |------|------|
-| MySQL 初始化失败 | `sudo systemctl restart mysqld` |
-| 端口冲突 | `netstat -tulnp \| grep <端口>` 找到并 kill 占用进程 |
-| 内存不足 | 添加 swap：`sudo dd if=/dev/zero of=/swapfile bs=1M count=2048 && sudo mkswap /swapfile && sudo swapon /swapfile` |
-| 模型加载失败 | `chmod -R 755 models` |
+| Falha na inicialização do MySQL | `sudo systemctl restart mysqld` |
+| Conflito de portas | `netstat -tulnp \| grep <porta>` para localizar e encerrar (kill) o processo que está usando a porta |
+| Memória insuficiente | Adicionar swap: `sudo dd if=/dev/zero of=/swapfile bs=1M count=2048 && sudo mkswap /swapfile && sudo swapon /swapfile` |
+| Falha ao carregar modelo | `chmod -R 755 models` |

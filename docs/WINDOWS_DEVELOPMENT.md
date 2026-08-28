@@ -1,19 +1,19 @@
-# Windows 部署指南
+# Guia de Implantação no Windows
 
-## 系统要求
+## Requisitos do Sistema
 
-- Windows 10+，管理员权限
+- Windows 10+, com permissões de administrador
 
-## 1. 安装依赖
+## 1. Instalar Dependências
 
-| 依赖 | 下载 | 环境变量 | 验证 |
+| Dependência | Download | Variável de Ambiente | Verificação |
 |------|------|----------|------|
-| JDK 21 | [Oracle JDK 21](https://www.oracle.com/java/technologies/downloads/#java21) | `JAVA_HOME` → 安装路径，Path 添加 `%JAVA_HOME%\bin` | `java -version` |
-| MySQL 8.0 | [MySQL Installer](https://dev.mysql.com/downloads/installer/) | Path 添加 `C:\Program Files\MySQL\MySQL Server 8\bin` | `mysql --version` |
-| Maven | [Maven 下载](https://maven.apache.org/download.cgi) | `MAVEN_HOME` → 解压路径，Path 添加 `%MAVEN_HOME%\bin` | `mvn -v` |
-| Node.js | [Node.js LTS](https://nodejs.org/) | 安装程序自动配置 | `node -v` |
+| JDK 21 | [Oracle JDK 21](https://www.oracle.com/java/technologies/downloads/#java21) | `JAVA_HOME` → caminho de instalação; adicione `%JAVA_HOME%\bin` ao Path | `java -version` |
+| MySQL 8.0 | [MySQL Installer](https://dev.mysql.com/downloads/installer/) | Adicione `C:\Program Files\MySQL\MySQL Server 8\bin` ao Path | `mysql --version` |
+| Maven | [Download do Maven](https://maven.apache.org/download.cgi) | `MAVEN_HOME` → caminho de extração; adicione `%MAVEN_HOME%\bin` ao Path | `mvn -v` |
+| Node.js | [Node.js LTS](https://nodejs.org/) | Configurado automaticamente pelo instalador | `node -v` |
 
-## 2. 数据库配置
+## 2. Configuração do Banco de Dados
 
 ```sql
 mysql -u root -p
@@ -23,81 +23,81 @@ GRANT ALL PRIVILEGES ON xiaozhi.* TO 'xiaozhi'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
-> 无需手动导入 SQL，项目集成 Flyway，首次启动自动建表。
+> Não é necessário importar o SQL manualmente — o projeto integra o Flyway, que cria as tabelas automaticamente na primeira inicialização.
 
-## 3. 下载模型和原生库
+## 3. Baixar Modelos e Bibliotecas Nativas
 
-使用第三方 STT/TTS 服务可只下载基础依赖。在 Git Bash 中执行：
-
-```bash
-./scripts/download_models.sh            # 下载全部（模型 + 原生库）
-./scripts/download_models.sh status     # 查看状态
-```
-
-也可按需单独下载：
+Se estiver usando serviços de STT/TTS de terceiros, é possível baixar somente as dependências básicas. Execute no Git Bash:
 
 ```bash
-./scripts/download_base.sh              # 基础依赖（VAD 模型 + 原生库）— 必须
-./scripts/download_stt.sh               # Vosk STT 模型（使用第三方 STT 可跳过）
-./scripts/download_tts.sh               # TTS 模型（使用第三方 TTS 可跳过）
+./scripts/download_models.sh            # baixa tudo (modelos + bibliotecas nativas)
+./scripts/download_models.sh status     # verifica o status
 ```
 
-> 手动下载：从 [Vosk 模型](https://alphacephei.com/vosk/models) 下载 `vosk-model-cn-0.22`，解压重命名为 `models\vosk-model`。
+Também é possível baixar individualmente, conforme a necessidade:
 
-## 4. 部署
+```bash
+./scripts/download_base.sh              # dependências básicas (modelo VAD + bibliotecas nativas) — obrigatório
+./scripts/download_stt.sh               # modelo Vosk STT (pode ser pulado se usar STT de terceiros)
+./scripts/download_tts.sh               # modelo TTS (pode ser pulado se usar TTS de terceiros)
+```
 
-项目采用**双进程架构**：
+> Download manual: baixe `vosk-model-cn-0.22` em [Modelos Vosk](https://alphacephei.com/vosk/models), extraia e renomeie para `models\vosk-model`.
 
-| 服务 | 端口 | 说明 |
+## 4. Implantação
+
+O projeto adota uma **arquitetura de dois processos**:
+
+| Serviço | Porta | Descrição |
 |------|------|------|
-| xiaozhi-server | 8091 | 管理后台 API、用户/设备管理 |
-| xiaozhi-dialogue | 8092 | 设备对话、AI、WebSocket |
+| xiaozhi-server | 8091 | API do painel administrativo, gerenciamento de usuários/dispositivos |
+| xiaozhi-dialogue | 8092 | Diálogo com dispositivos, IA, WebSocket |
 
 ```bash
 git clone https://github.com/joey-zhou/xiaozhi-esp32-server-java
 cd xiaozhi-esp32-server-java
 ```
 
-### 方式一：bin 脚本（Git Bash / WSL）
+### Método 1: Scripts bin (Git Bash / WSL)
 
 ```bash
-bin/all.sh start       # 编译并启动
-bin/all.sh status      # 查看状态
-bin/all.sh restart     # 重启
+bin/all.sh start       # compilar e iniciar
+bin/all.sh status      # verificar status
+bin/all.sh restart     # reiniciar
 ```
 
-### 方式二：手动启动（CMD / PowerShell）
+### Método 2: Inicialização Manual (CMD / PowerShell)
 
 ```bash
 mvn clean install -DskipTests
 
-# 终端1：启动管理后台
+# Terminal 1: iniciar o painel administrativo
 java -Djava.library.path=lib -jar xiaozhi-server\target\xiaozhi-server-*.jar
 
-# 终端2：启动对话服务
+# Terminal 2: iniciar o serviço de diálogo
 java -Djava.library.path=lib -jar xiaozhi-dialogue\target\xiaozhi-dialogue-*-exec.jar
 ```
 
-### 前端
+### Frontend
 
 ```bash
 cd web && npm install && npm run dev
 ```
 
-## 5. 访问
+## 5. Acesso
 
-| 服务 | 地址 |
+| Serviço | Endereço |
 |------|------|
-| 前端 | http://localhost:8084 |
-| 后台 API | http://localhost:8091 |
+| Frontend | http://localhost:8084 |
+| API do painel administrativo | http://localhost:8091 |
 | WebSocket | ws://localhost:8092/ws/xiaozhi/v1/ |
 
-默认管理员：admin / 123456
+Administrador padrão: admin / 123456
 
-## 常见问题
+## Problemas Comuns
 
-| 问题 | 解决 |
+| Problema | Solução |
 |------|------|
-| 端口冲突 | 修改 `xiaozhi-server\src\main\resources\application.yml` 中的 `server.port` |
-| MySQL 连接失败 | 确认 MySQL 服务已启动（服务管理器检查） |
-| 构建失败 | `mvn clean install`，确认网络可访问 Maven 中央仓库 |
+| Conflito de portas | Altere `server.port` em `xiaozhi-server\src\main\resources\application.yml` |
+| Falha na conexão com o MySQL | Confirme que o serviço MySQL está em execução (verifique no gerenciador de serviços) |
+| Falha no build | Execute `mvn clean install` e confirme que a rede tem acesso ao repositório central do Maven |
