@@ -156,7 +156,7 @@ public class McpToolExcludeServiceImpl implements McpToolExcludeService {
             }
         } catch (Exception e) {
             log.error("Save MCP tool exclude config failed", e);
-            throw new OperationFailedException("保存MCP工具排除配置失败", e);
+            throw new OperationFailedException("Falha ao salvar configuração de exclusão de ferramentas MCP", e);
         }
     }
 
