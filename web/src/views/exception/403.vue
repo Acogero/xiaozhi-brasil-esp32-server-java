@@ -11,7 +11,7 @@ function goBack() {
 }
 
 function goHome() {
-  // 清除用户信息和token，避免因权限不足导致的循环跳转
+  // Limpar informações do usuário e token, para evitar redirecionamento em loop por permissão insuficiente
   userStore.clearUserInfo()
   userStore.clearToken()
   router.push(ROUTES.LOGIN)
@@ -23,12 +23,12 @@ function goHome() {
     <a-result
       status="403"
       title="403"
-      sub-title="抱歉，您没有权限访问此页面。"
+      sub-title="Desculpe, você não tem permissão para acessar esta página."
     >
       <template #extra>
         <a-space>
-          <a-button type="primary" @click="() => goHome()">返回首页</a-button>
-          <a-button @click="() => goBack()">返回上一页</a-button>
+          <a-button type="primary" @click="() => goHome()">Voltar à Página Inicial</a-button>
+          <a-button @click="() => goBack()">Voltar à Página Anterior</a-button>
         </a-space>
       </template>
     </a-result>
