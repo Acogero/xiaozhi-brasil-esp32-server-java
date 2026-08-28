@@ -20,24 +20,24 @@ import okhttp3.WebSocket;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 讯飞语音合成服务
+ * Serviço de síntese de voz iFLYTEK
  */
 @Slf4j
 public class XfyunTtsService implements TtsService {
     private static final String PROVIDER_NAME = "xfyun";
-    // 识别超时时间（60秒）
+    // Tempo limite de reconhecimento (60 segundos)
     private static final long RECOGNITION_TIMEOUT_MS = 60000;
 
-    // 重试机制常量
+    // Constantes do mecanismo de retry
     private static final int MAX_RETRY_ATTEMPTS = 3;
     private static final long RETRY_DELAY_MS = 1000;
 
     private final XiaozhiTtsOptions options;
 
-    // 音频输出路径
+    // Caminho de saída do áudio
     private String outputPath;
 
-    // appid, apiKey, apiSecret是在开放平台控制台(https://console.xfyun.cn/)获得
+    // appid, apiKey e apiSecret são obtidos no console da plataforma aberta (https://console.xfyun.cn/)
     private String appId;
     private String apiKey;
     private String apiSecret;
@@ -68,53 +68,53 @@ public class XfyunTtsService implements TtsService {
     @Override
     public Path textToSpeech(String text) throws Exception {
         if (text == null || text.isEmpty()) {
-            log.warn("文本内容为空！");
+            log.warn("Conteúdo de texto vazio!");
             return null;
         }
 
         int attempts = 0;
         while (attempts < MAX_RETRY_ATTEMPTS) {
             try {
-                // 生成音频文件名
+                // Gera o nome do arquivo de áudio
                 String audioFileName = getAudioFileName();
                 String audioFilePath = outputPath + audioFileName;
                 File file = new File(audioFilePath);
-                // 发送POST请求
+                // Envia a requisição POST
                 boolean success = sendRequest(text, file);
 
                 if (success) {
                     return Path.of(audioFilePath);
                 } else {
-                    throw new Exception("语音合成失败");
+                    throw new Exception("Falha na síntese de voz");
                 }
             } catch (Exception e) {
                 attempts++;
                 if (attempts < MAX_RETRY_ATTEMPTS) {
-                    log.warn("讯飞语音合成失败，正在重试 ({}/{}): {}", attempts, MAX_RETRY_ATTEMPTS, e.getMessage());
+                    log.warn("Falha na síntese de voz da iFLYTEK, tentando novamente ({}/{}): {}", attempts, MAX_RETRY_ATTEMPTS, e.getMessage());
                     try {
                         Thread.sleep(RETRY_DELAY_MS);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
-                        log.error("重试等待被中断", ie);
+                        log.error("Espera de retry interrompida", ie);
                         throw e;
                     }
                 } else {
-                    log.error("讯飞语音合成失败，已达到最大重试次数", e);
+                    log.error("Falha na síntese de voz da iFLYTEK; número máximo de tentativas atingido", e);
                     throw e;
                 }
             }
         }
-        throw new Exception("语音合成失败");
+        throw new Exception("Falha na síntese de voz");
     }
 
     /**
-     * 发送POST请求到 xfyun，获取语音合成结果
+     * Envia a requisição POST para o xfyun, obtendo o resultado da síntese de voz
      */
     private boolean sendRequest(String text, File file) throws Exception {
         CountDownLatch recognitionLatch = new CountDownLatch(1);
         try {
-            // 将我们的参数（0.5-2.0）非线性映射到讯飞的参数（0-100）
-            // 映射规则：0.5→0，1.0→50（讯飞默认），2.0→100
+            // Mapeia de forma não linear nosso parâmetro (0.5-2.0) para o parâmetro do xfyun (0-100)
+            // Regra de mapeamento: 0.5→0, 1.0→50 (padrão do xfyun), 2.0→100
             int xfyunSpeed;
             if (getSpeed() <= 1.0f) {
                 xfyunSpeed = (int)Math.round((getSpeed() - 0.5f) * 100f);
@@ -129,11 +129,11 @@ public class XfyunTtsService implements TtsService {
                 xfyunPitch = (int)Math.round(50f + (getPitch() - 1.0f) * 50f);
             }
 
-            // 确保值在有效范围内
+            // Garante que o valor esteja dentro do intervalo válido
             xfyunSpeed = Math.max(0, Math.min(100, xfyunSpeed));
             xfyunPitch = Math.max(0, Math.min(100, xfyunPitch));
 
-            // 设置合成参数
+            // Define os parâmetros de síntese
             TtsClient ttsClient = new TtsClient.Builder()
                     .signature(appId, apiKey, apiSecret)
                     .aue("lame")
@@ -142,7 +142,7 @@ public class XfyunTtsService implements TtsService {
                     .pitch(xfyunPitch)
                     .build();
             ttsClient.send(text, new AbstractTtsWebSocketListener() {
-                //返回格式为音频文件的二进制数组bytes
+                // O formato de retorno é o array binário bytes do arquivo de áudio
                 @Override
                 public void onSuccess(byte[] bytes) {
                     FileOutputStream outputStream = null;
@@ -151,39 +151,39 @@ public class XfyunTtsService implements TtsService {
                         outputStream.write(bytes);
                         outputStream.flush();
                         
-                        // 确保文件句柄被释放
+                        // Garante que o handle do arquivo seja liberado
                         if(outputStream != null){
                             try {
                                 outputStream.close();
-                                outputStream = null;  // 标记已关闭
+                                outputStream = null;  // Marca como fechado
                             } catch (IOException e) {
-                                log.error("关闭 xfyun 语音合成文件流失败", e);
-                                throw new RuntimeException("文件关闭失败", e);
+                                log.error("Falha ao fechar o fluxo de arquivo de síntese de voz do xfyun", e);
+                                throw new RuntimeException("Falha ao fechar o arquivo", e);
                             }
                         }
                         
-                        // 验证文件已成功写入
+                        // Verifica se o arquivo foi gravado com sucesso
                         if (!file.exists() || file.length() == 0) {
-                            throw new RuntimeException("音频文件写入失败");
+                            throw new RuntimeException("Falha ao gravar o arquivo de áudio");
                         }
                         
                     } catch (Exception e) {
-                        log.error("写入音频文件失败", e);
+                        log.error("Falha ao gravar o arquivo de áudio", e);
                         throw new RuntimeException(e);
                     } finally {
-                        // 最后确保countDown被调用
+                        // Por fim, garante que countDown seja chamado
                         recognitionLatch.countDown();
                     }
                 }
 
-                //授权失败通过throwable.getMessage()获取对应错误信息
+                // Em caso de falha de autorização, obtém a mensagem de erro correspondente via throwable.getMessage()
                 @Override
                 public void onFail(WebSocket webSocket, Throwable throwable, Response response) {
-                    log.error("xfyun tts fail，原因：{}", throwable.getMessage());
+                    log.error("Falha no TTS do xfyun, motivo: {}", throwable.getMessage());
                     recognitionLatch.countDown();
                 }
 
-                //业务失败通过ttsResponse获取错误码和错误信息
+                // Em caso de falha de negócio, obtém o código e a mensagem de erro via ttsResponse
                 @Override
                 public void onBusinessFail(WebSocket webSocket, TtsResponse ttsResponse) {
                     log.error(ttsResponse.toString());
@@ -191,14 +191,14 @@ public class XfyunTtsService implements TtsService {
                 }
             });
         } catch (Exception e) {
-            log.error("发送TTS请求时发生错误", e);
+            log.error("Erro ao enviar a requisição TTS", e);
             recognitionLatch.countDown();
-            throw new Exception("发送TTS请求失败", e);
+            throw new Exception("Falha ao enviar a requisição TTS", e);
         }
-        // 等待语音合成完成或超时
+        // Aguarda a conclusão da síntese de voz ou o timeout
         boolean recognized = recognitionLatch.await(RECOGNITION_TIMEOUT_MS, TimeUnit.MILLISECONDS);
         if (!recognized) {
-            log.warn("讯飞云语音合成超时");
+            log.warn("Timeout na síntese de voz da iFLYTEK Cloud");
         }
         return true;
     }

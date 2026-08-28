@@ -42,13 +42,13 @@ public class EdgeTtsService implements TtsService {
     @Override
     public Path textToSpeech(String text) throws Exception {
         if (text == null || text.isEmpty()) {
-            throw new Exception("文本内容为空");
+            throw new Exception("Conteúdo de texto vazio");
         }
 
         Voice voiceObj = TTSVoice.provides().stream()
                 .filter(v -> v.getShortName().equals(getVoiceName()))
                 .findFirst()
-                .orElseThrow(() -> new Exception("Edge TTS 找不到语音: " + getVoiceName()));
+                .orElseThrow(() -> new Exception("Voz não encontrada no Edge TTS: " + getVoiceName()));
 
         int ratePercent = (int) ((getSpeed() - 1.0f) * 100);
         int pitchHz = (int) ((getPitch() - 1.0f) * 50);
@@ -65,7 +65,7 @@ public class EdgeTtsService implements TtsService {
                 .trans();
 
         if (filename == null || filename.isEmpty()) {
-            throw new Exception("Edge TTS 合成结果为空");
+            throw new Exception("Resultado da síntese do Edge TTS vazio");
         }
         return Paths.get(outputPath, filename);
     }

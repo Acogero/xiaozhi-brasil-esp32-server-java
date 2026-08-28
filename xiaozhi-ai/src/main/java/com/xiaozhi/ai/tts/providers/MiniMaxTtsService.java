@@ -25,7 +25,7 @@ public class MiniMaxTtsService implements TtsService {
 
     private static final String PROVIDER_NAME = "minimax";
 
-    // 重试机制常量
+    // Constantes do mecanismo de retry
     private static final int MAX_RETRY_ATTEMPTS = 3;
     private static final long RETRY_DELAY_MS = 1000;
 
@@ -34,7 +34,7 @@ public class MiniMaxTtsService implements TtsService {
 
     private final String outputPath;
 
-    // 语音参数（voiceName, pitch, speed）
+    // Parâmetros de voz (voiceName, pitch, speed)
     private final XiaozhiTtsOptions options;
     private int minimaxPitch;
     private final String model;
@@ -49,10 +49,10 @@ public class MiniMaxTtsService implements TtsService {
         this.options = XiaozhiTtsOptions.builder().voiceName(voiceName).pitch(pitch).speed(speed).build();
         this.outputPath = outputPath;
         this.model = config.getConfigName();
-        // 设置音调（需要映射：我们的 [0.5, 2] → MiniMax的 [-12, 12]）
-        // 映射公式：minimax_pitch = (our_pitch - 1.0) × 24
+        // Define o tom (é necessário mapear: nosso [0.5, 2] → o [-12, 12] do MiniMax)
+        // Fórmula de mapeamento: minimax_pitch = (our_pitch - 1.0) × 24
         minimaxPitch = (int)Math.round((getPitch() - 1.0) * 24);
-        // 确保值在有效范围内
+        // Garante que o valor esteja dentro do intervalo válido
         minimaxPitch = Math.max(-12, Math.min(12, minimaxPitch));
     }
 
@@ -84,34 +84,34 @@ public class MiniMaxTtsService implements TtsService {
                 lastException = e;
                 attempts++;
                 if (attempts < MAX_RETRY_ATTEMPTS) {
-                    log.warn("MiniMax语音合成失败，正在重试 ({}/{}): {}", attempts, MAX_RETRY_ATTEMPTS, e.getMessage());
+                    log.warn("Falha na síntese de voz do MiniMax, tentando novamente ({}/{}): {}", attempts, MAX_RETRY_ATTEMPTS, e.getMessage());
                     try {
                         Thread.sleep(RETRY_DELAY_MS);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
-                        log.error("重试等待被中断", ie);
+                        log.error("Espera de retry interrompida", ie);
                         throw e;
                     }
                 } else {
-                    log.error("MiniMax语音合成失败，已达到最大重试次数", e);
+                    log.error("Falha na síntese de voz do MiniMax; número máximo de tentativas atingido", e);
                 }
             }
         }
-        throw lastException != null ? lastException : new Exception("语音合成失败");
+        throw lastException != null ? lastException : new Exception("Falha na síntese de voz");
     }
 
     private void sendRequest(String text, String filepath) {
-        // 创建请求参数
+        // Cria os parâmetros da requisição
         var params = new Text2AudioParams(model, getVoiceName(), text);
 
-        // 设置语速（MiniMax范围 [0.5, 2]，与我们的范围一致，直接使用）
+        // Define a velocidade (o intervalo do MiniMax [0.5, 2] é igual ao nosso; usado diretamente)
         params.voiceSetting.setSpeed(getSpeed());
         params.voiceSetting.setPitch(minimaxPitch);
 
         var request = new Request.Builder()
                 .url("https://api.minimaxi.com/v1/t2a_v2?Groupid=%s".formatted(groupId))
                 .addHeader("Content-Type", "application/json")
-                .addHeader("Authorization", "Bearer %s".formatted(apiKey)) // 添加Authorization头
+                .addHeader("Authorization", "Bearer %s".formatted(apiKey)) // Adiciona o header Authorization
                 .post(RequestBody.create(JsonUtil.toJson(params), JSON))
                 .build();
 
@@ -122,14 +122,14 @@ public class MiniMaxTtsService implements TtsService {
                     var bytes = HexFormat.of().parseHex(respBody.data.audio);
                     Files.write(Paths.get(filepath), bytes);
                 } else {
-                    log.error("TTS失败 {}:{}", respBody.baseResp.statusCode, respBody.baseResp.statusMsg);
+                    log.error("Falha no TTS {}:{}", respBody.baseResp.statusCode, respBody.baseResp.statusMsg);
                 }
             } else {
-                log.error("TTS请求失败 {}", resp.body().string());
+                log.error("Falha na requisição TTS {}", resp.body().string());
             }
         } catch (IOException e) {
-            log.error("发送TTS请求时发生错误", e);
-            throw new RuntimeException("发送TTS请求失败", e);
+            log.error("Erro ao enviar a requisição TTS", e);
+            throw new RuntimeException("Falha ao enviar a requisição TTS", e);
         }
     }
     
@@ -197,7 +197,7 @@ public class MiniMaxTtsService implements TtsService {
         private BaseResp baseResp;
 
         /**
-         * 在MiniMax 的 WebSocket协议中，Data不一定会有 status。 java record默认是全参构造函数。
+         * No protocolo WebSocket do MiniMax, Data nem sempre tem status. O record do Java, por padrão, tem um construtor com todos os parâmetros.
          */
         @lombok.Data
         public static class Data {
@@ -212,24 +212,24 @@ public class MiniMaxTtsService implements TtsService {
             private int audioChannel;
             @JsonProperty("audio_format")
             private String audioFormat;
-            // 音频时长，精确到毫秒
+            // Duração do áudio, em milissegundos
             @JsonProperty("audio_length")
             private int audioLength;
             @JsonProperty("audio_sample_rate")
             private int audioSampleRate;
-            // 音频文件大小，单位为字节
+            // Tamanho do arquivo de áudio, em bytes
             @JsonProperty("audio_size")
             private int audioSize;
-            // 音频比特率
+            // Taxa de bits do áudio
             @JsonProperty("bitrate")
             private int bitrate;
-            // 非法字符占比。非法字符不超过 10%（包含 10%），音频会正常生成并返回非法字符占比，超过进行报错
+            // Proporção de caracteres inválidos. Se não ultrapassar 10% (inclusive), o áudio é gerado normalmente e a proporção é retornada; acima disso, ocorre erro
             @JsonProperty("invisible_character_ratio")
             private int invisibleCharacterRatio;
-            // 计费字符数。本次语音生成的计费字符数
+            // Número de caracteres cobrados nesta geração de voz
             @JsonProperty("usage_characters")
             private int usageCharacters;
-            // 已发音的字数统计，包含汉字、数字、字母，不包含标点符号
+            // Contagem de caracteres pronunciados, incluindo ideogramas, números e letras, sem contar pontuação
             @JsonProperty("word_count")
             private int wordCount;
         }
