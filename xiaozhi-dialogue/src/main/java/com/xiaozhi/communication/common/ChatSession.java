@@ -31,35 +31,35 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 public abstract class ChatSession {
     /**
-     * 当前会话的sessionId
+     * sessionId da sessão atual
      */
     protected String sessionId;
     /**
-     * 设备信息
+     * Informações do dispositivo
      */
     protected DeviceBO device;
 
     /**
-     * 对话上下文，承载与对话逻辑直接相关的状态（Persona、Player、工具回调等）。
-     * 内部实现细节，外部通过本类的直通方法访问。
+     * Contexto do diálogo, carrega o estado diretamente relacionado à lógica do diálogo (Persona, Player, callbacks de ferramentas etc.).
+     * Detalhe de implementação interna; o acesso externo é feito por meio dos métodos de passthrough desta classe.
      */
     private DialogueContext dialogueContext;
 
     /**
-     * 设备iot信息
+     * Informações de IoT do dispositivo
      */
     protected Map<String, IotDescriptor> iotDescriptors = new ConcurrentHashMap<>();
 
     /**
-     * 设备服务端状态机。
-     * 替代原有的 playing / musicPlaying / streamingState / inWakeupResponse 分散布尔字段。
-     * 只有 IDLE 状态才允许触发不活跃超时。
+     * Máquina de estados do dispositivo no lado do servidor.
+     * Substitui os antigos campos booleanos dispersos playing / musicPlaying / streamingState / inWakeupResponse.
+     * Somente o estado IDLE permite disparar o timeout de inatividade.
      */
     private volatile DeviceState deviceState = DeviceState.IDLE;
 
     /**
-     * 状态转换方法
-     * 包含状态转换验证和日志
+     * Método de transição de estado
+     * Inclui validação da transição de estado e log
      */
     public void transitionTo(DeviceState newState) {
         if (newState == null) {
@@ -70,27 +70,27 @@ public abstract class ChatSession {
             return;
         }
         this.deviceState = newState;
-        log.debug("状态转换: {} -> {} (SessionId: {})", oldState, newState, sessionId);
+        log.debug("Transição de estado: {} -> {} (SessionId: {})", oldState, newState, sessionId);
     }
 
     /**
-     * 设备状态(auto, realTime)
+     * Estado do dispositivo (auto, realTime)
      */
     protected ListenMode mode;
     /**
-     * 会话的音频数据流。
-     * 保留在 ChatSession 而非 Persona：audioSinks 是 VAD 驱动的音频输入缓冲，
-     * 生命周期跟"用户说话的起止"绑定（生产者是 DialogueService/VAD，消费者是 STT），
-     * 属于传输层关注，与 Persona（AI 能力运行时）生命周期不同。
-     * 移入 Persona 会增加 null 判断复杂度而无收益。
+     * Fluxo de dados de áudio da sessão.
+     * Mantido em ChatSession e não em Persona: audioSinks é o buffer de entrada de áudio orientado pelo VAD,
+     * seu ciclo de vida está vinculado ao "início e fim da fala do usuário" (o produtor é DialogueService/VAD, o consumidor é o STT),
+     * é uma preocupação da camada de transporte, com ciclo de vida diferente do Persona (runtime das capacidades de IA).
+     * Movê-lo para Persona aumentaria a complexidade das verificações de null sem trazer benefício.
      */
     protected volatile Sinks.Many<byte[]> audioSinks;
     /**
-     * 会话的最后有效活动时间
+     * Horário da última atividade válida da sessão
      */
     protected volatile Instant lastActivityTime;
 
-    // ========== 对话层直通方法（内部委托给 dialogueContext，外部无需感知） ==========
+    // ========== Métodos de passthrough da camada de diálogo (delegados internamente a dialogueContext; transparentes para quem os chama de fora) ==========
 
     public Persona getPersona()                 { return dialogueContext.getPersona(); }
     public void setPersona(Persona persona)     { dialogueContext.setPersona(persona); }
@@ -108,10 +108,10 @@ public abstract class ChatSession {
     public List<DialogueContext.ToolCallInfo> drainToolCallDetails()           { return dialogueContext.drainToolCallDetails(); }
     public boolean isFunctionCalled()                                          { return dialogueContext.isFunctionCalled(); }
 
-    // ========== 超时断连标记 ==========
+    // ========== Marcador de desconexão por timeout ==========
     private volatile boolean timeoutDisconnect;
 
-    // --------------------设备mcp-------------------------
+    // --------------------MCP do dispositivo-------------------------
     private DeviceMcpHolder deviceMcpHolder = new DeviceMcpHolder();
 
     public ChatSession(String sessionId) {
@@ -121,37 +121,37 @@ public abstract class ChatSession {
     }
 
     public void clearAudioSinks(){
-        // 清理音频流
+        // Limpa o fluxo de áudio
         Sinks.Many<byte[]> sink = getAudioSinks();
         if (sink != null) {
             sink.tryEmitComplete();
         }
-        // 重置会话状态
+        // Reseta o estado da sessão
         deviceState = DeviceState.IDLE;
         setAudioSinks(null);
     }
 
-    // ========== 音频流管理方法（从 SessionManager 迁入） ==========
+    // ========== Métodos de gerenciamento do fluxo de áudio (migrados de SessionManager) ==========
 
     /**
-     * 创建新的音频数据流
+     * Cria um novo fluxo de dados de áudio
      */
     public void createAudioStream() {
         this.audioSinks = Sinks.many().multicast().onBackpressureBuffer();
     }
 
     /**
-     * 发送音频数据到流
+     * Envia dados de áudio para o fluxo
      */
     public void sendAudioData(byte[] data) {
-        Sinks.Many<byte[]> sink = audioSinks; // 局部变量避免 TOCTOU
+        Sinks.Many<byte[]> sink = audioSinks; // variável local para evitar TOCTOU
         if (sink != null) {
             sink.tryEmitNext(data);
         }
     }
 
     /**
-     * 完成音频流（通知下游数据发送完毕）
+     * Finaliza o fluxo de áudio (notifica os consumidores de que o envio de dados terminou)
      */
     public void completeAudioStream() {
         if (audioSinks != null) {
@@ -160,15 +160,15 @@ public abstract class ChatSession {
     }
 
     /**
-     * 关闭音频流（释放引用）
+     * Fecha o fluxo de áudio (libera a referência)
      */
     public void closeAudioStream() {
         this.audioSinks = null;
     }
 
     /**
-     * 音频文件约定路径为：audio/{date}/{device-id}/{role-id}/{timestamp}-{who}.wav|ogg
-     * 按日期分目录，便于批量清理过期数据（直接删整个日期目录）
+     * Convenção de caminho dos arquivos de áudio: audio/{date}/{device-id}/{role-id}/{timestamp}-{who}.wav|ogg
+     * Organizado em diretórios por data, facilitando a limpeza em lote de dados expirados (basta excluir o diretório da data inteira)
      *
      * @param who
      * @param instant
@@ -182,7 +182,7 @@ public abstract class ChatSession {
         String date = localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE);
         String datetime = localDateTime.format(DateTimeFormatter.ISO_DATE_TIME).replace(":", "");
         DeviceBO device = this.getDevice();
-        // 判断设备ID是否有不适合路径的特殊字符，它很可能是mac地址需要转换。
+        // Verifica se o ID do dispositivo contém caracteres especiais impróprios para um caminho; provavelmente é um endereço MAC que precisa ser convertido.
         String deviceId = device.getDeviceId().replace(":", "-");
         String roleId = device.getRoleId().toString();
         String extension = MessageBO.SENDER_USER.equals(who) ? "wav" : "ogg";
@@ -191,14 +191,14 @@ public abstract class ChatSession {
     }
 
     /**
-     * 会话连接是否打开中
+     * Se a conexão da sessão está aberta
      *
      * @return
      */
     public abstract boolean isOpen();
 
     /**
-     * 音频通道是否打开可用
+     * Se o canal de áudio está aberto e disponível
      *
      * @return
      */
@@ -214,8 +214,8 @@ public abstract class ChatSession {
     public void setTimeoutDisconnect(boolean flag)  { this.timeoutDisconnect = flag; }
 
     /**
-     * 平台主动下发helloMessage
-     * 一般用于会话激活
+     * Plataforma envia helloMessage de forma proativa
+     * Geralmente usado para ativação da sessão
      */
     public void sendHelloMessage() {}
 }

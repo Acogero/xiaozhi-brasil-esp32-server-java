@@ -29,27 +29,27 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 会话注册表，负责管理所有连接的会话状态。
- * 核心职责：register / get / remove / close，以及设备注册与验证码状态管理。
+ * Registro de sessões, responsável por gerenciar o estado de todas as sessões conectadas.
+ * Responsabilidades principais: register / get / remove / close, além do registro de dispositivos e do gerenciamento do estado do código de verificação.
  * <p>
- * 不活跃会话检查已拆分至 {@link InactiveSessionChecker}。
- * 音频流管理已迁移至 {@link ChatSession} 实例方法。
+ * A verificação de sessões inativas foi extraída para {@link InactiveSessionChecker}.
+ * O gerenciamento do fluxo de áudio foi migrado para métodos de instância de {@link ChatSession}.
  */
 @Slf4j
 @Service
 public class SessionManager {
     private final ConcurrentHashMap<String, ChatSession> sessions = new ConcurrentHashMap<>();
 
-    /** deviceId → sessionId 反向索引，O(1) 查找设备所在会话 */
+    /** Índice reverso deviceId → sessionId, busca O(1) da sessão do dispositivo */
     private final ConcurrentHashMap<String, String> deviceIdToSessionId = new ConcurrentHashMap<>();
 
-    // 存储验证码生成状态
+    // Armazena o estado de geração do código de verificação
     private final ConcurrentHashMap<String, Boolean> captchaState = new ConcurrentHashMap<>();
 
-    // 用于启动时延迟重置设备状态
+    // Usado para adiar o reset do estado do dispositivo na inicialização
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-    // 服务关闭标志，关闭期间跳过设备状态写库（启动时会 bulk reset，无需重复写）
+    // Sinalizador de encerramento do serviço; durante o desligamento, pula a gravação do estado do dispositivo no banco (na inicialização é feito bulk reset, então não é necessário regravar)
     private volatile boolean shuttingDown = false;
 
     @Resource
@@ -71,21 +71,21 @@ public class SessionManager {
     @PostConstruct
     public void init() {
         if (checkInactiveSession) {
-            // 项目启动时，只重置属于本实例的设备为离线（延迟执行避免循环依赖）
+            // Na inicialização do projeto, reseta para offline somente os dispositivos pertencentes a esta instância (execução adiada para evitar dependência circular)
             scheduler.schedule(() -> {
                 try {
                     Set<String> ownDeviceIds = deviceRegistry.getOwnDeviceIds();
                     if (!ownDeviceIds.isEmpty()) {
                         int updated = deviceRepository.batchUpdateState(ownDeviceIds, DeviceBO.DEVICE_STATE_OFFLINE);
-                        log.info("项目启动，重置本实例 {} 个设备状态为离线", updated);
-                        // 清理本实例旧的 Redis 映射
+                        log.info("Projeto iniciado; {} dispositivo(s) desta instância resetado(s) para offline", updated);
+                        // Limpa os mapeamentos antigos no Redis desta instância
                         for (String deviceId : ownDeviceIds) {
                             deviceRegistry.unbind(deviceId);
                         }
                     }
-                    log.info("项目启动，instanceId: {}", instanceIdHolder.getInstanceId());
+                    log.info("Projeto iniciado, instanceId: {}", instanceIdHolder.getInstanceId());
                 } catch (Exception e) {
-                    log.error("项目启动时重置设备状态失败", e);
+                    log.error("Falha ao resetar o estado dos dispositivos na inicialização do projeto", e);
                 }
             }, 1, TimeUnit.SECONDS);
         }
@@ -96,8 +96,8 @@ public class SessionManager {
     }
 
     /**
-     * ContextClosedEvent 在所有 @PreDestroy 之前触发，
-     * 确保 shuttingDown 标志在断链回调发生前已置位。
+     * O ContextClosedEvent é disparado antes de todos os @PreDestroy,
+     * garantindo que o sinalizador shuttingDown já esteja definido antes que os callbacks de desconexão ocorram.
      */
     @EventListener(ContextClosedEvent.class)
     public void onContextClosed() {
@@ -106,14 +106,14 @@ public class SessionManager {
     }
 
     /**
-     * 打开音频通道并发布事件（供Handler调用）
+     * Abre o canal de áudio e publica o evento (para uso do Handler)
      */
     public void openAudioChannel(String sessionId, String deviceId) {
         applicationContext.publishEvent(new ChatAudioOpenedEvent(this, sessionId, deviceId));
     }
 
     /**
-     * 设备信息变更时同步到对应的会话
+     * Sincroniza com a sessão correspondente quando as informações do dispositivo mudam
      */
     @EventListener
     public void onDeviceUpdated(DeviceUpdatedEvent event) {
@@ -136,11 +136,11 @@ public class SessionManager {
         }
     }
 
-    // ========== 会话注册与获取 ==========
+    // ========== Registro e obtenção de sessão ==========
 
     public void registerSession(String sessionId, ChatSession chatSession) {
         sessions.put(sessionId, chatSession);
-        log.info("会话已注册 - SessionId: {}  SessionType: {}", sessionId, chatSession.getClass().getSimpleName());
+        log.info("Sessão registrada - SessionId: {}  SessionType: {}", sessionId, chatSession.getClass().getSimpleName());
         String deviceId = chatSession.getDevice() != null ? chatSession.getDevice().getDeviceId() : null;
         applicationContext.publishEvent(new ChatSessionOpenedEvent(this, sessionId, deviceId));
     }
@@ -163,20 +163,20 @@ public class SessionManager {
             if (session != null) {
                 return session;
             }
-            // 映射残留，清理
+            // Mapeamento residual, limpando
             deviceIdToSessionId.remove(deviceId);
         }
         return null;
     }
 
     /**
-     * 获取所有会话（供 InactiveSessionChecker 等遍历使用）
+     * Obtém todas as sessões (para uso em iterações por InactiveSessionChecker e outros)
      */
     public Collection<ChatSession> getAllSessions() {
         return sessions.values();
     }
 
-    // ========== 会话关闭 ==========
+    // ========== Fechamento de sessão ==========
 
     public void closeSession(String sessionId) {
         ChatSession chatSession = sessions.get(sessionId);
@@ -193,7 +193,7 @@ public class SessionManager {
             if (chatSession instanceof WebSocketSession) {
                 removeSession(chatSession.getSessionId());
             }
-            // 解除设备-实例绑定
+            // Remove o vínculo dispositivo-instância
             if (chatSession.getDevice() != null) {
                 deviceRegistry.unbind(chatSession.getDevice().getDeviceId());
             }
@@ -201,20 +201,20 @@ public class SessionManager {
                 chatSession.close();
                 String closeDeviceId = chatSession.getDevice() != null ? chatSession.getDevice().getDeviceId() : null;
                 applicationContext.publishEvent(new ChatSessionClosedEvent(this, chatSession.getSessionId(), closeDeviceId));
-                log.info("会话已关闭 - SessionId: {} SessionType: {}", chatSession.getSessionId(), chatSession.getClass().getSimpleName());
+                log.info("Sessão fechada - SessionId: {} SessionType: {}", chatSession.getSessionId(), chatSession.getClass().getSimpleName());
             }
             chatSession.clearAudioSinks();
         } catch (Exception e) {
-            log.error("清理会话资源时发生错误 - SessionId: {}",
+            log.error("Erro ao limpar os recursos da sessão - SessionId: {}",
                     chatSession.getSessionId(), e);
         }
     }
 
-    // ========== 设备注册 ==========
+    // ========== Registro de dispositivo ==========
 
     public void registerDevice(String sessionId, DeviceBO device) {
         if (device == null || device.getDeviceId() == null) {
-            log.warn("注册设备失败: device 或 deviceId 为 null, sessionId={}", sessionId);
+            log.warn("Falha ao registrar o dispositivo: device ou deviceId é null, sessionId={}", sessionId);
             return;
         }
         ChatSession chatSession = sessions.get(sessionId);
@@ -223,7 +223,7 @@ public class SessionManager {
             deviceIdToSessionId.put(device.getDeviceId(), sessionId);
             updateLastActivity(sessionId);
             deviceRegistry.bind(device.getDeviceId());
-            log.debug("设备配置已注册 - SessionId: {}, DeviceId: {}", sessionId, device.getDeviceId());
+            log.debug("Configuração do dispositivo registrada - SessionId: {}, DeviceId: {}", sessionId, device.getDeviceId());
             applicationContext.publishEvent(new DeviceOnlineEvent(this, device.getDeviceId()));
         }
     }
@@ -235,7 +235,7 @@ public class SessionManager {
         }
     }
 
-    // ========== 验证码状态 ==========
+    // ========== Estado do código de verificação ==========
 
     public boolean markCaptchaGeneration(String deviceId) {
         return captchaState.putIfAbsent(deviceId, Boolean.TRUE) == null;
@@ -245,7 +245,7 @@ public class SessionManager {
         captchaState.remove(deviceId);
     }
 
-    // ========== 跨会话查询 ==========
+    // ========== Consulta entre sessões ==========
 
     public Optional<Conversation> findConversation(String deviceId) {
         ChatSession session = getSessionByDeviceId(deviceId);

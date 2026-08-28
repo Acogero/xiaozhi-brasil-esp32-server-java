@@ -11,20 +11,20 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 设备-实例注册表。
- * 通过 Redis 维护 device → instance 映射，用于集群部署场景下：
+ * Registro de dispositivo-instância.
+ * Mantém o mapeamento device → instance via Redis, usado em cenários de implantação em cluster para:
  * <ul>
- *   <li>设备上线时绑定到当前实例</li>
- *   <li>设备下线时解绑</li>
- *   <li>心跳刷新 TTL，防止映射过期</li>
- *   <li>启动时查询属于本实例的设备（用于精准重置状态）</li>
+ *   <li>Vincular o dispositivo à instância atual quando ele ficar online</li>
+ *   <li>Desvincular quando o dispositivo ficar offline</li>
+ *   <li>Atualizar o TTL via heartbeat, evitando que o mapeamento expire</li>
+ *   <li>Consultar, na inicialização, os dispositivos pertencentes a esta instância (para resetar o estado com precisão)</li>
  * </ul>
  */
 @Component
 public class DeviceRegistry {
 
     private static final String KEY_PREFIX = "xiaozhi:device:instance:";
-    private static final Duration TTL = Duration.ofSeconds(300); // 5 分钟
+    private static final Duration TTL = Duration.ofSeconds(300); // 5 minutos
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -33,7 +33,7 @@ public class DeviceRegistry {
     private InstanceIdHolder instanceIdHolder;
 
     /**
-     * 设备上线：绑定到本实例
+     * Dispositivo online: vincula à instância atual
      */
     public void bind(String deviceId) {
         stringRedisTemplate.opsForValue().set(
@@ -41,29 +41,29 @@ public class DeviceRegistry {
     }
 
     /**
-     * 设备下线：解绑
+     * Dispositivo offline: desvincula
      */
     public void unbind(String deviceId) {
         stringRedisTemplate.delete(KEY_PREFIX + deviceId);
     }
 
     /**
-     * 刷新心跳（由 InactiveSessionChecker 定期调用）
+     * Atualiza o heartbeat (chamado periodicamente por InactiveSessionChecker)
      */
     public void refresh(String deviceId) {
         stringRedisTemplate.expire(KEY_PREFIX + deviceId, TTL);
     }
 
     /**
-     * 查询设备所在实例
+     * Consulta a instância em que o dispositivo está
      */
     public String getInstance(String deviceId) {
         return stringRedisTemplate.opsForValue().get(KEY_PREFIX + deviceId);
     }
 
     /**
-     * 查询属于本实例的所有设备 ID。
-     * 通过 SCAN 遍历 {@code xiaozhi:device:instance:*}，筛选 value 等于本实例 ID 的 key。
+     * Consulta todos os IDs de dispositivo pertencentes a esta instância.
+     * Percorre {@code xiaozhi:device:instance:*} via SCAN, filtrando as chaves cujo valor é igual ao ID desta instância.
      */
     public Set<String> getOwnDeviceIds() {
         Set<String> ownDeviceIds = new HashSet<>();
@@ -82,7 +82,7 @@ public class DeviceRegistry {
     }
 
     /**
-     * 判断设备是否属于本实例
+     * Verifica se o dispositivo pertence a esta instância
      */
     public boolean isOwned(String deviceId) {
         return instanceIdHolder.getInstanceId().equals(getInstance(deviceId));
