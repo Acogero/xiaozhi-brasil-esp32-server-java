@@ -6,7 +6,7 @@ import reactor.core.publisher.Flux;
 public interface ChatConverter {
 
     /**
-     * 将 tokens 字符串转换为SentenceResult（纯文本 + 情绪词）。
+     * Converte a string de tokens em um SentenceResult (texto puro + palavra de emoção).
      * @return
      */
     Flux<SentenceHelper.SentenceResult> convert(Flux<String> stringFlux);

@@ -11,38 +11,38 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 句子处理帮助类，统一分句逻辑。
- * 有状态的实例，不要复用，用完就丢弃。
+ * Classe auxiliar de processamento de frases, unificando a lógica de segmentação.
+ * Instância com estado; não reutilize — descarte após o uso.
  *
- * 提供两种使用方式：
- * 1. 响应式：convert(Flux<String>) → Flux<String>，供 FileSynthesizer 使用
- * 2. 命令式：take(String token) / take()，供 TTS Provider 内部 WebSocket 订阅使用
+ * Oferece duas formas de uso:
+ * 1. Reativa: convert(Flux<String>) → Flux<String>, usada pelo FileSynthesizer
+ * 2. Imperativa: take(String token) / take(), usada internamente pela assinatura WebSocket do TTS Provider
  */
 public class SentenceHelper implements ChatConverter {
 
     /**
-     * 分句结果，包含去除表情符号后的纯文本和提取的情绪词。
+     * Resultado da segmentação, contendo o texto puro sem emoticons e a palavra de emoção extraída.
      */
     public record SentenceResult(String text, String mood) {}
-    // 句子结束标点符号模式（中英文句号、感叹号、问号）
+    // Padrão de pontuação de fim de frase (ponto, exclamação, interrogação em chinês e inglês)
     private static final Pattern SENTENCE_END_PATTERN = Pattern.compile("[。！？!?]");
 
-    // 逗号、分号等停顿标点
+    // Pontuação de pausa como vírgula, ponto e vírgula, etc.
     private static final Pattern PAUSE_PATTERN = Pattern.compile("[，、；,;]");
 
-    // 冒号和引号等特殊标点
+    // Pontuação especial como dois-pontos e aspas
     private static final Pattern SPECIAL_PATTERN = Pattern.compile("[：:\"]");
 
-    // 换行符
+    // Quebra de linha
     private static final Pattern NEWLINE_PATTERN = Pattern.compile("[\n\r]");
 
-    // 数字模式（用于检测小数点是否在数字中）
+    // Padrão numérico (usado para detectar se o ponto decimal está dentro de um número)
     private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+\\.\\d+");
 
-    // 最小句子长度（字符数）
+    // Comprimento mínimo da frase (número de caracteres)
     private static final int MIN_SENTENCE_LENGTH = 8;
 
-    // 上下文缓冲区最大长度（用于数字小数点检测等上下文判断）
+    // Comprimento máximo do buffer de contexto (usado para detecção de ponto decimal e outras verificações de contexto)
     private static final int CONTEXT_BUFFER_MAX_LENGTH = 20;
 
     private final StringBuilder currentSentence = new StringBuilder();
@@ -52,8 +52,8 @@ public class SentenceHelper implements ChatConverter {
     }
 
     /**
-     * 命令式分句：逐 token 输入，返回检测到的完整句子，未成句则返回空字符串。
-     * 供 TTS Provider 内部 WebSocket 订阅回调使用。
+     * Segmentação imperativa: recebe tokens um a um, retornando a frase completa detectada; retorna string vazia se ainda não formar uma frase.
+     * Usada internamente pelo callback de assinatura WebSocket do TTS Provider.
      */
     public List<SentenceResult> take(String token) {
         List<SentenceResult> sentences = new ArrayList<>();
@@ -117,7 +117,7 @@ public class SentenceHelper implements ChatConverter {
     }
 
     /**
-     * 命令式分句：刷出缓冲区剩余内容（在文本流结束时调用）。
+     * Segmentação imperativa: libera o conteúdo restante do buffer (chamado ao final do fluxo de texto).
      */
     public SentenceResult take() {
         String rawSentence = currentSentence.toString().trim();

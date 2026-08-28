@@ -13,17 +13,17 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * 适配器：将项目的 {@link TtsService} / {@link StreamingTextToSpeech} 桥接到
- * Spring AI 的 {@link TextToSpeechModel} 标准接口。
+ * Adaptador: faz a ponte entre {@link TtsService} / {@link StreamingTextToSpeech} do projeto e
+ * a interface padrão {@link TextToSpeechModel} do Spring AI.
  * <p>
- * 使用方式：
+ * Forma de uso:
  * <pre>
  * TtsService ttsService = ttsServiceFactory.getTtsService(config, voiceName, pitch, speed);
  * TextToSpeechModel springAiTts = new TtsServiceAdapter(ttsService);
- * byte[] audio = springAiTts.call("你好");
+ * byte[] audio = springAiTts.call("Olá");
  * </pre>
  * <p>
- * 这样现有的 TTS Provider 无需修改即可兼容 Spring AI 的 TTS 生态。
+ * Dessa forma, os TTS Providers existentes ficam compatíveis com o ecossistema TTS do Spring AI sem precisar de modificações.
  */
 @Slf4j
 public class TtsServiceAdapter implements TextToSpeechModel {
@@ -40,7 +40,7 @@ public class TtsServiceAdapter implements TextToSpeechModel {
         try {
             Path audioPath = ttsService.textToSpeech(text);
             byte[] audioBytes = Files.readAllBytes(audioPath);
-            // 清理临时文件
+            // Limpa os arquivos temporários
             Files.deleteIfExists(audioPath);
             return new TextToSpeechResponse(List.of(new Speech(audioBytes)));
         } catch (Exception e) {
@@ -60,7 +60,7 @@ public class TtsServiceAdapter implements TextToSpeechModel {
     }
 
     /**
-     * 获取底层的原始 TtsService 实例。
+     * Obtém a instância original subjacente de TtsService.
      */
     public TtsService unwrap() {
         return ttsService;
