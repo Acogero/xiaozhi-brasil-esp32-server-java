@@ -4,8 +4,8 @@ import com.xiaozhi.common.domain.AbstractDomainEvent;
 import lombok.Getter;
 
 /**
- * 角色配置变更事件（更新或删除）。
- * 由 RoleRepositoryImpl.save() / delete() 发布，供对话会话层刷新 Persona 缓存。
+ * Evento de alteração de configuração do papel (atualização ou exclusão).
+ * Publicado por RoleRepositoryImpl.save() / delete(), usado pela camada de sessão de diálogo para atualizar o cache da Persona.
  */
 @Getter
 public class RoleUpdatedEvent extends AbstractDomainEvent {

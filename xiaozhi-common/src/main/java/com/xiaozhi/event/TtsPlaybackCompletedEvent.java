@@ -4,9 +4,9 @@ import com.xiaozhi.common.domain.AbstractDomainEvent;
 import lombok.Getter;
 
 /**
- * TTS 播放结束事件
- * 由 Player.sendStop() 触发，用于通知各组件 TTS 播放已结束。
- * VadService 监听此事件以重置 Silero 隐状态，消除 TTS 播放期间的状态污染。
+ * Evento de fim de reprodução TTS
+ * Disparado por Player.sendStop(), usado para notificar os componentes de que a reprodução TTS terminou.
+ * O VadService escuta este evento para resetar o estado oculto do Silero, eliminando a contaminação de estado durante a reprodução TTS.
  */
 @Getter
 public class TtsPlaybackCompletedEvent extends AbstractDomainEvent {

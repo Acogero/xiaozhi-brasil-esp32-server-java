@@ -4,9 +4,9 @@ import com.xiaozhi.common.domain.AbstractDomainEvent;
 import lombok.Getter;
 
 /**
- * 设备绑定角色变更事件。
- * 由 DeviceRepositoryImpl.save() 在检测到 ROLE_CHANGED 信号时发布，
- * 触发跨实例广播使 Persona 重建。
+ * Evento de alteração do papel vinculado ao dispositivo.
+ * Publicado por DeviceRepositoryImpl.save() ao detectar o sinal ROLE_CHANGED,
+ * dispara o broadcast entre instâncias para reconstruir a Persona.
  */
 @Getter
 public class DeviceRoleChangedEvent extends AbstractDomainEvent {

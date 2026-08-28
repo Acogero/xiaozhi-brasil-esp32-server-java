@@ -4,7 +4,7 @@ import com.xiaozhi.common.domain.AbstractDomainEvent;
 import lombok.Getter;
 
 /**
- * Session 关闭事件
+ * Evento de encerramento de sessão
  */
 @Getter
 public class ChatSessionClosedEvent extends AbstractDomainEvent {

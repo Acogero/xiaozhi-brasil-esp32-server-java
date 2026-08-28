@@ -5,7 +5,7 @@ import com.xiaozhi.common.domain.AbstractDomainEvent;
 import lombok.Getter;
 
 /**
- * 设备信息变更事件，通知会话层同步设备信息
+ * Evento de alteração de informações do dispositivo, notifica a camada de sessão para sincronizar as informações do dispositivo
  */
 @Getter
 public class DeviceUpdatedEvent extends AbstractDomainEvent {

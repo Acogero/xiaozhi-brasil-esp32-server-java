@@ -4,8 +4,8 @@ import com.xiaozhi.common.domain.AbstractDomainEvent;
 import lombok.Getter;
 
 /**
- * 工具调用完成事件。
- * 在 XiaoZhiToolCallingManager 执行工具后发布，供日志记录和审计使用。
+ * Evento de conclusão de chamada de ferramenta.
+ * Publicado após a execução da ferramenta em XiaoZhiToolCallingManager, usado para registro de log e auditoria.
  */
 @Getter
 public class ToolCallCompletedEvent extends AbstractDomainEvent {
