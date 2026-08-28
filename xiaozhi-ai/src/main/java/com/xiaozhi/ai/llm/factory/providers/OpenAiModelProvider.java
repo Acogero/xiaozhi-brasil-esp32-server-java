@@ -31,10 +31,10 @@ import java.time.Duration;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * OpenAI及兼容OpenAI协议的模型提供者。
- * 支持: OpenAI, Azure OpenAI, 各种兼容OpenAI的本地模型等。
+ * Provedor de modelo OpenAI e compatíveis com o protocolo OpenAI.
+ * Suporta: OpenAI, Azure OpenAI, diversos modelos locais compatíveis com OpenAI, etc.
  * <p>
- * 通过配置 {@code enableThinking} 控制是否启用推理模式（{@code reasoningEffort}）。
+ * Controla, via a configuração {@code enableThinking}, se o modo de raciocínio ({@code reasoningEffort}) é habilitado.
  */
 @Slf4j
 @Component
@@ -63,7 +63,7 @@ public class OpenAiModelProvider implements ChatModelProvider {
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add("Content-Type", "application/json");
         
-        // LM Studio不支持Http/2，所以需要强制使用HTTP/1.1
+        // LM Studio não suporta Http/2, portanto é necessário forçar o uso de HTTP/1.1
         var openAiApi = OpenAiApi.builder()
                 .apiKey(StringUtils.hasText(apiKey) ? new SimpleApiKey(apiKey) : new NoopApiKey())
                 .baseUrl(endpoint)
@@ -90,7 +90,7 @@ public class OpenAiModelProvider implements ChatModelProvider {
 
         if (enableThinking) {
             chatOptionsBuilder.reasoningEffort("medium");
-            log.info("OpenAI model {} 已启用思考模式，reasoningEffort=medium", model);
+            log.info("OpenAI model {} com modo de raciocínio habilitado, reasoningEffort=medium", model);
         }
 
         var openAiChatOptions = chatOptionsBuilder.build();
@@ -125,7 +125,7 @@ public class OpenAiModelProvider implements ChatModelProvider {
                         .requestFactory(createRequestFactory()))
                 .build();
         var options = OpenAiEmbeddingOptions.builder().model(config.getConfigName()).build();
-        log.debug("创建 OpenAI EmbeddingModel: model={}, endpoint={}", config.getConfigName(), config.getApiUrl());
+        log.debug("Criando OpenAI EmbeddingModel: model={}, endpoint={}", config.getConfigName(), config.getApiUrl());
         return new OpenAiEmbeddingModel(openAiApi, MetadataMode.EMBED, options);
     }
 

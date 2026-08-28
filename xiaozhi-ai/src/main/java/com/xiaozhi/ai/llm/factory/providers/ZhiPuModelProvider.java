@@ -20,9 +20,9 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 智谱AI模型提供者。
- * 支持 GLM-4-Air、GLM-4.5、GLM-4.6、GLM-Z1 等模型。
- * 通过配置 {@code enableThinking} 控制是否启用 Thinking Mode（Spring AI 1.1.0+ 原生支持）。
+ * Provedor de modelo ZhiPu AI.
+ * Suporta os modelos GLM-4-Air, GLM-4.5, GLM-4.6, GLM-Z1, entre outros.
+ * Controla, via a configuração {@code enableThinking}, se o Thinking Mode é habilitado (suportado nativamente pelo Spring AI 1.1.0+).
  */
 @Slf4j
 @Component
@@ -59,7 +59,7 @@ public class ZhiPuModelProvider implements ChatModelProvider {
 
         if (enableThinking) {
             optionsBuilder.thinking(ZhiPuAiApi.ChatCompletionRequest.Thinking.enabled());
-            log.info("ZhiPu model {} 已启用思考模式", model);
+            log.info("ZhiPu model {} com modo de raciocínio habilitado", model);
         }
 
         var zhipuAiChatOptions = optionsBuilder.build();

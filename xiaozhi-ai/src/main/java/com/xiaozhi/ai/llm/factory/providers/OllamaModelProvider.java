@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * Ollama模型提供者
+ * Provedor de modelo Ollama
  */
 @Slf4j
 @Component
