@@ -37,13 +37,13 @@ import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 自定义的工具调用管理器，用于处理工具调用和执行。
- * 基于Spring AI的DefaultToolCallingManager，增加了自定义的监控和元数据处理功能。
+ * Gerenciador customizado de chamadas de ferramenta, usado para processar e executar chamadas de ferramenta.
+ * Baseado no DefaultToolCallingManager do Spring AI, com funcionalidades customizadas de monitoramento e processamento de metadados adicionadas.
  * <p>
- * 包含对流式工具调用分片合并的修复（Spring AI issue #4629, #4790）。
- * 该问题在 Spring AI 1.1.4 中仍未修复，mergeToolCalls 方法作为必要的修复保留。
+ * Inclui a correção para a mesclagem de fragmentos de chamadas de ferramenta em streaming (Spring AI issue #4629, #4790).
+ * Esse problema ainda não foi corrigido no Spring AI 1.1.4; o método mergeToolCalls é mantido como uma correção necessária.
  * <p>
- * TODO: [Spring AI 升级追踪] 持续关注后续版本是否修复分片问题，届时可移除 mergeToolCalls 方法。
+ * TODO: [Acompanhamento de atualização do Spring AI] Acompanhar se versões futuras corrigem o problema de fragmentação; quando isso ocorrer, o método mergeToolCalls poderá ser removido.
  */
 @Slf4j
 public class XiaoZhiToolCallingManager implements ToolCallingManager, ApplicationContextAware {
@@ -90,21 +90,21 @@ public class XiaoZhiToolCallingManager implements ToolCallingManager, Applicatio
     }
 
     /**
-     * 获取 ToolSessionProvider
+     * Obtém o ToolSessionProvider
      */
     private static ToolSessionProvider sessionProvider() {
         if (applicationContext != null) {
             try {
                 return applicationContext.getBean(ToolSessionProvider.class);
             } catch (Exception e) {
-                log.debug("无法获取ToolSessionProvider: {}", e.getMessage());
+                log.debug("Não foi possível obter o ToolSessionProvider: {}", e.getMessage());
             }
         }
         return null;
     }
 
     /**
-     * 发布工具调用事件
+     * Publica o evento de chamada de ferramenta
      */
     private static void publishToolEvent(String sessionId, String toolName, String arguments,
                                           String result, boolean success, long startTimeMs) {
@@ -116,7 +116,7 @@ public class XiaoZhiToolCallingManager implements ToolCallingManager, Applicatio
             applicationContext.publishEvent(new ToolCallCompletedEvent(
                     XiaoZhiToolCallingManager.class, sessionId, toolName, arguments, result, success, durationMs));
         } catch (Exception e) {
-            log.debug("发布工具调用事件失败: {}", e.getMessage());
+            log.debug("Falha ao publicar o evento de chamada de ferramenta: {}", e.getMessage());
         }
     }
 
@@ -160,7 +160,7 @@ public class XiaoZhiToolCallingManager implements ToolCallingManager, Applicatio
 
         AssistantMessage originalAssistantMessage = toolCallGeneration.get().getOutput();
 
-        // 修复流式分片导致的 ToolCall 拆分问题
+        // Corrige o problema de ToolCall dividido causado pela fragmentação em streaming
         List<AssistantMessage.ToolCall> mergedToolCalls = mergeToolCalls(originalAssistantMessage.getToolCalls());
         AssistantMessage assistantMessage = (mergedToolCalls == originalAssistantMessage.getToolCalls())
                 ? originalAssistantMessage
@@ -175,7 +175,7 @@ public class XiaoZhiToolCallingManager implements ToolCallingManager, Applicatio
         XiaoZhiToolCallingManager.ToolExecResult toolExecResult = executeToolCall(prompt, assistantMessage,
                 toolContext);
 
-        // 将中间消息（模型的 tool_call 请求 + 工具执行结果）存入 ToolSession，供 Persona 注入 Conversation
+        // Armazena a mensagem intermediária (requisição tool_call do modelo + resultado da execução da ferramenta) no ToolSession, para que a Persona a injete na Conversation
         String sessionId = toolContext.getContext().get("sessionId") instanceof String s ? s : null;
         if (sessionId != null) {
             ToolSessionProvider provider = sessionProvider();
@@ -214,7 +214,7 @@ public class XiaoZhiToolCallingManager implements ToolCallingManager, Applicatio
                                                                              AssistantMessage assistantMessage) {
         List<Message> messageHistory = new ArrayList<>(prompt.copy().getInstructions());
 
-        // 确保工具调用消息包含正确的元数据
+        // Garante que a mensagem de chamada de ferramenta contenha a metadata correta
         if (!CollectionUtils.isEmpty(assistantMessage.getToolCalls())) {
             Map<String, Object> metadata = new HashMap<>(assistantMessage.getMetadata());
             String toolName = assistantMessage.getToolCalls().get(0).name();
@@ -237,28 +237,28 @@ public class XiaoZhiToolCallingManager implements ToolCallingManager, Applicatio
     }
 
     /**
-     * 合并流式响应中被拆分的工具调用（Spring AI issue #4629, #4790，1.1.4 仍未修复）。
+     * Mescla as chamadas de ferramenta fragmentadas na resposta em streaming (Spring AI issue #4629, #4790; ainda não corrigido na 1.1.4).
      * <p>
-     * 部分 OpenAI 兼容 API（千问、阿里云等）在流式返回 tool call 时，续传 chunk 的 id 为空字符串 "" 而非 null，
-     * 导致 OpenAiStreamFunctionCallingHelper.merge() 将同一个 tool call 的 name 和 arguments 拆成多条记录。
+     * Algumas APIs compatíveis com OpenAI (Qwen, Alibaba Cloud, etc.) retornam, no streaming de tool call, o id do chunk de continuação como uma string vazia "" em vez de null,
+     * o que faz com que OpenAiStreamFunctionCallingHelper.merge() divida o name e os arguments de um mesmo tool call em múltiplos registros.
      * <p>
-     * 已观测到的分片模式（同一 id 被拆成两条）：
+     * Padrão de fragmentação observado (o mesmo id dividido em duas partes):
      * <pre>
-     *   分片[0]: id='call_xxx', name='get_device_status', arguments=''
-     *   分片[1]: id='call_xxx', name='',                  arguments='{}'
+     *   Fragmento[0]: id='call_xxx', name='get_device_status', arguments=''
+     *   Fragmento[1]: id='call_xxx', name='',                  arguments='{}'
      * </pre>
      * <p>
-     * 合并策略：
-     * - 相同 id 的条目属于同一个 tool call，合并 name 和 arguments
-     * - id 为空且 name 为空的条目视为续传片段，合并到紧邻的上一个 tool call
-     * - 合并后仍缺少 name 的条目会被 warn 并跳过（arguments 允许为空，部分工具不需要参数）
+     * Estratégia de mesclagem:
+     * - Entradas com o mesmo id pertencem ao mesmo tool call; mescla name e arguments
+     * - Entradas com id vazio e name vazio são tratadas como fragmentos de continuação, mescladas ao tool call imediatamente anterior
+     * - Entradas que, após a mesclagem, ainda não tiverem name recebem um warn e são ignoradas (arguments pode ser vazio; algumas ferramentas não requerem parâmetros)
      */
     private static List<AssistantMessage.ToolCall> mergeToolCalls(List<AssistantMessage.ToolCall> toolCalls) {
         if (toolCalls == null || toolCalls.size() <= 1) {
             return toolCalls;
         }
 
-        // 快速检查：如果所有条目都有 name，说明没有分片问题，直接返回
+        // Verificação rápida: se todas as entradas têm name, não há problema de fragmentação; retorna diretamente
         boolean hasFragment = toolCalls.stream()
                 .anyMatch(tc -> !StringUtils.hasText(tc.name()));
         if (!hasFragment) {
@@ -272,13 +272,13 @@ public class XiaoZhiToolCallingManager implements ToolCallingManager, Applicatio
         StringBuilder currentArgs = null;
 
         for (AssistantMessage.ToolCall tc : toolCalls) {
-            // 判断是否为续传：同一 id 或无 id 无 name 的孤立片段
+            // Verifica se é continuação: mesmo id, ou um fragmento isolado sem id e sem name
             boolean isContinuation = currentId != null
                     && ((!StringUtils.hasText(tc.id()) && !StringUtils.hasText(tc.name()))
                         || (StringUtils.hasText(tc.id()) && tc.id().equals(currentId)));
 
             if (isContinuation) {
-                // 续传片段：合并到当前 tool call
+                // Fragmento de continuação: mescla ao tool call atual
                 if (StringUtils.hasText(tc.name()) && !StringUtils.hasText(currentName)) {
                     currentName = tc.name();
                 }
@@ -286,7 +286,7 @@ public class XiaoZhiToolCallingManager implements ToolCallingManager, Applicatio
                     currentArgs.append(tc.arguments());
                 }
             } else {
-                // 新的 tool call：先输出上一个
+                // Novo tool call: emite primeiro o anterior
                 if (currentName != null) {
                     merged.add(new AssistantMessage.ToolCall(currentId, currentType, currentName, currentArgs.toString()));
                 }
@@ -296,23 +296,23 @@ public class XiaoZhiToolCallingManager implements ToolCallingManager, Applicatio
                 currentArgs = new StringBuilder(tc.arguments() != null ? tc.arguments() : "");
             }
         }
-        // 输出最后一个
+        // Emite o último
         if (currentName != null) {
             merged.add(new AssistantMessage.ToolCall(currentId, currentType, currentName, currentArgs.toString()));
         }
 
-        // 验证：只拦截缺 name 的，arguments 允许为空（部分工具不需要参数）
+        // Validação: intercepta apenas as que faltam name; arguments pode ser vazio (algumas ferramentas não requerem parâmetros)
         List<AssistantMessage.ToolCall> valid = new ArrayList<>();
         for (AssistantMessage.ToolCall tc : merged) {
             if (!StringUtils.hasText(tc.name())) {
-                log.warn("工具调用合并后仍缺少 name，跳过: id={}, arguments={}", tc.id(), tc.arguments());
+                log.warn("Chamada de ferramenta ainda sem name após a mesclagem, ignorando: id={}, arguments={}", tc.id(), tc.arguments());
             } else {
                 valid.add(tc);
             }
         }
 
         if (valid.size() != toolCalls.size()) {
-            log.warn("工具调用分片合并触发: {} 条 → {} 条",
+            log.warn("Mesclagem de fragmentos de chamada de ferramenta acionada: {} registros → {} registros",
                     toolCalls.size(), valid.size());
         }
         return valid;
@@ -343,11 +343,11 @@ public class XiaoZhiToolCallingManager implements ToolCallingManager, Applicatio
                     .orElseGet(() -> this.toolCallbackResolver.resolve(toolName));
 
             if (toolCallback == null) {
-                // 模型幻觉调用了未注册的工具，返回错误结果让模型自行总结回复，而不是崩掉整个流
-                log.error("模型调用了未注册的工具: {}", toolName);
+                // O modelo alucinou e chamou uma ferramenta não registrada; retorna um resultado de erro para que o modelo resuma a resposta por conta própria, em vez de quebrar todo o fluxo
+                log.error("O modelo chamou uma ferramenta não registrada: {}", toolName);
                 toolResponses.add(new ToolResponseMessage.ToolResponse(
                         toolCall.id(), toolName,
-                        "工具 '" + toolName + "' 不存在或未注册，请告知用户该功能当前不可用。"));
+                        "A ferramenta '" + toolName + "' não existe ou não foi registrada; informe ao usuário que esta funcionalidade não está disponível no momento."));
                 continue;
             }
 
@@ -363,7 +363,7 @@ public class XiaoZhiToolCallingManager implements ToolCallingManager, Applicatio
                     .toolMetadata(toolCallback.getToolMetadata())
                     .toolCallArguments(toolInputArguments)
                     .build();
-            // 通过 sessionId 获取 ToolSession（Persona 只传 sessionId 避免序列化问题）
+            // Obtém o ToolSession através do sessionId (a Persona passa apenas o sessionId para evitar problemas de serialização)
             String sessionId = toolContext.getContext().get("sessionId") instanceof String s ? s : null;
             ToolSession toolSession = null;
             if (sessionId != null) {
@@ -371,7 +371,7 @@ public class XiaoZhiToolCallingManager implements ToolCallingManager, Applicatio
                 observationContext.put("sessionId", sessionId);
             }
 
-            // 记录工具调用开始时间
+            // Registra o horário de início da chamada de ferramenta
             final long[] startTimeRef = new long[]{System.currentTimeMillis()};
             final boolean[] successRef = new boolean[]{true};
 
@@ -399,12 +399,12 @@ public class XiaoZhiToolCallingManager implements ToolCallingManager, Applicatio
                         return toolResult;
                     });
 
-            // 记录工具调用详情到session
+            // Registra os detalhes da chamada de ferramenta na session
             if (toolSession != null) {
                 toolSession.addToolCallDetail(toolName, toolInputArguments, toolCallResult);
             }
 
-            // 发布工具调用事件
+            // Publica o evento de chamada de ferramenta
             publishToolEvent(sessionId, toolName, toolInputArguments, toolCallResult,
                     successRef[0], startTimeRef[0]);
 
@@ -420,7 +420,7 @@ public class XiaoZhiToolCallingManager implements ToolCallingManager, Applicatio
                                                                      AssistantMessage assistantMessage, ToolResponseMessage toolResponseMessage) {
         List<Message> messages = new ArrayList<>(previousMessages);
 
-        // 确保工具调用消息包含正确的元数据
+        // Garante que a mensagem de chamada de ferramenta contenha a metadata correta
         if (!CollectionUtils.isEmpty(assistantMessage.getToolCalls())) {
             Map<String, Object> metadata = new HashMap<>(assistantMessage.getMetadata());
             String toolName = assistantMessage.getToolCalls().get(0).name();

@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ToolsGlobalRegistry implements ToolCallbackResolver {
     private static final String TAG = "FUNCTION_GLOBAL";
 
-    // 用于存储所有function列表
+    // Usado para armazenar a lista de todas as functions
     protected static final ConcurrentHashMap<String, ToolCallback> allFunction
             = new ConcurrentHashMap<>();
 
@@ -32,8 +32,8 @@ public class ToolsGlobalRegistry implements ToolCallbackResolver {
     private GlobalToolRedisRegistry globalToolRedisRegistry;
 
     /**
-     * 应用启动后，将本进程注册的 GlobalFunction 元数据发布到 Redis，
-     * 使 server 进程能在"排除工具"界面拿到由 dialogue 进程持有的工具列表。
+     * Após a inicialização da aplicação, publica no Redis os metadados de GlobalFunction registrados neste processo,
+     * permitindo que o processo server obtenha, na interface de "excluir ferramentas", a lista de ferramentas mantida pelo processo dialogue.
      */
     @EventListener(ApplicationReadyEvent.class)
     public void publishGlobalToolMetadata() {
@@ -83,8 +83,8 @@ public class ToolsGlobalRegistry implements ToolCallbackResolver {
      * @return a map of all registered functions
      */
     public Map<String, ToolCallback> getAllFunctions(ToolSession toolSession) {
-        // 注意：这里不再自动注册所有全局函数到allFunction中
-        // 而是返回一个临时的Map，由 ToolRegistrationService 统一管理工具注册
+        // Observação: aqui não se registra mais automaticamente todas as funções globais em allFunction
+        // Em vez disso, retorna um Map temporário; o registro das ferramentas é gerenciado de forma unificada pelo ToolRegistrationService
         Map<String, ToolCallback> tempFunctions = new HashMap<>();
         globalFunctions.forEach(
                 globalFunction -> {
@@ -98,7 +98,7 @@ public class ToolsGlobalRegistry implements ToolCallbackResolver {
     }
 
     /**
-     * 获取所有已注册 GlobalFunction 的工具摘要（name + description）
+     * Obtém o resumo de todas as GlobalFunction registradas (name + description)
      */
     public List<Map<String, String>> getGlobalToolSummaries() {
         return globalFunctions.stream()
@@ -110,12 +110,12 @@ public class ToolsGlobalRegistry implements ToolCallbackResolver {
         ToolCallback getFunctionCallTool(ToolSession toolSession);
 
         /**
-         * 工具名称
+         * Nome da ferramenta
          */
         String getToolName();
 
         /**
-         * 工具描述
+         * Descrição da ferramenta
          */
         String getToolDescription();
     }

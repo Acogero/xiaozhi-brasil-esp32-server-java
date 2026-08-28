@@ -7,7 +7,7 @@ import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 与session绑定的functionTools
+ * functionTools vinculadas à session
  */
 @Slf4j
 public class ToolsSessionHolder {
@@ -100,10 +100,10 @@ public class ToolsSessionHolder {
     }
 
     /**
-     * 注册全局函数到FunctionHolder
+     * Registra funções globais no FunctionHolder
      */
     public void registerGlobalFunctionTools() {
-        // 全局函数由 ToolRegistrationService 统一管理
-        log.debug("[{}] - SessionId:{} 跳过自动注册全局函数，由 ToolRegistrationService 统一管理", TAG, sessionId);
+        // As funções globais são gerenciadas de forma unificada pelo ToolRegistrationService
+        log.debug("[{}] - SessionId:{} pulando o registro automático de funções globais, gerenciado de forma unificada pelo ToolRegistrationService", TAG, sessionId);
     }
 }
