@@ -1,29 +1,29 @@
 #!/usr/bin/env bash
 # =============================================================================
-# 下载 STT 语音识别模型 (Vosk)
-# 可独立运行，也可被 download_models.sh 总控脚本调用
+# Download do modelo de reconhecimento de voz (STT) (Vosk)
+# Pode ser executado de forma independente ou chamado pelo script principal download_models.sh
 #
-# 用法:
-#   ./scripts/download_stt.sh              # 下载小模型 (默认)
-#   ./scripts/download_stt.sh small        # 下载小模型 (~50MB)
-#   ./scripts/download_stt.sh standard     # 下载标准模型 (~1.3GB)
-#   ./scripts/download_stt.sh clean        # 清理
-#   ./scripts/download_stt.sh status       # 查看状态
+# Uso:
+#   ./scripts/download_stt.sh              # Baixa o modelo pequeno (padrão)
+#   ./scripts/download_stt.sh small        # Baixa o modelo pequeno (~50MB)
+#   ./scripts/download_stt.sh standard     # Baixa o modelo padrão (~1.3GB)
+#   ./scripts/download_stt.sh clean        # Limpa
+#   ./scripts/download_stt.sh status       # Verifica o status
 # =============================================================================
 
 set -e
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/_common.sh"
 
-# ---- Vosk STT 模型配置 ----
-# small: vosk-model-small-cn-0.22 (~50MB，速度快，适合低配设备)
-# standard: vosk-model-cn-0.22 (~1.3GB，精度高，推荐生产使用)
+# ---- Configuração do modelo Vosk STT ----
+# small: vosk-model-small-cn-0.22 (~50MB, mais rápido, indicado para dispositivos com poucos recursos)
+# standard: vosk-model-cn-0.22 (~1.3GB, alta precisão, recomendado para produção)
 VOSK_MODEL_SMALL="vosk-model-small-cn-0.22"
 VOSK_MODEL_STANDARD="vosk-model-cn-0.22"
 VOSK_BASE_URL="https://alphacephei.com/vosk/models"
 STT_MODEL_DIR="${MODELS_DIR}"
 
 # ============================================================
-# 下载 Vosk STT 模型
+# Download do modelo Vosk STT
 # ============================================================
 download_stt() {
     local size="${1:-small}"
@@ -35,65 +35,65 @@ download_stt() {
         model_name="$VOSK_MODEL_STANDARD"
     fi
 
-    info "========== 下载语音识别(STT)模型 =========="
-    info "模型: ${model_name}"
+    info "========== Download do modelo de reconhecimento de voz (STT) =========="
+    info "Modelo: ${model_name}"
     if [ "$size" = "small" ]; then
-        info "说明: Vosk 中文小模型 (~50MB，速度快)"
+        info "Descrição: modelo Vosk chinês pequeno (~50MB, mais rápido)"
     else
-        info "说明: Vosk 中文标准模型 (~1.3GB，精度高)"
+        info "Descrição: modelo Vosk chinês padrão (~1.3GB, alta precisão)"
     fi
 
     mkdir -p "$STT_MODEL_DIR"
 
     if [ -d "${STT_MODEL_DIR}/vosk-model" ]; then
-        info "Vosk模型已存在: ${STT_MODEL_DIR}/vosk-model/"
-        info "如需重新下载，请先运行: $0 clean"
+        info "Modelo Vosk já existe: ${STT_MODEL_DIR}/vosk-model/"
+        info "Para baixar novamente, execute primeiro: $0 clean"
         return 0
     fi
 
     cd "$STT_MODEL_DIR"
-    info "正在下载 ${model_name}.zip ..."
+    info "Baixando ${model_name}.zip ..."
     download_file "${VOSK_BASE_URL}/${model_name}.zip" "${model_name}.zip"
 
-    info "正在解压..."
+    info "Extraindo..."
     unzip -q "${model_name}.zip"
 
-    # 重命名为统一目录名 vosk-model（与 VoskSttService.java 中的路径一致）
+    # Renomeia para o diretório padrão vosk-model (consistente com o caminho em VoskSttService.java)
     mv "${model_name}" vosk-model
     rm -f "${model_name}.zip"
 
-    info "STT模型下载完成！"
-    info "路径: ${STT_MODEL_DIR}/vosk-model/"
+    info "Download do modelo STT concluído!"
+    info "Caminho: ${STT_MODEL_DIR}/vosk-model/"
     echo ""
 }
 
 # ============================================================
-# 清理
+# Limpeza
 # ============================================================
 clean_stt() {
-    warn "========== 清理 STT 模型 =========="
+    warn "========== Limpando modelo STT =========="
     if [ -d "${STT_MODEL_DIR}/vosk-model" ]; then
         rm -rf "${STT_MODEL_DIR}/vosk-model"
-        info "已删除 Vosk STT 模型"
+        info "Modelo Vosk STT removido"
     else
-        info "无需清理"
+        info "Nada a limpar"
     fi
-    info "清理完成！"
+    info "Limpeza concluída!"
 }
 
 # ============================================================
-# 状态
+# Status
 # ============================================================
 show_stt_status() {
     if [ -d "${STT_MODEL_DIR}/vosk-model" ]; then
-        echo -e "  STT (语音识别):    ${GREEN}✓ 已下载${NC} - vosk-model"
+        echo -e "  STT (reconhecimento de voz): ${GREEN}✓ Baixado${NC} - vosk-model"
     else
-        echo -e "  STT (语音识别):    ${RED}✗ 未下载${NC} - vosk-model"
+        echo -e "  STT (reconhecimento de voz): ${RED}✗ Não baixado${NC} - vosk-model"
     fi
 }
 
 # ============================================================
-# 独立运行时的入口
+# Ponto de entrada para execução independente
 # ============================================================
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     case "${1:-small}" in
@@ -104,15 +104,15 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             clean_stt
             ;;
         status)
-            echo ""; info "========== STT 模型状态 =========="; show_stt_status; echo ""
+            echo ""; info "========== Status do modelo STT =========="; show_stt_status; echo ""
             ;;
         *)
-            echo "用法: $0 [small|standard|clean|status]"
+            echo "Uso: $0 [small|standard|clean|status]"
             echo ""
-            echo "  small    - 下载 Vosk 中文小模型 (~50MB，默认)"
-            echo "  standard - 下载 Vosk 中文标准模型 (~1.3GB)"
-            echo "  clean    - 清理 STT 模型"
-            echo "  status   - 查看状态"
+            echo "  small    - Baixa o modelo Vosk chinês pequeno (~50MB, padrão)"
+            echo "  standard - Baixa o modelo Vosk chinês padrão (~1.3GB)"
+            echo "  clean    - Limpa o modelo STT"
+            echo "  status   - Verifica o status"
             exit 1
             ;;
     esac

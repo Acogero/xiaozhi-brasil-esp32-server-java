@@ -1,65 +1,65 @@
 #!/usr/bin/env bash
 # =============================================================================
-# 下载基础依赖: VAD 模型 + 原生库 (sherpa-onnx JNI + Vosk)
-# 可独立运行，也可被 download_models.sh 总控脚本调用
+# Download de dependências básicas: modelo VAD + bibliotecas nativas (sherpa-onnx JNI + Vosk)
+# Pode ser executado de forma independente ou chamado pelo script principal download_models.sh
 #
-# 用法:
-#   ./scripts/download_base.sh              # 下载全部基础依赖
-#   ./scripts/download_base.sh vad          # 仅下载 VAD 模型
-#   ./scripts/download_base.sh jni          # 仅下载 sherpa-onnx JNI 原生库
-#   ./scripts/download_base.sh vosk-lib     # 仅下载 Vosk 原生库
-#   ./scripts/download_base.sh libs         # 下载所有原生库
-#   ./scripts/download_base.sh clean        # 清理
-#   ./scripts/download_base.sh status       # 查看状态
+# Uso:
+#   ./scripts/download_base.sh              # Baixa todas as dependências básicas
+#   ./scripts/download_base.sh vad          # Baixa somente o modelo VAD
+#   ./scripts/download_base.sh jni          # Baixa somente a biblioteca nativa sherpa-onnx JNI
+#   ./scripts/download_base.sh vosk-lib     # Baixa somente a biblioteca nativa Vosk
+#   ./scripts/download_base.sh libs         # Baixa todas as bibliotecas nativas
+#   ./scripts/download_base.sh clean        # Limpa
+#   ./scripts/download_base.sh status       # Verifica o status
 # =============================================================================
 
 set -e
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/_common.sh"
 
-# ---- VAD 模型配置 ----
+# ---- Configuração do modelo VAD ----
 VAD_MODEL_NAME="silero_vad.onnx"
 VAD_MODEL_URL="https://github.com/snakers4/silero-vad/raw/master/src/silero_vad/data/silero_vad.onnx"
 VAD_MODEL_DIR="${MODELS_DIR}"
 
-# ---- 原生库下载地址 ----
+# ---- Endereços de download das bibliotecas nativas ----
 SHERPA_GITHUB="https://github.com/k2-fsa/sherpa-onnx/releases/download/v${SHERPA_VERSION}"
 VOSK_GITHUB="https://github.com/alphacep/vosk-api/releases/download/v${VOSK_VERSION}"
 
 # ============================================================
-# 下载 VAD 模型 (Silero VAD)
+# Download do modelo VAD (Silero VAD)
 # ============================================================
 download_vad() {
-    info "========== 下载 VAD 语音检测模型 =========="
-    info "模型: ${VAD_MODEL_NAME} (~2.2MB)"
+    info "========== Download do modelo VAD de detecção de voz =========="
+    info "Modelo: ${VAD_MODEL_NAME} (~2.2MB)"
 
     mkdir -p "$VAD_MODEL_DIR"
 
     if [ -f "${VAD_MODEL_DIR}/${VAD_MODEL_NAME}" ]; then
-        info "VAD模型已存在: ${VAD_MODEL_DIR}/${VAD_MODEL_NAME}"
-        info "如需重新下载，请先运行: $0 clean"
+        info "Modelo VAD já existe: ${VAD_MODEL_DIR}/${VAD_MODEL_NAME}"
+        info "Para baixar novamente, execute primeiro: $0 clean"
         return 0
     fi
 
-    info "正在下载..."
+    info "Baixando..."
     download_file "$VAD_MODEL_URL" "${VAD_MODEL_DIR}/${VAD_MODEL_NAME}"
 
-    info "VAD模型下载完成！"
+    info "Download do modelo VAD concluído!"
     echo ""
 }
 
 # ============================================================
-# 下载 sherpa-onnx JNI 原生库（全平台，从 JNI tarball 提取）
+# Download da biblioteca nativa sherpa-onnx JNI (todas as plataformas, extraída do tarball JNI)
 # ============================================================
 download_jni_lib() {
     detect_platform
-    info "========== 下载 sherpa-onnx JNI 原生库 =========="
-    info "版本: v${SHERPA_VERSION} (${PLATFORM})"
+    info "========== Download da biblioteca nativa sherpa-onnx JNI =========="
+    info "Versão: v${SHERPA_VERSION} (${PLATFORM})"
 
     mkdir -p "$LIB_DIR"
 
     if [ -f "${LIB_DIR}/${SHERPA_JNI_LIB}" ] && [ -f "${LIB_DIR}/${ONNXRT_LIB}" ]; then
-        info "JNI原生库已存在: ${LIB_DIR}/"
-        info "如需重新下载，请先运行: $0 clean"
+        info "Biblioteca nativa JNI já existe: ${LIB_DIR}/"
+        info "Para baixar novamente, execute primeiro: $0 clean"
         return 0
     fi
 
@@ -69,26 +69,26 @@ download_jni_lib() {
     local WORK_DIR=$(mktemp -d)
     trap "rm -rf '$WORK_DIR'" EXIT
 
-    info "正在下载 ${tar_name} ..."
+    info "Baixando ${tar_name} ..."
     download_file "$tar_url" "${WORK_DIR}/${tar_name}"
 
-    info "正在解压原生库..."
+    info "Extraindo bibliotecas nativas..."
     tar xf "${WORK_DIR}/${tar_name}" -C "$WORK_DIR"
 
     local found=0
     while IFS= read -r -d '' lib_file; do
         cp "$lib_file" "$LIB_DIR/"
-        info "  提取: $(basename "$lib_file")"
+        info "  Extraindo: $(basename "$lib_file")"
         found=$((found + 1))
     done < <(find "$WORK_DIR" -type f \( -name "*.${LIB_EXT}" -o -name "*.${LIB_EXT}.*" \) -print0)
 
-    # macOS: 创建 libonnxruntime.dylib 符号链接
+    # macOS: cria link simbólico libonnxruntime.dylib
     if [[ "$PLATFORM" == osx-* ]] && [ ! -e "${LIB_DIR}/libonnxruntime.dylib" ]; then
         local versioned_ort
         versioned_ort=$(ls "${LIB_DIR}"/libonnxruntime.*.dylib 2>/dev/null | head -1)
         if [ -n "$versioned_ort" ]; then
             ln -sf "$(basename "$versioned_ort")" "${LIB_DIR}/libonnxruntime.dylib"
-            info "  创建符号链接: libonnxruntime.dylib -> $(basename "$versioned_ort")"
+            info "  Criando link simbólico: libonnxruntime.dylib -> $(basename "$versioned_ort")"
         fi
     fi
 
@@ -96,27 +96,27 @@ download_jni_lib() {
     trap - EXIT
 
     if [ "$found" -eq 0 ]; then
-        error "提取失败，未找到任何 .${LIB_EXT} 文件"
+        error "Falha na extração, nenhum arquivo .${LIB_EXT} encontrado"
         return 1
     fi
 
-    info "sherpa-onnx JNI 原生库下载完成！(共 ${found} 个文件)"
+    info "Download da biblioteca nativa sherpa-onnx JNI concluído! (${found} arquivo(s) no total)"
     echo ""
 }
 
 # ============================================================
-# 下载 Vosk 原生库（从 Maven JAR 中提取）
+# Download da biblioteca nativa Vosk (extraída do JAR do Maven)
 # ============================================================
 download_vosk_lib() {
     detect_platform
-    info "========== 下载 Vosk 原生库 =========="
-    info "版本: v${VOSK_VERSION} (${PLATFORM})"
+    info "========== Download da biblioteca nativa Vosk =========="
+    info "Versão: v${VOSK_VERSION} (${PLATFORM})"
 
     mkdir -p "$LIB_DIR"
 
     if [ -f "${LIB_DIR}/${VOSK_LIB}" ]; then
-        info "Vosk原生库已存在: ${LIB_DIR}/${VOSK_LIB}"
-        info "如需重新下载，请先运行: $0 clean"
+        info "Biblioteca nativa Vosk já existe: ${LIB_DIR}/${VOSK_LIB}"
+        info "Para baixar novamente, execute primeiro: $0 clean"
         return 0
     fi
 
@@ -124,8 +124,8 @@ download_vosk_lib() {
     case "$PLATFORM" in
         linux-x64)      jar_subdir="linux-x86-64" ;;
         linux-aarch64)
-            warn "Vosk Maven JAR 不包含 linux-aarch64 原生库"
-            warn "请从 ${VOSK_GITHUB}/vosk-linux-aarch64-${VOSK_VERSION}.zip 手动下载"
+            warn "O JAR Maven do Vosk não contém a biblioteca nativa linux-aarch64"
+            warn "Baixe manualmente em ${VOSK_GITHUB}/vosk-linux-aarch64-${VOSK_VERSION}.zip"
             return 0
             ;;
         osx-*)          jar_subdir="darwin" ;;
@@ -135,13 +135,13 @@ download_vosk_lib() {
     local vosk_jar=""
     local m2_jar="${HOME}/.m2/repository/com/alphacephei/vosk/${VOSK_VERSION}/vosk-${VOSK_VERSION}.jar"
     if [ -f "$m2_jar" ]; then
-        info "从本地 Maven 缓存提取..."
+        info "Extraindo do cache local do Maven..."
         vosk_jar="$m2_jar"
     else
         local jar_url="https://repo1.maven.org/maven2/com/alphacephei/vosk/${VOSK_VERSION}/vosk-${VOSK_VERSION}.jar"
         local WORK_DIR=$(mktemp -d)
         vosk_jar="${WORK_DIR}/vosk-${VOSK_VERSION}.jar"
-        info "正在从 Maven Central 下载 vosk-${VOSK_VERSION}.jar ..."
+        info "Baixando vosk-${VOSK_VERSION}.jar do Maven Central ..."
         download_file "$jar_url" "$vosk_jar"
     fi
 
@@ -150,9 +150,9 @@ download_vosk_lib() {
 
     if [ -f "${EXTRACT_DIR}/${jar_subdir}/${VOSK_LIB}" ]; then
         cp "${EXTRACT_DIR}/${jar_subdir}/${VOSK_LIB}" "$LIB_DIR/"
-        info "Vosk 原生库提取完成: ${VOSK_LIB}"
+        info "Extração da biblioteca nativa Vosk concluída: ${VOSK_LIB}"
     else
-        error "未在 JAR 中找到 ${jar_subdir}/${VOSK_LIB}"
+        error "${jar_subdir}/${VOSK_LIB} não encontrado no JAR"
         rm -rf "$EXTRACT_DIR" "${WORK_DIR:-}"
         return 1
     fi
@@ -162,7 +162,7 @@ download_vosk_lib() {
 }
 
 # ============================================================
-# 下载所有原生库
+# Download de todas as bibliotecas nativas
 # ============================================================
 download_libs() {
     download_jni_lib
@@ -170,7 +170,7 @@ download_libs() {
 }
 
 # ============================================================
-# 下载全部基础依赖
+# Download de todas as dependências básicas
 # ============================================================
 download_base_all() {
     download_vad
@@ -178,14 +178,14 @@ download_base_all() {
 }
 
 # ============================================================
-# 清理
+# Limpeza
 # ============================================================
 clean_base() {
-    warn "========== 清理基础依赖 =========="
+    warn "========== Limpando dependências básicas =========="
 
     if [ -f "${VAD_MODEL_DIR}/${VAD_MODEL_NAME}" ]; then
         rm -f "${VAD_MODEL_DIR}/${VAD_MODEL_NAME}"
-        info "已删除 VAD 模型: ${VAD_MODEL_NAME}"
+        info "Modelo VAD removido: ${VAD_MODEL_NAME}"
     fi
 
     local cleaned=0
@@ -197,53 +197,53 @@ clean_base() {
         for f in "${LIB_DIR}"/${pattern}; do
             if [ -f "$f" ] || [ -L "$f" ]; then
                 rm -f "$f"
-                info "已删除: $(basename "$f")"
+                info "Removido: $(basename "$f")"
                 cleaned=$((cleaned + 1))
             fi
         done
     done
 
-    [ "$cleaned" -eq 0 ] && info "lib/ 目录无需清理"
-    info "清理完成！"
+    [ "$cleaned" -eq 0 ] && info "Diretório lib/ não precisa de limpeza"
+    info "Limpeza concluída!"
 }
 
 # ============================================================
-# 状态
+# Status
 # ============================================================
 show_base_status() {
     detect_platform
 
     # VAD
     if [ -f "${VAD_MODEL_DIR}/${VAD_MODEL_NAME}" ]; then
-        echo -e "  VAD (语音检测):    ${GREEN}✓ 已下载${NC} - ${VAD_MODEL_NAME}"
+        echo -e "  VAD (detecção de voz): ${GREEN}✓ Baixado${NC} - ${VAD_MODEL_NAME}"
     else
-        echo -e "  VAD (语音检测):    ${RED}✗ 未下载${NC} - ${VAD_MODEL_NAME}"
+        echo -e "  VAD (detecção de voz): ${RED}✗ Não baixado${NC} - ${VAD_MODEL_NAME}"
     fi
 
     # sherpa-onnx JNI
     if [ -f "${LIB_DIR}/${SHERPA_JNI_LIB}" ]; then
-        echo -e "  sherpa-onnx JNI:   ${GREEN}✓ 已存在${NC} - ${SHERPA_JNI_LIB}"
+        echo -e "  sherpa-onnx JNI:   ${GREEN}✓ Existe${NC} - ${SHERPA_JNI_LIB}"
     else
-        echo -e "  sherpa-onnx JNI:   ${RED}✗ 不存在${NC} - ${SHERPA_JNI_LIB}"
+        echo -e "  sherpa-onnx JNI:   ${RED}✗ Não existe${NC} - ${SHERPA_JNI_LIB}"
     fi
 
     # onnxruntime
     if [ -f "${LIB_DIR}/${ONNXRT_LIB}" ] || ls "${LIB_DIR}"/libonnxruntime.*.${LIB_EXT} &>/dev/null 2>&1; then
-        echo -e "  onnxruntime:       ${GREEN}✓ 已存在${NC} - ${ONNXRT_LIB}"
+        echo -e "  onnxruntime:       ${GREEN}✓ Existe${NC} - ${ONNXRT_LIB}"
     else
-        echo -e "  onnxruntime:       ${RED}✗ 不存在${NC} - ${ONNXRT_LIB}"
+        echo -e "  onnxruntime:       ${RED}✗ Não existe${NC} - ${ONNXRT_LIB}"
     fi
 
     # Vosk
     if [ -f "${LIB_DIR}/${VOSK_LIB}" ]; then
-        echo -e "  Vosk 原生库:       ${GREEN}✓ 已存在${NC} - ${VOSK_LIB}"
+        echo -e "  Vosk (biblioteca nativa): ${GREEN}✓ Existe${NC} - ${VOSK_LIB}"
     else
-        echo -e "  Vosk 原生库:       ${RED}✗ 不存在${NC} - ${VOSK_LIB}"
+        echo -e "  Vosk (biblioteca nativa): ${RED}✗ Não existe${NC} - ${VOSK_LIB}"
     fi
 }
 
 # ============================================================
-# 独立运行时的入口
+# Ponto de entrada para execução independente
 # ============================================================
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     case "${1:-all}" in
@@ -253,17 +253,17 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         libs)       download_libs ;;
         all)        download_base_all ;;
         clean)      clean_base ;;
-        status)     detect_platform; echo ""; info "========== 基础依赖状态 (${PLATFORM}) =========="; show_base_status; echo "" ;;
+        status)     detect_platform; echo ""; info "========== Status das dependências básicas (${PLATFORM}) =========="; show_base_status; echo "" ;;
         *)
-            echo "用法: $0 [vad|jni|vosk-lib|libs|all|clean|status]"
+            echo "Uso: $0 [vad|jni|vosk-lib|libs|all|clean|status]"
             echo ""
-            echo "  vad      - 下载 VAD 语音检测模型 (silero_vad)"
-            echo "  jni      - 下载 sherpa-onnx JNI 原生库 (含 onnxruntime)"
-            echo "  vosk-lib - 下载 Vosk 原生库"
-            echo "  libs     - 下载所有原生库 (JNI + Vosk)"
-            echo "  all      - 下载全部基础依赖 (默认)"
-            echo "  clean    - 清理所有基础依赖"
-            echo "  status   - 查看状态"
+            echo "  vad      - Baixa o modelo VAD de detecção de voz (silero_vad)"
+            echo "  jni      - Baixa a biblioteca nativa sherpa-onnx JNI (inclui onnxruntime)"
+            echo "  vosk-lib - Baixa a biblioteca nativa Vosk"
+            echo "  libs     - Baixa todas as bibliotecas nativas (JNI + Vosk)"
+            echo "  all      - Baixa todas as dependências básicas (padrão)"
+            echo "  clean    - Limpa todas as dependências básicas"
+            echo "  status   - Verifica o status"
             exit 1
             ;;
     esac

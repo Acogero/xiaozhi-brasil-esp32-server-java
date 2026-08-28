@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
 # =============================================================================
-# 下载 TTS 语音合成模型 (sherpa-onnx)
-# 可独立运行，也可被 download_models.sh 总控脚本调用
+# Download do modelo de síntese de voz (TTS) (sherpa-onnx)
+# Pode ser executado de forma independente ou chamado pelo script principal download_models.sh
 #
-# 用法:
-#   ./scripts/download_tts.sh              # 下载默认模型 (vits-melo)
-#   ./scripts/download_tts.sh vits-melo    # 下载 VITS MeloTTS 中英文 (~163MB)
-#   ./scripts/download_tts.sh matcha       # 下载 Matcha-Icefall 中英文
-#   ./scripts/download_tts.sh clean        # 清理
-#   ./scripts/download_tts.sh status       # 查看状态
+# Uso:
+#   ./scripts/download_tts.sh              # Baixa o modelo padrão (vits-melo)
+#   ./scripts/download_tts.sh vits-melo    # Baixa o modelo VITS MeloTTS chinês-inglês (~163MB)
+#   ./scripts/download_tts.sh matcha       # Baixa o modelo Matcha-Icefall chinês-inglês
+#   ./scripts/download_tts.sh clean        # Limpa
+#   ./scripts/download_tts.sh status       # Verifica o status
 # =============================================================================
 
 set -e
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/_common.sh"
 
-# ---- TTS 模型配置 ----
+# ---- Configuração do modelo TTS ----
 TTS_MODEL_DIR="${MODELS_DIR}/tts"
 SHERPA_TTS_BASE_URL="https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models"
-# 支持的 TTS 模型: vits-melo (默认), matcha
+# Modelos TTS suportados: vits-melo (padrão), matcha
 TTS_VITS_MELO="vits-melo-tts-zh_en"
 TTS_MATCHA="matcha-icefall-zh-en"
 
 # ============================================================
-# 下载 TTS 模型
+# Download do modelo TTS
 # ============================================================
 download_tts() {
     local tts_type="${1:-vits-melo}"
@@ -31,16 +31,16 @@ download_tts() {
     case "$tts_type" in
         vits-melo|vits|melo)
             model_name="$TTS_VITS_MELO"
-            info "========== 下载语音合成(TTS)模型 =========="
-            info "模型: ${model_name} (VITS MeloTTS 中英文，~163MB)"
+            info "========== Download do modelo de síntese de voz (TTS) =========="
+            info "Modelo: ${model_name} (VITS MeloTTS chinês-inglês, ~163MB)"
             ;;
         matcha|matcha-icefall)
             model_name="$TTS_MATCHA"
-            info "========== 下载语音合成(TTS)模型 =========="
-            info "模型: ${model_name} (Matcha-Icefall 中英文)"
+            info "========== Download do modelo de síntese de voz (TTS) =========="
+            info "Modelo: ${model_name} (Matcha-Icefall chinês-inglês)"
             ;;
         *)
-            error "未知的 TTS 模型类型: $tts_type (支持: vits-melo, matcha)"
+            error "Tipo de modelo TTS desconhecido: $tts_type (suportados: vits-melo, matcha)"
             return 1
             ;;
     esac
@@ -48,60 +48,60 @@ download_tts() {
     mkdir -p "$TTS_MODEL_DIR"
 
     if [ -f "${TTS_MODEL_DIR}/${model_name}/model.onnx" ]; then
-        info "TTS模型已存在: ${TTS_MODEL_DIR}/${model_name}/"
-        info "如需重新下载，请先运行: $0 clean"
+        info "Modelo TTS já existe: ${TTS_MODEL_DIR}/${model_name}/"
+        info "Para baixar novamente, execute primeiro: $0 clean"
         return 0
     fi
 
     local tar_url="${SHERPA_TTS_BASE_URL}/${model_name}.tar.bz2"
 
     cd "$TTS_MODEL_DIR"
-    info "正在下载..."
+    info "Baixando..."
     download_file "$tar_url" "${model_name}.tar.bz2"
 
-    info "正在解压..."
+    info "Extraindo..."
     tar xf "${model_name}.tar.bz2"
     rm -f "${model_name}.tar.bz2"
 
-    info "TTS模型下载完成！"
-    info "路径: ${TTS_MODEL_DIR}/${model_name}/"
+    info "Download do modelo TTS concluído!"
+    info "Caminho: ${TTS_MODEL_DIR}/${model_name}/"
     echo ""
 }
 
 # ============================================================
-# 清理
+# Limpeza
 # ============================================================
 clean_tts() {
-    warn "========== 清理 TTS 模型 =========="
+    warn "========== Limpando modelo TTS =========="
     for tts_model in "$TTS_VITS_MELO" "$TTS_MATCHA"; do
         if [ -d "${TTS_MODEL_DIR}/${tts_model}" ]; then
             rm -rf "${TTS_MODEL_DIR}/${tts_model}"
-            info "已删除 TTS 模型: ${tts_model}"
+            info "Modelo TTS removido: ${tts_model}"
         fi
         rm -f "${TTS_MODEL_DIR}/${tts_model}.tar.bz2" 2>/dev/null
     done
-    info "清理完成！"
+    info "Limpeza concluída!"
 }
 
 # ============================================================
-# 状态
+# Status
 # ============================================================
 show_tts_status() {
     if [ -f "${TTS_MODEL_DIR}/${TTS_VITS_MELO}/model.onnx" ]; then
-        echo -e "  TTS (vits-melo):   ${GREEN}✓ 已下载${NC} - ${TTS_VITS_MELO}"
+        echo -e "  TTS (vits-melo):   ${GREEN}✓ Baixado${NC} - ${TTS_VITS_MELO}"
     else
-        echo -e "  TTS (vits-melo):   ${RED}✗ 未下载${NC} - ${TTS_VITS_MELO}"
+        echo -e "  TTS (vits-melo):   ${RED}✗ Não baixado${NC} - ${TTS_VITS_MELO}"
     fi
 
     if [ -f "${TTS_MODEL_DIR}/${TTS_MATCHA}/model.onnx" ]; then
-        echo -e "  TTS (matcha):      ${GREEN}✓ 已下载${NC} - ${TTS_MATCHA}"
+        echo -e "  TTS (matcha):      ${GREEN}✓ Baixado${NC} - ${TTS_MATCHA}"
     else
-        echo -e "  TTS (matcha):      ${YELLOW}○ 未下载${NC} - ${TTS_MATCHA} (可选)"
+        echo -e "  TTS (matcha):      ${YELLOW}○ Não baixado${NC} - ${TTS_MATCHA} (opcional)"
     fi
 }
 
 # ============================================================
-# 独立运行时的入口
+# Ponto de entrada para execução independente
 # ============================================================
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     case "${1:-vits-melo}" in
@@ -112,15 +112,15 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             clean_tts
             ;;
         status)
-            echo ""; info "========== TTS 模型状态 =========="; show_tts_status; echo ""
+            echo ""; info "========== Status do modelo TTS =========="; show_tts_status; echo ""
             ;;
         *)
-            echo "用法: $0 [vits-melo|matcha|clean|status]"
+            echo "Uso: $0 [vits-melo|matcha|clean|status]"
             echo ""
-            echo "  vits-melo - 下载 VITS MeloTTS 中英文 (~163MB，默认)"
-            echo "  matcha    - 下载 Matcha-Icefall 中英文"
-            echo "  clean     - 清理所有 TTS 模型"
-            echo "  status    - 查看状态"
+            echo "  vits-melo - Baixa o modelo VITS MeloTTS chinês-inglês (~163MB, padrão)"
+            echo "  matcha    - Baixa o modelo Matcha-Icefall chinês-inglês"
+            echo "  clean     - Limpa todos os modelos TTS"
+            echo "  status    - Verifica o status"
             exit 1
             ;;
     esac
