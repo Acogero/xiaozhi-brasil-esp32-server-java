@@ -10,10 +10,10 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
- * Dialogue 独立启动入口
+ * Ponto de entrada de inicialização independente do Dialogue
  * <p>
- * 包含：WebSocket/MQTT。
- * 可横向扩展，通过 Redis Pub/Sub 与其他实例协作。
+ * Inclui: WebSocket/MQTT.
+ * Pode escalar horizontalmente, colaborando com outras instâncias via Redis Pub/Sub.
  * <p>
  */
 @SpringBootApplication
@@ -25,7 +25,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         "com.xiaozhi.common",
         "com.xiaozhi.communication",
         "com.xiaozhi.utils",
-        // xiaozhi-service (dialogue 需要的部分)
+        // xiaozhi-service (partes necessárias para o dialogue)
         "com.xiaozhi.config",
         "com.xiaozhi.storage",
         "com.xiaozhi.device",
