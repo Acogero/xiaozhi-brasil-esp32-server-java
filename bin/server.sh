@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # =============================================================================
-# xiaozhi-server 管理脚本
-# 用法: bin/server.sh <start|stop|restart|status>
+# Script de gerenciamento do xiaozhi-server
+# Uso: bin/server.sh <start|stop|restart|status>
 # =============================================================================
 source "$(cd "$(dirname "$0")" && pwd)/_common.sh"
 
