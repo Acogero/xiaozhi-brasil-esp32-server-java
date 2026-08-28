@@ -52,7 +52,7 @@ public class DeviceMcpService {
     private int maxToolsCount = 32;
 
     /**
-     * 初始化设备端MCP工具列表，并将能力列表持久化到数据库
+     * Inicializa a lista de ferramentas MCP do dispositivo e persiste a lista de capacidades no banco de dados
      */
     public void initialize(ChatSession chatSession) {
         DeviceMcpMessage initResult = sendInitialize(chatSession);
@@ -66,7 +66,7 @@ public class DeviceMcpService {
     }
 
     /**
-     * 初始化设备端MCP工具列表（包含用户工具），并将能力列表持久化到数据库
+     * Inicializa a lista de ferramentas MCP do dispositivo (incluindo ferramentas do usuário) e persiste a lista de capacidades no banco de dados
      */
     public void initializeWithUserTools(ChatSession chatSession) {
         DeviceMcpMessage initResult = sendInitialize(chatSession);
@@ -80,17 +80,17 @@ public class DeviceMcpService {
     }
 
     /**
-     * 服务端主动调用设备 MCP 工具
+     * O servidor chama proativamente uma ferramenta MCP do dispositivo
      *
-     * @param deviceId 设备ID（设备必须在线）
-     * @param toolName 工具原始名称（如 "screenshot"、"self.reboot"）
-     * @param args     工具参数
-     * @return MCP 响应的 result 字段
+     * @param deviceId ID do dispositivo (o dispositivo deve estar online)
+     * @param toolName nome original da ferramenta (ex.: "screenshot", "self.reboot")
+     * @param args     parâmetros da ferramenta
+     * @return o campo result da resposta MCP
      */
     public Map<String, Object> callDeviceTool(String deviceId, String toolName, Map<String, Object> args) {
         ChatSession chatSession = sessionManager.getSessionByDeviceId(deviceId);
         if (chatSession == null) {
-            throw new IllegalStateException("设备离线或未连接: " + deviceId);
+            throw new IllegalStateException("Dispositivo offline ou não conectado: " + deviceId);
         }
 
         DeviceMcpMessage request = new DeviceMcpMessage();
@@ -106,16 +106,16 @@ public class DeviceMcpService {
 
         DeviceMcpMessage response = sendMcpRequest(chatSession, request);
         if (response == null) {
-            throw new IllegalStateException("设备响应超时: " + toolName);
+            throw new IllegalStateException("Tempo limite excedido na resposta do dispositivo: " + toolName);
         }
         if (response.getPayload().getResult() == null) {
-            throw new IllegalStateException("工具调用失败: " + response.getPayload().getError());
+            throw new IllegalStateException("Falha na chamada da ferramenta: " + response.getPayload().getError());
         }
         return response.getPayload().getResult();
     }
 
     /**
-     * 发送初始化命令
+     * Envia o comando de inicialização
      */
     protected DeviceMcpMessage sendInitialize(ChatSession chatSession) {
         DeviceMcpMessage message = new DeviceMcpMessage();
@@ -147,9 +147,9 @@ public class DeviceMcpService {
     }
 
     /**
-     * 发送工具列表请求（支持分页递归）
+     * Envia a requisição de listagem de ferramentas (com suporte a paginação recursiva)
      *
-     * @return 本次及后续分页中收集到的所有原始工具名
+     * @return todos os nomes originais de ferramentas coletados nesta página e nas seguintes
      */
     private List<String> sendToolsList(ChatSession chatSession, Boolean withUserTools) {
         DeviceMcpMessage message = new DeviceMcpMessage();
@@ -180,9 +180,9 @@ public class DeviceMcpService {
             return collectedNames;
         }
 
-        // 按原名长度倒序构建 original -> sanitized 映射：
-        // 长名先替换能避免短名字是长名字子串时替换错位
-        // （例如 description 里同时存在 self.audio_speaker 和 self.audio_speaker.set_volume）
+        // Constrói o mapeamento original -> sanitized em ordem decrescente do comprimento do nome original:
+        // Substituir os nomes longos primeiro evita erros de posicionamento quando um nome curto é substring de um nome longo
+        // (por exemplo, quando description contém tanto self.audio_speaker quanto self.audio_speaker.set_volume)
         Map<String, String> nameMapping = new LinkedHashMap<>();
         tools.stream()
                 .map(t -> (String) t.get("name"))
@@ -193,7 +193,7 @@ public class DeviceMcpService {
         for (Map<String, Object> tool : tools) {
             final String name = (String) tool.get("name");
             String funcName = nameMapping.get(name);
-            // 同步替换 description 中出现的原始工具名，避免模型照描述文本输出未注册的原名
+            // Substitui de forma síncrona os nomes originais de ferramentas que aparecem em description, evitando que o modelo produza o nome original não registrado com base no texto da descrição
             String funcDescription = sanitizeDescription((String) tool.get("description"), nameMapping);
             Object inputSchema = tool.get("inputSchema");
 
@@ -209,7 +209,7 @@ public class DeviceMcpService {
 
                         DeviceMcpMessage resp = sendMcpRequest(chatSession, req);
                         if (resp == null) {
-                            return "操作失败";
+                            return "Falha na operação";
                         }
                         log.info("SessionId: {}, MCP function call response: {}", chatSession.getSessionId(), resp);
                         if (resp.getPayload().getResult() == null) {
@@ -250,7 +250,7 @@ public class DeviceMcpService {
             return;
         }
         String mcpList = String.join(",", toolNames);
-        // 与 session 内存中的值比较，相同则跳过，无需查库
+        // Compara com o valor em memória da session; se forem iguais, pula a consulta ao banco
         if (Objects.equals(chatSession.getDevice().getMcpList(), mcpList)) {
             return;
         }
@@ -267,19 +267,19 @@ public class DeviceMcpService {
     }
 
     /**
-     * 将设备端 MCP 工具名规范化为 OpenAI Function Calling 兼容名称。
+     * Normaliza o nome da ferramenta MCP do dispositivo para um nome compatível com o OpenAI Function Calling.
      * <p>
-     * 保留字母、数字、下划线、连字符和中文，其他字符（包括 '.'）替换为 '_'。
+     * Mantém letras, números, sublinhado, hífen e caracteres chineses; os demais caracteres (incluindo '.') são substituídos por '_'.
      */
     static String sanitizeToolName(String rawName) {
         return rawName.replaceAll("[^a-zA-Z0-9_\\-\\u4e00-\\u9fff]", "_");
     }
 
     /**
-     * 将 description 中引用的工具原名替换为 sanitized 名称，
-     * 避免 LLM 按描述里的原名（如 {@code self.get_device_status}）输出导致 resolve 失败。
+     * Substitui, em description, os nomes originais de ferramentas referenciados pelos nomes sanitized,
+     * evitando que o LLM produza o nome original mencionado na descrição (como {@code self.get_device_status}), o que causaria falha no resolve.
      * <p>
-     * 传入的 mapping 应按原名长度倒序，避免短名字是长名字子串时替换错位。
+     * O mapping informado deve estar em ordem decrescente do comprimento do nome original, evitando erros de posicionamento quando um nome curto é substring de um nome longo.
      */
     static String sanitizeDescription(String description, Map<String, String> nameMapping) {
         if (description == null || description.isEmpty() || nameMapping == null || nameMapping.isEmpty()) {

@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * PersonaListener 的 Spring 管理实现（基础设施层）。
- * 负责对话消息持久化。
+ * Implementação gerenciada pelo Spring de PersonaListener (camada de infraestrutura).
+ * Responsável pela persistência das mensagens do diálogo.
  */
 @Slf4j
 @Component
@@ -27,12 +27,12 @@ public class DialogueListener implements PersonaListener {
         try {
             messageService.saveAll(dialogueTurnConverter.toMessages(turn));
         } catch (Exception e) {
-            log.error("对话持久化失败", e);
+            log.error("Falha ao persistir o diálogo", e);
         }
     }
 
     @Override
     public void onError(Throwable error) {
-        log.error("LLM调用失败", error);
+        log.error("Falha na chamada ao LLM", error);
     }
 }

@@ -4,7 +4,7 @@ import com.xiaozhi.communication.common.ChatSession;
 import com.xiaozhi.ai.tts.TtsService;
 
 /**
- * Synthesizer 工厂，创建对应的 Synthesizer 实现。
+ * Factory de Synthesizer, cria a implementação correspondente de Synthesizer.
  */
 public class SynthesizerFactory {
 

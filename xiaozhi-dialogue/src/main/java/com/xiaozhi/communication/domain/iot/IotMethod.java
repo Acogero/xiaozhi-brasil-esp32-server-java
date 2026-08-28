@@ -6,16 +6,16 @@ import lombok.Data;
 import java.util.Map;
 
 /**
- * function_call的方法定义
+ * Definição do método de function_call
  */
 @Data
 public class IotMethod {
     /**
-     * 方法描述
+     * Descrição do método
      */
     private String description;
     /**
-     * 方法参数
+     * Parâmetros do método
      */
     private Map<String, IotMethodParameter> parameters;
 

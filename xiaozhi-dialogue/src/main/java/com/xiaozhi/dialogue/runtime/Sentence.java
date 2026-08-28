@@ -11,29 +11,29 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 句子对象，表达文本。与Speech对象相对应。用于在Flux流里表达与处理对应的文本。
- * 以顺序来保障关联性。由 Player 来处理。Sentence还是需要 普通的Text、表情符号这些的处理的。
- * 不要Path 不要音频存储在这里了，分开处理。
+ * Objeto de frase, representa texto. Corresponde ao objeto Speech. Usado para representar e processar o texto correspondente no fluxo Flux.
+ * A ordem garante a associação. É processado pelo Player. Sentence ainda precisa tratar texto comum, emojis etc.
+ * Sem Path, sem armazenamento de áudio aqui; trate isso separadamente.
  */
 @Slf4j
 @Data
 public class Sentence implements Comparable<Sentence>{
-    // 用于控制句子的序列号。
+    // Usado para controlar o número de sequência da frase.
     private static final AtomicInteger sentenceCounter = new AtomicInteger(0);
 
-    // 获取句子序列号
+    // Obtém o número de sequência da frase
     private int seq = sentenceCounter.incrementAndGet();
 
-    // 可能带有颜文字的原始句子文本。
+    // Texto original da frase, que pode conter emoticons.
     private final String text;
 
-    // 可以用来生成TTS的纯文本，表情符号被过滤掉，表情符号不适合TTS
+    // Texto puro que pode ser usado para gerar o TTS, com os emojis filtrados, pois emojis não são adequados para TTS
     private String text4Speech =null;
 
-    // 包含所有匹配的表情符号
+    // Contém todos os emojis correspondentes
     private List<String> moods=null;
 
-    // 用于记录每一个句子的形成时间戳。
+    // Usado para registrar o timestamp de formação de cada frase.
     private final Instant createdAt = Instant.now();
 
     public Sentence(String text) {
@@ -41,7 +41,7 @@ public class Sentence implements Comparable<Sentence>{
     }
 
     /**
-     * 获取情感词列表的不可修改副本
+     * Obtém uma cópia não modificável da lista de palavras de emoção
      */
     public List<String> getMoods() {
         if(moods==null){
@@ -60,14 +60,14 @@ public class Sentence implements Comparable<Sentence>{
     }
 
     public boolean isOnlyEmoji() {
-        // 表情符号通常不超过4个字符
+        // Emojis geralmente não ultrapassam 4 caracteres
         return moods != null && !moods.isEmpty() &&
                 (text.trim().length() <= 4);
     }
 
     @Override
     public int compareTo(Sentence other) {
-        // 按句子的序列号排序
+        // Ordena pelo número de sequência da frase
         return Integer.compare(this.getSeq(), other.getSeq());
     }
 }

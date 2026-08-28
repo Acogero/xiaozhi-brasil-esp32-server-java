@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 //@Component
 public class PlayMusicFunction implements ToolsGlobalRegistry.GlobalFunction {
     private static final String TOOL_NAME = "play_music";
-    // 使用虚拟线程执行器处理定时任务
+    // Usa um executor de virtual threads para tratar tarefas agendadas
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(
             Runtime.getRuntime().availableProcessors(),
             Thread.ofVirtual().name("music-scheduler-", 0).factory());
@@ -39,29 +39,29 @@ public class PlayMusicFunction implements ToolsGlobalRegistry.GlobalFunction {
                 String songName = params.get("songName");
                 try{
                     if (songName == null || songName.isEmpty()) {
-                        return "音乐播放失败";
+                        return "Falha na reprodução da música";
                     }else{
                         scheduler.schedule(() -> {
-                            // 必须异步处理，也就是先返回一个回应用户的字符串，再开始播放。
+                            // Deve ser tratado de forma assíncrona: primeiro retorna uma string de resposta ao usuário, depois inicia a reprodução.
                             new MusicPlayer(chatSession,songName, null).play();
                         },60, TimeUnit.MILLISECONDS);
 
-                        return "尝试播放歌曲《"+songName+"》";
+                        return "Tentando reproduzir a música \""+songName+"\"";
                     }
                 }catch (Exception e){
-                    log.error("device 音乐播放异常，song name: {}", songName, e);
-                    return "音乐播放失败";
+                    log.error("Exceção na reprodução de música do device, song name: {}", songName, e);
+                    return "Falha na reprodução da música";
                 }
             })
             .toolMetadata(ToolMetadata.builder().returnDirect(true).build())
-            .description("音乐播放助手,需要用户提供歌曲的名称")
+            .description("Assistente de reprodução de música; requer que o usuário informe o nome da música")
             .inputSchema("""
                         {
                             "type": "object",
                             "properties": {
                                 "songName": {
                                     "type": "string",
-                                    "description": "要播放的歌曲名称"
+                                    "description": "Nome da música a ser reproduzida"
                                 }
                             },
                             "required": ["songName"]
@@ -83,6 +83,6 @@ public class PlayMusicFunction implements ToolsGlobalRegistry.GlobalFunction {
 
     @Override
     public String getToolDescription() {
-        return "播放音乐";
+        return "Reproduzir música";
     }
 }

@@ -9,23 +9,23 @@ import reactor.core.publisher.Flux;
 
 
 /**
- * 语音合成器基类，TtsService 的高层编排器。
+ * Classe base do sintetizador de voz, orquestrador de alto nível do TtsService.
  *
- * 在对话管道 VAD → STT → LLM → TTS → Player 中，Synthesizer 属于 TTS 阶段，
- * 负责将 LLM 输出的文本流（或单个文本）编排为 Player 可消费的 Speech 音频流。
- * 不同 TTS Provider 返回的数据格式不同，
- * Synthesizer 屏蔽了这些差异，统一向 Player 提供 Flux<Speech>。
+ * No pipeline do diálogo VAD → STT → LLM → TTS → Player, o Synthesizer pertence à etapa de TTS,
+ * responsável por orquestrar o fluxo de texto (ou um único texto) gerado pelo LLM em um fluxo de áudio Speech consumível pelo Player.
+ * Diferentes Providers de TTS retornam formatos de dados diferentes,
+ * e o Synthesizer oculta essas diferenças, fornecendo de forma unificada um Flux<Speech> ao Player.
  *
- * 架构层级：
- * - TtsService：底层 TTS Provider 接口
- * - Synthesizer（本类）：高层编排器，负责分句、缓存查询、音频流构建
- * - Player：终端音频播放，接收 Flux<Speech>，转换为设备协议格式（Opus）发送
+ * Camadas da arquitetura:
+ * - TtsService: interface de baixo nível do Provider de TTS
+ * - Synthesizer (esta classe): orquestrador de alto nível, responsável pela segmentação de frases, consulta de cache e construção do fluxo de áudio
+ * - Player: reprodução de áudio no terminal, recebe o Flux<Speech> e converte para o formato do protocolo do dispositivo (Opus) para envio
  *
- * 合成模式：
+ * Modo de síntese:
  * text → Path（FileSynthesizer + TtsService）
  *
- * 生命周期：Synthesizer 在一轮对话的 AI 响应合成完毕后即可回收，Player 可能仍在播放。
- * 同一个 Synthesizer 可组合不同的 Player，因此 Player 不在 Synthesizer 内部创建。
+ * Ciclo de vida: o Synthesizer pode ser liberado assim que a síntese da resposta da IA de uma rodada de diálogo terminar; o Player pode ainda estar reproduzindo.
+ * O mesmo Synthesizer pode ser combinado com Players diferentes; por isso, o Player não é criado internamente pelo Synthesizer.
  */
 @Data
 public abstract class Synthesizer {
@@ -37,9 +37,9 @@ public abstract class Synthesizer {
     private int firstChatDurationMillis = 0;
 
     /**
-     * @param chatSession  当前会话
-     * @param ttsService   底层 TTS Provider（由 TtsServiceFactory 创建）
-     * @param player       播放音频的播放器
+     * @param chatSession  sessão atual
+     * @param ttsService   Provider de TTS de baixo nível (criado por TtsServiceFactory)
+     * @param player       player usado para reproduzir o áudio
      */
     public Synthesizer(ChatSession chatSession, TtsService ttsService, Player player) {
         this.chatSession = chatSession;
@@ -48,27 +48,27 @@ public abstract class Synthesizer {
     }
 
     /**
-     * 语音合成。
-     * @param stringFlux 文本流，流的每一个元素来自于LLM的输出，主要是token。
-     *                   一般不能直接提交进行TTS语音合成，需要由具体的Provider实现重整成句子再进行语音合成。
+     * Síntese de voz.
+     * @param stringFlux fluxo de texto; cada elemento do fluxo vem da saída do LLM, principalmente tokens.
+     *                   Em geral, não pode ser submetido diretamente para síntese de TTS; a implementação específica do Provider precisa reorganizar em frases antes da síntese de voz.
      */
     abstract public void synthesize(Flux<String> stringFlux);
 
     /**
-     * 取消语音合成，停止上游Flux订阅。
-     * 在用户打断（abort）时由外部调用，确保不再产生新的音频数据。
+     * Cancela a síntese de voz, interrompendo a assinatura do Flux upstream.
+     * Chamado externamente quando o usuário interrompe (abort), garantindo que nenhum novo dado de áudio seja gerado.
      */
     abstract public void cancel();
 
     /**
-     * 检查语音合成管道是否仍在活跃（LLM生成中、TTS合成中等）。
-     * 用于打断判断，即使Player已停止播放，如果上游管道仍在工作也应被打断。
+     * Verifica se o pipeline de síntese de voz ainda está ativo (LLM gerando, TTS sintetizando etc.).
+     * Usado na decisão de interrupção: mesmo que o Player já tenha parado de reproduzir, se o pipeline upstream ainda estiver em funcionamento, a interrupção deve ocorrer.
      */
     abstract public boolean isActive();
 
     /**
-     * 语音合成。
-     * @param text 一般是完整的句子或者完整的可以一次性提交进行语音合成的文本。
+     * Síntese de voz.
+     * @param text geralmente é uma frase completa ou um texto completo que pode ser submetido de uma vez para a síntese de voz.
      */
     abstract public void synthesize(String text);
 }

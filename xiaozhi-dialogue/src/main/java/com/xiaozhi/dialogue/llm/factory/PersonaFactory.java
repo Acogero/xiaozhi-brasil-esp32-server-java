@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * Persona 工厂类，负责构建完整的 Persona 实例（含 STT/TTS/LLM/Player 等组件）。
+ * Classe factory de Persona, responsável por construir a instância completa do Persona (incluindo componentes como STT/TTS/LLM/Player).
  */
 @Slf4j
 @Component
@@ -71,49 +71,49 @@ public class PersonaFactory {
     private StorageServiceFactory storageServiceFactory;
 
     /**
-     * 构建完整的 Persona 实例。
-     * ToolCallbacks 当前通过 session.getToolCallbacks() 动态获取，支持MCP/IoT工具运行时注册。
-     * Player 不完全属于 Persona，在角色不存在时 Player 就应先于 Persona 构建，以应对错误信息播报。
+     * Constrói a instância completa do Persona.
+     * ToolCallbacks é obtido dinamicamente via session.getToolCallbacks(), suportando o registro de ferramentas MCP/IoT em tempo de execução.
+     * Player não pertence totalmente ao Persona; quando o papel não existe, o Player deve ser construído antes do Persona, para permitir a reprodução de mensagens de erro.
      *
-     * @param session 当前会话
-     * @param device 设备信息
-     * @param role 角色配置，当与当前Persona不同时才需要构建新的Persona
-     * @return 构建好的 Persona 实例
+     * @param session sessão atual
+     * @param device informações do dispositivo
+     * @param role configuração do papel; um novo Persona só precisa ser construído quando diferente do Persona atual
+     * @return a instância de Persona construída
      */
     public Persona buildPersona(ChatSession session, DeviceBO device, RoleBO role) {
         Assert.notNull(device, "device cannot be null");
         Assert.notNull(role, "role cannot be null");
 
-        // 幂等保护：Persona 已存在则跳过重建
+        // Proteção de idempotência: pula a reconstrução se o Persona já existir
         if (session.getPersona() != null) {
             return session.getPersona();
         }
 
-        // Player应该是可以独立于Persona而存在的，同时也可以看作是角色的嘴巴/声带。
+        // O Player deve poder existir independentemente do Persona; também pode ser visto como a boca/as cordas vocais do papel.
         Player player = session.getPlayer();
         if(player == null){
             player = new ScheduledPlayer(session, sessionMessageService);
             player.setOpusRecorder(new OpusRecorder(session, chatMessageService, aecService, storageServiceFactory));
             session.setPlayer(player);
         }
-        // 初始化Conversation(相当于角色的记忆）
+        // Inicializa o Conversation (equivalente à memória do papel)
         String ownerId = device.getDeviceId();
         Integer userId = device.getUserId();
         Conversation conversation = conversationFactory.initConversation(ownerId, userId, role, session.getSessionId());
 
-        // 获取STT服务
+        // Obtém o serviço de STT
         SttService sttService = initSttService(role);
 
-        // 初始化语音合成器
+        // Inicializa o sintetizador de voz
         Synthesizer synthesizer = initSynthesizer(session,player,role);
 
-        //处理工具注册（系统工具 + 设备MCP）
+        //Trata o registro de ferramentas (ferramentas do sistema + MCP do dispositivo)
         toolRegistrationService.register(new ChatSessionToolAdapter(session));
 
-        // 获取ChatModel
+        // Obtém o ChatModel
         ChatModel chatModel = chatModelFactory.getChatModel(role);
 
-        // MCP/IoT 工具已注册完毕，获取完整的工具列表传给 Persona
+        // Ferramentas MCP/IoT já registradas; obtém a lista completa de ferramentas para passar ao Persona
         var toolCallbacks = session.getToolCallbacks();
 
         Persona persona = Persona.builder()
@@ -133,7 +133,7 @@ public class PersonaFactory {
     }
 
     /**
-     * 重载：仅传 session，自动从 session 获取 device，从 DB/缓存获取 role。
+     * Sobrecarga: passa apenas session; obtém device automaticamente da session e role do DB/cache.
      */
     public Persona buildPersona(ChatSession session) {
         if (session.getPersona() != null) {
@@ -145,7 +145,7 @@ public class PersonaFactory {
     }
 
     /**
-     * 初始化STT服务，将重要信息记录日志
+     * Inicializa o serviço de STT, registrando as informações importantes em log
      * @param role
      * @return
      */
@@ -153,26 +153,26 @@ public class PersonaFactory {
         Assert.notNull(role, "role cannot be null");
         var sttId = role.getSttId();
         if (sttId == null || sttId <= 0) {
-            log.warn("角色没有配置STT服务 - Role: {},默认使用vosk", role.getRoleName());
+            log.warn("O papel não tem serviço de STT configurado - Role: {}, usando vosk como padrão", role.getRoleName());
             return sttFactory.getSttService(null);
         }
         var sttConfig = configService.getBO(sttId);
         if(sttConfig == null){
-            log.error("无法获取STT服务配置 - Id: {}", sttId);
+            log.error("Não foi possível obter a configuração do serviço de STT - Id: {}", sttId);
             return null;
         }
         SttService sttService = sttFactory.getSttService(sttConfig);
         if (sttService == null) {
-            log.error("无法获取STT服务 - Provider: {}", sttConfig != null ? sttConfig.getProvider() : "null");
+            log.error("Não foi possível obter o serviço de STT - Provider: {}", sttConfig != null ? sttConfig.getProvider() : "null");
         }
         return sttService;
     }
 
     /**
-     * 初始化对话状态
+     * Inicializa o estado do diálogo
      */
     public Synthesizer initSynthesizer(ChatSession session, Player player, RoleBO role) {
-        // 新增加的设备很有可能没有配置TTS，采用默认Edge需要传递null
+        // É provável que um dispositivo recém-adicionado não tenha o TTS configurado; para usar o Edge padrão é necessário passar null
         ConfigBO ttsConfig = null;
         if (role.getTtsId() != null && role.getTtsId() > 0) {
             ttsConfig = configService.getBO(role.getTtsId());

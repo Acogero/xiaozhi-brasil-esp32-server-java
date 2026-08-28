@@ -14,17 +14,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 服务端 AEC（回声消除）服务。
- * 使用 WebRTC AEC3 在服务端消除麦克风中的扬声器回声，
- * 使不带硬件 AEC 的设备也能正常打断和对话。
+ * Serviço de AEC (cancelamento de eco) do lado do servidor.
+ * Usa o WebRTC AEC3 no servidor para eliminar o eco do alto-falante captado pelo microfone,
+ * permitindo que dispositivos sem AEC de hardware também consigam interromper e dialogar normalmente.
  *
- * 核心设计：
- * - feedReference() 解码参考 Opus 帧后，立即逐子帧调用 processReverseStream，
- *   以 TTS 发送的实时节奏驱动 AEC3 参考通道，不做缓队列积压。
- * - process() 以麦克风到达的实时节奏逐子帧调用 processStream。
- * - 两者都直接驱动 AEC3，保持各自的实时时间线；AEC3 内置延迟估计器
- *   自动找到参考信号与回声之间的延迟，无需手动对齐。
- * - setStreamDelayMs 仅作为初始提示加速收敛。
+ * Design principal:
+ * - Após feedReference() decodificar o frame Opus de referência, chama processReverseStream imediatamente, subframe a subframe,
+ *   conduzindo o canal de referência do AEC3 no ritmo em tempo real do envio do TTS, sem acumular fila de buffer.
+ * - process() chama processStream subframe a subframe, no ritmo em tempo real de chegada do microfone.
+ * - Ambos conduzem o AEC3 diretamente, mantendo suas próprias linhas do tempo em tempo real; o estimador de atraso embutido no AEC3
+ *   encontra automaticamente o atraso entre o sinal de referência e o eco, sem necessidade de alinhamento manual.
+ * - setStreamDelayMs serve apenas como dica inicial para acelerar a convergência.
  */
 @Slf4j
 @Service
@@ -38,15 +38,15 @@ public class AecService {
     @Value("${aec.noise.suppression.level:MODERATE}")
     private String noiseSuppressionLevel;
 
-    // 每会话 AEC 状态
+    // Estado de AEC por sessão
     private final ConcurrentHashMap<String, AecState> states = new ConcurrentHashMap<>();
 
-    // 10ms 帧参数 (16kHz mono, 16-bit)
+    // Parâmetros de frame de 10ms (16kHz mono, 16 bits)
     private static final int FRAME_BYTES_10MS = 320;      // bytes
 
     /**
-     * 确保会话的 AEC 状态已初始化。
-     * 如果已存在则复用（保留已收敛的滤波器状态），不存在才新建。
+     * Garante que o estado de AEC da sessão já esteja inicializado.
+     * Se já existir, reutiliza (preservando o estado do filtro já convergido); só cria um novo se não existir.
      */
     public void initSession(String sessionId) {
         if (!enabled) return;
@@ -56,17 +56,17 @@ public class AecService {
             if (existing == null) {
             }
         } catch (Exception e) {
-            log.error("AEC会话初始化失败: {}", sessionId, e);
+            log.error("Falha ao inicializar a sessão de AEC: {}", sessionId, e);
         }
     }
 
     /**
-     * 重置（销毁）会话的 AEC 状态
+     * Reseta (destrói) o estado de AEC da sessão
      */
     public void resetSession(String sessionId) {
         AecState state = states.remove(sessionId);
         if (state != null) {
-            // 在 apmLock 内 dispose，确保等待正在进行的 processStream/processReverseStream 完成
+            // Faz o dispose dentro do apmLock, garantindo que aguarde a conclusão de processStream/processReverseStream em andamento
             synchronized (state.apmLock) {
                 state.dispose();
             }
@@ -74,9 +74,9 @@ public class AecService {
     }
 
     /**
-     * TTS 播放结束时重建 AEC 实例。
-     * AEC3 在 TTS 停止后仍保留旧的回声滤波器，会把用户说话当回声消除（过度消除）。
-     * 重建 APM 实例可以清除旧滤波器，避免误消除用户声音。
+     * Reconstrói a instância de AEC quando a reprodução do TTS termina.
+     * Após o TTS parar, o AEC3 ainda mantém o filtro de eco antigo, o que pode tratar a fala do usuário como eco e removê-la indevidamente (cancelamento excessivo).
+     * Reconstruir a instância do APM limpa o filtro antigo, evitando o cancelamento indevido da voz do usuário.
      */
     @EventListener
     public void onTtsPlaybackEnd(TtsPlaybackCompletedEvent event) {
@@ -86,27 +86,27 @@ public class AecService {
         if (old == null) return;
         try {
             AecState fresh = new AecState();
-            // 原子替换：用新实例替换旧实例
+            // Substituição atômica: substitui a instância antiga pela nova
             if (states.replace(sessionId, old, fresh)) {
-                // 在 apmLock 内 dispose，确保等待正在进行的 processStream/processReverseStream 完成
+                // Faz o dispose dentro do apmLock, garantindo que aguarde a conclusão de processStream/processReverseStream em andamento
                 synchronized (old.apmLock) {
                     old.dispose();
                 }
             } else {
-                // 并发竞争，新实例被抢先替换，释放刚创建的
+                // Concorrência: a nova instância foi substituída antes por outra thread; libera a que acabou de ser criada
                 synchronized (fresh.apmLock) {
                     fresh.dispose();
                 }
             }
         } catch (Exception e) {
-            log.warn("AEC重建失败: {}: {}", sessionId, e.getMessage());
+            log.warn("Falha ao reconstruir o AEC: {}: {}", sessionId, e.getMessage());
         }
     }
 
     /**
-     * 喂入参考信号（TTS 发给设备的 Opus 帧）。
-     * 解码后立即逐子帧调用 processReverseStream，以 TTS 发送的实时节奏驱动 AEC3。
-     * 不缓队列——队列积压会导致参考帧与麦克风帧时间线错位，使 AEC3 无法正确对齐。
+     * Alimenta o sinal de referência (frame Opus enviado do TTS para o dispositivo).
+     * Após a decodificação, chama processReverseStream imediatamente, subframe a subframe, conduzindo o AEC3 no ritmo em tempo real do envio do TTS.
+     * Sem fila de buffer — o acúmulo em fila causaria desalinhamento entre a linha do tempo do frame de referência e do frame do microfone, impedindo o AEC3 de alinhar corretamente.
      */
     public void feedReference(String sessionId, byte[] opusFrame) {
         if (!enabled) return;
@@ -114,11 +114,11 @@ public class AecService {
         if (state == null) return;
 
         try {
-            // 用独立解码器解码参考 Opus 帧
+            // Decodifica o frame Opus de referência com um decodificador independente
             byte[] pcm = state.refDecoder.opusToPcm(opusFrame);
             if (pcm == null || pcm.length == 0) return;
 
-            // 立即逐子帧调用 processReverseStream，以 TTS 实时节奏驱动参考通道
+            // Chama processReverseStream imediatamente, subframe a subframe, conduzindo o canal de referência no ritmo em tempo real do TTS
             synchronized (state.apmLock) {
                 if (state.disposed) return;
                 int offset = 0;
@@ -132,14 +132,14 @@ public class AecService {
             }
 
         } catch (Exception e) {
-            log.warn("AEC feedReference 失败 - SessionId: {}: {}", sessionId, e.getMessage());
+            log.warn("Falha no feedReference do AEC - SessionId: {}: {}", sessionId, e.getMessage());
         }
     }
 
     /**
-     * 处理麦克风 PCM 数据，消除回声。
-     * 以麦克风到达的实时节奏逐子帧调用 processStream。
-     * AEC3 内部延迟估计器自动将参考通道与麦克风通道对齐。
+     * Processa os dados PCM do microfone, eliminando o eco.
+     * Chama processStream subframe a subframe, no ritmo em tempo real de chegada do microfone.
+     * O estimador de atraso interno do AEC3 alinha automaticamente o canal de referência com o canal do microfone.
      */
     public byte[] process(String sessionId, byte[] micPcm) {
         if (!enabled) return micPcm;
@@ -165,14 +165,14 @@ public class AecService {
                 }
             }
 
-            // 处理不足 10ms 的尾部数据
+            // Trata os dados residuais com menos de 10ms
             if (offset < totalBytes) {
                 System.arraycopy(micPcm, offset, aecOutput, outOffset, totalBytes - offset);
             }
 
             return aecOutput;
         } catch (Exception e) {
-            log.warn("AEC process 失败 - SessionId: {}: {}", sessionId, e.getMessage());
+            log.warn("Falha no process do AEC - SessionId: {}: {}", sessionId, e.getMessage());
             return micPcm;
         }
     }
@@ -182,14 +182,14 @@ public class AecService {
     }
 
     /**
-     * 每会话的 AEC 状态。
+     * Estado de AEC por sessão.
      */
     private class AecState {
         final AudioProcessing apm;
         final OpusProcessor refDecoder;
         final AudioProcessingStreamConfig streamConfig;
-        final Object apmLock = new Object();  // feedReference 和 process 共用同一把锁，保证 APM 调用线程安全
-        volatile boolean disposed = false;     // dispose 标志，在 apmLock 内设置和检查
+        final Object apmLock = new Object();  // feedReference e process compartilham o mesmo lock, garantindo a segurança de thread nas chamadas ao APM
+        volatile boolean disposed = false;     // sinalizador de dispose, definido e verificado dentro do apmLock
 
         AecState() {
             apm = new AudioProcessing();
@@ -198,7 +198,7 @@ public class AecService {
             config.echoCanceller.enabled = true;
             config.echoCanceller.enforceHighPassFiltering = false;
 
-            // 降噪：可配置级别
+            // Redução de ruído: nível configurável
             AudioProcessingConfig.NoiseSuppression.Level nsLevel;
             try {
                 nsLevel = AudioProcessingConfig.NoiseSuppression.Level.valueOf(noiseSuppressionLevel.toUpperCase());
@@ -210,14 +210,14 @@ public class AecService {
 
             config.highPassFilter.enabled = true;
 
-            // 自适应增益控制（AGC）：替代 AudioEnhancer 的固定增益+压缩，
-            // 与 AEC/降噪在同一处理链内协同，不会放大残留回声
+            // Controle de ganho adaptativo (AGC): substitui o ganho fixo + compressão do AudioEnhancer,
+            // atuando em conjunto com o AEC/redução de ruído na mesma cadeia de processamento, sem amplificar o eco residual
             config.gainControl.enabled = true;
             config.gainControl.adaptiveDigital.enabled = true;
 
             apm.applyConfig(config);
 
-            // 设置初始延迟提示，帮助 AEC3 加速收敛（AEC3 内置延迟估计器会自动调整）
+            // Define a dica de atraso inicial, ajudando o AEC3 a acelerar a convergência (o estimador de atraso embutido no AEC3 ajusta automaticamente)
             apm.setStreamDelayMs(streamDelayMs);
 
             refDecoder = new OpusProcessor();
@@ -229,7 +229,7 @@ public class AecService {
             try {
                 apm.dispose();
             } catch (Exception e) {
-                log.warn("AEC dispose 失败: {}", e.getMessage());
+                log.warn("Falha no dispose do AEC: {}", e.getMessage());
             }
         }
     }

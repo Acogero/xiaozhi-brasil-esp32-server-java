@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * MCP请求类，用于处理向设备发送相关的MCP请求
+ * Classe de requisição MCP, usada para tratar requisições MCP enviadas ao dispositivo
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -14,7 +14,7 @@ public final  class DeviceMcpMessage extends Message {
         super("mcp");
     }
 
-    private String sessionId;//会话id
+    private String sessionId;//id da sessão
     private String type = "mcp";
     private DeviceMcpPayload payload;
 }

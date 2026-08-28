@@ -3,10 +3,10 @@ package com.xiaozhi.communication.domain.mcp.device.initialize;
 import lombok.Data;
 
 /**
- * 摄像头视觉相关
+ * Relacionado à visão da câmera
  */
 @Data
 public class DeviceMcpVision {
-    private String url;//摄像头: 图片处理地址(必须是http地址, 不是websocket地址)
+    private String url;//câmera: endereço de processamento de imagem (deve ser um endereço http, não um endereço websocket)
     private String token;// url toke
 }

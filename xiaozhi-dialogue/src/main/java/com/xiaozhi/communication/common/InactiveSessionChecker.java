@@ -17,8 +17,8 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 不活跃会话检查器，定期检查并关闭超时未活动的会话。
- * 从 SessionManager 拆分出来，职责单一化。
+ * Verificador de sessões inativas, checa periodicamente e fecha as sessões que ultrapassaram o timeout de inatividade.
+ * Extraído de SessionManager para ter responsabilidade única.
  */
 @Slf4j
 @Component
@@ -42,7 +42,7 @@ public class InactiveSessionChecker {
     public void init() {
         if (checkInactiveSession) {
             scheduler.scheduleAtFixedRate(this::checkInactiveSessions, 10, 10, TimeUnit.SECONDS);
-            log.info("不活跃会话检查任务已启动，超时时间: {}秒", inactiveTimeOutSeconds);
+            log.info("Tarefa de verificação de sessões inativas iniciada, timeout: {} segundos", inactiveTimeOutSeconds);
         }
     }
 
@@ -57,13 +57,13 @@ public class InactiveSessionChecker {
             scheduler.shutdownNow();
             Thread.currentThread().interrupt();
         }
-        log.info("不活跃会话检查任务已关闭");
+        log.info("Tarefa de verificação de sessões inativas encerrada");
     }
 
     private void checkInactiveSessions() {
         Instant now = Instant.now();
         sessionManager.getAllSessions().forEach(session -> {
-            // 刷新设备-实例心跳
+            // Atualiza o heartbeat de dispositivo-instância
             if (session.getDevice() != null) {
                 deviceRegistry.refresh(session.getDevice().getDeviceId());
             }
@@ -72,11 +72,11 @@ public class InactiveSessionChecker {
                 if (lastActivity != null) {
                     Duration inactiveDuration = Duration.between(lastActivity, now);
                     if (inactiveDuration.getSeconds() > inactiveTimeOutSeconds) {
-                        // 正在说话或思考时不触发超时（SPEAKING/THINKING 有活跃处理）
-                        // IDLE 和 LISTENING 均可触发（设备连接中但用户长时间没说话）
+                        // Não dispara o timeout enquanto está falando ou pensando (SPEAKING/THINKING têm processamento ativo)
+                        // IDLE e LISTENING podem disparar o timeout (dispositivo conectado, mas o usuário ficou sem falar por muito tempo)
                         if (session.getDeviceState() != DeviceState.SPEAKING
                                 && session.getDeviceState() != DeviceState.THINKING) {
-                            log.info("会话 {} 已经 {} 秒没有有效活动，发送超时提示并自动关闭",
+                            log.info("A sessão {} está há {} segundos sem atividade válida; enviando aviso de timeout e encerrando automaticamente",
                                     session.getSessionId(), inactiveDuration.getSeconds());
                             session.clearAudioSinks();
                             if (session.getPersona() != null) {

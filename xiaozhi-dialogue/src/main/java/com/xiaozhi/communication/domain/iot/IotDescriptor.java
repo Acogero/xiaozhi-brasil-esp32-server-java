@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.Map;
 
 /**
- * Iot设备描述信息
+ * Informações de descrição do dispositivo IoT
  */
 @Data
 public class IotDescriptor {

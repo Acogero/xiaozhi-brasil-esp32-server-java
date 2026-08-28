@@ -38,11 +38,11 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
         String deviceIdAuth = headers.get("device-id");
         String token = headers.get("Authorization");
         if (deviceIdAuth == null || deviceIdAuth.isEmpty()) {
-            log.error("设备ID为空");
+            log.error("ID do dispositivo vazio");
             try {
-                session.close(CloseStatus.BAD_DATA.withReason("设备ID为空"));
+                session.close(CloseStatus.BAD_DATA.withReason("ID do dispositivo vazio"));
             } catch (IOException e) {
-                log.error("关闭WebSocket连接失败", e);
+                log.error("Falha ao fechar a conexão WebSocket", e);
             }
             return;
         }
@@ -52,7 +52,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
         messageHandler.afterConnection(xiaoZhiSession, deviceIdAuth);
         sessionManager.openAudioChannel(xiaoZhiSession.getSessionId(), deviceIdAuth);
 
-        log.info("WebSocket连接建立成功 - SessionId: {}, DeviceId: {}", session.getId(), deviceIdAuth);
+        log.info("Conexão WebSocket estabelecida com sucesso - SessionId: {}, DeviceId: {}", session.getId(), deviceIdAuth);
     }
 
     @Override
@@ -68,24 +68,24 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
                 handleHelloMessage(session, m);
             } else {
                 if (device == null || device.getRoleId() == null) {
-                    // 设备未绑定，尝试自动绑定
+                    // Dispositivo não vinculado, tentando vinculação automática
                     boolean autoBound = messageHandler.handleUnboundDevice(sessionId, device);
                     if (!autoBound) {
-                        // 自动绑定失败或需要验证码，不继续处理消息
+                        // Falha na vinculação automática ou é necessário código de verificação; não continua processando a mensagem
                         return;
                     }
-                    // 自动绑定成功，重新获取设备信息
+                    // Vinculação automática bem-sucedida, obtendo novamente as informações do dispositivo
                     device = chatSession != null ? chatSession.getDevice() : null;
                     if (device == null || device.getRoleId() == null) {
-                        log.warn("自动绑定后设备信息异常 - SessionId: {}", sessionId);
+                        log.warn("Informações do dispositivo inconsistentes após a vinculação automática - SessionId: {}", sessionId);
                         return;
                     }
-                    log.info("自动绑定成功，继续处理消息 - SessionId: {}, DeviceId: {}", sessionId, device.getDeviceId());
+                    log.info("Vinculação automática bem-sucedida, continuando o processamento da mensagem - SessionId: {}, DeviceId: {}", sessionId, device.getDeviceId());
                 }
                 messageHandler.handleMessage(msg, sessionId);
             }
         } catch (Exception e) {
-            log.error("handleTextMessage处理失败", e);
+            log.error("Falha no processamento de handleTextMessage", e);
         }
     }
 
@@ -104,37 +104,37 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
         String sessionId = session.getId();
         messageHandler.afterConnectionClosed(sessionId);
 
-        log.info("WebSocket连接关闭 - SessionId: {}, 状态: {}", sessionId, status);
+        log.info("Conexão WebSocket fechada - SessionId: {}, status: {}", sessionId, status);
     }
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) {
         String sessionId = session.getId();
-        // 检查是否是客户端正常关闭连接导致的异常
+        // Verifica se a exceção foi causada pelo fechamento normal da conexão pelo cliente
         if (isClientCloseRequest(exception)) {
-            // 客户端主动关闭，记录为信息级别日志而非错误
-            log.info("WebSocket连接被客户端主动关闭 - SessionId: {}", sessionId);
+            // Fechamento iniciado pelo cliente; registrado como log de nível informativo, não como erro
+            log.info("Conexão WebSocket fechada pelo cliente - SessionId: {}", sessionId);
             messageHandler.afterConnectionClosed(sessionId);
         } else {
-            // 真正的传输错误
-            log.error("WebSocket传输错误 - SessionId: {}", sessionId, exception);
+            // Erro de transporte real
+            log.error("Erro de transporte do WebSocket - SessionId: {}", sessionId, exception);
         }
     }
 
     /**
-     * 判断异常是否由客户端主动关闭连接导致
+     * Verifica se a exceção foi causada pelo fechamento da conexão pelo cliente
      */
     private boolean isClientCloseRequest(Throwable exception) {
-        // 检查常见的客户端关闭连接导致的异常类型
+        // Verifica os tipos comuns de exceção causados pelo fechamento da conexão pelo cliente
         if (exception instanceof IOException) {
             String message = exception.getMessage();
             if (message != null) {
                 return message.contains("Connection reset by peer") ||
                     message.contains("Broken pipe") ||
                     message.contains("Connection closed") ||
-                    message.contains("远程主机强迫关闭了一个现有的连接");
+                    message.contains("Uma conexão existente foi forçosamente fechada pelo host remoto");
             }
-            // 处理EOFException，这通常是客户端关闭连接导致的
+            // Trata EOFException, que geralmente é causada pelo fechamento da conexão pelo cliente
             return exception instanceof java.io.EOFException;
         }
         return false;
@@ -142,17 +142,17 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
 
     private void handleHelloMessage(WebSocketSession session, HelloMessage message) {
         var sessionId = session.getId();
-        log.info("收到hello消息 - SessionId: {}, JsonNode: {}", sessionId, message);
+        log.info("Mensagem hello recebida - SessionId: {}, JsonNode: {}", sessionId, message);
 
         if (message.getAudioParams() != null) {
-            log.info("客户端音频参数 - 格式: {}, 采样率: {}, 声道: {}, 帧时长: {}ms",
+            log.info("Parâmetros de áudio do cliente - formato: {}, taxa de amostragem: {}, canais: {}, duração do frame: {}ms",
                     message.getAudioParams().getFormat(),
                     message.getAudioParams().getSampleRate(),
                     message.getAudioParams().getChannels(),
                     message.getAudioParams().getFrameDuration());
         }
 
-        // 回复hello消息
+        // Responde à mensagem hello
         var resp = new HelloMessageResp()
                 .setTransport("websocket")
                 .setSessionId(sessionId)
@@ -161,7 +161,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
         try {
             session.sendMessage(new TextMessage(JsonUtil.toJson(resp)));
             if(message.getFeatures() != null && message.getFeatures().getMcp()) {
-                //如果客户端开启mcp协议，异步初始化MCP工具
+                //Se o cliente tiver o protocolo MCP habilitado, inicializa as ferramentas MCP de forma assíncrona
                 ChatSession chatSession = sessionManager.getSession(sessionId);
                 Thread.startVirtualThread(() -> {
                     DeviceBO device = chatSession != null ? chatSession.getDevice() : null;
@@ -171,12 +171,12 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
                 });
             }
         } catch (Exception e) {
-            log.error("发送hello响应失败", e);
+            log.error("Falha ao enviar a resposta hello", e);
         }
     }
 
     private Map<String, String> getHeadersFromSession(WebSocketSession session) {
-        // 尝试从请求头获取设备ID
+        // Tenta obter o ID do dispositivo a partir do cabeçalho da requisição
         String[] deviceKeys = { "device-id", "mac_address", "uuid", "Authorization" };
 
         Map<String, String> headers = new HashMap<>();
@@ -187,7 +187,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
                 headers.put(key, value);
             }
         }
-        // 尝试从URI参数中获取
+        // Tenta obter a partir dos parâmetros da URI
         URI uri = session.getUri();
         if (uri != null) {
             String query = uri.getQuery();

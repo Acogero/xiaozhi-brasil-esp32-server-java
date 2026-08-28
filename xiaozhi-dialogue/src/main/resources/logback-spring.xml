@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- 引入Spring Boot默认配置 -->
+    <!-- Importa a configuração padrão do Spring Boot -->
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
     
-    <!-- 定义日志文件存储位置 -->
+    <!-- Define o local de armazenamento dos arquivos de log -->
     <property name="LOG_HOME" value="./logs" />
     
-    <!-- 控制台输出配置 -->
+    <!-- Configuração de saída no console -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{30}:%line) - %msg%n</pattern>
@@ -14,7 +14,7 @@
         </encoder>
     </appender>
     
-    <!-- 文件输出配置 - 所有日志 -->
+    <!-- Configuração de saída em arquivo - todos os logs -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_HOME}/xiaozhi-dialogue.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
@@ -29,7 +29,7 @@
         </encoder>
     </appender>
     
-    <!-- 文件输出配置 - 仅错误日志 -->
+    <!-- Configuração de saída em arquivo - apenas logs de erro -->
     <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_HOME}/xiaozhi-dialogue-error.log</file>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -47,7 +47,7 @@
         </encoder>
     </appender>
     
-    <!-- 开发环境配置 -->
+    <!-- Configuração do ambiente de desenvolvimento -->
     <springProfile name="dev">
         <root level="INFO">
             <appender-ref ref="CONSOLE" />
@@ -59,7 +59,7 @@
         <logger name="com.alibaba.dashscope.protocol.okhttp" level="WARN" />
     </springProfile>
 
-    <!-- 生产环境配置 -->
+    <!-- Configuração do ambiente de produção -->
     <springProfile name="prod">
         <root level="INFO">
             <appender-ref ref="FILE" />
@@ -71,7 +71,7 @@
         <logger name="com.alibaba.dashscope.protocol.okhttp" level="WARN" />
     </springProfile>
     
-    <!-- 默认配置（如果没有指定profile） -->
+    <!-- Configuração padrão (caso nenhum profile seja especificado) -->
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="FILE" />

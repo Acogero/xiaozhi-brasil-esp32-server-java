@@ -139,7 +139,7 @@ public class RoleController extends BaseController {
         ConfigBO config = null;
         if (!param.getProvider().equals("edge")) {
             if (param.getTtsId() == null) {
-                throw new IllegalArgumentException("Provedores que não sejam "edge" precisam ter uma configuração de voz definida");
+                throw new IllegalArgumentException("Provedores que não sejam \"edge\" precisam ter uma configuração de voz definida");
             }
             config = configService.getBO(param.getTtsId());
             if (config == null) {

@@ -8,9 +8,9 @@ import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 实例标识持有者。
- * 优先使用配置的 {@code xiaozhi.instance.id}，未配置时自动生成（hostname + 随机后缀）。
- * Pod/进程重启即重新注册。
+ * Detentor do identificador da instância.
+ * Usa preferencialmente o {@code xiaozhi.instance.id} configurado; se não configurado, gera automaticamente (hostname + sufixo aleatório).
+ * A cada reinício do Pod/processo, um novo registro é feito.
  */
 @Slf4j
 @Component
@@ -31,7 +31,7 @@ public class InstanceIdHolder {
             String suffix = UUID.randomUUID().toString().substring(0, 8);
             this.instanceId = host + "-" + suffix;
         }
-        log.info("实例标识已生成: {}", instanceId);
+        log.info("Identificador da instância gerado: {}", instanceId);
     }
 
     public String getInstanceId() {

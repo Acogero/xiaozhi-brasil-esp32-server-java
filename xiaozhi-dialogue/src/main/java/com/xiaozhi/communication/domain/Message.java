@@ -32,7 +32,7 @@ public sealed abstract class Message
         this.type = type;
     }
 
-    @NotNull(message = "消息类型不能为空")
+    @NotNull(message = "O tipo de mensagem não pode ser nulo")
     protected String type;
 
 }

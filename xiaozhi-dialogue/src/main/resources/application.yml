@@ -1,17 +1,17 @@
 # ============================================================
-# Dialogue 独立部署配置
-# 仅包含与 server 不同的部分，其余沿用各模块默认值
+# Configuração de implantação independente do Dialogue
+# Contém apenas as partes diferentes do server; o restante segue os valores padrão de cada módulo
 # ============================================================
 
 server:
   port: 8092
 
 spring:
-  # Flyway Migration 只在 server 执行，dialogue 不执行，避免多实例重复迁移
+  # A migração do Flyway é executada apenas no server; o dialogue não a executa, evitando migrações duplicadas em múltiplas instâncias
   flyway:
     enabled: false
 
-  # 数据源配置（与 server 共享同一数据库）
+  # Configuração da fonte de dados (compartilha o mesmo banco de dados com o server)
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
@@ -54,7 +54,7 @@ spring:
     virtual:
       enabled: true
 
-  # 激活开发环境，覆盖此处配置使用 application-dev.yml
+  # Ativa o ambiente de desenvolvimento, sobrescrevendo esta configuração usando application-dev.yml
   profiles:
     active: dev
 
@@ -68,7 +68,7 @@ mybatis-plus:
     map-underscore-to-camel-case: false
 
 # ============================================================
-# 日志配置
+# Configuração de log
 # ============================================================
 logging:
   level:
@@ -77,7 +77,7 @@ logging:
     io.netty.handler: ERROR
 
 # ============================================================
-# 小智扩展配置
+# Configuração de extensão do Xiaozhi
 # ============================================================
 xiaozhi:
   runtime:
@@ -92,7 +92,7 @@ xiaozhi:
       session: true
 
 # ============================================================
-# Sa-Token（仅用于 @SaIgnore 和无状态接口校验，token 验证依赖 Redis）
+# Sa-Token (usado apenas para @SaIgnore e validação de interfaces sem estado; a validação do token depende do Redis)
 # ============================================================
 sa-token:
   token-name: Authorization

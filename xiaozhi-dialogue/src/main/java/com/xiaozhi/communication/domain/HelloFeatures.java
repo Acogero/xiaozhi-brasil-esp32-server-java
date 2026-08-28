@@ -5,11 +5,11 @@ import lombok.Data;
 @Data
 public class HelloFeatures {
     /**
-     * 设备是否启用mcp
+     * Se o dispositivo tem o MCP habilitado
      */
     private Boolean mcp = false;
     /**
-     * 设备是否启用服务端aec
+     * Se o dispositivo tem o AEC do lado do servidor habilitado
      */
     private Boolean aec = false;
 }

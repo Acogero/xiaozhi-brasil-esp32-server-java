@@ -8,22 +8,22 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 /**
- * 超时消息供应器
- * 用于提供会话超时时的提示语
+ * Fornecedor de mensagens de timeout
+ * Usado para fornecer a mensagem de aviso quando a sessão expira por timeout
  */
 @Component
 public class TimeoutMessageSupplier implements Supplier<String> {
 
     private static final Random random = new Random();
 
-    // 超时提示语列表
+    // Lista de mensagens de aviso de timeout
     private static final List<String> timeoutMessages = Arrays.asList(
-            "你好像在忙别的事情，我先退下啦~",
-            "看来你暂时不需要我了，我先休息一下~",
-            "你有一会儿没说话了，我先去充电啦~",
-            "看起来你在忙，我先不打扰了~",
-            "看来你有别的事情要忙，我先离开啦~",
-            "你有段时间没说话了，我先去休息了~");
+            "Parece que você está ocupado com outra coisa, vou me retirar por agora~",
+            "Parece que você não precisa de mim no momento, vou descansar um pouco~",
+            "Faz um tempo que você não fala nada, vou recarregar as baterias~",
+            "Parece que você está ocupado, não vou incomodar~",
+            "Parece que você tem outra coisa para fazer, vou sair por agora~",
+            "Faz um tempo que você não fala nada, vou descansar~");
 
     @Override
     public String get() {

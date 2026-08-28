@@ -29,19 +29,19 @@ public class SessionExitFunction implements ToolsGlobalRegistry.GlobalFunction {
                 chatSession.getPlayer().setFunctionAfterChat(()->sessionManager.closeSession(chatSession));
                 String sayGoodbye = params.get("sayGoodbye");
                 if(sayGoodbye == null || sayGoodbye.trim().isEmpty()){
-                    sayGoodbye = "好的，再见！期待下次聊天哦！";
+                    sayGoodbye = "Certo, até logo! Aguardo nossa próxima conversa!";
                 }
                 return sayGoodbye;
             })
             .toolMetadata(new XiaozhiToolMetadata(true))
-            .description("当用户明确表达要离开/结束对话时调用此函数。触发词汇：'拜拜'、'再见'、'退下'、'走了'、'结束对话'、'退出'、'我要走了'、'goodbye'、'bye'。重要：检测到这些词汇时必须调用此函数来正确结束会话，不要只是普通回复。")
+            .description("Chamado quando o usuário expressa claramente que deseja sair/encerrar o diálogo. Palavras-gatilho: 'tchau', 'até logo', 'já vou', 'encerrar conversa', 'sair', 'eu vou embora', 'goodbye', 'bye'. Importante: ao detectar essas palavras, esta função deve ser chamada para encerrar corretamente a sessão, não apenas responder normalmente.")
             .inputSchema("""
                         {
                             "type": "object",
                             "properties": {
                                 "sayGoodbye": {
                                     "type": "string",
-                                    "description": "告别语"
+                                    "description": "Mensagem de despedida"
                                 }
                             },
                             "required": ["sayGoodbye"]
@@ -63,6 +63,6 @@ public class SessionExitFunction implements ToolsGlobalRegistry.GlobalFunction {
 
     @Override
     public String getToolDescription() {
-        return "会话退出";
+        return "Saída da sessão";
     }
 }

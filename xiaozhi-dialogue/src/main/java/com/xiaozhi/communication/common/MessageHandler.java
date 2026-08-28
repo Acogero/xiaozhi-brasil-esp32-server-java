@@ -93,11 +93,11 @@ public class MessageHandler {
     @Resource
     private RedisBroadcast redisBroadcast;
 
-    // 用于存储设备ID和验证码生成状态的映射
+    // Mapa para armazenar o ID do dispositivo e o estado de geração do código de verificação
     private final Map<String, Boolean> captchaGenerationInProgress = new ConcurrentHashMap<>();
 
     /**
-     * 处理连接建立事件.
+     * Trata o evento de estabelecimento de conexão.
      *
      * @param chatSession
      * @param deviceIdAuth
@@ -105,69 +105,69 @@ public class MessageHandler {
     public void afterConnection(ChatSession chatSession, String deviceIdAuth) {
         String deviceId = deviceIdAuth;
         String sessionId = chatSession.getSessionId();
-        // 注册会话
+        // Registra a sessão
         sessionManager.registerSession(sessionId, chatSession);
 
-        // 跨实例幽灵会话清理：如果设备之前绑定在其他实例，通知旧实例关闭会话
-        // 此时 registerDevice 尚未调用，本实例的 deviceIdToSessionId 无此设备，
-        // 所以广播到达本实例时 getSessionByDeviceId 返回 null，不会误关自己
+        // Limpeza de sessão fantasma entre instâncias: se o dispositivo estava vinculado anteriormente a outra instância, notifica a instância antiga para fechar a sessão
+        // Neste ponto, registerDevice ainda não foi chamado; o deviceIdToSessionId desta instância não contém este dispositivo,
+        // então, quando o broadcast chega a esta instância, getSessionByDeviceId retorna null e não há risco de fechar a própria sessão por engano
         String previousInstance = deviceRegistry.getInstance(deviceId);
         if (previousInstance != null && !previousInstance.equals(instanceIdHolder.getInstanceId())) {
-            log.info("设备 {} 之前在实例 {} 上，通知旧实例清理幽灵会话", deviceId, previousInstance);
+            log.info("O dispositivo {} estava anteriormente na instância {}; notificando a instância antiga para limpar a sessão fantasma", deviceId, previousInstance);
             redisBroadcast.closeDeviceSession(deviceId);
         }
 
-        log.info("开始查询设备信息 - DeviceId: {}", deviceId);
+        log.info("Iniciando consulta das informações do dispositivo - DeviceId: {}", deviceId);
         DeviceBO device = Optional.ofNullable(deviceService.getBO(deviceId)).orElse(new DeviceBO());
         device.setDeviceId(deviceId);
         device.setSessionId(sessionId);
         sessionManager.registerDevice(sessionId, device);
-        // 如果已绑定，则初始化其他内容
+        // Se já estiver vinculado, inicializa o restante
         if (!ObjectUtils.isEmpty(device) && device.getRoleId() != null) {
             initializeBoundDevice(chatSession, device);
         }
     }
 
     /**
-     * 初始化已绑定的设备
+     * Inicializa um dispositivo já vinculado
      *
-     * @param chatSession 聊天会话
-     * @param device 设备信息
+     * @param chatSession sessão de chat
+     * @param device informações do dispositivo
      */
     private void initializeBoundDevice(ChatSession chatSession, DeviceBO device) {
         String deviceId = device.getDeviceId();
         String sessionId = chatSession.getSessionId();
         
-        //这里需要放在虚拟线程外
+        //Isso precisa ficar fora da virtual thread
         ToolsSessionHolder toolsSessionHolder = new ToolsSessionHolder(chatSession.getSessionId(),
                 device, toolsGlobalRegistry);
         chatSession.setToolsSessionHolder(toolsSessionHolder);
-        // 从缓存/数据库获取角色描述。device
+        // Obtém a descrição do papel a partir do cache/banco de dados. device
         RoleBO role = roleService.getBO(device.getRoleId());
         if (role == null) {
-            throw new IllegalStateException("角色不存在");
+            throw new IllegalStateException("O papel não existe");
         }
 
         personaFactory.buildPersona(chatSession, device, role);
 
-        // 连接建立时就初始化 AEC，确保后续任何 TTS 播放（含唤醒响应）的参考帧都不会被丢弃
+        // Inicializa o AEC já no estabelecimento da conexão, garantindo que os frames de referência de qualquer reprodução TTS futura (incluindo a resposta de wake word) não sejam descartados
         if (aecService != null) aecService.initSession(sessionId);
 
-        // 以上同步处理结束后，异步更新设备在线状态
+        // Após o processamento síncrono acima, atualiza de forma assíncrona o status online do dispositivo
         String newState = DeviceBO.DEVICE_STATE_ONLINE;
         Thread.startVirtualThread(() -> {
             try {
                 deviceRepository.updateState(deviceId, newState);
             } catch (Exception e) {
-                // 仅记录告警，不关闭会话：状态写库失败不影响设备正常通信
-                log.warn("更新设备在线状态失败 - DeviceId: {}, State: {}", deviceId, newState, e);
+                // Apenas registra um alerta, sem fechar a sessão: falha ao gravar o estado no banco não afeta a comunicação normal do dispositivo
+                log.warn("Falha ao atualizar o status online do dispositivo - DeviceId: {}, State: {}", deviceId, newState, e);
             }
         });
 
     }
 
     /**
-     * 处理连接关闭事件.
+     * Trata o evento de fechamento de conexão.
      *
      * @param sessionId
      */
@@ -176,43 +176,43 @@ public class MessageHandler {
         if (chatSession == null) {
             return;
         }
-        // 连接关闭时清理资源
+        // Limpa os recursos ao fechar a conexão
         DeviceBO device = chatSession.getDevice();
         if (device != null) {
             String deviceId = device.getDeviceId();
 
-            // 服务关闭期间跳过状态写库：启动时会 bulk reset 所有设备为离线，无需在关机时逐台写入
+            // Durante o desligamento do serviço, pula a gravação do estado no banco: na inicialização é feito um bulk reset de todos os dispositivos para offline, então não é necessário gravar um por um no desligamento
             if (!sessionManager.isShuttingDown()) {
                 Thread.startVirtualThread(() -> {
                     try {
                         String newState = DeviceBO.DEVICE_STATE_OFFLINE;
 
-                        // 时序保护：检查设备是否已重连
+                        // Proteção de timing: verifica se o dispositivo já reconectou
                         ChatSession currentSession = sessionManager.getSessionByDeviceId(deviceId);
                         if (currentSession != null && !sessionId.equals(currentSession.getSessionId())) {
                             return;
                         }
 
                         deviceRepository.updateState(deviceId, newState);
-                        log.info("连接已关闭 - SessionId: {}, DeviceId: {}, 新状态: {}",
+                        log.info("Conexão fechada - SessionId: {}, DeviceId: {}, novo estado: {}",
                                 sessionId, deviceId, newState);
                     } catch (Exception e) {
-                        log.error("更新设备状态失败", e);
+                        log.error("Falha ao atualizar o estado do dispositivo", e);
                     }
                 });
             }
         }
-        // 清理会话
+        // Limpa a sessão
         sessionManager.closeSession(sessionId);
-        // 清理VAD会话
+        // Limpa a sessão de VAD
         vadService.resetSession(sessionId);
-        // 清理AEC会话
+        // Limpa a sessão de AEC
         if (aecService != null) aecService.resetSession(sessionId);
 
     }
 
     /**
-     * 处理音频数据
+     * Trata os dados de áudio
      *
      * @param sessionId
      * @param opusData
@@ -222,14 +222,14 @@ public class MessageHandler {
         if ((chatSession == null || !chatSession.isOpen()) && !vadService.isSessionInitialized(sessionId)) {
             return;
         }
-        // 委托给DialogueService处理音频数据
+        // Delega o processamento dos dados de áudio ao DialogueService
         dialogueService.processAudioData(chatSession, opusData);
 
     }
 
     /**
-     * 处理未绑定设备
-     * @return true 如果设备自动绑定成功，false 如果需要生成验证码
+     * Trata dispositivo não vinculado
+     * @return true se o dispositivo foi vinculado automaticamente com sucesso, false se for necessário gerar um código de verificação
      */
     public boolean handleUnboundDevice(String sessionId, DeviceBO device) {
         String deviceId;
@@ -238,12 +238,12 @@ public class MessageHandler {
         }
         deviceId = device.getDeviceId();
         
-        // 检查是否是 user_chat_ 开头的虚拟设备，如果是则自动绑定
+        // Verifica se é um dispositivo virtual com prefixo user_chat_; se for, vincula automaticamente
         if (deviceId.startsWith("user_chat_")) {
             try {
-                log.info("检测到虚拟设备 {}，尝试自动绑定", deviceId);
+                log.info("Dispositivo virtual {} detectado, tentando vinculação automática", deviceId);
                 
-                // 提取用户ID
+                // Extrai o ID do usuário
                 String userIdStr = deviceId.substring("user_chat_".length());
                 Integer userId = Integer.parseInt(userIdStr);
                 
@@ -251,41 +251,41 @@ public class MessageHandler {
                 Integer defaultRoleId = defaultRole != null ? defaultRole.getRoleId() : null;
                 
                 if (defaultRoleId != null) {
-                    // 创建虚拟设备并绑定到默认角色
+                    // Cria o dispositivo virtual e vincula ao papel padrão
                     Device createdDevice = Device.newDevice(
-                            deviceId, "小助手", "web", userId, defaultRoleId);
+                            deviceId, "Assistente", "web", userId, defaultRoleId);
                     deviceRepository.save(createdDevice);
                     if (createdDevice.getDeviceId() != null) {
-                        log.info("虚拟设备 {} 自动绑定成功，角色ID: {}", deviceId, defaultRoleId);
+                        log.info("Dispositivo virtual {} vinculado automaticamente com sucesso, ID do papel: {}", deviceId, defaultRoleId);
                         
-                        // 重新查询设备信息
+                        // Consulta novamente as informações do dispositivo
                         DeviceBO boundDevice = deviceService.getBO(deviceId);
                         if (boundDevice != null) {
-                            // 更新会话中的设备信息
+                            // Atualiza as informações do dispositivo na sessão
                             boundDevice.setSessionId(sessionId);
                             sessionManager.registerDevice(sessionId, boundDevice);
                             
-                            // 获取会话对象
+                            // Obtém o objeto da sessão
                             ChatSession chatSession = sessionManager.getSession(sessionId);
                             if (chatSession != null && chatSession.isOpen()) {
-                                // 初始化设备会话（与afterConnection中的逻辑一致）
+                                // Inicializa a sessão do dispositivo (mesma lógica de afterConnection)
                                 initializeBoundDevice(chatSession, boundDevice);
-                                log.info("虚拟设备 {} 初始化完成，可以开始对话", deviceId);
+                                log.info("Dispositivo virtual {} inicializado, o diálogo pode começar", deviceId);
                             }
                             
-                            // 设备已绑定并初始化完成，返回true表示可以继续处理消息
+                            // Dispositivo vinculado e inicializado; retorna true indicando que o processamento da mensagem pode continuar
                             return true;
                         }
                     } else {
-                        log.warn("虚拟设备 {} 自动绑定失败", deviceId);
+                        log.warn("Falha ao vincular automaticamente o dispositivo virtual {}", deviceId);
                     }
                 } else {
-                    log.warn("用户 {} 没有可用的角色，无法自动绑定虚拟设备", userId);
+                    log.warn("O usuário {} não possui papéis disponíveis; não é possível vincular o dispositivo virtual automaticamente", userId);
                 }
             } catch (NumberFormatException e) {
-                log.error("解析虚拟设备ID失败: {}", deviceId, e);
+                log.error("Falha ao analisar o ID do dispositivo virtual: {}", deviceId, e);
             } catch (Exception e) {
-                log.error("自动绑定虚拟设备失败: {}", deviceId, e);
+                log.error("Falha ao vincular automaticamente o dispositivo virtual: {}", deviceId, e);
             }
         }
         
@@ -293,25 +293,25 @@ public class MessageHandler {
         if (chatSession == null || !chatSession.isOpen()) {
             return false;
         }
-        // 检查是否已经在处理中，使用CAS操作保证线程安全
+        // Verifica se já está em processamento, usando operação CAS para garantir segurança em concorrência
         Boolean previous = captchaGenerationInProgress.putIfAbsent(deviceId, true);
         if (previous != null && previous) {
-            return false; // 已经在处理中
+            return false; // já está em processamento
         }
 
         Thread.startVirtualThread(() -> {
             try {
-                // 对于未绑定设备， 播放器是一次性用途，不需要绑定到ChatSession。
+                // Para dispositivos não vinculados, o player é de uso único e não precisa ser vinculado ao ChatSession.
                 Player player = new ScheduledPlayer(chatSession, messageService);
-                // 设备已注册但未配置模型
+                // Dispositivo registrado, mas sem modelo configurado
                 if (device.getDeviceName() != null && device.getRoleId() == null) {
-                    String message = "设备未配置角色，请到角色配置页面完成配置后开始对话";
+                    String message = "Dispositivo sem papel configurado; acesse a página de configuração de papéis para concluir a configuração antes de iniciar o diálogo";
 
                     Path audioFilePath = ttsFactory.getDefaultTtsService().textToSpeech(message);
 
                     player.play(message, audioFilePath);
 
-                    // 延迟一段时间后再解除标记
+                    // Remove a marcação após um período de atraso
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -321,12 +321,12 @@ public class MessageHandler {
                     return;
                 }
 
-                // 设备未命名，生成验证码
-                // 生成新验证码
+                // Dispositivo sem nome, gerando código de verificação
+                // Gera um novo código de verificação
                 VerifyCodeBO codeResult = deviceService.generateCode(deviceId, sessionId, device.getType());
                 Path audioPath;
                 if (!StringUtils.hasText(codeResult.getAudioPath())) {
-                    String codeMessage = "请到设备管理页面添加设备，输入验证码" + codeResult.getCode();
+                    String codeMessage = "Acesse a página de gerenciamento de dispositivos para adicioná-lo, informando o código de verificação " + codeResult.getCode();
                     audioPath = ttsFactory.getDefaultTtsService().textToSpeech(codeMessage);
                     deviceService.updateCodeAudioPath(deviceId, sessionId, codeResult.getCode(), audioPath.toString());
                 } else {
@@ -334,7 +334,7 @@ public class MessageHandler {
                 }
 
                 player.play(codeResult.getCode(), audioPath);
-                // 延迟一段时间后再解除标记
+                // Remove a marcação após um período de atraso
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -343,55 +343,55 @@ public class MessageHandler {
                 captchaGenerationInProgress.remove(deviceId);
 
             } catch (Exception e) {
-                log.error("处理未绑定设备失败", e);
+                log.error("Falha ao tratar dispositivo não vinculado", e);
                 captchaGenerationInProgress.remove(deviceId);
             }
         });
         
-        // 返回false表示需要验证码流程，不继续处理当前消息
+        // Retorna false indicando que é necessário o fluxo de código de verificação; não continua processando a mensagem atual
         return false;
     }
 
     private void handleListenMessage(ChatSession chatSession, ListenMessage message) {
         String sessionId = chatSession.getSessionId();
-        log.info("收到listen消息 - SessionId: {}, State: {}, Mode: {}", sessionId, message.getState(), message.getMode());
+        log.info("Mensagem listen recebida - SessionId: {}, State: {}, Mode: {}", sessionId, message.getState(), message.getMode());
 
-        // 如果会话标记为即将关闭，忽略listen消息
+        // Se a sessão estiver marcada para fechamento iminente, ignora a mensagem listen
         if (chatSession.getPlayer().getFunctionAfterChat()!= null) {
             return;
         }
 
         chatSession.setMode(message.getMode());
 
-        // 根据state处理不同的监听状态
+        // Trata os diferentes estados de escuta de acordo com o state
         switch (message.getState()) {
             case ListenState.Start:
-                // 设备开始录音，进入聆听状态
-                log.info("开始监听 - Mode: {}", message.getMode());
+                // O dispositivo começou a gravar, entrando em estado de escuta
+                log.info("Iniciando escuta - Mode: {}", message.getMode());
 
                 chatSession.transitionTo(DeviceState.LISTENING);
 
-                // 初始化VAD会话
+                // Inicializa a sessão de VAD
                 vadService.initSession(sessionId);
-                // 初始化AEC会话
+                // Inicializa a sessão de AEC
                 if (aecService != null) aecService.initSession(sessionId);
                 break;
 
             case ListenState.Stop:
-                // 停止监听
-                log.info("停止监听");
+                // Interrompe a escuta
+                log.info("Escuta interrompida");
 
-                // 关闭音频流，恢复到 IDLE
+                // Fecha o fluxo de áudio, retornando ao estado IDLE
                 chatSession.completeAudioStream();
                 chatSession.closeAudioStream();
                 chatSession.transitionTo(DeviceState.IDLE);
-                // 重置VAD会话
+                // Reseta a sessão de VAD
                 vadService.resetSession(sessionId);
-                // 注意：不重置 AEC 会话，保留已收敛的滤波器状态供后续对话复用
+                // Atenção: não reseta a sessão de AEC, mantendo o estado do filtro já convergido para reutilização em diálogos futuros
                 break;
 
             case ListenState.Text:
-                // 检测聊天文本输入 — 确保 AEC 在 TTS 开始前已初始化
+                // Detecta entrada de texto de chat — garante que o AEC esteja inicializado antes do início do TTS
                 if (aecService != null) aecService.initSession(sessionId);
                 Player player = chatSession.getPlayer();
                 if (player != null ) {
@@ -399,22 +399,22 @@ public class MessageHandler {
                     String abortDeviceId = chatSession.getDevice() != null ? chatSession.getDevice().getDeviceId() : null;
                     applicationContext.publishEvent(new ChatAbortedEvent(this, chatSession.getSessionId(), abortDeviceId, modeValue));
                 }
-                // 确保 Persona 存在、通知设备、更新活跃时间
+                // Garante que o Persona exista, notifica o dispositivo e atualiza o horário de atividade
                 sessionManager.updateLastActivity(sessionId);
                 personaFactory.buildPersona(chatSession);
                 messageService.sendSttMessage(chatSession, message.getText());
-                log.info("处理聊天文字输入: \"{}\"", message.getText());
+                log.info("Processando entrada de texto de chat: \"{}\"", message.getText());
                 dialogueService.handleText(chatSession, SttResult.textOnly(message.getText()));
                 break;
 
             case ListenState.Detect:
-                // 检测到唤醒词 — 确保 AEC 在 TTS 开始前已初始化
+                // Palavra de ativação detectada — garante que o AEC esteja inicializado antes do início do TTS
                 if (aecService != null) aecService.initSession(sessionId);
                 dialogueService.handleWakeWord(chatSession, message.getText());
                 break;
 
             default:
-                log.warn("未知的listen状态: {}", message.getState());
+                log.warn("Estado de listen desconhecido: {}", message.getState());
         }
     }
 
@@ -425,35 +425,35 @@ public class MessageHandler {
 
     private void handleIotMessage(ChatSession chatSession, IotMessage message) {
         String sessionId = chatSession.getSessionId();
-        // 处理设备描述信息
+        // Trata as informações de descrição do dispositivo
         if (message.getDescriptors() != null) {
-            log.info("收到IoT设备描述信息 - SessionId: {}: {}", sessionId, message.getDescriptors());
-            // 处理设备描述信息的逻辑
+            log.info("Informações de descrição do dispositivo IoT recebidas - SessionId: {}: {}", sessionId, message.getDescriptors());
+            // Lógica de tratamento das informações de descrição do dispositivo
             iotService.handleDeviceDescriptors(sessionId, message.getDescriptors());
         }
 
-        // 处理设备状态更新
+        // Trata a atualização de estado do dispositivo
         if (message.getStates() != null) {
-            log.info("收到IoT设备状态更新 - SessionId: {}: {}", sessionId, message.getStates());
-            // 处理设备状态更新的逻辑
+            log.info("Atualização de estado do dispositivo IoT recebida - SessionId: {}: {}", sessionId, message.getStates());
+            // Lógica de tratamento da atualização de estado do dispositivo
             iotService.handleDeviceStates(sessionId, message.getStates());
         }
     }
 
     private void handleGoodbyeMessage(ChatSession session, GoodbyeMessage message) {
-        // 检查会话是否已经关闭，避免重复处理
+        // Verifica se a sessão já foi fechada, evitando processamento duplicado
         if (!session.isAudioChannelOpen()) {
             return;
         }
 
-        // 先清理VAD和AEC会话，防止后续的listen消息重新初始化
+        // Limpa primeiro as sessões de VAD e AEC, evitando que mensagens listen subsequentes as reinicializem
         String sessionId = session.getSessionId();
         vadService.resetSession(sessionId);
         if (aecService != null) aecService.resetSession(sessionId);
 
-        // 中止正在进行的对话，停止TTS和音频发送
+        // Interrompe o diálogo em andamento, parando o TTS e o envio de áudio
         String goodbyeDeviceId = session.getDevice() != null ? session.getDevice().getDeviceId() : null;
-        applicationContext.publishEvent(new ChatAbortedEvent(this, session.getSessionId(), goodbyeDeviceId, "设备主动退出"));
+        applicationContext.publishEvent(new ChatAbortedEvent(this, session.getSessionId(), goodbyeDeviceId, "Dispositivo saiu voluntariamente"));
 
         sessionManager.closeSession(session);
     }

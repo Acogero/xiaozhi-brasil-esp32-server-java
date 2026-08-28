@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 /**
- * 会话关闭时清理 Persona 相关资源（Conversation 历史、Player 播放器）。
+ * Limpa os recursos relacionados ao Persona quando a sessão é fechada (histórico do Conversation, player do Player).
  */
 @Component
 public class PersonaCleanup {

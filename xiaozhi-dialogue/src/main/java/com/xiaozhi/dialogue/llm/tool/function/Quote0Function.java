@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * Quote0更新
+ * Atualização do Quote0
  */
 @Slf4j
 // @Component
@@ -24,7 +24,7 @@ public class Quote0Function implements ToolsGlobalRegistry.GlobalFunction {
     private static final String TOOL_NAME = "update_eink";
     private static final String API_BASE_URL = "https://dot.mindreset.tech/api/open/text";
 
-    // 使用OkHttp3替代JDK HttpClient
+    // Usa OkHttp3 em vez do HttpClient do JDK
     private static final OkHttpClient okHttpClient = new OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
@@ -39,7 +39,7 @@ public class Quote0Function implements ToolsGlobalRegistry.GlobalFunction {
                     String message = params.get("message");
                     String signature = params.get("signature");
                     try {
-                        // 构建JSON请求体
+                        // Monta o corpo da requisição JSON
                         String jsonBody = String.format("""
                                 {
                                     "refreshNow": true,
@@ -52,45 +52,45 @@ public class Quote0Function implements ToolsGlobalRegistry.GlobalFunction {
                                 }
                                 """, title, message, signature);
 
-                        // 构建HTTP请求
+                        // Monta a requisição HTTP
                         okhttp3.Request request = new okhttp3.Request.Builder()
                                 .url(API_BASE_URL)
                                 .post(okhttp3.RequestBody.create(jsonBody, okhttp3.MediaType.parse("application/json")))
-                                .addHeader("Authorization", "Bearer xxx") // 需要替换为实际的API密钥
+                                .addHeader("Authorization", "Bearer xxx") // Deve ser substituído pela chave de API real
                                 .addHeader("Content-Type", "application/json")
                                 .build();
 
-                        // 执行请求
+                        // Executa a requisição
                         try (okhttp3.Response response = okHttpClient.newCall(request).execute()) {
                             if (response.isSuccessful()) {
-                                return "墨水屏信息更新成功";
+                                return "Informações da tela de tinta eletrônica atualizadas com sucesso";
                             } else {
-                                log.error("墨水屏更新失败，HTTP状态码: {}", response.code());
-                                return "墨水屏更新失败，状态码: " + response.code();
+                                log.error("Falha ao atualizar a tela de tinta eletrônica, código HTTP: {}", response.code());
+                                return "Falha ao atualizar a tela de tinta eletrônica, código: " + response.code();
                             }
                         }
                     } catch (Exception e) {
-                        log.error("墨水屏更新异常", e);
-                        return "墨水屏更新异常: " + e.getMessage();
+                        log.error("Exceção ao atualizar a tela de tinta eletrônica", e);
+                        return "Exceção ao atualizar a tela de tinta eletrônica: " + e.getMessage();
                     }
                 })
                 .toolMetadata(ToolMetadata.builder().returnDirect(true).build())
-                .description("更新墨水屏信息，当前的时间是：" + LocalDateTime.now())
+                .description("Atualiza as informações da tela de tinta eletrônica; o horário atual é: " + LocalDateTime.now())
                 .inputSchema("""
                             {
                                 "type": "object",
                                 "properties": {
                                     "title": {
                                         "type": "string",
-                                        "description": "更新的标题，一般是日程提醒"
+                                        "description": "Título da atualização, geralmente um lembrete de agenda"
                                     },
                                     "message": {
                                         "type": "string",
-                                        "description": "需要展示的信息"
+                                        "description": "Informações a serem exibidas"
                                     },
                                     "signature": {
                                         "type": "string",
-                                        "description": "需要关注的时间，格式：yyyy-MM-dd HH:mm:ss"
+                                        "description": "Horário de atenção, formato: yyyy-MM-dd HH:mm:ss"
                                     }
                                 },
                                 "required": ["title","message","signature"]
@@ -108,6 +108,6 @@ public class Quote0Function implements ToolsGlobalRegistry.GlobalFunction {
 
     @Override
     public String getToolDescription() {
-        return "更新墨水屏";
+        return "Atualizar tela de tinta eletrônica";
     }
 }

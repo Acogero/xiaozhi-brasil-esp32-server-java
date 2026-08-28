@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * Dialogue服务器自动注册器 — 启动时注册，定时心跳，关闭时注销
+ * Registrador automático do servidor Dialogue — registra na inicialização, envia heartbeat periódico e cancela o registro no encerramento
  */
 @Slf4j
 @Component
@@ -40,19 +40,19 @@ public class DialogueServerRegistrar {
         String instanceId = instanceIdHolder.getInstanceId();
         try {
             dialogueServerRegistry.register(buildServerInfo());
-            log.info("Dialogue服务器已注册到注册中心, instanceId={}", instanceId);
+            log.info("Servidor Dialogue registrado no centro de registro, instanceId={}", instanceId);
         } catch (Exception e) {
-            log.warn("Dialogue服务器初次注册失败，将在后续心跳继续重试, instanceId={}", instanceId, e);
+            log.warn("Falha no registro inicial do servidor Dialogue, tentará novamente nos próximos heartbeats, instanceId={}", instanceId, e);
         }
 
         checkStorageConfig();
 
-        // 每30秒发送心跳
+        // Envia heartbeat a cada 30 segundos
         scheduler.scheduleAtFixedRate(() -> {
             try {
                 dialogueServerRegistry.heartbeat(buildServerInfo());
             } catch (Exception e) {
-                log.warn("Dialogue服务器心跳失败, instanceId={}", instanceId, e);
+                log.warn("Falha no heartbeat do servidor Dialogue, instanceId={}", instanceId, e);
             }
         }, 30, 30, TimeUnit.SECONDS);
     }
@@ -63,9 +63,9 @@ public class DialogueServerRegistrar {
         try {
             String instanceId = instanceIdHolder.getInstanceId();
             dialogueServerRegistry.unregister(instanceId);
-            log.info("Dialogue服务器已从注册中心注销, instanceId={}", instanceId);
+            log.info("Servidor Dialogue removido do centro de registro, instanceId={}", instanceId);
         } catch (Exception e) {
-            log.warn("注销失败", e);
+            log.warn("Falha ao cancelar registro", e);
         }
     }
 
@@ -73,10 +73,10 @@ public class DialogueServerRegistrar {
         try {
             String provider = storageServiceFactory.getStorageService().getProvider();
             if ("local".equals(provider)) {
-                log.warn("当前 StorageService 为 local 模式，音频文件仅存储在本地。集群部署请配置 COS/OSS，否则跨实例音频不可用。");
+                log.warn("O StorageService atual está no modo local, os arquivos de áudio são armazenados apenas localmente. Em implantações em cluster, configure COS/OSS, caso contrário o áudio entre instâncias ficará indisponível.");
             }
         } catch (Exception e) {
-            log.warn("检测 StorageService 配置失败: {}", e.getMessage());
+            log.warn("Falha ao verificar a configuração do StorageService: {}", e.getMessage());
         }
     }
 
