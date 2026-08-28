@@ -7,12 +7,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * 服务地址提供器 — 负责组装各协议的访问地址
+ * Provedor de endereços de serviço — responsável por montar os endereços de acesso de cada protocolo
  */
 @Component
 public class ServerAddressProvider {
 
-    /** WebSocket 路径，与 WebSocketConfig.WS_PATH 保持一致 */
+    /** Caminho do WebSocket, deve permanecer consistente com WebSocketConfig.WS_PATH */
     public static final String WS_PATH = "/ws/xiaozhi/v1/";
 
     private String websocketAddress;
