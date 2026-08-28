@@ -1,506 +1,506 @@
 [
   {
-    "label": "智小虎",
+    "label": "Zhi Xiaohu",
     "value": "502007",
     "gender": "male",
     "provider": "tencent",
-    "model": "超自然大模型音色",
-    "scene": "聊天童声",
-    "language": "中英文"
+    "model": "Voz hiper-natural de modelo grande",
+    "scene": "Voz infantil de chat",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "智小悟",
+    "label": "Zhi Xiaowu",
     "value": "502006",
     "gender": "male",
     "provider": "tencent",
-    "model": "超自然大模型音色",
-    "scene": "聊天男声",
-    "language": "中英文"
+    "model": "Voz hiper-natural de modelo grande",
+    "scene": "Voz masculina de chat",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "智小解",
+    "label": "Zhi Xiaojie",
     "value": "502005",
     "gender": "male",
     "provider": "tencent",
-    "model": "超自然大模型音色",
-    "scene": "解说男声",
-    "language": "中英文"
+    "model": "Voz hiper-natural de modelo grande",
+    "scene": "Voz masculina de narração",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "智小满",
+    "label": "Zhi Xiaoman",
     "value": "502004",
     "gender": "female",
     "provider": "tencent",
-    "model": "超自然大模型音色",
-    "scene": "营销女声",
-    "language": "中英文"
+    "model": "Voz hiper-natural de modelo grande",
+    "scene": "Voz feminina de marketing",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "智小敏",
+    "label": "Zhi Xiaomin",
     "value": "502003",
     "gender": "female",
     "provider": "tencent",
-    "model": "超自然大模型音色",
-    "scene": "聊天女声",
-    "language": "中英文"
+    "model": "Voz hiper-natural de modelo grande",
+    "scene": "Voz feminina de chat",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "智小柔",
+    "label": "Zhi Xiaorou",
     "value": "502001",
     "gender": "female",
     "provider": "tencent",
-    "model": "超自然大模型音色",
-    "scene": "聊天女声",
-    "language": "中英文"
+    "model": "Voz hiper-natural de modelo grande",
+    "scene": "Voz feminina de chat",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "暖心阿灿",
+    "label": "Nuanxin Acan",
     "value": "602004",
     "gender": "male",
     "provider": "tencent",
-    "model": "超自然大模型音色",
-    "scene": "聊天男声",
-    "language": "中英文"
+    "model": "Voz hiper-natural de modelo grande",
+    "scene": "Voz masculina de chat",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "专业梓欣",
+    "label": "Zhuanye Zixin",
     "value": "602005",
     "gender": "female",
     "provider": "tencent",
-    "model": "超自然大模型音色",
-    "scene": "聊天女声",
-    "language": "中英文"
+    "model": "Voz hiper-natural de modelo grande",
+    "scene": "Voz feminina de chat",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "懂事少年",
+    "label": "Dongshi Shaonian",
     "value": "603000",
     "gender": "male",
     "provider": "tencent",
-    "model": "超自然大模型音色",
-    "scene": "特色男声",
-    "language": "中英文"
+    "model": "Voz hiper-natural de modelo grande",
+    "scene": "Voz masculina característica",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "潇湘妹妹",
+    "label": "Xiaoxiang Meimei",
     "value": "603001",
     "gender": "female",
     "provider": "tencent",
-    "model": "超自然大模型音色",
-    "scene": "特色女声",
-    "language": "中英文"
+    "model": "Voz hiper-natural de modelo grande",
+    "scene": "Voz feminina característica",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "软萌心心",
+    "label": "Ruanmeng Xinxin",
     "value": "603002",
     "gender": "male",
     "provider": "tencent",
-    "model": "超自然大模型音色",
-    "scene": "特色男童声",
-    "language": "中英文"
+    "model": "Voz hiper-natural de modelo grande",
+    "scene": "Voz infantil masculina característica",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "随和老李",
+    "label": "Suihe Laoli",
     "value": "603003",
     "gender": "male",
     "provider": "tencent",
-    "model": "超自然大模型音色",
-    "scene": "聊天男声",
-    "language": "中英文"
+    "model": "Voz hiper-natural de modelo grande",
+    "scene": "Voz masculina de chat",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "温柔小柠",
+    "label": "Wenrou Xiaoning",
     "value": "603004",
     "gender": "female",
     "provider": "tencent",
-    "model": "超自然大模型音色",
-    "scene": "聊天女声",
-    "language": "中英文"
+    "model": "Voz hiper-natural de modelo grande",
+    "scene": "Voz feminina de chat",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "知心大林",
+    "label": "Zhixin Dalin",
     "value": "603005",
     "gender": "male",
     "provider": "tencent",
-    "model": "超自然大模型音色",
-    "scene": "聊天男声",
-    "language": "中英文"
+    "model": "Voz hiper-natural de modelo grande",
+    "scene": "Voz masculina de chat",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "爱小悠",
+    "label": "Ai Xiaoyou",
     "value": "602003",
     "gender": "female",
     "provider": "tencent",
-    "model": "超自然大模型音色",
-    "scene": "聊天女声",
-    "language": "中英文"
+    "model": "Voz hiper-natural de modelo grande",
+    "scene": "Voz feminina de chat",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "智斌",
+    "label": "Zhi Bin",
     "value": "501000",
     "gender": "male",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "阅读男声",
-    "language": "中英文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz masculina de leitura",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "智兰",
+    "label": "Zhi Lan",
     "value": "501001",
     "gender": "female",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "资讯女声",
-    "language": "中英文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz feminina informativa",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "智菊",
+    "label": "Zhi Ju",
     "value": "501002",
     "gender": "female",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "阅读女声",
-    "language": "中英文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz feminina de leitura",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "智宇",
+    "label": "Zhi Yu",
     "value": "501003",
     "gender": "male",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "阅读男声",
-    "language": "中英文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz masculina de leitura",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "月华",
+    "label": "Yuehua",
     "value": "501004",
     "gender": "female",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "聊天女声",
-    "language": "中英文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz feminina de chat",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "飞镜",
+    "label": "Feijing",
     "value": "501005",
     "gender": "male",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "聊天男声",
-    "language": "中英文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz masculina de chat",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "千嶂",
+    "label": "Qianzhang",
     "value": "501006",
     "gender": "male",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "聊天男声",
-    "language": "中英文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz masculina de chat",
+    "language": "Chinês e inglês"
   },
   {
-    "label": "浅草",
+    "label": "Qiancao",
     "value": "501007",
     "gender": "male",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "聊天男声",
-    "language": "中英文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz masculina de chat",
+    "language": "Chinês e inglês"
   },
   {
     "label": "WeJames",
     "value": "501008",
     "gender": "male",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "外语男声",
-    "language": "英文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz masculina em idioma estrangeiro",
+    "language": "Inglês"
   },
   {
     "label": "WeWinny",
     "value": "501009",
     "gender": "female",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "外语女声",
-    "language": "英文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz feminina em idioma estrangeiro",
+    "language": "Inglês"
   },
   {
-    "label": "爱小童",
+    "label": "Ai Xiaotong",
     "value": "601015",
     "gender": "male",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "男童声",
-    "language": "中文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz infantil masculina",
+    "language": "Chinês"
   },
   {
-    "label": "爱小溪",
+    "label": "Ai Xiaoxi",
     "value": "601000",
     "gender": "female",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "聊天女声",
-    "language": "中文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz feminina de chat",
+    "language": "Chinês"
   },
   {
-    "label": "爱小洛",
+    "label": "Ai Xiaoluo",
     "value": "601001",
     "gender": "female",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "阅读女声",
-    "language": "中文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz feminina de leitura",
+    "language": "Chinês"
   },
   {
-    "label": "爱小辰",
+    "label": "Ai Xiaochen",
     "value": "601002",
     "gender": "male",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "聊天男声",
-    "language": "中文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz masculina de chat",
+    "language": "Chinês"
   },
   {
-    "label": "爱小荷",
+    "label": "Ai Xiaohe",
     "value": "601003",
     "gender": "female",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "阅读女声",
-    "language": "中文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz feminina de leitura",
+    "language": "Chinês"
   },
   {
-    "label": "爱小树",
+    "label": "Ai Xiaoshu",
     "value": "601004",
     "gender": "male",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "资讯男声",
-    "language": "中文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz masculina informativa",
+    "language": "Chinês"
   },
   {
-    "label": "爱小静",
+    "label": "Ai Xiaojing",
     "value": "601005",
     "gender": "female",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "聊天女声",
-    "language": "中文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz feminina de chat",
+    "language": "Chinês"
   },
   {
-    "label": "爱小耀",
+    "label": "Ai Xiaoyao",
     "value": "601006",
     "gender": "male",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "阅读男声",
-    "language": "中文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz masculina de leitura",
+    "language": "Chinês"
   },
   {
-    "label": "爱小叶",
+    "label": "Ai Xiaoye",
     "value": "601007",
     "gender": "female",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "聊天女声",
-    "language": "中文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz feminina de chat",
+    "language": "Chinês"
   },
   {
-    "label": "爱小豪",
+    "label": "Ai Xiaohao",
     "value": "601008",
     "gender": "male",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "聊天男声",
-    "language": "中文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz masculina de chat",
+    "language": "Chinês"
   },
   {
-    "label": "爱小芊",
+    "label": "Ai Xiaoqian",
     "value": "601009",
     "gender": "female",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "聊天女声",
-    "language": "中文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz feminina de chat",
+    "language": "Chinês"
   },
   {
-    "label": "爱小娇",
+    "label": "Ai Xiaojiao",
     "value": "601010",
     "gender": "female",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "聊天女声",
-    "language": "中文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz feminina de chat",
+    "language": "Chinês"
   },
   {
-    "label": "爱小川",
+    "label": "Ai Xiaochuan",
     "value": "601011",
     "gender": "male",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "聊天男声",
-    "language": "中文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz masculina de chat",
+    "language": "Chinês"
   },
   {
-    "label": "爱小璟",
+    "label": "Ai Xiaojing",
     "value": "601012",
     "gender": "female",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "特色女声",
-    "language": "中文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz feminina característica",
+    "language": "Chinês"
   },
   {
-    "label": "爱小伊",
+    "label": "Ai Xiaoyi",
     "value": "601013",
     "gender": "female",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "阅读女声",
-    "language": "中文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz feminina de leitura",
+    "language": "Chinês"
   },
   {
-    "label": "爱小简",
+    "label": "Ai Xiaojian",
     "value": "601014",
     "gender": "male",
     "provider": "tencent",
-    "model": "大模型音色",
-    "scene": "聊天男声",
-    "language": "中文"
+    "model": "Voz de modelo grande",
+    "scene": "Voz masculina de chat",
+    "language": "Chinês"
   },
   {
     "label": "WeJack",
     "value": "101050",
     "gender": "male",
     "provider": "tencent",
-    "model": "精品音色",
-    "scene": "英文男声",
-    "language": "英文"
+    "model": "Voz premium",
+    "scene": "Voz masculina em inglês",
+    "language": "Inglês"
   },
   {
-    "label": "智付",
+    "label": "Zhi Fu",
     "value": "101055",
     "gender": "female",
     "provider": "tencent",
-    "model": "精品音色",
-    "scene": "通用女声",
-    "language": "中文"
+    "model": "Voz premium",
+    "scene": "Voz feminina geral",
+    "language": "Chinês"
   },
   {
-    "label": "智辉",
+    "label": "Zhi Hui",
     "value": "101013",
     "gender": "male",
     "provider": "tencent",
-    "model": "精品音色",
-    "scene": "新闻男声",
-    "language": "中文"
+    "model": "Voz premium",
+    "scene": "Voz masculina de notícias",
+    "language": "Chinês"
   },
   {
-    "label": "智彤",
+    "label": "Zhi Tong",
     "value": "101019",
     "gender": "female",
     "provider": "tencent",
-    "model": "精品音色",
-    "scene": "粤语女声",
-    "language": "中文"
+    "model": "Voz premium",
+    "scene": "Voz feminina em cantonês",
+    "language": "Chinês"
   },
   {
-    "label": "智柯",
+    "label": "Zhi Ke",
     "value": "101030",
     "gender": "male",
     "provider": "tencent",
-    "model": "精品音色",
-    "scene": "通用男声",
-    "language": "中文"
+    "model": "Voz premium",
+    "scene": "Voz masculina geral",
+    "language": "Chinês"
   },
   {
-    "label": "智友",
+    "label": "Zhi You",
     "value": "101054",
     "gender": "male",
     "provider": "tencent",
-    "model": "精品音色",
-    "scene": "通用男声",
-    "language": "中文"
+    "model": "Voz premium",
+    "scene": "Voz masculina geral",
+    "language": "Chinês"
   },
   {
-    "label": "智梅",
+    "label": "Zhi Mei",
     "value": "101027",
     "gender": "female",
     "provider": "tencent",
-    "model": "精品音色",
-    "scene": "通用女声",
-    "language": "中文"
+    "model": "Voz premium",
+    "scene": "Voz feminina geral",
+    "language": "Chinês"
   },
   {
-    "label": "智希",
+    "label": "Zhi Xi",
     "value": "101026",
     "gender": "female",
     "provider": "tencent",
-    "model": "精品音色",
-    "scene": "通用女声",
-    "language": "中文"
+    "model": "Voz premium",
+    "scene": "Voz feminina geral",
+    "language": "Chinês"
   },
   {
-    "label": "智云",
+    "label": "Zhi Yun",
     "value": "101004",
     "gender": "male",
     "provider": "tencent",
-    "model": "精品音色",
-    "scene": "通用男声",
-    "language": "中文"
+    "model": "Voz premium",
+    "scene": "Voz masculina geral",
+    "language": "Chinês"
   },
   {
-    "label": "智萌",
+    "label": "Zhi Meng",
     "value": "101015",
     "gender": "male",
     "provider": "tencent",
-    "model": "精品音色",
-    "scene": "男童声",
-    "language": "中文"
+    "model": "Voz premium",
+    "scene": "Voz infantil masculina",
+    "language": "Chinês"
   },
   {
-    "label": "智燕",
+    "label": "Zhi Yan",
     "value": "101011",
     "gender": "female",
     "provider": "tencent",
-    "model": "精品音色",
-    "scene": "新闻女声",
-    "language": "中文"
+    "model": "Voz premium",
+    "scene": "Voz feminina de notícias",
+    "language": "Chinês"
   },
   {
-    "label": "智瑜",
+    "label": "Zhi Yu",
     "value": "101001",
     "gender": "female",
     "provider": "tencent",
-    "model": "精品音色",
-    "scene": "情感女声",
-    "language": "中文"
+    "model": "Voz premium",
+    "scene": "Voz feminina emotiva",
+    "language": "Chinês"
   },
   {
-    "label": "智瑞",
+    "label": "Zhi Rui",
     "value": "101021",
     "gender": "male",
     "provider": "tencent",
-    "model": "精品音色",
-    "scene": "新闻男声",
-    "language": "中文"
+    "model": "Voz premium",
+    "scene": "Voz masculina de notícias",
+    "language": "Chinês"
   },
   {
-    "label": "智甜",
+    "label": "Zhi Tian",
     "value": "101016",
     "gender": "female",
     "provider": "tencent",
-    "model": "精品音色",
-    "scene": "女童声",
-    "language": "中文"
+    "model": "Voz premium",
+    "scene": "Voz infantil feminina",
+    "language": "Chinês"
   },
   {
-    "label": "爱小静",
+    "label": "Ai Xiaojing",
     "value": "301037",
     "gender": "female",
     "provider": "tencent",
-    "model": "精品音色",
-    "scene": "对话女声",
-    "language": "中文"
+    "model": "Voz premium",
+    "scene": "Voz feminina de diálogo",
+    "language": "Chinês"
   }
 ]

@@ -1,6 +1,6 @@
 /**
- * 路由路径常量
- * 集中管理所有路由路径，避免硬编码字符串分散在各处
+ * Constantes de caminhos de rota
+ * Gerencia de forma centralizada todos os caminhos de rota, evitando strings fixas espalhadas pelo código
  */
 export const ROUTES = {
   LOGIN: '/login',

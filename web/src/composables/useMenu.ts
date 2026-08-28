@@ -4,19 +4,19 @@ import { useUserStore } from '@/store/user'
 import type { MenuItem, MenuMeta } from '@/types/menu'
 
 /**
- * 菜单管理 Composable
- * 处理侧边栏菜单的展开、选中、权限过滤等逻辑
+ * Composable de gerenciamento de menu
+ * Processa a expansão, seleção e filtragem por permissão do menu lateral
  */
 export function useMenu() {
   const route = useRoute()
   const router = useRouter()
   const userStore = useUserStore()
 
-  // 展开的菜单keys（根据当前路由的父菜单初始化）
+  // Keys de menus expandidos (inicializados com base no menu pai da rota atual)
   const initialOpenKey = route.meta?.parent as string | undefined
   const openKeys = ref<string[]>(initialOpenKey ? [initialOpenKey] : [])
 
-  // 路由变化时同步展开对应父菜单
+  // Sincroniza a expansão do menu pai correspondente quando a rota muda
   watch(
     () => route.meta?.parent,
     (parent) => {
@@ -26,10 +26,10 @@ export function useMenu() {
     }
   )
   
-  // 根级子菜单keys（用于手风琴模式）
+  // Keys de submenus de nível raiz (usados no modo acordeão)
   const rootSubmenuKeys = ['router.parent.roleManagement', 'router.parent.configManagement', 'router.parent.settings', 'router.parent.memoryManagement']
 
-  // 父菜单图标映射
+  // Mapeamento de ícones dos menus pai
   const parentIconMap: Record<string, string> = {
     'router.parent.roleManagement': 'UserAddOutlined',
     'router.parent.configManagement': 'SettingOutlined',
@@ -37,22 +37,22 @@ export function useMenu() {
     'router.parent.memoryManagement': 'DatabaseOutlined',
   }
 
-  // 获取所有菜单项（从路由配置中获取）
+  // Obtém todos os itens de menu (a partir da configuração de rotas)
   const menuItems = computed<MenuItem[]>(() => {
-    // 找到主布局路由
+    // Encontra a rota do layout principal
     const mainRoute = router.getRoutes().find(r => r.path === '/' && r.children)
     if (!mainRoute?.children) return []
     
-    // 菜单映射，用于组织父子关系
+    // Mapeamento de menus, usado para organizar a relação pai-filho
     const menuMap = new Map<string, MenuItem>()
     const rootMenus: MenuItem[] = []
     
-    // 遍历路由，构建菜单
+    // Percorre as rotas para construir o menu
     mainRoute.children
       .filter(route => 
         route.meta?.title && 
         !route.meta?.hideInMenu &&
-        // 排除仅显示在用户端header的路由
+        // Exclui rotas exibidas apenas no cabeçalho do lado do usuário
         !route.meta?.showInUserHeader
       )
       .forEach(route => {
@@ -63,17 +63,17 @@ export function useMenu() {
           children: []
         }
         
-        // 如果有 parent，说明是子菜单
+        // Se houver parent, é um submenu
         if (route.meta?.parent) {
           const parentKey = route.meta.parent as string
           
-          // 查找或创建父菜单
+          // Busca ou cria o menu pai
           if (!menuMap.has(parentKey)) {
             const parentMenu: MenuItem = {
               path: parentKey,
               name: parentKey,
               meta: {
-                title: parentKey, // 这里已经是多语言键了
+                title: parentKey, // Aqui já é uma chave de i18n
                 icon: parentIconMap[parentKey] || 'SettingOutlined',
                 isAdmin: route.meta.isAdmin
               },
@@ -83,12 +83,12 @@ export function useMenu() {
             rootMenus.push(parentMenu)
           }
           
-          // 添加到父菜单的子菜单中
+          // Adiciona ao submenu do menu pai
           const parentMenu = menuMap.get(parentKey)!
           if (!parentMenu.children) parentMenu.children = []
           parentMenu.children.push(menuItem)
         } else {
-          // 没有 parent，是根菜单
+          // Sem parent, é um menu raiz
           rootMenus.push(menuItem)
           menuMap.set(menuItem.path, menuItem)
         }
@@ -99,18 +99,18 @@ export function useMenu() {
 
   const { isAdmin } = userStore
 
-  // 过滤后的菜单（根据权限）
+  // Menu filtrado (com base na permissão)
   const filteredMenuItems = computed(() => {
     return filterMenuByPermission(menuItems.value)
   })
 
-  // 当前选中的菜单key
+  // Key do menu atualmente selecionado
   const selectedKeys = computed(() => {
     return [route.path]
   })
 
   /**
-   * 根据权限过滤菜单
+   * Filtra o menu com base na permissão
    */
   function filterMenuByPermission(items: MenuItem[]): MenuItem[] {
     return items.reduce<MenuItem[]>((result, item) => {
@@ -143,13 +143,13 @@ export function useMenu() {
   }
 
   /**
-   * 处理菜单展开变化（手风琴模式）
+   * Processa a mudança de expansão do menu (modo acordeão)
    */
   function handleOpenChange(keys: string[]) {
     const latestOpenKey = keys.find(key => !openKeys.value.includes(key))
 
     if (latestOpenKey && rootSubmenuKeys.includes(latestOpenKey)) {
-      // 新打开一个根级菜单，只保留这一个（手风琴）
+      // Ao abrir um novo menu de nível raiz, mantém apenas este (acordeão)
       openKeys.value = [latestOpenKey]
     } else {
       openKeys.value = keys
@@ -157,7 +157,7 @@ export function useMenu() {
   }
 
   /**
-   * 菜单点击处理
+   * Processa o clique no menu
    */
   function handleMenuClick(path: string) {
     router.push(path)

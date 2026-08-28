@@ -7,7 +7,7 @@
     :closable="true"
   >
     <a-space direction="vertical" :size="24" style="width: 100%">
-      <!-- 主题设置 -->
+      <!-- Configurações de tema -->
       <div>
         <h4 style="margin-bottom: 12px">
           <BulbOutlined /> {{ t('component.settings.theme.title') }}
@@ -30,7 +30,7 @@
 
       <a-divider style="margin: 0" />
 
-      <!-- 语言设置 -->
+      <!-- Configurações de idioma -->
       <div>
         <h4 style="margin-bottom: 12px">
           <GlobalOutlined /> {{ t('component.settings.language.title') }}
@@ -40,7 +40,7 @@
             v-for="locale in availableLocales"
             :key="locale"
             :value="locale"
-            style="width: 50%"
+            :style="{ width: (100 / availableLocales.length) + '%' }"
           >
             {{ localeNames[locale] }}
           </a-radio-button>
@@ -52,7 +52,7 @@
 
       <a-divider style="margin: 0" />
 
-      <!-- 快捷操作 -->
+      <!-- Ações rápidas -->
       <div>
         <h4 style="margin-bottom: 12px">
           <ThunderboltOutlined /> {{ t('component.settings.quickActions.title') }}
@@ -69,15 +69,15 @@
 
       <a-divider style="margin: 0" />
 
-      <!-- 系统信息 -->
+      <!-- Informações do sistema -->
       <div>
         <h4 style="margin-bottom: 12px">
-          <InfoCircleOutlined /> 系统信息
+          <InfoCircleOutlined /> Informações do sistema
         </h4>
         <a-descriptions :column="1" size="small" bordered>
-          <a-descriptions-item label="主题">{{ themeName }}</a-descriptions-item>
-          <a-descriptions-item label="语言">{{ localeName }}</a-descriptions-item>
-          <a-descriptions-item label="版本">Vue 3.0</a-descriptions-item>
+          <a-descriptions-item label="Tema">{{ themeName }}</a-descriptions-item>
+          <a-descriptions-item label="Idioma">{{ localeName }}</a-descriptions-item>
+          <a-descriptions-item label="Versão">Vue 3.0</a-descriptions-item>
         </a-descriptions>
       </div>
     </a-space>

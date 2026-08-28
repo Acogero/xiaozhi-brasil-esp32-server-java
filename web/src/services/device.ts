@@ -3,35 +3,35 @@ import api from './api'
 import type { Device, DeviceQueryParams } from '@/types/device'
 
 /**
- * 查询设备列表
+ * Consulta a lista de dispositivos
  */
 export function queryDevices(params: Partial<DeviceQueryParams>) {
   return http.getPage<Device>(api.device.query, params)
 }
 
 /**
- * 添加设备
+ * Adiciona um dispositivo
  */
 export function addDevice(code: string) {
   return http.post(api.device.add, { code })
 }
 
 /**
- * 更新设备信息
+ * Atualiza as informações do dispositivo
  */
 export function updateDevice(data: Partial<Device>) {
   return http.put(`${api.device.update}/${data.deviceId}`, data)
 }
 
 /**
- * 删除设备
+ * Exclui um dispositivo
  */
 export function deleteDevice(deviceId: string) {
   return http.delete(`${api.device.delete}/${deviceId}`)
 }
 
 /**
- * 清除设备记忆
+ * Limpa a memória do dispositivo
  */
 export function clearDeviceMemory(deviceId: string) {
   return http.delete(api.message.delete, { deviceId })

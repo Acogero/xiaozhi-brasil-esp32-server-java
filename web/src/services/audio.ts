@@ -1,9 +1,9 @@
-// 音频处理服务 - Vue3 TypeScript版本
+// Serviço de processamento de áudio - Versão Vue3 TypeScript
 
 import { log } from './websocket'
 
 // =============================
-// 类型定义
+// Definições de tipo
 // =============================
 
 interface OpusDecoderModule {
@@ -52,7 +52,7 @@ interface StreamingContext {
   startPlaying: () => void
 }
 
-// Opus Module 可能的结构
+// Possível estrutura do Opus Module
 interface OpusModule {
   instance?: OpusDecoderModule
   _opus_decoder_get_size?: (channels: number) => number
@@ -82,7 +82,7 @@ declare global {
 }
 
 // =============================
-// 配置
+// Configuração
 // =============================
 
 const defaultConfig: AudioConfig = {
@@ -92,7 +92,7 @@ const defaultConfig: AudioConfig = {
 }
 
 // =============================
-// 状态变量
+// Variáveis de estado
 // =============================
 
 let audioContext: AudioContext | null = null
@@ -104,20 +104,20 @@ let streamingContext: StreamingContext | null = null
 let audioContextResumePromise: Promise<AudioContext> | null = null
 
 // =============================
-// 音频上下文初始化
+// Inicialização do contexto de áudio
 // =============================
 
 async function initAudioContext(): Promise<AudioContext | null> {
   if (audioContext) {
     if (audioContext.state === 'suspended' && !audioContextResumePromise) {
       audioContextResumePromise = new Promise((resolve) => {
-        log('音频上下文已暂停。需要用户交互才能恢复。', 'warning')
+        log('Contexto de áudio pausado. É necessária interação do usuário para retomar.', 'warning')
 
         const resumeAudioContext = async () => {
           try {
             if (audioContext) {
               await audioContext.resume()
-              log('音频上下文已通过用户交互恢复', 'success')
+              log('Contexto de áudio retomado por meio de interação do usuário', 'success')
               resolve(audioContext)
 
               ;['click', 'touchstart', 'keydown'].forEach(event => {
@@ -126,7 +126,7 @@ async function initAudioContext(): Promise<AudioContext | null> {
               audioContextResumePromise = null
             }
           } catch (err) {
-            log('恢复音频上下文失败: ' + err, 'error')
+            log('Falha ao retomar o contexto de áudio: ' + err, 'error')
           }
         }
 
@@ -148,14 +148,14 @@ async function initAudioContext(): Promise<AudioContext | null> {
     })
 
     if (audioContext.state === 'suspended') {
-      log('新创建的音频上下文处于暂停状态。需要用户交互才能启动。', 'warning')
+      log('O contexto de áudio recém-criado está em estado pausado. É necessária interação do usuário para iniciá-lo.', 'warning')
 
       audioContextResumePromise = new Promise((resolve) => {
         const resumeAudioContext = async () => {
           try {
             if (audioContext) {
               await audioContext.resume()
-              log('音频上下文已通过用户交互启动', 'success')
+              log('Contexto de áudio iniciado por meio de interação do usuário', 'success')
               resolve(audioContext)
 
               ;['click', 'touchstart', 'keydown'].forEach(event => {
@@ -164,7 +164,7 @@ async function initAudioContext(): Promise<AudioContext | null> {
               audioContextResumePromise = null
             }
           } catch (err) {
-            log('启动音频上下文失败: ' + err, 'error')
+            log('Falha ao iniciar o contexto de áudio: ' + err, 'error')
           }
         }
 
@@ -180,13 +180,13 @@ async function initAudioContext(): Promise<AudioContext | null> {
 
     return audioContext
   } catch (error) {
-    log('初始化音频上下文失败:' + error, 'error')
+    log('Falha ao inicializar o contexto de áudio:' + error, 'error')
     return null
   }
 }
 
 // =============================
-// Opus 库加载
+// Carregamento da biblioteca Opus
 // =============================
 
 function checkOpusLoaded(): boolean {
@@ -197,19 +197,19 @@ function checkOpusLoaded(): boolean {
 
     const module = window.Module
 
-    // 检查 Module.instance 是否存在且有效
+    // Verifica se Module.instance existe e é válido
     if (
       module.instance &&
       typeof module.instance._opus_decoder_get_size === 'function'
     ) {
       window.ModuleInstance = module.instance
-      log('Opus库加载成功（使用Module.instance）', 'success')
+      log('Biblioteca Opus carregada com sucesso (usando Module.instance)', 'success')
       return true
     }
 
-    // 检查 Module 本身是否包含解码器方法
+    // Verifica se o próprio Module contém os métodos do decodificador
     if (typeof module._opus_decoder_get_size === 'function') {
-      // 确保 module 符合 OpusDecoderModule 接口
+      // Garante que o module está em conformidade com a interface OpusDecoderModule
       const decoderModule: OpusDecoderModule = {
         _opus_decoder_get_size: module._opus_decoder_get_size,
         _opus_decoder_init: module._opus_decoder_init!,
@@ -220,22 +220,22 @@ function checkOpusLoaded(): boolean {
         HEAP16: module.HEAP16!
       }
       window.ModuleInstance = decoderModule
-      log('Opus库加载成功（使用全局Module）', 'success')
+      log('Biblioteca Opus carregada com sucesso (usando Module global)', 'success')
       return true
     }
 
-    // 检查是否已经设置了 ModuleInstance
+    // Verifica se ModuleInstance já foi definido
     if (
       window.ModuleInstance &&
       typeof window.ModuleInstance._opus_decoder_get_size === 'function'
     ) {
-      log('Opus库已加载（使用ModuleInstance）', 'success')
+      log('Biblioteca Opus já carregada (usando ModuleInstance)', 'success')
       return true
     }
 
     return false
   } catch (err) {
-    log(`Opus库检查失败: ${err}`, 'error')
+    log(`Falha na verificação da biblioteca Opus: ${err}`, 'error')
     return false
   }
 }
@@ -247,7 +247,7 @@ export function loadOpusLibrary(): Promise<boolean> {
       return
     }
 
-    log('尝试加载libopus.js', 'info')
+    log('Tentando carregar libopus.js', 'info')
 
     const possiblePaths = [
       '/libopus.js',
@@ -261,20 +261,20 @@ export function loadOpusLibrary(): Promise<boolean> {
     script.async = true
 
     script.onload = () => {
-      log('libopus.js脚本加载成功，等待初始化', 'success')
+      log('Script libopus.js carregado com sucesso, aguardando inicialização', 'success')
 
       const maxAttempts = 100
       let attempts = 0
 
       const checkModule = () => {
         if (checkOpusLoaded()) {
-          log('Opus库初始化成功', 'success')
+          log('Biblioteca Opus inicializada com sucesso', 'success')
           resolve(true)
           return
         }
 
         if (attempts >= maxAttempts) {
-          log('Opus库初始化超时', 'error')
+          log('Tempo esgotado na inicialização da biblioteca Opus', 'error')
           resolve(false)
           return
         }
@@ -287,7 +287,7 @@ export function loadOpusLibrary(): Promise<boolean> {
     }
 
     script.onerror = () => {
-      log('libopus.js加载失败，尝试下一个路径', 'warning')
+      log('Falha ao carregar libopus.js, tentando o próximo caminho', 'warning')
       tryNextPath()
     }
 
@@ -295,7 +295,7 @@ export function loadOpusLibrary(): Promise<boolean> {
 
     function tryNextPath() {
       if (pathIndex >= possiblePaths.length) {
-        log('所有路径都尝试失败', 'error')
+        log('Falha em todas as tentativas de caminho', 'error')
         resolve(false)
         return
       }
@@ -304,12 +304,12 @@ export function loadOpusLibrary(): Promise<boolean> {
       pathIndex++
 
       if (!path) {
-        log('路径为空，加载失败', 'error')
+        log('Caminho vazio, falha no carregamento', 'error')
         resolve(false)
         return
       }
 
-      log(`尝试从路径加载: ${path}`, 'info')
+      log(`Tentando carregar a partir do caminho: ${path}`, 'info')
       script.src = path
       document.head.appendChild(script)
     }
@@ -319,7 +319,7 @@ export function loadOpusLibrary(): Promise<boolean> {
 }
 
 // =============================
-// Opus 解码器
+// Decodificador Opus
 // =============================
 
 function createOpusDecoder(mod: OpusDecoderModule): OpusDecoder {
@@ -339,28 +339,28 @@ function createOpusDecoder(mod: OpusDecoderModule): OpusDecoder {
         if (this.decoderPtr) return true
 
         const decoderSize = mod._opus_decoder_get_size(this.channels)
-        log('Opus解码器大小:' + decoderSize + '字节', 'debug')
+        log('Tamanho do decodificador Opus:' + decoderSize + ' bytes', 'debug')
 
         this.decoderPtr = mod._malloc(decoderSize)
         if (!this.decoderPtr) {
-          throw new Error('无法分配解码器内存')
+        throw new Error('Não foi possível alocar memória para o decodificador')
         }
 
         const err = mod._opus_decoder_init(this.decoderPtr, this.rate, this.channels)
 
         if (err < 0) {
           this.destroy()
-          throw new Error(`Opus解码器初始化失败: ${err}`)
+          throw new Error(`Falha ao inicializar o decodificador Opus: ${err}`)
         }
 
-        log('Opus解码器初始化成功', 'success')
+        log('Decodificador Opus inicializado com sucesso', 'success')
         return true
       },
 
       decode: function (opusData: Uint8Array): Int16Array {
         if (!this.decoderPtr) {
           if (!this.init()) {
-            throw new Error('解码器未初始化且无法初始化')
+            throw new Error('Decodificador não inicializado e não foi possível inicializá-lo')
           }
         }
 
@@ -384,7 +384,7 @@ function createOpusDecoder(mod: OpusDecoderModule): OpusDecoder {
           if (decodedSamples < 0) {
             mod._free(opusPtr)
             mod._free(pcmPtr)
-            throw new Error(`Opus解码失败: ${decodedSamples}`)
+            throw new Error(`Falha na decodificação Opus: ${decodedSamples}`)
           }
 
           const decodedData = new Int16Array(decodedSamples)
@@ -400,7 +400,7 @@ function createOpusDecoder(mod: OpusDecoderModule): OpusDecoder {
 
           return decodedData
         } catch (error) {
-          log('Opus解码错误:' + error, 'error')
+          log('Erro de decodificação Opus:' + error, 'error')
           return new Int16Array(0)
         }
       },
@@ -414,13 +414,13 @@ function createOpusDecoder(mod: OpusDecoderModule): OpusDecoder {
     }
 
     if (!decoder.init()) {
-      throw new Error('Opus解码器初始化失败')
+      throw new Error('Falha ao inicializar o decodificador Opus')
     }
 
     opusDecoder = decoder
     return decoder
   } catch (error) {
-    log('Opus解码器初始化失败:' + error, 'error')
+    log('Falha ao inicializar o decodificador Opus:' + error, 'error')
     opusDecoder = null
     throw error
   }
@@ -434,23 +434,23 @@ export async function initOpusDecoder(): Promise<OpusDecoder | null> {
   try {
     const opusLoaded = await loadOpusLibrary()
     if (!opusLoaded) {
-      throw new Error('Opus库未加载')
+      throw new Error('Biblioteca Opus não carregada')
     }
 
     const mod = window.ModuleInstance
     if (!mod) {
-      throw new Error('ModuleInstance不可用')
+      throw new Error('ModuleInstance indisponível')
     }
 
     return createOpusDecoder(mod)
   } catch (error) {
-    log(`初始化Opus解码器失败:` + error, 'error')
+    log(`Falha ao inicializar o decodificador Opus:` + error, 'error')
     throw error
   }
 }
 
 // =============================
-// 音频播放
+// Reprodução de áudio
 // =============================
 
 function convertInt16ToFloat32(int16Data: Int16Array): number[] {
@@ -473,13 +473,13 @@ function resetAudioBuffer(): void {
 function addAudioToBuffer(opusData: Uint8Array): boolean {
   audioBufferQueue.push(opusData)
 
-  // 如果没有在播放，启动缓冲流程
+  // Se não estiver reproduzindo, inicia o processo de buffer
   if (!isAudioPlaying && !isAudioBuffering) {
     startAudioBuffering()
   }
-  // 如果正在播放但当前没有播放片段，且有足够数据，触发解码
+  // Se estiver reproduzindo mas não houver segmento atual e houver dados suficientes, aciona a decodificação
   else if (isAudioPlaying && streamingContext && !streamingContext.playing && audioBufferQueue.length >= 3) {
-    log('🔄 播放中收到新数据，立即解码', 'debug')
+    log('🔄 Novos dados recebidos durante a reprodução, decodificando imediatamente', 'debug')
     const frames = [...audioBufferQueue]
     audioBufferQueue = []
     streamingContext.decodeOpusFrames(frames)
@@ -492,15 +492,15 @@ function startAudioBuffering(): boolean {
   if (isAudioBuffering || isAudioPlaying) return false
 
   isAudioBuffering = true
-  log('开始音频缓冲...', 'info')
+  log('Iniciando buffer de áudio...', 'info')
 
   initOpusDecoder().catch(error => {
-    log(`预初始化Opus解码器失败: ${error}`, 'warning')
+    log(`Falha ao pré-inicializar o decodificador Opus: ${error}`, 'warning')
   })
 
   setTimeout(() => {
     if (isAudioBuffering && audioBufferQueue.length > 0) {
-      log(`缓冲超时，当前缓冲包数: ${audioBufferQueue.length}，开始播放`, 'info')
+      log(`Tempo de buffer esgotado, pacotes em buffer no momento: ${audioBufferQueue.length}, iniciando reprodução`, 'info')
       playBufferedAudio()
     }
   }, 300)
@@ -514,7 +514,7 @@ function startAudioBuffering(): boolean {
 
     if (audioBufferQueue.length >= bufferThreshold) {
       clearInterval(bufferCheckInterval)
-      log(`已缓冲 ${audioBufferQueue.length} 个音频包，开始播放`, 'info')
+      log(`${audioBufferQueue.length} pacotes de áudio em buffer, iniciando reprodução`, 'info')
       playBufferedAudio()
     }
   }, 50)
@@ -534,21 +534,21 @@ async function playBufferedAudio(): Promise<boolean> {
     }
 
     if (!audioContext || audioContext.state === 'suspended') {
-      log('音频上下文被暂停，等待用户交互...', 'warning')
+      log('Contexto de áudio pausado, aguardando interação do usuário...', 'warning')
       isAudioPlaying = false
       return false
     }
 
     if (!opusDecoder) {
-      log('初始化Opus解码器...', 'info')
+      log('Inicializando decodificador Opus...', 'info')
       try {
         opusDecoder = await initOpusDecoder()
         if (!opusDecoder) {
-          throw new Error('解码器初始化失败')
+          throw new Error('Falha ao inicializar o decodificador')
         }
-        log('Opus解码器初始化成功', 'success')
+        log('Decodificador Opus inicializado com sucesso', 'success')
       } catch (error) {
-        log('Opus解码器初始化失败: ' + error, 'error')
+        log('Falha ao inicializar o decodificador Opus: ' + error, 'error')
         isAudioPlaying = false
         return false
       }
@@ -566,7 +566,7 @@ async function playBufferedAudio(): Promise<boolean> {
 
         decodeOpusFrames: async function (opusFrames: Uint8Array[]) {
           if (!opusDecoder) {
-            log('Opus解码器未初始化，无法解码', 'error')
+            log('Decodificador Opus não inicializado, não é possível decodificar', 'error')
             return
           }
 
@@ -579,7 +579,7 @@ async function playBufferedAudio(): Promise<boolean> {
                 decodedSamples.push(...floatData)
               }
             } catch (error) {
-              log('Opus解码失败: ' + error, 'error')
+              log('Falha na decodificação Opus: ' + error, 'error')
             }
           }
 
@@ -592,7 +592,7 @@ async function playBufferedAudio(): Promise<boolean> {
               this.startPlaying()
             }
           } else {
-            log('没有成功解码的样本', 'warning')
+            log('Nenhuma amostra decodificada com sucesso', 'warning')
           }
         },
 
@@ -600,7 +600,7 @@ async function playBufferedAudio(): Promise<boolean> {
           if (this.playing || this.queue.length === 0 || !audioContext) return
 
           if (audioContext.state === 'suspended') {
-            log('音频上下文仍处于暂停状态，无法播放', 'warning')
+            log('Contexto de áudio ainda pausado, não é possível reproduzir', 'warning')
             return
           }
 
@@ -650,7 +650,7 @@ async function playBufferedAudio(): Promise<boolean> {
           this.lastPlayTime = audioContext.currentTime
 
           log(
-            `开始播放 ${currentSamples.length} 个样本，约 ${(currentSamples.length / defaultConfig.sampleRate).toFixed(2)} 秒`,
+            `Iniciando reprodução de ${currentSamples.length} amostras, aproximadamente ${(currentSamples.length / defaultConfig.sampleRate).toFixed(2)} segundos`,
             'debug'
           )
 
@@ -659,28 +659,28 @@ async function playBufferedAudio(): Promise<boolean> {
             this.analyser = null
             this.playing = false
 
-            // 继续播放队列中的数据
+            // Continua reproduzindo os dados na fila
             if (this.queue.length > 0) {
               setTimeout(() => this.startPlaying(), 10)
             }
-            // 检查是否有新的缓冲数据
+            // Verifica se há novos dados em buffer
             else if (audioBufferQueue.length > 0) {
               const frames = [...audioBufferQueue]
               audioBufferQueue = []
               this.decodeOpusFrames(frames)
             }
-            // 流已明确结束
+            // O stream terminou explicitamente
             else if (this.endOfStream) {
-              log('🏁 音频播放完成（流结束）', 'info')
+              log('🏁 Reprodução de áudio concluída (fim do stream)', 'info')
               isAudioPlaying = false
               streamingContext = null
               window.streamingContext = undefined
             }
-            // 等待更多数据（不设置超时，持续等待）
+            // Aguardando mais dados (sem timeout, espera contínua)
             else {
-              log('⏳ 等待更多音频数据...', 'debug')
-              // 不做任何处理，保持 isAudioPlaying = true
-              // 当新数据到达时，会通过 addAudioToBuffer 触发继续播放
+              log('⏳ Aguardando mais dados de áudio...', 'debug')
+              // Nenhuma ação necessária, mantém isAudioPlaying = true
+              // Quando novos dados chegarem, addAudioToBuffer acionará a continuação da reprodução
             }
           }
 
@@ -697,7 +697,7 @@ async function playBufferedAudio(): Promise<boolean> {
     await streamingContext.decodeOpusFrames(frames)
     return true
   } catch (error) {
-    log(`播放已缓冲的音频出错:` + error, 'error')
+    log(`Erro ao reproduzir o áudio em buffer:` + error, 'error')
     isAudioPlaying = false
     streamingContext = null
     window.streamingContext = undefined
@@ -717,7 +717,7 @@ export function stopAudioPlayback(): boolean {
         streamingContext.source = null
         streamingContext.analyser = null
       } catch (e) {
-        // 忽略已停止的音频源错误
+        // Ignora erros de fonte de áudio já interrompida
       }
     }
 
@@ -730,16 +730,16 @@ export function stopAudioPlayback(): boolean {
       window.dispatchEvent(new CustomEvent('audio-playback-stopped'))
     }
 
-    log('音频播放已停止', 'info')
+    log('Reprodução de áudio interrompida', 'info')
     return true
   } catch (error) {
-    log(`停止音频播放失败:` + error, 'error')
+    log(`Falha ao interromper a reprodução de áudio:` + error, 'error')
     return false
   }
 }
 
 // =============================
-// 导出函数
+// Funções exportadas
 // =============================
 
 export async function initAudio(): Promise<boolean> {
@@ -750,7 +750,7 @@ export async function initAudio(): Promise<boolean> {
       try {
         if (audioContext && audioContext.state === 'suspended') {
           await audioContext.resume()
-          log('音频上下文已恢复', 'success')
+          log('Contexto de áudio retomado', 'success')
         }
 
         let opusLoaded = false
@@ -758,47 +758,47 @@ export async function initAudio(): Promise<boolean> {
           try {
             opusLoaded = await loadOpusLibrary()
             if (opusLoaded) {
-              log(`Opus库加载成功 (尝试 ${i + 1}/3)`, 'success')
+              log(`Biblioteca Opus carregada com sucesso (tentativa ${i + 1}/3)`, 'success')
               break
             }
           } catch (err) {
-            log(`尝试 ${i + 1}/3 加载libopus.js失败，将重试`, 'warning')
+            log(`Tentativa ${i + 1}/3 de carregar libopus.js falhou, tentando novamente`, 'warning')
           }
         }
 
         if (!opusLoaded) {
-          log('所有Opus库加载尝试均失败，音频播放功能将不可用', 'error')
+          log('Todas as tentativas de carregar a biblioteca Opus falharam, a reprodução de áudio ficará indisponível', 'error')
           return false
         }
 
         try {
           await initOpusDecoder()
-          log('Opus解码器初始化成功', 'success')
+          log('Decodificador Opus inicializado com sucesso', 'success')
           return true
         } catch (err) {
-          log(`Opus解码器初始化失败: ${err}，音频播放功能将不可用`, 'error')
+            log(`Falha ao inicializar o decodificador Opus: ${err}, a reprodução de áudio ficará indisponível`, 'error')
           return false
         }
       } catch (error) {
-        log('启用音频失败:' + error, 'error')
+        log('Falha ao habilitar o áudio:' + error, 'error')
         return false
       }
     }
 
     await loadOpusLibrary()
 
-    log('音频系统已初始化。请通过用户交互启用音频功能。', 'info')
+    log('Sistema de áudio inicializado. Habilite o áudio por meio de interação do usuário.', 'info')
 
     return true
   } catch (error) {
-    log('初始化音频失败:' + error, 'error')
+    log('Falha ao inicializar o áudio:' + error, 'error')
     return false
   }
 }
 
 export async function handleBinaryAudioMessage(data: ArrayBuffer): Promise<boolean> {
   try {
-    log(`收到ArrayBuffer音频数据，大小: ${data.byteLength}字节`, 'debug')
+    log(`Dados de áudio ArrayBuffer recebidos, tamanho: ${data.byteLength} bytes`, 'debug')
 
     const opusData = new Uint8Array(data)
 
@@ -815,7 +815,7 @@ export async function handleBinaryAudioMessage(data: ArrayBuffer): Promise<boole
 
       return true
     } else {
-      log('收到空音频数据帧，可能是结束标志', 'warning')
+      log('Quadro de dados de áudio vazio recebido, possivelmente um marcador de fim', 'warning')
 
       if (audioBufferQueue.length > 0 && !isAudioPlaying) {
         playBufferedAudio()
@@ -832,7 +832,7 @@ export async function handleBinaryAudioMessage(data: ArrayBuffer): Promise<boole
       return true
     }
   } catch (error) {
-    log('处理二进制消息出错:' + error, 'error')
+    log('Erro ao processar mensagem binária:' + error, 'error')
     return false
   }
 }
@@ -853,10 +853,10 @@ export function cleanupAudio(): boolean {
 
     resetAudioBuffer()
 
-    log('音频资源已清理', 'info')
+    log('Recursos de áudio limpos', 'info')
     return true
   } catch (error) {
-    log('清理音频资源失败:' + error, 'error')
+    log('Falha ao limpar recursos de áudio:' + error, 'error')
     return false
   }
 }

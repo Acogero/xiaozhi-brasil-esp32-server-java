@@ -2,51 +2,51 @@ import { ref, type Ref } from 'vue'
 import type { FormInstance } from 'ant-design-vue'
 
 /**
- * 弹窗管理 Composable
- * 用于统一管理创建/编辑弹窗的状态和逻辑
+ * Composable de gerenciamento de modal
+ * Usado para gerenciar de forma unificada o estado e a lógica dos modais de criação/edição
  */
 
 export interface UseModalOptions<T = any> {
   /**
-   * 提交回调函数
-   * @param data 表单数据
-   * @param isEdit 是否为编辑模式
-   * @returns 是否成功，返回 false 时不关闭弹窗
+   * Função de callback de envio
+   * @param data Dados do formulário
+   * @param isEdit Indica se está em modo de edição
+   * @returns Indica sucesso; se retornar false, o modal não é fechado
    */
   onSubmit?: (data: T, isEdit: boolean) => Promise<boolean | void>
   
   /**
-   * 打开弹窗回调
-   * @param item 编辑项（编辑模式时传入）
+   * Callback de abertura do modal
+   * @param item Item de edição (informado no modo de edição)
    */
   onOpen?: (item?: T) => void | Promise<void>
   
   /**
-   * 关闭弹窗回调
+   * Callback de fechamento do modal
    */
   onClose?: () => void
   
   /**
-   * 表单实例引用（用于重置表单）
+   * Referência da instância do formulário (usada para resetar o formulário)
    */
   formRef?: Ref<FormInstance | undefined>
 }
 
 export function useModal<T = any>(options?: UseModalOptions<T>) {
-  // 弹窗可见性
+  // Visibilidade do modal
   const visible = ref(false)
   
-  // 是否为编辑模式
+  // Indica se está em modo de edição
   const isEdit = ref(false)
   
-  // 当前编辑的项
+  // Item atualmente em edição
   const editingItem = ref<T | null>(null)
   
-  // 提交加载状态
+  // Estado de carregamento do envio
   const submitLoading = ref(false)
   
   /**
-   * 打开弹窗 - 创建模式
+   * Abre o modal - modo de criação
    */
   const openCreate = async () => {
     isEdit.value = false
@@ -56,8 +56,8 @@ export function useModal<T = any>(options?: UseModalOptions<T>) {
   }
   
   /**
-   * 打开弹窗 - 编辑模式
-   * @param item 要编辑的项
+   * Abre o modal - modo de edição
+   * @param item Item a ser editado
    */
   const openEdit = async (item: T) => {
     isEdit.value = true
@@ -67,13 +67,13 @@ export function useModal<T = any>(options?: UseModalOptions<T>) {
   }
   
   /**
-   * 关闭弹窗
+   * Fecha o modal
    */
   const close = () => {
     visible.value = false
     editingItem.value = null
     
-    // 重置表单
+    // Reseta o formulário
     if (options?.formRef?.value) {
       options.formRef.value.resetFields()
     }
@@ -82,8 +82,8 @@ export function useModal<T = any>(options?: UseModalOptions<T>) {
   }
   
   /**
-   * 提交表单
-   * @param data 表单数据
+   * Envia o formulário
+   * @param data Dados do formulário
    */
   const submit = async (data: T): Promise<boolean> => {
     if (!options?.onSubmit) {
@@ -95,7 +95,7 @@ export function useModal<T = any>(options?: UseModalOptions<T>) {
     try {
       const result = await options.onSubmit(data, isEdit.value)
       
-      // 如果返回 false，不关闭弹窗
+      // Se retornar false, o modal não é fechado
       if (result === false) {
         return false
       }
@@ -103,7 +103,7 @@ export function useModal<T = any>(options?: UseModalOptions<T>) {
       close()
       return true
     } catch (error) {
-      console.error('提交失败:', error)
+      console.error('Falha ao enviar:', error)
       return false
     } finally {
       submitLoading.value = false
@@ -111,20 +111,20 @@ export function useModal<T = any>(options?: UseModalOptions<T>) {
   }
   
   /**
-   * 取消操作（与 close 相同，但语义更明确）
+   * Cancela a operação (igual a close, mas com semântica mais clara)
    */
   const cancel = () => {
     close()
   }
   
   return {
-    // 状态
+    // Estado
     visible,
     isEdit,
     editingItem,
     submitLoading,
     
-    // 方法
+    // Métodos
     openCreate,
     openEdit,
     close,

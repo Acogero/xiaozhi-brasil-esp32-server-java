@@ -1,11 +1,11 @@
 import type { PageQueryParams } from './api'
 
 /**
- * 记忆类型定义
+ * Definições de tipos de memória
  */
 
 /**
- * 摘要记忆
+ * Memória resumida
  */
 export interface SummaryMemory {
   id: number
@@ -19,7 +19,7 @@ export interface SummaryMemory {
 }
 
 /**
- * 聊天消息（短期/窗口记忆）
+ * Mensagem de chat (memória de curto prazo/janela)
  */
 export interface ChatMemory {
   messageId: string
@@ -33,7 +33,7 @@ export interface ChatMemory {
 }
 
 /**
- * 记忆查询参数
+ * Parâmetros de consulta de memória
  */
 export interface MemoryQueryParams extends PageQueryParams {
   roleId: number
@@ -41,7 +41,7 @@ export interface MemoryQueryParams extends PageQueryParams {
 }
 
 /**
- * 记忆管理视图的状态
+ * Estado da view de gerenciamento de memória
  */
 export interface MemoryManagementState {
   roleId: number

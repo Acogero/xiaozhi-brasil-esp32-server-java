@@ -12,7 +12,7 @@ export function useConfigManager(configType: ConfigType) {
   const { t } = useI18n()
   const loadingStore = useLoadingStore()
   
-  // 使用统一的表格管理
+  // Usa o gerenciamento unificado de tabelas
   const {
     loading,
     data: configItems,
@@ -20,13 +20,13 @@ export function useConfigManager(configType: ConfigType) {
     loadData,
   } = useTable<Config>()
 
-  // 状态
+  // Estado
   const currentType = ref('')
   const editingConfigId = ref<number>()
   const activeTabKey = ref('1')
   const modelOptions = ref<ModelOption[]>([])
   
-  // LLM 工厂数据
+  // Dados das fábricas de LLM
   interface LLMFactoryModelInfo {
     chat?: LLMModel[]
     vision?: LLMModel[]
@@ -37,19 +37,19 @@ export function useConfigManager(configType: ConfigType) {
   const llmFactoryUrls = ref<Record<string, string>>({})
   const availableProviders = ref<Array<{ value: string; label: string; configNameOptions?: string[] }>>([])
 
-  // 查询表单
+  // Formulário de consulta
   const queryForm = ref({
     provider: '',
     configName: '',
     modelType: '',
   })
 
-  // 配置类型信息
+  // Informações do tipo de configuração
   const configTypeInfo = computed(() => {
     return configTypeMap[configType] || { label: '' }
   })
 
-  // 类型选项
+  // Opções de tipo
   const typeOptions = computed(() => {
     if (configType === 'llm') {
       return availableProviders.value
@@ -57,17 +57,17 @@ export function useConfigManager(configType: ConfigType) {
     return configTypeInfo.value.typeOptions || []
   })
 
-  // 当前类型字段
+  // Campos do tipo atual
   const currentTypeFields = computed((): ConfigField[] => {
     if (!currentType.value) return []
 
     const typeFieldsMap = configTypeInfo.value.typeFields || {}
 
     if (configType === 'llm') {
-      // 如果 providerConfig 有明确定义，使用它
+      // Se providerConfig estiver explicitamente definido, usa-o
       if (typeFieldsMap[currentType.value]) {
         const fields = [...(typeFieldsMap[currentType.value] || [])]
-        // 如果没有 apiUrl 字段但工厂有 URL，自动追加
+        // Se não houver o campo apiUrl mas a fábrica tiver URL, adiciona automaticamente
         const factoryUrl = llmFactoryUrls.value[currentType.value]
         if (factoryUrl && !fields.some(f => f.name === 'apiUrl')) {
           fields.push({
@@ -83,7 +83,7 @@ export function useConfigManager(configType: ConfigType) {
         return fields
       }
 
-      // 没有明确定义：根据工厂数据自动生成默认字段
+      // Não definido explicitamente: gera campos padrão automaticamente a partir dos dados da fábrica
       const factoryUrl = llmFactoryUrls.value[currentType.value] || ''
       return [
         {
@@ -110,11 +110,11 @@ export function useConfigManager(configType: ConfigType) {
   })
 
   /**
-   * 初始化 LLM 工厂数据
+   * Inicializa os dados das fábricas de LLM
    */
   function initLlmFactoriesData() {
     if (!llmFactoriesData || !llmFactoriesData.factory_llm_infos) {
-      console.warn('llm_factories.json 数据格式不正确')
+      console.warn('Formato de dados de llm_factories.json inválido')
       return
     }
 
@@ -130,17 +130,17 @@ export function useConfigManager(configType: ConfigType) {
         label: providerName,
       })
 
-      // 存储工厂 URL
+      // Armazena a URL da fábrica
       if (factory.url) {
         urls[providerName] = factory.url
       }
 
-      // 存储排序权重
+      // Armazena o peso de ordenação
       if (factory.rank) {
         ranks[providerName] = parseInt(factory.rank) || 0
       }
 
-      // 按模型类型分组存储模型
+      // Armazena os modelos agrupados por tipo
       const modelsByType: LLMFactoryModelInfo = {
         chat: [],
         embedding: [],
@@ -152,12 +152,12 @@ export function useConfigManager(configType: ConfigType) {
         factory.llm.forEach((llm: LLMModel) => {
           let mappedModelType = llm.model_type
 
-          // 映射模型类型
+          // Mapeia o tipo de modelo
           if (mappedModelType === 'speech2text' || mappedModelType === 'image2text') {
             mappedModelType = 'vision'
           }
 
-          // 只保留需要的模型类型
+          // Mantém apenas os tipos de modelo necessários
           if (['chat', 'embedding', 'vision'].includes(mappedModelType as keyof LLMFactoryModelInfo)) {
             (modelsByType[mappedModelType as keyof LLMFactoryModelInfo] as LLMModel[]).push({
               llm_name: llm.llm_name,
@@ -176,7 +176,7 @@ export function useConfigManager(configType: ConfigType) {
     llmFactoryData.value = factoryData
     llmFactoryUrls.value = urls
 
-    // 按照工厂 rank 排序（降序，rank 越大越靠前），相同 rank 按字母排序
+    // Ordena pelo rank da fábrica (decrescente, rank maior aparece primeiro); ranks iguais são ordenados alfabeticamente
     const sortedProviders = providers.sort((a, b) => {
       const rankA = ranks[a.value] || 0
       const rankB = ranks[b.value] || 0
@@ -188,7 +188,7 @@ export function useConfigManager(configType: ConfigType) {
   }
 
   /**
-   * 根据 provider 和 modelType 获取模型列表
+   * Obtém a lista de modelos com base em provider e modelType
    */
   function getModelsByProviderAndType(provider: string, modelType: string): LLMModel[] {
     if (!llmFactoryData.value[provider]) {
@@ -199,7 +199,7 @@ export function useConfigManager(configType: ConfigType) {
   }
 
   /**
-   * 更新模型选项列表
+   * Atualiza a lista de opções de modelo
    */
   function updateModelOptions(provider: string, modelType: string) {
     if (configType !== 'llm') {
@@ -214,7 +214,7 @@ export function useConfigManager(configType: ConfigType) {
   }
 
   /**
-   * 获取配置列表
+   * Obtém a lista de configurações
    */
   async function fetchData() {
     await loadData(async ({ pageNo, pageSize }) => {
@@ -228,7 +228,7 @@ export function useConfigManager(configType: ConfigType) {
   }
 
   /**
-   * 删除配置（快速操作，只用 table loading）
+   * Exclui a configuração (ação rápida, usa apenas o loading da tabela)
    */
   async function deleteConfig(configId: number) {
     loading.value = true
@@ -242,7 +242,7 @@ export function useConfigManager(configType: ConfigType) {
         message.error(res.message)
       }
     } catch (error) {
-      console.error('删除配置失败:', error)
+      console.error('Falha ao excluir a configuração:', error)
       message.error(t('common.serverMaintenance'))
     } finally {
       loading.value = false
@@ -250,7 +250,7 @@ export function useConfigManager(configType: ConfigType) {
   }
 
   /**
-   * 设置为默认配置（快速操作，只用 table loading）
+   * Define como configuração padrão (ação rápida, usa apenas o loading da tabela)
    */
   async function setAsDefault(record: Config) {
     if (configType === 'tts') return
@@ -271,20 +271,20 @@ export function useConfigManager(configType: ConfigType) {
         message.error(res.message || t('common.setDefaultFailed'))
       }
     } catch (error) {
-      console.error('设置默认配置失败:', error)
+      console.error('Falha ao definir a configuração padrão:', error)
       message.error(t('common.serverMaintenance'))
     } finally {
       loading.value = false
     }
   }
 
-  // 初始化
+  // Inicialização
   if (configType === 'llm') {
     initLlmFactoriesData()
   }
 
   return {
-    // 状态
+    // Estado
     loading,
     configItems,
     currentType,
@@ -294,12 +294,12 @@ export function useConfigManager(configType: ConfigType) {
     pagination,
     queryForm,
     
-    // 计算属性
+    // Propriedades computadas
     configTypeInfo,
     typeOptions,
     currentTypeFields,
     
-    // 方法
+    // Métodos
     fetchData,
     deleteConfig,
     setAsDefault,

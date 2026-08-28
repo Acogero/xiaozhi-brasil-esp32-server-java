@@ -4,38 +4,38 @@ import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 
 /**
- * 卡片列表管理 Composable
- * 用于管理卡片式列表的搜索、加载、骨架屏等功能
+ * Composable de gerenciamento de listas em cartões
+ * Usado para gerenciar busca, carregamento, skeleton screen etc. de listas em formato de cartão
  */
 
 export interface UseCardListOptions<T extends object> {
   /**
-   * 获取数据的函数
+   * Função para obter os dados
    */
   fetchData: () => Promise<T[]>
   
   /**
-   * 搜索字段（支持多字段搜索）
+   * Campos de busca (suporta busca em múltiplos campos)
    */
   searchFields: (keyof T)[]
   
   /**
-   * 默认骨架屏数量
+   * Quantidade padrão de skeletons
    */
   defaultSkeletonCount?: number
   
   /**
-   * 防抖延迟（毫秒）
+   * Atraso do debounce (em milissegundos)
    */
   debounceDelay?: number
   
   /**
-   * 是否在初始化时自动加载数据
+   * Se deve carregar os dados automaticamente na inicialização
    */
   immediate?: boolean
   
   /**
-   * 错误处理
+   * Tratamento de erros
    */
   onError?: (error: Error) => void
 }
@@ -43,16 +43,16 @@ export interface UseCardListOptions<T extends object> {
 export function useCardList<T extends object>(options: UseCardListOptions<T>) {
   const { t } = useI18n()
   
-  // 加载状态
+  // Estado de carregamento
   const loading = shallowRef(false)
   
-  // 搜索关键词
+  // Palavra-chave de busca
   const searchQuery = shallowRef('')
   
-  // 所有数据（使用 shallowRef 避免深层响应式）
+  // Todos os dados (usa shallowRef para evitar reatividade profunda)
   const allItems = shallowRef<T[]>([])
   
-  // 过滤后的数据
+  // Dados filtrados
   const filteredItems = computed(() => {
     if (!searchQuery.value.trim()) {
       return allItems.value
@@ -70,28 +70,28 @@ export function useCardList<T extends object>(options: UseCardListOptions<T>) {
     })
   })
   
-  // 骨架屏数量（动态计算）
+  // Quantidade de skeletons (calculada dinamicamente)
   const skeletonCount = computed(() => {
-    // 如果正在加载且没有数据，显示默认数量
+    // Se estiver carregando e não houver dados, exibe a quantidade padrão
     if (loading.value && allItems.value.length === 0) {
       return options.defaultSkeletonCount || 6
     }
-    // 如果有数据，根据实际数量显示（最多6个）
+    // Se houver dados, exibe conforme a quantidade real (no máximo 6)
     return Math.max(1, Math.min(allItems.value.length, 6))
   })
   
-  // 是否为空
+  // Se está vazio
   const isEmpty = computed(() => {
     return !loading.value && filteredItems.value.length === 0
   })
   
-  // 是否有数据
+  // Se há dados
   const hasData = computed(() => {
     return filteredItems.value.length > 0
   })
   
   /**
-   * 加载数据
+   * Carrega os dados
    */
   const loadData = async () => {
     loading.value = true
@@ -99,13 +99,13 @@ export function useCardList<T extends object>(options: UseCardListOptions<T>) {
       const data = await options.fetchData()
       allItems.value = data
     } catch (error) {
-      console.error('加载数据失败:', error)
+      console.error('Falha ao carregar dados:', error)
       const errorMessage = error instanceof Error 
         ? error.message 
         : t('common.loadDataFailed')
       message.error(errorMessage)
       
-      // 触发错误回调
+      // Dispara o callback de erro
       if (error instanceof Error) {
         options.onError?.(error)
       }
@@ -115,36 +115,36 @@ export function useCardList<T extends object>(options: UseCardListOptions<T>) {
   }
   
   /**
-   * 刷新数据
+   * Atualiza os dados
    */
   const refresh = async () => {
     await loadData()
   }
   
   /**
-   * 防抖搜索
+   * Busca com debounce
    */
   const debouncedSearch = useDebounceFn(() => {
-    // filteredItems 会自动更新，这里不需要额外逻辑
-    // 可以在这里添加搜索分析等
+    // filteredItems é atualizado automaticamente, não é necessária lógica adicional aqui
+    // É possível adicionar análise de busca etc. aqui
   }, options.debounceDelay || 300)
   
   /**
-   * 重置搜索
+   * Reseta a busca
    */
   const resetSearch = () => {
     searchQuery.value = ''
   }
   
   /**
-   * 添加项到列表
+   * Adiciona um item à lista
    */
   const addItem = (item: T) => {
     allItems.value = [...allItems.value, item]
   }
   
   /**
-   * 更新项
+   * Atualiza um item
    */
   const updateItem = (predicate: (item: T) => boolean, newItem: Partial<T>) => {
     const items = allItems.value
@@ -157,7 +157,7 @@ export function useCardList<T extends object>(options: UseCardListOptions<T>) {
   }
   
   /**
-   * 删除项
+   * Remove um item
    */
   const removeItem = (predicate: (item: T) => boolean) => {
     const items = allItems.value
@@ -165,20 +165,20 @@ export function useCardList<T extends object>(options: UseCardListOptions<T>) {
   }
   
   /**
-   * 清空数据
+   * Limpa os dados
    */
   const clear = () => {
     allItems.value = []
     searchQuery.value = ''
   }
   
-  // 如果设置了立即加载，则自动加载数据
+  // Se o carregamento imediato estiver habilitado, carrega os dados automaticamente
   if (options.immediate !== false) {
     loadData()
   }
   
   return {
-    // 状态
+    // Estado
     loading,
     searchQuery,
     allItems,
@@ -187,7 +187,7 @@ export function useCardList<T extends object>(options: UseCardListOptions<T>) {
     isEmpty,
     hasData,
     
-    // 方法
+    // Métodos
     loadData,
     refresh,
     debouncedSearch,

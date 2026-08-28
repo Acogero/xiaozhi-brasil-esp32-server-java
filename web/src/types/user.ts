@@ -1,7 +1,7 @@
 import type { PageQueryParams } from './api'
 
 /**
- * 用户信息接口
+ * Interface de informações do usuário
  */
 export interface User {
   userId: string
@@ -10,30 +10,30 @@ export interface User {
   email?: string
   tel?: string
   avatar?: string
-  state: number // 1-正常 0-禁用
-  isAdmin: number // 1-管理员 0-普通用户
-  totalDevice?: number // 设备数量
-  aliveNumber?: number // 在线设备数
-  totalMessage?: number // 对话消息数
-  loginTime?: string // 最后登录时间
-  loginIp?: string // 最后登录IP
-  authRoleId?: number // 后台权限角色ID
-  authRoleName?: string // 后台权限角色名称
-  editable?: boolean // 表格编辑状态
+  state: number // 1-normal 0-desabilitado
+  isAdmin: number // 1-administrador 0-usuário comum
+  totalDevice?: number // Quantidade de dispositivos
+  aliveNumber?: number // Dispositivos online
+  totalMessage?: number // Quantidade de mensagens de conversa
+  loginTime?: string // Horário do último login
+  loginIp?: string // IP do último login
+  authRoleId?: number // ID da função de permissão do backend
+  authRoleName?: string // Nome da função de permissão do backend
+  editable?: boolean // Estado de edição na tabela
 }
 
 /**
- * 用户查询参数
+ * Parâmetros de consulta de usuário
  */
 export interface UserQueryParams extends PageQueryParams {
-  name?: string // 姓名
-  email?: string // 邮箱
-  tel?: string // 电话
-  authRoleId?: number // 后台权限角色ID
+  name?: string // Nome
+  email?: string // E-mail
+  tel?: string // Telefone
+  authRoleId?: number // ID da função de permissão do backend
 }
 
 /**
- * 更新用户信息参数
+ * Parâmetros de atualização de informações do usuário
  */
 export interface UpdateUserParams {
   userId?: string
@@ -41,6 +41,6 @@ export interface UpdateUserParams {
   name?: string
   email?: string
   tel?: string
-  password?: string // 密码字段
-  avatar?: string // 头像字段
+  password?: string // Campo de senha
+  avatar?: string // Campo de avatar
 }

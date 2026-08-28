@@ -12,21 +12,21 @@ import PageSkeleton from '@/components/PageSkeleton.vue'
 const router = useRouter()
 const userStore = useUserStore()
 
-// 侧边栏宽度控制
+// Controle de largura da barra lateral
 const sidebarWidth = ref(200)
 const isCollapsed = ref(false)
 
-// 客户端宽度
+// Largura do cliente
 const clientWidth = ref(document.body.clientWidth)
 
-// 是否是移动端
+// Se é dispositivo móvel
 const isMobile = computed(() => clientWidth.value < 768)
 
-// 用户信息
+// Informações do usuário
 const userInfo = computed(() => userStore.userInfo)
 
 /**
- * 处理窗口大小变化
+ * Trata a mudança de tamanho da janela
  */
 function handleResize() {
   clientWidth.value = document.body.clientWidth
@@ -34,26 +34,26 @@ function handleResize() {
 }
 
 /**
- * 处理断点变化（响应式布局）
+ * Trata a mudança de breakpoint (layout responsivo)
  */
 function handleBreakpoint(broken: boolean) {
   if (broken) {
-    // 小屏幕 - 自动折叠侧边栏
+    // Tela pequena - recolhe a barra lateral automaticamente
     sidebarWidth.value = 80
     isCollapsed.value = true
   } else {
-    // 大屏幕 - 展开侧边栏
+    // Tela grande - expande a barra lateral
     sidebarWidth.value = 200
     isCollapsed.value = false
   }
 }
 
 onMounted(() => {
-  // 监听窗口大小变化
+  // Monitora a mudança de tamanho da janela
   window.addEventListener('resize', handleResize)
   handleResize()
   
-  // 检查登录状态
+  // Verifica o status de login
   if (!userInfo.value) {
     router.push(ROUTES.LOGIN)
   }
@@ -67,7 +67,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="main-layout">
     <a-layout>
-      <!-- 占位 Sider - 用于保持内容区域位置 -->
+      <!-- Sider de espaço reservado - usado para manter a posição da área de conteúdo -->
       <div
         class="sider-placeholder"
         :style="{
@@ -78,7 +78,7 @@ onBeforeUnmount(() => {
         }"
       />
 
-      <!-- 固定侧边栏 -->
+      <!-- Barra lateral fixa -->
       <a-layout-sider
         v-model:collapsed="isCollapsed"
         theme="light"
@@ -92,14 +92,14 @@ onBeforeUnmount(() => {
         <AppSidebar :collapsed="isCollapsed" />
       </a-layout-sider>
 
-      <!-- 主内容区域 -->
+      <!-- Área de conteúdo principal -->
       <a-layout class="main-content-layout">
-        <!-- 顶部栏 -->
+        <!-- Barra superior -->
         <a-layout-header class="layout-header">
           <AppHeader />
         </a-layout-header>
 
-        <!-- 内容区 -->
+        <!-- Área de conteúdo -->
         <a-layout-content class="layout-content">
         <router-view v-slot="{ Component }">
           <Suspense>
@@ -113,14 +113,14 @@ onBeforeUnmount(() => {
         </router-view>
         </a-layout-content>
 
-        <!-- 页脚 -->
+        <!-- Rodapé -->
         <a-layout-footer class="layout-footer">
           <AppFooter />
         </a-layout-footer>
       </a-layout>
     </a-layout>
 
-    <!-- 浮动聊天组件 -->
+    <!-- Componente de chat flutuante -->
     <FloatingChat />
   </div>
 </template>

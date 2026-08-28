@@ -18,12 +18,12 @@ function goHome() {
     <a-result
       status="404"
       title="404"
-      sub-title="抱歉，您访问的页面不存在。"
+      sub-title="Desculpe, a página que você acessou não existe."
     >
       <template #extra>
         <a-space>
-          <a-button type="primary" @click="() => goHome()">返回首页</a-button>
-          <a-button @click="() => goBack()">返回上一页</a-button>
+          <a-button type="primary" @click="() => goHome()">Voltar à Página Inicial</a-button>
+          <a-button @click="() => goBack()">Voltar à Página Anterior</a-button>
         </a-space>
       </template>
     </a-result>

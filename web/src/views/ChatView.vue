@@ -22,7 +22,7 @@ import ThinkingBlock from '@/components/chat/ThinkingBlock.vue'
 
 const { t } = useI18n()
 
-// 会话 / 消息 / 历史
+// Sessão / Mensagens / Histórico
 const {
   sessionId,
   sending,
@@ -37,14 +37,14 @@ const {
   toggleThinking,
 } = useChatSession()
 
-// 角色选择
+// Seleção de personagem
 const {
   list: roles,
   load: loadRoles,
 } = useSelectLoadMore<Role>(queryRoles)
 const selectedRoleId = ref<number | undefined>(undefined)
 
-// 自动选择默认角色
+// Seleciona automaticamente o personagem padrão
 watch(roles, (newRoles) => {
   if (!selectedRoleId.value && newRoles && newRoles.length > 0) {
     const defaultRole = newRoles.find((r: Role) => String(r.isDefault) === '1' || String(r.isDefault) === 'true')
@@ -56,7 +56,7 @@ watch(roles, (newRoles) => {
   }
 }, { immediate: true })
 
-// UI 状态：历史记录抽屉
+// Estado da UI: gaveta de histórico
 const showHistory = ref(false)
 
 function toggleHistory() {
@@ -71,7 +71,7 @@ function formatTime(timeStr: string) {
   return `${d.getMonth() + 1}-${d.getDate()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
 }
 
-// 视图状态：输入框 / 滚动 / 角色弹窗
+// Estado da view: caixa de entrada / rolagem / popover de personagem
 const inputText = ref('')
 const chatContainerRef = ref<HTMLDivElement>()
 const textareaRef = ref()
@@ -81,7 +81,7 @@ const selectedRole = computed(() => roles.value.find((r: Role) => r.roleId === s
 const selectedRoleName = computed(() => selectedRole.value?.roleName || '')
 const selectedRoleAvatar = computed(() => selectedRole.value?.avatar || '')
 
-// 初始化加载
+// Carregamento inicial
 loadRoles()
 loadConversations()
 
@@ -124,13 +124,13 @@ async function sendMessage() {
   const text = inputText.value.trim()
   if (!text || sending.value || !selectedRoleId.value) return
 
-  // 立即清空输入框并重新聚焦
+  // Limpa a caixa de entrada imediatamente e refoca
   inputText.value = ''
   focusInput()
 
   const { openedNow, success } = await sendMessageToSession(text, selectedRoleId.value, scrollToBottom)
   focusInput()
-  // 新开/续接会话发送完一轮后，刷新列表（新会话入列表，续接会话上浮）
+  // Após enviar uma rodada em uma nova sessão / sessão continuada, atualiza a lista (nova sessão entra na lista, sessão continuada sobe)
   if (success && openedNow) {
     loadConversations()
   }
@@ -146,7 +146,7 @@ function handleKeyDown(e: KeyboardEvent) {
 
 <template>
   <a-layout class="chat-layout">
-    <!-- 顶部导航栏 -->
+    <!-- Barra de navegação superior -->
     <a-layout-header class="chat-header">
       <a-flex justify="space-between" align="center" :style="{ height: '100%' }">
         <a-popover
@@ -199,9 +199,9 @@ function handleKeyDown(e: KeyboardEvent) {
       </a-flex>
     </a-layout-header>
 
-    <!-- 主体对话区域 -->
+    <!-- Área principal de conversa -->
     <a-layout-content class="chat-content" :style="{ paddingRight: showHistory ? '320px' : '0' }">
-      <!-- 消息列表 -->
+      <!-- Lista de mensagens -->
       <div class="chat-messages" ref="chatContainerRef">
         <div class="chat-messages-inner">
           <div v-if="messages.length === 0" :style="{ margin: 'auto', textAlign: 'center', color: '#8c8c8c' }">
@@ -239,7 +239,7 @@ function handleKeyDown(e: KeyboardEvent) {
         </div>
       </div>
 
-      <!-- 输入区域 -->
+      <!-- Área de entrada -->
       <div class="chat-input-wrapper">
         <a-card :bordered="true" class="chat-input-card" :body-style="{ padding: '12px' }">
           <a-textarea
@@ -268,7 +268,7 @@ function handleKeyDown(e: KeyboardEvent) {
         </a-typography-text>
       </div>
 
-      <!-- 历史记录抽屉（渲染在 chat-content 内） -->
+      <!-- Gaveta de histórico (renderizada dentro de chat-content) -->
       <a-drawer
         v-model:open="showHistory"
         :title="t('chat.history')"
@@ -425,7 +425,7 @@ function handleKeyDown(e: KeyboardEvent) {
   transition: padding-right 0.3s;
 }
 
-/* 消息区域 */
+/* Área de mensagens */
 .chat-messages {
   flex: 1;
   min-height: 0;
@@ -442,7 +442,7 @@ function handleKeyDown(e: KeyboardEvent) {
   min-height: 100%;
 }
 
-/* 消息气泡（无 AntD 等效组件，保留自定义） */
+/* Balão de mensagem (sem componente equivalente no AntD, mantido customizado) */
 .message-row {
   display: flex;
   gap: 16px;
@@ -511,7 +511,7 @@ function handleKeyDown(e: KeyboardEvent) {
   30% { opacity: 1; transform: scale(1); }
 }
 
-/* 输入区域 */
+/* Área de entrada */
 .chat-input-wrapper {
   max-width: 880px;
   margin: 0 auto;
@@ -536,7 +536,7 @@ function handleKeyDown(e: KeyboardEvent) {
   font-size: 16px;
 }
 
-/* 历史记录时间线 */
+/* Linha do tempo do histórico */
 .history-timeline {
   padding-top: 4px;
 }

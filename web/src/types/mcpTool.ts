@@ -1,9 +1,9 @@
 /**
- * MCP工具相关类型定义
+ * Definições de tipos relacionados a ferramentas MCP
  */
 
 /**
- * 系统全局工具摘要
+ * Resumo global de ferramentas do sistema
  */
 export interface SystemGlobalToolSummary {
   name: string
@@ -11,7 +11,7 @@ export interface SystemGlobalToolSummary {
 }
 
 /**
- * MCP工具项
+ * Item de ferramenta MCP
  */
 export interface McpToolItem {
   name: string
@@ -23,7 +23,7 @@ export interface McpToolItem {
 }
 
 /**
- * MCP工具参数属性
+ * Propriedade de parâmetro de ferramenta MCP
  */
 export interface McpToolSchemaProperty {
   name: string

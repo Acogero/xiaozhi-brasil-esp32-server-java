@@ -1,55 +1,55 @@
 [
   {
-    "label": "龙应催",
+    "label": "Long Yingcui",
     "value": "longyingcui",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙应答",
+    "label": "Long Yingda",
     "value": "longyingda",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙应静",
+    "label": "Long Yingjing",
     "value": "longyingjing",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙应严",
+    "label": "Long Yingyan",
     "value": "longyingyan",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙应甜",
+    "label": "Long Yingtian",
     "value": "longyingtian",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙应冰",
+    "label": "Long Yingbing",
     "value": "longyingbing",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙应桃",
+    "label": "Long Yingtao",
     "value": "longyingtao",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙应聆",
+    "label": "Long Yingling",
     "value": "longyingling",
     "gender": "female",
     "provider": "aliyun",
@@ -63,259 +63,259 @@
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙小淳",
+    "label": "Long Xiaochun",
     "value": "longxiaochun_v2",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙小夏",
+    "label": "Long Xiaoxia",
     "value": "longxiaoxia_v2",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙安燃",
+    "label": "Long Anran",
     "value": "longanran",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙安宣",
+    "label": "Long Anxuan",
     "value": "longanxuan",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙三叔",
+    "label": "Long Sanshu",
     "value": "longsanshu",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙修",
+    "label": "Long Xiu",
     "value": "longxiu_v2",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙妙",
+    "label": "Long Miao",
     "value": "longmiao_v2",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙悦",
+    "label": "Long Yue",
     "value": "longyue_v2",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙楠",
+    "label": "Long Nan",
     "value": "longnan_v2",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙媛",
+    "label": "Long Yuan",
     "value": "longyuan_v2",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙安柔",
+    "label": "Long Anrou",
     "value": "longanrou",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙嫱",
+    "label": "Long Qiang",
     "value": "longqiang_v2",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙寒",
+    "label": "Long Han",
     "value": "longhan_v2",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙星",
+    "label": "Long Xing",
     "value": "longxing_v2",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙华",
+    "label": "Long Hua",
     "value": "longhua_v2",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙婉",
+    "label": "Long Wan",
     "value": "longwan_v2",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙橙",
+    "label": "Long Cheng",
     "value": "longcheng_v2",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙菲菲",
+    "label": "Long Feifei",
     "value": "longfeifei_v2",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙小诚",
+    "label": "Long Xiaocheng",
     "value": "longxiaocheng_v2",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙哲",
+    "label": "Long Zhe",
     "value": "longzhe_v2",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙颜",
+    "label": "Long Yan",
     "value": "longyan_v2",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙天",
+    "label": "Long Tian",
     "value": "longtian_v2",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙泽",
+    "label": "Long Ze",
     "value": "longze_v2",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙邵",
+    "label": "Long Shao",
     "value": "longshao_v2",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙浩",
+    "label": "Long Hao",
     "value": "longhao_v2",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙深",
+    "label": "Long Shen",
     "value": "kabuleshen_v2",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙杰力豆",
+    "label": "Long Jielidou",
     "value": "longjielidou_v2",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙铃",
+    "label": "Long Ling",
     "value": "longling_v2",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙可",
+    "label": "Long Ke",
     "value": "longke_v2",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙仙",
+    "label": "Long Xian",
     "value": "longxian_v2",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙老铁",
+    "label": "Long Laotie",
     "value": "longlaotie_v2",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙嘉怡",
+    "label": "Long Jiayi",
     "value": "longjiayi_v2",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙桃",
+    "label": "Long Tao",
     "value": "longtao_v2",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙飞",
+    "label": "Long Fei",
     "value": "longfei_v2",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "李白",
+    "label": "Li Bai",
     "value": "libai_v2",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙津",
+    "label": "Long Jin",
     "value": "longjin_v2",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙书",
+    "label": "Long Shu",
     "value": "longshu_v2",
     "gender": "male",
     "provider": "aliyun",
@@ -329,21 +329,21 @@
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙硕",
+    "label": "Long Shuo",
     "value": "longshuo_v2",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙小白",
+    "label": "Long Xiaobai",
     "value": "longxiaobai_v2",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v2"
   },
   {
-    "label": "龙婧",
+    "label": "Long Jing",
     "value": "longjing_v2",
     "gender": "female",
     "provider": "aliyun",
@@ -490,826 +490,826 @@
     "model": "cosyvoice-v2"
   },
   {
-    "label": "知楠 (广告男声)",
+    "label": "Zhi Nan (voz masculina publicitária)",
     "value": "sambert-zhinan-v1",
     "gender": "male",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知琪 (温柔女声)",
+    "label": "Zhi Qi (voz feminina suave)",
     "value": "sambert-zhiqi-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知厨 (舌尖男声)",
+    "label": "Zhi Chu (voz masculina gastronômica)",
     "value": "sambert-zhichu-v1",
     "gender": "male",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知德 (新闻男声)",
+    "label": "Zhi De (voz masculina de noticiário)",
     "value": "sambert-zhide-v1",
     "gender": "male",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知佳 (标准女声)",
+    "label": "Zhi Jia (voz feminina padrão)",
     "value": "sambert-zhijia-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知茹 (新闻女声)",
+    "label": "Zhi Ru (voz feminina de noticiário)",
     "value": "sambert-zhiru-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知倩 (资讯女声)",
+    "label": "Zhi Qian (voz feminina informativa)",
     "value": "sambert-zhiqian-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知祥 (磁性男声)",
+    "label": "Zhi Xiang (voz masculina magnética)",
     "value": "sambert-zhixiang-v1",
     "gender": "male",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知薇 (萝莉女声)",
+    "label": "Zhi Wei (voz feminina estilo lolita)",
     "value": "sambert-zhiwei-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知浩 (咨询男声)",
+    "label": "Zhi Hao (voz masculina de atendimento)",
     "value": "sambert-zhihao-v1",
     "gender": "male",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知婧 (严厉女声)",
+    "label": "Zhi Jing (voz feminina severa)",
     "value": "sambert-zhijing-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知茗 (诙谐男声)",
+    "label": "Zhi Ming (voz masculina bem-humorada)",
     "value": "sambert-zhiming-v1",
     "gender": "male",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知墨 (情感男声)",
+    "label": "Zhi Mo (voz masculina emotiva)",
     "value": "sambert-zhimo-v1",
     "gender": "male",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知娜 (浙普女声)",
+    "label": "Zhi Na (voz feminina com sotaque de Zhejiang)",
     "value": "sambert-zhina-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知树 (资讯男声)",
+    "label": "Zhi Shu (voz masculina informativa)",
     "value": "sambert-zhishu-v1",
     "gender": "male",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知莎 (知性女声)",
+    "label": "Zhi Sha (voz feminina intelectual)",
     "value": "sambert-zhistella-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知婷 (电台女声)",
+    "label": "Zhi Ting (voz feminina de rádio)",
     "value": "sambert-zhiting-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知笑 (资讯女声)",
+    "label": "Zhi Xiao (voz feminina informativa)",
     "value": "sambert-zhixiao-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知雅 (严厉女声)",
+    "label": "Zhi Ya (voz feminina severa)",
     "value": "sambert-zhiya-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知晔 (青年男声)",
+    "label": "Zhi Ye (voz masculina jovem)",
     "value": "sambert-zhiye-v1",
     "gender": "male",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知颖 (软萌童声)",
+    "label": "Zhi Ying (voz infantil fofa e meiga)",
     "value": "sambert-zhiying-v1",
     "gender": "male",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知媛 (知心姐姐)",
+    "label": "Zhi Yuan (irmã mais velha confidente)",
     "value": "sambert-zhiyuan-v1",
     "gender": "male",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知悦 (温柔女声)",
+    "label": "Zhi Yue (voz feminina suave)",
     "value": "sambert-zhiyue-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知柜 (直播女声)",
+    "label": "Zhi Gui (voz feminina de transmissão ao vivo)",
     "value": "sambert-zhigui-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知硕 (自然男声)",
+    "label": "Zhi Shuo (voz masculina natural)",
     "value": "sambert-zhishuo-v1",
     "gender": "male",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知妙（多情感） (多种情感女声)",
+    "label": "Zhi Miao (multiemocional) (voz feminina com múltiplas emoções)",
     "value": "sambert-zhimiao-emo-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知猫 (直播女声)",
+    "label": "Zhi Mao (voz feminina de transmissão ao vivo)",
     "value": "sambert-zhimao-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知伦 (悬疑解说)",
+    "label": "Zhi Lun (narração de suspense)",
     "value": "sambert-zhilun-v1",
     "gender": "male",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知飞 (激昂解说)",
+    "label": "Zhi Fei (narração vibrante)",
     "value": "sambert-zhifei-v1",
     "gender": "male",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "知达 (标准男声)",
+    "label": "Zhi Da (voz masculina padrão)",
     "value": "sambert-zhida-v1",
     "gender": "male",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "Camila (西班牙语女声)",
+    "label": "Camila (voz feminina em espanhol)",
     "value": "sambert-camila-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "Perla (意大利语女声)",
+    "label": "Perla (voz feminina em italiano)",
     "value": "sambert-perla-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "Indah (印尼语女声)",
+    "label": "Indah (voz feminina em indonésio)",
     "value": "sambert-indah-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "Clara (法语女声)",
+    "label": "Clara (voz feminina em francês)",
     "value": "sambert-clara-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "Hanna (德语女声)",
+    "label": "Hanna (voz feminina em alemão)",
     "value": "sambert-hanna-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "Beth (咨询女声)",
+    "label": "Beth (voz feminina de atendimento)",
     "value": "sambert-beth-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "Betty (客服女声)",
+    "label": "Betty (voz feminina de atendimento ao cliente)",
     "value": "sambert-betty-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "Cally (自然女声)",
+    "label": "Cally (voz feminina natural)",
     "value": "sambert-cally-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "Cindy (对话女声)",
+    "label": "Cindy (voz feminina de diálogo)",
     "value": "sambert-cindy-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "Eva (陪伴女声)",
+    "label": "Eva (voz feminina de companhia)",
     "value": "sambert-eva-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "Donna (教育女声)",
+    "label": "Donna (voz feminina educativa)",
     "value": "sambert-donna-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "Brian (客服男声)",
+    "label": "Brian (voz masculina de atendimento ao cliente)",
     "value": "sambert-brian-v1",
     "gender": "male",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "Waan (泰语女声)",
+    "label": "Waan (voz feminina em tailandês)",
     "value": "sambert-waan-v1",
     "gender": "female",
     "provider": "aliyun",
     "model": "Sambert"
   },
   {
-    "label": "Vivian - 十三",
+    "label": "Vivian - Shisan",
     "value": "qwen3-tts-instruct-flash-realtime:Vivian",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Nofish - 不吃鱼",
+    "label": "Nofish - Bu Chiyu",
     "value": "qwen3-tts-instruct-flash-realtime:Nofish",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Nini - 邻家妹妹",
+    "label": "Nini - Linjia Meimei",
     "value": "qwen3-tts-instruct-flash-realtime:Nini",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Pip - 顽屁小孩",
+    "label": "Pip - Wanpi Xiaohai",
     "value": "qwen3-tts-instruct-flash-realtime:Pip",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Cherry - 芊悦",
+    "label": "Cherry - Qianyue",
     "value": "qwen3-tts-instruct-flash-realtime:Cherry",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Serena - 苏瑶",
+    "label": "Serena - Suyao",
     "value": "qwen3-tts-instruct-flash-realtime:Serena",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Chelsie - 千雪",
+    "label": "Chelsie - Qianxue",
     "value": "qwen3-tts-instruct-flash-realtime:Chelsie",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Momo - 茉兔",
+    "label": "Momo - Motu",
     "value": "qwen3-tts-instruct-flash-realtime:Momo",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Moon - 月白",
+    "label": "Moon - Yuebai",
     "value": "qwen3-tts-instruct-flash-realtime:Moon",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Maia - 四月",
+    "label": "Maia - Siyue",
     "value": "qwen3-tts-instruct-flash-realtime:Maia",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Kai - 凯",
+    "label": "Kai - Kai",
     "value": "qwen3-tts-instruct-flash-realtime:Kai",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Bella - 萌宝",
+    "label": "Bella - Mengbao",
     "value": "qwen3-tts-instruct-flash-realtime:Bella",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "EldricSage - 沧明子",
+    "label": "EldricSage - Cang Mingzi",
     "value": "qwen3-tts-instruct-flash-realtime:EldricSage",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Bellona - 燕铮莺",
+    "label": "Bellona - Yan Zhengying",
     "value": "qwen3-tts-instruct-flash-realtime:Bellona",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Vincent - 田叔",
+    "label": "Vincent - Tianshu",
     "value": "qwen3-tts-instruct-flash-realtime:Vincent",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Bunny - 萌小姬",
+    "label": "Bunny - Meng Xiaoji",
     "value": "qwen3-tts-instruct-flash-realtime:Bunny",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Elias - 墨讲师",
+    "label": "Elias - Mo Jiangshi",
     "value": "qwen3-tts-instruct-flash-realtime:Elias",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Arthur - 徐大爷",
+    "label": "Arthur - Xu Daye",
     "value": "qwen3-tts-instruct-flash-realtime:Arthur",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Ebona - 诡婆婆",
+    "label": "Ebona - Gui Popo",
     "value": "qwen3-tts-instruct-flash-realtime:Ebona",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Seren - 小婉",
+    "label": "Seren - Xiaowan",
     "value": "qwen3-tts-instruct-flash-realtime:Seren",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Stella - 少女阿月",
+    "label": "Stella - Shaonv Ayue",
     "value": "qwen3-tts-instruct-flash-realtime:Stella",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-instruct-flash-realtime"
   },
   {
-    "label": "Jennifer - 詹妮弗",
+    "label": "Jennifer - Zhan Nifu",
     "value": "qwen3-tts-flash-realtime:Jennifer",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Ethan - 晨煦",
+    "label": "Ethan - Chenxu",
     "value": "qwen3-tts-flash-realtime:Ethan",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Ryan - 甜茶",
+    "label": "Ryan - Tiancha",
     "value": "qwen3-tts-flash-realtime:Ryan",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Aiden - 艾登",
+    "label": "Aiden - Aideng",
     "value": "qwen3-tts-flash-realtime:Aiden",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Mia - 乖小妹",
+    "label": "Mia - Guai Xiaomei",
     "value": "qwen3-tts-flash-realtime:Mia",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Bodega - 博德加",
+    "label": "Bodega - Bo Dejia",
     "value": "qwen3-tts-flash-realtime:Bodega",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Sonrisa - 索尼莎",
+    "label": "Sonrisa - Suo Nisha",
     "value": "qwen3-tts-flash-realtime:Sonrisa",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Alek - 阿列克",
+    "label": "Alek - A Lieke",
     "value": "qwen3-tts-flash-realtime:Alek",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Dolce - 多尔切",
+    "label": "Dolce - Duo Erqie",
     "value": "qwen3-tts-flash-realtime:Dolce",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Sohee - 素熙",
+    "label": "Sohee - Suxi",
     "value": "qwen3-tts-flash-realtime:Sohee",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "OnoAnna - 小野杏",
+    "label": "OnoAnna - Xiao Yexing",
     "value": "qwen3-tts-flash-realtime:OnoAnna",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Lenn - 莱恩",
+    "label": "Lenn - Laien",
     "value": "qwen3-tts-flash-realtime:Lenn",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Emilien - 埃米尔安",
+    "label": "Emilien - Aimi Eran",
     "value": "qwen3-tts-flash-realtime:Emilien",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Andre - 安德雷",
+    "label": "Andre - An Delei",
     "value": "qwen3-tts-flash-realtime:Andre",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Katerina - 卡捷琳娜",
+    "label": "Katerina - Kajie Linna",
     "value": "qwen3-tts-flash-realtime:Katerina",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Jada - 上海阿珍",
+    "label": "Jada - Shanghai Azhen",
     "value": "qwen3-tts-flash-realtime:Jada",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Dylan - 北京晓东",
+    "label": "Dylan - Beijing Xiaodong",
     "value": "qwen3-tts-flash-realtime:Dylan",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Li - 南京老李",
+    "label": "Li - Nanjing Laoli",
     "value": "qwen3-tts-flash-realtime:Li",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Marcus - 陕西秦川",
+    "label": "Marcus - Shaanxi Qinchuan",
     "value": "qwen3-tts-flash-realtime:Marcus",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Roy - 闽南阿杰",
+    "label": "Roy - Minnan Ajie",
     "value": "qwen3-tts-flash-realtime:Roy",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Peter - 天津李彼得",
+    "label": "Peter - Tianjin Li Bide",
     "value": "qwen3-tts-flash-realtime:Peter",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Rocky - 粤语阿强",
+    "label": "Rocky - Yueyu Aqiang",
     "value": "qwen3-tts-flash-realtime:Rocky",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Kiki - 粤语阿清",
+    "label": "Kiki - Yueyu Aqing",
     "value": "qwen3-tts-flash-realtime:Kiki",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Eric - 四川程川",
+    "label": "Eric - Sichuan Chengchuan",
     "value": "qwen3-tts-flash-realtime:Eric",
     "gender": "male",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "Sunny - 四川晴儿",
+    "label": "Sunny - Sichuan Qinger",
     "value": "qwen3-tts-flash-realtime:Sunny",
     "gender": "female",
     "provider": "aliyun",
     "model": "qwen3-tts-flash-realtime"
   },
   {
-    "label": "龙安洋(阳光大男孩)",
+    "label": "Long Anyang (garoto alegre e cheio de energia)",
     "value": "cosyvoice-v3-plus:longanyang",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v3-plus"
   },
   {
-    "label": "龙安欢(欢脱元气女)",
+    "label": "Long Anhuan (mulher animada e cheia de energia)",
     "value": "cosyvoice-v3-plus:longanhuan",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v3-plus"
   },
   {
-    "label": "龙安洋(阳光大男孩)",
+    "label": "Long Anyang (garoto alegre e cheio de energia)",
     "value": "cosyvoice-v3-flash:longanyang",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙安欢(欢脱元气女)",
+    "label": "Long Anhuan (mulher animada e cheia de energia)",
     "value": "cosyvoice-v3-flash:longanhuan",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙呼呼(天真烂漫女童)",
+    "label": "Long Huhu (menina ingênua e alegre)",
     "value": "cosyvoice-v3-flash:longhuhu_v3",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙应沐 (优雅知性女)",
+    "label": "Long Yingmu (mulher elegante e intelectual)",
     "value": "cosyvoice-v3-flash:longyingmu_v3",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙应笑 (清甜推销女)",
+    "label": "Long Yingxiao (mulher doce e persuasiva)",
     "value": "cosyvoice-v3-flash:longyingxiao_v3",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙应询 (年轻青涩男)",
+    "label": "Long Yingxun (homem jovem e inexperiente)",
     "value": "cosyvoice-v3-flash:longyingxun_v3",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙应桃 (温柔淡定女)",
+    "label": "Long Yingtao (mulher suave e serena)",
     "value": "cosyvoice-v3-flash:longyingtao_v3",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙安昀 (居家暖男)",
+    "label": "Long Anyun (homem gentil e caseiro)",
     "value": "cosyvoice-v3-flash:longanyun_v3",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙安温 (优雅知性女)",
+    "label": "Long Anwen (mulher elegante e intelectual)",
     "value": "cosyvoice-v3-flash:longanwen_v3",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙安莉 (利落从容女)",
+    "label": "Long Anli (mulher ágil e serena)",
     "value": "cosyvoice-v3-flash:longanli_v3",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙安朗 (清爽利落男)",
+    "label": "Long Anlang (homem descontraído e objetivo)",
     "value": "cosyvoice-v3-flash:longanlang_v3",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙安智 (睿智轻熟男)",
+    "label": "Long Anzhi (homem sábio e maduro)",
     "value": "cosyvoice-v3-flash:longanzhi_v3",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙安灵 (思维灵动女)",
+    "label": "Long Anling (mulher de raciocínio ágil)",
     "value": "cosyvoice-v3-flash:longanling_v3",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙安雅 (高雅气质女)",
+    "label": "Long Anya (mulher de temperamento refinado)",
     "value": "cosyvoice-v3-flash:longanya_v3",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙安亲 (亲和活泼女)",
+    "label": "Long Anqin (mulher afetuosa e animada)",
     "value": "cosyvoice-v3-flash:longanqin_v3",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙婉君 (细腻柔声女)",
+    "label": "Long Wanjun (mulher de voz delicada e suave)",
     "value": "cosyvoice-v3-flash:longwanjun_v3",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙逸尘 (洒脱活力男)",
+    "label": "Long Yichen (homem descontraído e enérgico)",
     "value": "cosyvoice-v3-flash:longyichen_v3",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙老伯 (沧桑岁月爷)",
+    "label": "Long Laobo (avô marcado pelo tempo)",
     "value": "cosyvoice-v3-flash:longlaobo_v3",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙老姨 (烟火从容阿姨)",
+    "label": "Long Laoyi (tia serena e experiente)",
     "value": "cosyvoice-v3-flash:longlaoyi_v3",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙机器 (呆萌机器人)",
+    "label": "Long Jiqi (robô fofo e desajeitado)",
     "value": "cosyvoice-v3-flash:longjiqi_v3",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙猴哥 (经典猴哥)",
+    "label": "Long Houge (clássico Irmão Macaco)",
     "value": "cosyvoice-v3-flash:longhouge_v3",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙黛玉 (娇率才女音)",
+    "label": "Long Daiyu (voz de mulher talentosa, doce e espontânea)",
     "value": "cosyvoice-v3-flash:longdaiyu_v3",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙安粤 (欢脱粤语男)",
+    "label": "Long Anyue (homem animado em cantonês)",
     "value": "cosyvoice-v3-flash:longanyue_v3",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙陕哥 (原味陕北男)",
+    "label": "Long Shange (homem autêntico do norte de Shaanxi)",
     "value": "cosyvoice-v3-flash:longshange_v3",
     "gender": "male",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙安闽 (清纯萝莉女)",
+    "label": "Long Anmin (mulher jovem e doce (estilo lolita))",
     "value": "cosyvoice-v3-flash:longanmin_v3",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "龙安宣 v3 (经典直播女)",
+    "label": "Long Anxuan v3 (voz feminina clássica de transmissão ao vivo)",
     "value": "cosyvoice-v3-flash:longanxuan_v3",
     "gender": "female",
     "provider": "aliyun",
     "model": "cosyvoice-v3-flash"
   },
   {
-    "label": "Bella 3.0 (精准干练女)",
+    "label": "Bella 3.0 (mulher precisa e competente)",
     "value": "cosyvoice-v3-flash:loongbella_v3",
     "gender": "female",
     "provider": "aliyun",

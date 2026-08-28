@@ -1,12 +1,12 @@
 /**
- * 头像处理 Composable
+ * Composable de tratamento de avatar
  */
 import { getResourceUrl } from '@/utils/resource'
 
 export function useAvatar() {
   /**
-   * 获取头像URL
-   * 使用统一的资源URL处理逻辑
+   * Obtém a URL do avatar
+   * Usa a lógica unificada de tratamento de URL de recursos
    */
   function getAvatarUrl(avatar?: string): string | undefined {
     return getResourceUrl(avatar)

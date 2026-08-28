@@ -1,6 +1,6 @@
 import JSEncrypt from 'jsencrypt'
 
-// 密钥对生成 http://web.chacuo.net/netrsakeypair
+// Geração do par de chaves http://web.chacuo.net/netrsakeypair
 
 const publicKey =
   'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDQJBHZKLLQKT8tIPwFMMQ8z2gh' +
@@ -24,18 +24,18 @@ const privateKey =
   'Kb5cejiwCL0fTT57KYz/8omSkNkI7qfYfst5VEexLChIE/ZDVRkyBepf466l4RXe' +
   'SswvOeKybPJxrNSG'
 
-// 加密
+// Criptografar
 export function encrypt(txt: string): string | false {
   const encryptor = new JSEncrypt()
-  encryptor.setPublicKey(publicKey) // 设置公钥
-  return encryptor.encrypt(txt) // 对数据进行加密
+  encryptor.setPublicKey(publicKey) // Define a chave pública
+  return encryptor.encrypt(txt) // Criptografa os dados
 }
 
-// 解密
+// Descriptografar
 export function decrypt(txt: string): string | false {
   const encryptor = new JSEncrypt()
-  encryptor.setPrivateKey(privateKey) // 设置私钥
-  return encryptor.decrypt(txt) // 对数据进行解密
+  encryptor.setPrivateKey(privateKey) // Define a chave privada
+  return encryptor.decrypt(txt) // Descriptografa os dados
 }
 
 

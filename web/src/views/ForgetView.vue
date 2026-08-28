@@ -33,7 +33,7 @@ const formRef = ref<FormInstance>()
 const isEmailVerified = ref(false)
 const showVerificationInput = ref(false)
 
-// 表单数据
+// Dados do formulário
 const formData = reactive({
   email: '',
   verificationCode: '',
@@ -81,7 +81,7 @@ const handleVerifyEmail = async () => {
     const success = await verifyCode(formData.email, formData.verificationCode, 'forget')
     if (success) {
       isEmailVerified.value = true
-      message.success('验证成功！请设置新密码')
+      message.success('Verificação bem-sucedida! Defina sua nova senha')
     }
   } finally {
     loading.value = false
@@ -100,17 +100,17 @@ const handleResetPassword = async () => {
 
 <template>
   <div class="forget-container">
-    <!-- 地球背景 -->
+    <!-- Fundo com globo terrestre -->
     <div class="earth-background"></div>
 
-    <!-- 忘记密码区域 -->
+    <!-- Área de recuperação de senha -->
     <a-row type="flex" justify="center" align="middle" style="min-height: 100vh">
       <a-col :xs="22" :sm="14" :md="12" :lg="10" :xl="8">
         <a-card class="forget-card" :bordered="false">
-          <!-- 标题 -->
+          <!-- Título -->
           <div class="welcome-title">{{ t('auth.forgetPassword') }}</div>
 
-          <!-- 忘记密码表单 -->
+          <!-- Formulário de recuperação de senha -->
           <a-form
             ref="formRef"
             :model="formData"
@@ -119,7 +119,7 @@ const handleResetPassword = async () => {
             :hideRequiredMark="true"
             layout="vertical"
           >
-            <!-- 邮箱输入 -->
+            <!-- Campo de e-mail -->
             <a-form-item :label="t('user.email')" name="email">
               <a-input
                 v-model:value="formData.email"
@@ -148,7 +148,7 @@ const handleResetPassword = async () => {
               </a-input>
             </a-form-item>
 
-            <!-- 验证码输入 - 发送成功后才显示 -->
+            <!-- Campo de código de verificação - exibido após envio bem-sucedido -->
             <a-form-item :label="t('auth.emailVerificationCode')" name="verificationCode" v-if="showVerificationInput">
               <a-input
                 v-model:value="formData.verificationCode"
@@ -163,7 +163,7 @@ const handleResetPassword = async () => {
               </a-input>
             </a-form-item>
 
-            <!-- 新密码输入 -->
+            <!-- Campo de nova senha -->
             <a-form-item :label="t('auth.newPassword')" name="newPassword" v-if="isEmailVerified">
               <a-input-password
                 v-model:value="formData.newPassword"
@@ -177,7 +177,7 @@ const handleResetPassword = async () => {
               </a-input-password>
             </a-form-item>
 
-            <!-- 确认新密码输入 -->
+            <!-- Campo de confirmação de nova senha -->
             <a-form-item :label="t('auth.confirmNewPassword')" name="confirmPassword" v-if="isEmailVerified">
               <a-input-password
                 v-model:value="formData.confirmPassword"
@@ -191,7 +191,7 @@ const handleResetPassword = async () => {
               </a-input-password>
             </a-form-item>
 
-            <!-- 提交按钮 -->
+            <!-- Botão de envio -->
             <a-form-item style="margin-top: 24px">
               <a-button
                 type="primary"
@@ -205,7 +205,7 @@ const handleResetPassword = async () => {
               </a-button>
             </a-form-item>
 
-            <!-- 返回登录链接 -->
+            <!-- Link para voltar ao login -->
             <div class="back-login-wrapper">
               <span class="back-text">{{ t('auth.rememberPassword') }}</span>
               <router-link to="/login" class="back-link"> {{ t('auth.backToLogin') }} </router-link>
@@ -218,7 +218,7 @@ const handleResetPassword = async () => {
 </template>
 
 <style lang="scss" scoped>
-// 主容器
+// Container principal
 .forget-container {
   position: relative;
   min-height: 100vh;
@@ -227,7 +227,7 @@ const handleResetPassword = async () => {
   font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
 }
 
-// 背景图片
+// Imagem de fundo
 .earth-background {
   position: fixed;
   top: 0;
@@ -251,7 +251,7 @@ const handleResetPassword = async () => {
   }
 }
 
-// 忘记密码卡片
+// Card de recuperação de senha
 .forget-card {
   background: rgba(42, 42, 42, 0.35) !important;
   backdrop-filter: blur(10px);
@@ -265,7 +265,7 @@ const handleResetPassword = async () => {
   }
 }
 
-// 标题样式
+// Estilo do título
 .welcome-title {
   text-align: center;
   color: #ffffff;
@@ -277,7 +277,7 @@ const handleResetPassword = async () => {
   display: block;
 }
 
-// 输入框样式
+// Estilo dos campos de entrada
 .input-field {
   background: rgba(255, 255, 255, 0.1) !important;
   border: none !important;
@@ -334,13 +334,13 @@ const handleResetPassword = async () => {
   }
 }
 
-// 表单标签
+// Rótulo do formulário
 :deep(.ant-form-item-label > label) {
   color: #cccccc !important;
   font-weight: 500;
 }
 
-// 发送验证码按钮
+// Botão de enviar código de verificação
 .send-code-btn {
   color: #4285f4;
   font-size: 12px;
@@ -368,7 +368,7 @@ const handleResetPassword = async () => {
   }
 }
 
-// 忘记密码按钮
+// Botão de recuperar senha
 .forget-button {
   height: 36px !important;
   transition: all 0.3s ease !important;
@@ -379,7 +379,7 @@ const handleResetPassword = async () => {
   }
 }
 
-// 返回登录链接
+// Link para voltar ao login
 .back-login-wrapper {
   text-align: center;
   font-size: 14px;

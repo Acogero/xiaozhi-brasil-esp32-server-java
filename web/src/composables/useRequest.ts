@@ -1,6 +1,6 @@
 /**
- * 请求处理 Composable
- * 集成全局 Loading、错误处理、防抖等功能
+ * Composable de tratamento de requisições
+ * Integra loading global, tratamento de erros, debounce e outras funcionalidades
  */
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
@@ -9,16 +9,16 @@ import { useDebounceFn } from '@vueuse/core'
 import { shouldIgnoreRequestError } from '@/services/request'
 
 interface RequestOptions<T = unknown> {
-  showLoading?: boolean // 是否显示全局 loading
-  loadingText?: string // loading 文本
-  showError?: boolean // 是否显示错误提示
-  showSuccess?: boolean // 是否显示成功提示
-  successText?: string // 成功提示文本
-  onSuccess?: (data: T) => void // 成功回调
-  onError?: (error: Error) => void // 错误回调
+  showLoading?: boolean // Indica se exibe o loading global
+  loadingText?: string // Texto do loading
+  showError?: boolean // Indica se exibe o aviso de erro
+  showSuccess?: boolean // Indica se exibe o aviso de sucesso
+  successText?: string // Texto do aviso de sucesso
+  onSuccess?: (data: T) => void // Callback de sucesso
+  onError?: (error: Error) => void // Callback de erro
 }
 
-// 错误类型守卫
+// Guarda de tipo de erro
 function isErrorWithMessage(error: unknown): error is { message: string } {
   return typeof error === 'object' && error !== null && 'message' in error
 }
@@ -30,18 +30,18 @@ function getErrorMessage(error: unknown): string {
   if (typeof error === 'string') {
     return error
   }
-  return '操作失败'
+  return 'Falha na operação'
 }
 
 /**
- * 请求处理 Hook
+ * Hook de tratamento de requisições
  */
 export function useRequest() {
   const loadingStore = useLoadingStore()
   const loading = ref(false)
 
   /**
-   * 执行请求
+   * Executa a requisição
    */
   const execute = async <T = unknown>(
     requestFn: () => Promise<T>,
@@ -49,10 +49,10 @@ export function useRequest() {
   ): Promise<T | undefined> => {
     const {
       showLoading = false,
-      loadingText = '加载中...',
+      loadingText = 'Carregando...',
       showError = true,
       showSuccess = false,
-      successText = '操作成功',
+      successText = 'Operação realizada com sucesso',
       onSuccess,
       onError,
     } = options
@@ -76,7 +76,7 @@ export function useRequest() {
       return result
     } catch (error: unknown) {
       if (shouldIgnoreRequestError(error)) {
-        console.debug('请求已静默处理:', getErrorMessage(error))
+        console.debug('Requisição tratada silenciosamente:', getErrorMessage(error))
         return undefined
       }
 
@@ -101,7 +101,7 @@ export function useRequest() {
   }
 
   /**
-   * 创建防抖请求函数
+   * Cria uma função de requisição com debounce
    */
   const createDebouncedRequest = <T = unknown>(
     requestFn: () => Promise<T>,
@@ -119,11 +119,11 @@ export function useRequest() {
 }
 
 /**
- * 简化的请求执行器（直接使用，不需要返回值）
+ * Executor de requisição simplificado (uso direto, sem valor de retorno)
  */
 export async function withLoading<T = unknown>(
   requestFn: () => Promise<T>,
-  loadingText = '加载中...'
+  loadingText = 'Carregando...'
 ): Promise<T | undefined> {
   const loadingStore = useLoadingStore()
 
@@ -132,7 +132,7 @@ export async function withLoading<T = unknown>(
     return await requestFn()
   } catch (error: unknown) {
     if (shouldIgnoreRequestError(error)) {
-      console.debug('请求已静默处理:', getErrorMessage(error))
+      console.debug('Requisição tratada silenciosamente:', getErrorMessage(error))
       return undefined
     }
     
@@ -146,17 +146,17 @@ export async function withLoading<T = unknown>(
 }
 
 /**
- * 错误处理包装器
+ * Wrapper de tratamento de erros
  */
 export async function withErrorHandler<T = unknown>(
   requestFn: () => Promise<T>,
-  errorMessage = '操作失败'
+  errorMessage = 'Falha na operação'
 ): Promise<T | undefined> {
   try {
     return await requestFn()
   } catch (error: unknown) {
     if (shouldIgnoreRequestError(error)) {
-      console.debug('请求已静默处理:', getErrorMessage(error))
+      console.debug('Requisição tratada silenciosamente:', getErrorMessage(error))
       return undefined
     }
     

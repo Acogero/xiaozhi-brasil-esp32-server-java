@@ -30,8 +30,8 @@ function applyPermission(el: HTMLElement, binding: DirectiveBinding<PermissionBi
 }
 
 /**
- * 权限指令
- * 用法：
+ * Diretiva de permissão
+ * Uso:
  * - v-permission="'system:device:create'"
  * - v-permission="['system:device:create', 'system:device:update']"
  */

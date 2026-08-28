@@ -14,17 +14,17 @@
 import { InboxOutlined } from '@ant-design/icons-vue'
 
 defineProps<{
-  /** 是否显示 */
+  /** Se deve exibir */
   show: boolean
-  /** 主提示文本 */
+  /** Texto de dica principal */
   text: string
-  /** 辅助提示文本 */
+  /** Texto de dica auxiliar */
   hint?: string
 }>()
 </script>
 
 <style scoped lang="scss">
-/* 全局拖拽提示层 */
+/* Camada global de dica de arrastar e soltar */
 .drag-upload-overlay {
   position: fixed;
   top: 0;
@@ -69,7 +69,7 @@ defineProps<{
   color: var(--ant-color-text-secondary);
 }
 
-/* 淡入淡出动画 */
+/* Animação de fade in/out */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s ease;
@@ -80,7 +80,7 @@ defineProps<{
   opacity: 0;
 }
 
-/* 图标弹跳动画 */
+/* Animação de salto do ícone */
 @keyframes bounce {
   0%, 100% {
     transform: translateY(0);

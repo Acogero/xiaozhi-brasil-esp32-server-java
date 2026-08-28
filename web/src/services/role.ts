@@ -4,21 +4,21 @@ import type { Role, RoleQueryParams, RoleFormData, TestVoiceParams } from '@/typ
 import type { McpToolItem, SystemGlobalToolSummary } from '@/types/mcpTool'
 
 /**
- * 查询角色列表
+ * Consulta a lista de personagens
  */
 export function queryRoles(params: Partial<RoleQueryParams>) {
   return http.getPage<Role>(api.role.query, params)
 }
 
 /**
- * 添加角色
+ * Adiciona um personagem
  */
 export function addRole(data: Partial<RoleFormData> & { avatar?: string }) {
   return http.post<Role>(api.role.add, data)
 }
 
 /**
- * 更新角色
+ * Atualiza um personagem
  */
 export function updateRole(data: Partial<RoleFormData>) {
   const { roleId, ...payload } = data
@@ -26,35 +26,35 @@ export function updateRole(data: Partial<RoleFormData>) {
 }
 
 /**
- * 删除角色
+ * Exclui um personagem
  */
 export function deleteRole(roleId: number) {
   return http.delete(`${api.role.delete}/${roleId}`)
 }
 
 /**
- * 测试语音
+ * Testa a voz
  */
 export function testVoice(data: Partial<TestVoiceParams>) {
   return http.get<string>(api.role.testVoice, data)
 }
 
 /**
- * 获取本地 sherpa-onnx 音色列表（动态扫描 models/tts 目录）
+ * Obtém a lista local de timbres de voz do sherpa-onnx (escaneamento dinâmico do diretório models/tts)
  */
 export function querySherpaVoices() {
   return http.getList<Record<string, string>>(api.role.sherpaVoices, {})
 }
 
 /**
- * 获取系统全局工具列表
+ * Obtém a lista global de ferramentas do sistema
  */
 export function getSystemGlobalTools() {
   return http.getList<SystemGlobalToolSummary>(api.mcpTool.systemGlobalTools, {})
 }
 
 /**
- * 获取角色禁用的工具列表
+ * Obtém a lista de ferramentas desabilitadas para o personagem
  */
 export function getDisabledTools(roleId: number) {
   return http.get<{ roleDisabled: string[]; globalDisabled: string[] }>(
@@ -63,7 +63,7 @@ export function getDisabledTools(roleId: number) {
 }
 
 /**
- * 批量更新工具禁用状态
+ * Atualiza em lote o status de desabilitação das ferramentas
  */
 export function updateToolsStatus(roleId: number, excludeTools: string[]) {
   return http.post(`${api.mcpTool.batchExclude}/${roleId}/exclude-tools`, { excludeTools })

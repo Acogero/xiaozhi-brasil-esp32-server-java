@@ -1,216 +1,216 @@
 [
   {
-    "label": "青涩青年音色",
+    "label": "Voz de Jovem Inexperiente",
     "value": "male-qn-qingse",
     "gender": "male",
     "provider": "minimax"
   },
   {
-    "label": "精英青年音色",
+    "label": "Voz de Jovem Elite",
     "value": "male-qn-jingying",
     "gender": "male",
     "provider": "minimax"
   },
   {
-    "label": "霸道青年音色",
+    "label": "Voz de Jovem Dominador",
     "value": "male-qn-badao",
     "gender": "male",
     "provider": "minimax"
   },
   {
-    "label": "青年大学生音色",
+    "label": "Voz de Universitário Jovem",
     "value": "male-qn-daxuesheng",
     "gender": "male",
     "provider": "minimax"
   },
   {
-    "label": "少女音色",
+    "label": "Voz de Garota Jovem",
     "value": "female-shaonv",
     "gender": "female",
     "provider": "minimax"
   },
   {
-    "label": "御姐音色",
+    "label": "Voz de Mulher Sedutora",
     "value": "female-yujie",
     "gender": "female",
     "provider": "minimax"
   },
   {
-    "label": "成熟女性音色",
+    "label": "Voz de Mulher Madura",
     "value": "female-chengshu",
     "gender": "female",
     "provider": "minimax"
   },
   {
-    "label": "甜美女性音色",
+    "label": "Voz de Mulher Doce",
     "value": "female-tianmei",
     "gender": "female",
     "provider": "minimax"
   },
   {
-    "label": "男性主持人",
+    "label": "Apresentador Masculino",
     "value": "presenter_male",
     "gender": "male",
     "provider": "minimax"
   },
   {
-    "label": "女性主持人",
+    "label": "Apresentadora Feminina",
     "value": "presenter_female",
     "gender": "female",
     "provider": "minimax"
   },
   {
-    "label": "男性有声书1",
+    "label": "Audiolivro Masculino 1",
     "value": "audiobook_male_1",
     "gender": "male",
     "provider": "minimax"
   },
   {
-    "label": "男性有声书2",
+    "label": "Audiolivro Masculino 2",
     "value": "audiobook_male_2",
     "gender": "male",
     "provider": "minimax"
   },
   {
-    "label": "女性有声书1",
+    "label": "Audiolivro Feminino 1",
     "value": "audiobook_female_1",
     "gender": "female",
     "provider": "minimax"
   },
   {
-    "label": "女性有声书2",
+    "label": "Audiolivro Feminino 2",
     "value": "audiobook_female_2",
     "gender": "female",
     "provider": "minimax"
   },
   {
-    "label": "青涩青年音色-beta",
+    "label": "Voz de Jovem Inexperiente-beta",
     "value": "male-qn-qingse-jingpin",
     "gender": "male",
     "provider": "minimax"
   },
   {
-    "label": "精英青年音色-beta",
+    "label": "Voz de Jovem Elite-beta",
     "value": "male-qn-jingying-jingpin",
     "gender": "male",
     "provider": "minimax"
   },
   {
-    "label": "霸道青年音色-beta",
+    "label": "Voz de Jovem Dominador-beta",
     "value": "male-qn-badao-jingpin",
     "gender": "male",
     "provider": "minimax"
   },
   {
-    "label": "青年大学生音色-beta",
+    "label": "Voz de Universitário Jovem-beta",
     "value": "male-qn-daxuesheng-jingpin",
     "gender": "male",
     "provider": "minimax"
   },
   {
-    "label": "少女音色-beta",
+    "label": "Voz de Garota Jovem-beta",
     "value": "female-shaonv-jingpin",
     "gender": "female",
     "provider": "minimax"
   },
   {
-    "label": "御姐音色-beta",
+    "label": "Voz de Mulher Sedutora-beta",
     "value": "female-yujie-jingpin",
     "gender": "female",
     "provider": "minimax"
   },
   {
-    "label": "成熟女性音色-beta",
+    "label": "Voz de Mulher Madura-beta",
     "value": "female-chengshu-jingpin",
     "gender": "female",
     "provider": "minimax"
   },
   {
-    "label": "甜美女性音色-beta",
+    "label": "Voz de Mulher Doce-beta",
     "value": "female-tianmei-jingpin",
     "gender": "female",
     "provider": "minimax"
   },
   {
-    "label": "聪明男童",
+    "label": "Menino Esperto",
     "value": "clever_boy",
     "gender": "male",
     "provider": "minimax"
   },
   {
-    "label": "可爱男童",
+    "label": "Menino Fofo",
     "value": "cute_boy",
     "gender": "male",
     "provider": "minimax"
   },
   {
-    "label": "萌萌女童",
+    "label": "Menina Fofinha",
     "value": "lovely_girl",
     "gender": "female",
     "provider": "minimax"
   },
   {
-    "label": "卡通猪小琪",
+    "label": "Porquinho Xiaoqi (desenho)",
     "value": "cartoon_pig",
     "gender": "female",
     "provider": "minimax"
   },
   {
-    "label": "病娇弟弟",
+    "label": "Irmão Mais Novo Obcecado",
     "value": "bingjiao_didi",
     "gender": "male",
     "provider": "minimax"
   },
   {
-    "label": "俊朗男友",
+    "label": "Namorado Bonitão",
     "value": "junlang_nanyou",
     "gender": "male",
     "provider": "minimax"
   },
   {
-    "label": "纯真学弟",
+    "label": "Calouro Inocente",
     "value": "chunzhen_xuedi",
     "gender": "male",
     "provider": "minimax"
   },
   {
-    "label": "冷淡学长",
+    "label": "Veterano Distante",
     "value": "lengdan_xiongzhang",
     "gender": "male",
     "provider": "minimax"
   },
   {
-    "label": "霸道少爷",
+    "label": "Jovem Nobre Dominador",
     "value": "badao_shaoye",
     "gender": "male",
     "provider": "minimax"
   },
   {
-    "label": "甜心小玲",
+    "label": "Xiaoling Querida",
     "value": "tianxin_xiaoling",
     "gender": "female",
     "provider": "minimax"
   },
   {
-    "label": "俏皮萌妹",
+    "label": "Garota Fofa e Brincalhona",
     "value": "qiaopi_mengmei",
     "gender": "female",
     "provider": "minimax"
   },
   {
-    "label": "妩媚御姐",
+    "label": "Mulher Sedutora e Charmosa",
     "value": "wumei_yujie",
     "gender": "female",
     "provider": "minimax"
   },
   {
-    "label": "嗲嗲学妹",
+    "label": "Caloura Manhosa",
     "value": "diadia_xuemei",
     "gender": "female",
     "provider": "minimax"
   },
   {
-    "label": "淡雅学姐",
+    "label": "Veterana Elegante",
     "value": "danya_xuejie",
     "gender": "female",
     "provider": "minimax"

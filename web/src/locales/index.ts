@@ -1,28 +1,29 @@
 /**
- * 国际化配置
- * 注意：需要安装 vue-i18n
+ * Configuração de internacionalização
+ * Nota: é necessário instalar o vue-i18n
  * npm install vue-i18n@9
  */
 import { createI18n } from 'vue-i18n'
 import zhCN from './zh-CN'
 import enUS from './en-US'
+import ptBR from './pt-BR'
 
-// 默认语言
-const defaultLocale = localStorage.getItem('locale') || 'zh-CN'
+// Idioma padrão
+const defaultLocale = localStorage.getItem('locale') || 'pt-BR'
 
-// 创建 i18n 实例
+// Cria a instância do i18n
 export const i18n = createI18n({
-  legacy: false, // 使用 Composition API 模式
+  legacy: false, // Usa o modo Composition API
   locale: defaultLocale,
-  fallbackLocale: 'zh-CN',
+  fallbackLocale: 'pt-BR',
   messages: {
     'zh-CN': zhCN,
     'en-US': enUS,
+    'pt-BR': ptBR,
   },
 })
 
-// 导出 t 函数，方便在 JS/TS 中使用
+// Exporta a função t, para facilitar o uso em JS/TS
 export const { t } = i18n.global
 
 export default i18n
-

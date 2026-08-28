@@ -1,6 +1,6 @@
 /**
- * 角色管理 Composable
- * 统一处理模型选择和音色选择逻辑
+ * Composable de gerenciamento de personagens
+ * Trata de forma unificada a lógica de seleção de modelo e de voz
  */
 
 import { ref } from 'vue'
@@ -13,34 +13,34 @@ import type { Config } from '@/types/config'
 import type { Agent } from '@/types/agent'
 
 export function useRoleManager() {
-  // 加载状态
+  // Estado de carregamento
   const modelLoading = ref(false)
   const voiceLoading = ref(false)
   const sttLoading = ref(false)
 
-  // 模型相关
+  // Relacionado a modelos
   const allModels = ref<ModelOption[]>([])
   const selectedModelId = ref<number>()
 
-  // 语音相关 - 所有语音列表（来自各个JSON文件）
+  // Relacionado a voz - lista de todas as vozes (proveniente de vários arquivos JSON)
   const allVoices = ref<VoiceOption[]>([])
   const selectedVoiceName = ref<string>()
 
-  // 语音识别
+  // Reconhecimento de voz
   const sttOptions = ref<SttOption[]>([])
 
-  // 原始数据存储
+  // Armazenamento de dados brutos
   const llmConfigs = ref<Config[]>([])
   const agentConfigs = ref<Agent[]>([])
   const ttsConfigs = ref<Config[]>([])
 
   /**
-   * 加载所有模型（LLM + Agent）
+   * Carrega todos os modelos (LLM + Agent)
    */
   async function loadAllModels() {
     modelLoading.value = true
     try {
-      // 并行加载LLM和Agent
+      // Carrega LLM e Agent em paralelo
       const [llmRes, cozeRes, difyRes, xingchenRes] = await Promise.all([
         queryConfigs({ configType: 'llm', pageNo: 1, pageSize: 1000 }),
         queryAgents({ provider: 'coze', pageNo: 1, pageSize: 1000 }),
@@ -50,11 +50,11 @@ export function useRoleManager() {
 
       const models: ModelOption[] = []
 
-      // 处理LLM配置（只加载对话模型）
+      // Processa a configuração de LLM (carrega apenas modelos de conversa)
       if (llmRes.code === 200 && llmRes.data?.list) {
         llmConfigs.value = llmRes.data.list
         llmRes.data.list.forEach((config: Config) => {
-          // 只添加对话模型（chat类型）
+          // Adiciona apenas modelos de conversa (tipo chat)
           if (config.modelType === 'chat') {
             models.push({
               label: config.configName,
@@ -69,12 +69,12 @@ export function useRoleManager() {
         })
       }
 
-      // 处理Coze Agent
+      // Processa o Coze Agent
       if (cozeRes.code === 200 && cozeRes.data?.list) {
         cozeRes.data.list.forEach((agent: Agent) => {
           agentConfigs.value.push(agent)
           models.push({
-            label: `${agent.agentName} (Coze智能体)`,
+            label: `${agent.agentName} (Agente Coze)`,
             value: agent.configId,
             desc: agent.agentDesc,
             type: 'agent',
@@ -85,12 +85,12 @@ export function useRoleManager() {
         })
       }
 
-      // 处理Dify Agent
+      // Processa o Dify Agent
       if (difyRes.code === 200 && difyRes.data?.list) {
         difyRes.data.list.forEach((agent: Agent) => {
           agentConfigs.value.push(agent)
           models.push({
-            label: `${agent.agentName} (Dify智能体)`,
+            label: `${agent.agentName} (Agente Dify)`,
             value: agent.configId,
             desc: agent.agentDesc,
             type: 'agent',
@@ -101,12 +101,12 @@ export function useRoleManager() {
         })
       }
 
-      // 处理XingChen Agent
+      // Processa o XingChen Agent
       if (xingchenRes.code === 200 && xingchenRes.data?.list) {
         xingchenRes.data.list.forEach((agent: Agent) => {
           agentConfigs.value.push(agent)
           models.push({
-            label: `${agent.agentName} (XingChen智能体)`,
+            label: `${agent.agentName} (Agente XingChen)`,
             value: agent.configId,
             desc: agent.agentDesc,
             type: 'agent',
@@ -119,26 +119,26 @@ export function useRoleManager() {
 
       allModels.value = models
     } catch (error) {
-      console.error('加载模型列表失败:', error)
-      message.error('加载模型列表失败')
+      console.error('Falha ao carregar lista de modelos:', error)
+      message.error('Falha ao carregar lista de modelos')
     } finally {
       modelLoading.value = false
     }
   }
 
   /**
-   * 加载所有语音选项（从TTS配置和JSON文件）
+   * Carrega todas as opções de voz (a partir da configuração de TTS e arquivos JSON)
    */
   async function loadAllVoices() {
     voiceLoading.value = true
     try {
-      // 1. 加载TTS配置
+      // 1. Carrega a configuração de TTS
       const ttsRes = await queryConfigs({ configType: 'tts', pageNo: 1, pageSize: 1000 })
       if (ttsRes.code === 200 && ttsRes.data?.list) {
         ttsConfigs.value = ttsRes.data.list
       }
 
-      // 2. 并行加载所有语音JSON文件和 sherpa-onnx 动态音色
+      // 2. Carrega em paralelo todos os arquivos JSON de voz e as vozes dinâmicas do sherpa-onnx
       const sherpaConfig = ttsConfigs.value.find(c => c.provider === 'sherpa-onnx')
       const [edgeVoices, aliyunVoices, aliyunNlsVoices, volcengineVoices, xfyunVoices, minimaxVoices, tencentVoices, sherpaRes] = await Promise.all([
         loadVoiceJson('/static/assets/edgeVoicesList.json', 'edge'),
@@ -151,16 +151,16 @@ export function useRoleManager() {
         sherpaConfig ? querySherpaVoices().catch(() => ({ data: [] })) : Promise.resolve({ data: [] })
       ])
 
-      // 3. 合并所有语音，并关联TTS配置
+      // 3. Combina todas as vozes e as associa à configuração de TTS
       const voices: VoiceOption[] = []
 
-      // Edge语音（不需要TTS配置）
+      // Voz do Edge (não precisa de configuração de TTS)
       voices.push(...edgeVoices.map(v => ({
         ...v,
         ttsId: -1
       })))
 
-      // 云服务提供商语音（需要关联TTS配置）
+      // Voz de provedores de nuvem (requer associação à configuração de TTS)
       const providerVoicesMap: Record<string, VoiceOption[]> = {
         aliyun: aliyunVoices,
         'aliyun-nls': aliyunNlsVoices,
@@ -179,7 +179,7 @@ export function useRoleManager() {
         }
       })
 
-      // sherpa-onnx 动态音色
+      // Vozes dinâmicas do sherpa-onnx
       if (sherpaConfig) {
         const items = (sherpaRes as { data?: Record<string, string>[] }).data ?? []
         items.forEach((item: Record<string, string>) => {
@@ -196,25 +196,25 @@ export function useRoleManager() {
 
       allVoices.value = voices
     } catch (error) {
-      console.error('加载语音列表失败:', error)
-      message.error('加载语音列表失败')
+      console.error('Falha ao carregar lista de vozes:', error)
+      message.error('Falha ao carregar lista de vozes')
     } finally {
       voiceLoading.value = false
     }
   }
 
   /**
-   * 加载单个语音JSON文件
+   * Carrega um único arquivo JSON de voz
    */
   async function loadVoiceJson(url: string, provider: VoiceProvider): Promise<VoiceOption[]> {
     try {
       const response = await fetch(url)
       if (!response.ok) {
-        throw new Error(`加载${provider}语音列表失败`)
+        throw new Error(`Falha ao carregar lista de vozes de ${provider}`)
       }
       const data = await response.json()
 
-      // 处理Edge特殊格式
+      // Processa o formato especial do Edge
       if (provider === 'edge') {
         interface EdgeVoice {
           Locale: string
@@ -239,19 +239,19 @@ export function useRoleManager() {
           })
       }
 
-      // 其他提供商直接返回原始label，不添加提供商标识
+      // Outros provedores retornam o label original diretamente, sem adicionar identificação do provedor
       return (data as Omit<VoiceOption, 'provider'>[]).map((voice) => ({
         ...voice,
         provider
       }))
     } catch (error) {
-      console.warn(`加载${provider}语音列表失败:`, error)
+      console.warn(`Falha ao carregar lista de vozes de ${provider}:`, error)
       return []
     }
   }
 
   /**
-   * 加载语音识别选项
+   * Carrega as opções de reconhecimento de voz
    */
   async function loadSttOptions() {
     sttLoading.value = true
@@ -259,9 +259,9 @@ export function useRoleManager() {
       const res = await queryConfigs({ configType: 'stt', pageNo: 1, pageSize: 1000 })
       const options: SttOption[] = [
         {
-          label: 'Vosk本地识别',
+          label: 'Reconhecimento local Vosk',
           value: -1,
-          desc: '默认Vosk本地语音识别模型'
+          desc: 'Modelo padrão de reconhecimento de voz local Vosk'
         }
       ]
 
@@ -277,15 +277,15 @@ export function useRoleManager() {
 
       sttOptions.value = options
     } catch (error) {
-      console.error('加载语音识别配置失败:', error)
-      message.error('加载语音识别配置失败')
+      console.error('Falha ao carregar configuração de reconhecimento de voz:', error)
+      message.error('Falha ao carregar configuração de reconhecimento de voz')
     } finally {
       sttLoading.value = false
     }
   }
 
   /**
-   * 根据模型ID获取模型信息
+   * Obtém informações do modelo a partir do ID
    */
   function getModelInfo(modelId?: number) {
     if (!modelId) return null
@@ -293,8 +293,8 @@ export function useRoleManager() {
   }
 
   /**
-   * 根据语音名称获取语音信息
-   * @param voiceName 语音名称/ID
+   * Obtém informações da voz a partir do nome
+   * @param voiceName Nome/ID da voz
    */
   function getVoiceInfo(voiceName?: string) {
     if (!voiceName) return null
@@ -302,17 +302,17 @@ export function useRoleManager() {
   }
 
   /**
-   * 格式化提供商名称
+   * Formata o nome do provedor
    */
   function formatProviderName(provider: string): string {
     const names: Record<string, string> = {
-      edge: '微软Edge',
-      aliyun: '阿里云',
-      'aliyun-nls': '阿里云NLS',
-      volcengine: '火山引擎',
-      xfyun: '讯飞云',
+      edge: 'Microsoft Edge',
+      aliyun: 'Alibaba Cloud',
+      'aliyun-nls': 'Alibaba Cloud NLS',
+      volcengine: 'Volcano Engine',
+      xfyun: 'iFlytek Cloud',
       minimax: 'Minimax',
-      tencent: '腾讯云',
+      tencent: 'Tencent Cloud',
       'sherpa-onnx': 'Sherpa-ONNX',
       coze: 'Coze',
       dify: 'Dify',
@@ -322,7 +322,7 @@ export function useRoleManager() {
   }
 
   /**
-   * 获取语音Tag颜色
+   * Obtém a cor da tag de voz
    */
   function getVoiceTagColor(provider?: string): string {
     const colors: Record<string, string> = {
@@ -338,21 +338,21 @@ export function useRoleManager() {
   }
 
   return {
-    // 状态
+    // Estado
     modelLoading,
     voiceLoading,
     sttLoading,
-    // 数据
+    // Dados
     allModels,
     allVoices,
     sttOptions,
     llmConfigs,
     agentConfigs,
     ttsConfigs,
-    // 选择
+    // Seleção
     selectedModelId,
     selectedVoiceName,
-    // 方法
+    // Métodos
     loadAllModels,
     loadAllVoices,
     loadSttOptions,

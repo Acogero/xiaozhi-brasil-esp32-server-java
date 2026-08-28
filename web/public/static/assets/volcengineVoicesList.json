@@ -1,174 +1,174 @@
 [
   {
-    "label": "北京小爷（多情感）",
+    "label": "Beijing Xiaoye (multiemoção)",
     "value": "zh_male_beijingxiaoye_emo_v2_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "柔美女友（多情感）",
+    "label": "Namorada Gentil (multiemoção)",
     "value": "zh_female_roumeinvyou_emo_v2_mars_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "阳光青年（多情感）",
+    "label": "Jovem Radiante (multiemoção)",
     "value": "zh_male_yangguangqingnian_emo_v2_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "魅力女友（多情感）",
+    "label": "Namorada Charmosa (multiemoção)",
     "value": "zh_female_meilinvyou_emo_v2_mars_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "爽快思思（多情感）",
+    "label": "Sisi Animada (multiemoção)",
     "value": "zh_female_shuangkuaisisi_emo_v2_mars_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "灿灿/Shiny",
+    "label": "Cancan/Shiny",
     "value": "zh_female_cancan_mars_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "清新女声",
+    "label": "Voz Feminina Refrescante",
     "value": "zh_female_qingxinnvsheng_mars_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "爽快思思/Skye",
+    "label": "Sisi Animada/Skye",
     "value": "zh_female_shuangkuaisisi_moon_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "温暖阿虎/Alvin",
+    "label": "Ahu Caloroso/Alvin",
     "value": "zh_male_wennuanahu_moon_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "少年梓辛/Brayan",
+    "label": "Jovem Zixin/Brayan",
     "value": "zh_male_shaonianzixin_moon_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "知性女声",
+    "label": "Voz Feminina Intelectual",
     "value": "zh_female_zhixingnvsheng_mars_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "清爽男大",
+    "label": "Universitário Descontraído",
     "value": "zh_male_qingshuangnanda_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "邻家女孩",
+    "label": "Garota Vizinha",
     "value": "zh_female_linjianvhai_moon_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "渊博小叔",
+    "label": "Tio Culto",
     "value": "zh_male_yuanboxiaoshu_moon_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "阳光青年",
+    "label": "Jovem Radiante",
     "value": "zh_male_yangguangqingnian_moon_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "甜美小源",
+    "label": "Xiaoyuan Doce",
     "value": "zh_female_tianmeixiaoyuan_moon_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "清澈梓梓",
+    "label": "Zizi Cristalina",
     "value": "zh_female_qingchezizi_moon_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "解说小明",
+    "label": "Xiaoming Narrador",
     "value": "zh_male_jieshuoxiaoming_moon_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "开朗姐姐",
+    "label": "Irmã Mais Velha Alegre",
     "value": "zh_female_kailangjiejie_moon_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "邻家男孩",
+    "label": "Garoto Vizinho",
     "value": "zh_male_linjiananhai_moon_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "甜美悦悦",
+    "label": "Yueyue Doce",
     "value": "zh_female_tianmeiyueyue_moon_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "心灵鸡汤",
+    "label": "Sopa de Galinha para a Alma",
     "value": "zh_female_xinlingjitang_moon_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "知性温婉",
+    "label": "Intelectual e Gentil",
     "value": "ICL_zh_female_zhixingwenwan_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "暖心体贴",
+    "label": "Caloroso e Atencioso",
     "value": "ICL_zh_male_nuanxintitie_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "温柔文雅",
+    "label": "Gentil e Elegante",
     "value": "ICL_zh_female_wenrouwenya_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "开朗轻快",
+    "label": "Alegre e Leve",
     "value": "ICL_zh_male_kailangqingkuai_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "活泼爽朗",
+    "label": "Vivaz e Espontâneo",
     "value": "ICL_zh_male_huoposhuanglang_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "率真小伙",
+    "label": "Rapaz Sincero",
     "value": "ICL_zh_male_shuaizhenxiaohuo_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "温柔小哥",
+    "label": "Rapaz Gentil",
     "value": "zh_male_wenrouxiaoge_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"
@@ -204,25 +204,25 @@
     "provider": "volcengine"
   },
   {
-    "label": "かずね（和音）/Javier or Álvaro",
+    "label": "Kazune/Javier or Álvaro",
     "value": "multi_male_jingqiangkanye_moon_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "はるこ（晴子）/Esmeralda",
+    "label": "Haruko/Esmeralda",
     "value": "multi_female_shuangkuaisisi_moon_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "ひろし（広志）/Roberto",
+    "label": "Hiroshi/Roberto",
     "value": "multi_male_wanqudashu_moon_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "あけみ（朱美）",
+    "label": "Akemi",
     "value": "multi_female_gaolengyujie_moon_bigtts",
     "gender": "female",
     "provider": "volcengine"
@@ -240,547 +240,547 @@
     "provider": "volcengine"
   },
   {
-    "label": "京腔侃爷/Harmony",
+    "label": "Tagarela de Pequim/Harmony",
     "value": "zh_male_jingqiangkanye_moon_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "湾湾小何",
+    "label": "Xiaohe Taiwanês",
     "value": "zh_female_wanwanxiaohe_moon_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "湾区大叔",
+    "label": "Tio da Grande Baía",
     "value": "zh_female_wanqudashu_moon_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "呆萌川妹",
+    "label": "Garota Fofa de Sichuan",
     "value": "zh_female_daimengchuanmei_moon_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "广州德哥",
+    "label": "Irmão De de Guangzhou",
     "value": "zh_male_guozhoudege_moon_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "北京小爷",
+    "label": "Beijing Xiaoye",
     "value": "zh_male_beijingxiaoye_moon_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "浩宇小哥",
+    "label": "Rapaz Haoyu",
     "value": "zh_male_haoyuxiaoge_moon_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "广西远舟",
+    "label": "Yuanzhou de Guangxi",
     "value": "zh_male_guangxiyuanzhou_moon_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "妹坨洁儿",
+    "label": "Jieer (Garota de Wuhan)",
     "value": "zh_female_meituojieer_moon_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "豫州子轩",
+    "label": "Zixuan de Henan",
     "value": "zh_male_yuzhouzixuan_moon_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "奶气萌娃",
+    "label": "Criancinha Fofa",
     "value": "zh_male_naiqimengwa_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "婆婆",
+    "label": "Vovó",
     "value": "zh_female_popo_mars_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "高冷御姐",
+    "label": "Mulher Sedutora e Distante",
     "value": "zh_female_gaolengyujie_moon_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "傲娇霸总",
+    "label": "Chefão Dominador e Orgulhoso",
     "value": "zh_male_aojiaobazong_moon_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "魅力女友",
+    "label": "Namorada Charmosa",
     "value": "zh_female_meilinvyou_moon_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "深夜播客",
+    "label": "Podcast da Madrugada",
     "value": "zh_male_shenyeboke_moon_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "柔美女友",
+    "label": "Namorada Gentil",
     "value": "zh_female_sajiaonvyou_moon_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "撒娇学妹",
+    "label": "Caloura Manhosa",
     "value": "zh_female_yuanqinvyou_moon_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "病弱少女",
+    "label": "Garota Frágil",
     "value": "ICL_zh_female_bingruoshaonv_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "活泼女孩",
+    "label": "Garota Animada",
     "value": "ICL_zh_female_huoponvhai_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "东方浩然",
+    "label": "Dongfang Haoran",
     "value": "zh_male_dongfanghaoran_moon_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "绿茶小哥",
+    "label": "Rapaz Dissimulado",
     "value": "ICL_zh_male_lvchaxiaoge_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "娇弱萝莉",
+    "label": "Garota Delicada",
     "value": "ICL_zh_female_jiaoruoluoli_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "冷淡疏离",
+    "label": "Frio e Distante",
     "value": "ICL_zh_male_lengdanshuli_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "憨厚敦实",
+    "label": "Simples e Robusto",
     "value": "ICL_zh_male_hanhoudunshi_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "傲气凌人",
+    "label": "Arrogante e Prepotente",
     "value": "ICL_zh_male_aiqilingren_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "活泼刁蛮",
+    "label": "Animada e Mimada",
     "value": "ICL_zh_female_huopodiaoman_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "固执病娇",
+    "label": "Teimoso(a) e Obcecado(a)",
     "value": "ICL_zh_male_guzhibingjiao_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "撒娇粘人",
+    "label": "Manhoso(a) e Grudento(a)",
     "value": "ICL_zh_male_sajiaonianren_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "傲慢娇声",
+    "label": "Voz Arrogante e Manhosa",
     "value": "ICL_zh_female_aomanjiaosheng_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "潇洒随性",
+    "label": "Descontraído e Espontâneo",
     "value": "ICL_zh_male_xiaosasuixing_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "腹黑公子",
+    "label": "Jovem Nobre Dissimulado",
     "value": "ICL_zh_male_fuheigongzi_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "诡异神秘",
+    "label": "Estranho e Misterioso",
     "value": "ICL_zh_male_guiyishenmi_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "儒雅才俊",
+    "label": "Erudito e Talentoso",
     "value": "ICL_zh_male_ruyacaijun_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "病娇白莲",
+    "label": "Hipócrita Obcecado(a)",
     "value": "ICL_zh_male_bingjiaobailian_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "正直青年",
+    "label": "Jovem Íntegro",
     "value": "ICL_zh_male_zhengzhiqingnian_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "娇憨女王",
+    "label": "Rainha Doce e Ingênua",
     "value": "ICL_zh_female_jiaohannvwang_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "病娇萌妹",
+    "label": "Garota Fofa e Obcecada",
     "value": "ICL_zh_female_bingjiaomengmei_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "青涩小生",
+    "label": "Jovem Inexperiente",
     "value": "ICL_zh_male_qingsenaigou_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "纯真学弟",
+    "label": "Calouro Inocente",
     "value": "ICL_zh_male_chunzhenxuedi_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "暖心学姐",
+    "label": "Veterana Acolhedora",
     "value": "ICL_zh_female_nuanxinxuejie_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "可爱女生",
+    "label": "Garota Fofa",
     "value": "ICL_zh_female_keainvsheng_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "成熟姐姐",
+    "label": "Irmã Mais Velha Madura",
     "value": "ICL_zh_female_chengshujiejie_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "病娇姐姐",
+    "label": "Irmã Mais Velha Obcecada",
     "value": "ICL_zh_female_bingjiaojiejie_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "优柔帮主",
+    "label": "Líder Indeciso",
     "value": "ICL_zh_male_youroubangzhu_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "优柔公子",
+    "label": "Jovem Nobre Indeciso",
     "value": "ICL_zh_male_yourougongzi_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "妩媚御姐",
+    "label": "Mulher Sedutora e Charmosa",
     "value": "ICL_zh_female_wumeiyujie_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "调皮公主",
+    "label": "Princesa Travessa",
     "value": "ICL_zh_female_tiaopigongzhu_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "傲娇女友",
+    "label": "Namorada Orgulhosa",
     "value": "ICL_zh_female_aojiaonvyou_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "贴心男友",
+    "label": "Namorado Atencioso",
     "value": "ICL_zh_male_tiexinnanyou_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "少年将军",
+    "label": "Jovem General",
     "value": "ICL_zh_male_shaonianjiangjun_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "贴心女友",
+    "label": "Namorada Atenciosa",
     "value": "ICL_zh_female_tiexinnvyou_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "病娇哥哥",
+    "label": "Irmão Mais Velho Obcecado",
     "value": "ICL_zh_male_bingjiaogege_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "学霸男同桌",
+    "label": "Colega de Classe Nerd",
     "value": "ICL_zh_male_xuebanantongzhuo_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "幽默叔叔",
+    "label": "Tio Engraçado",
     "value": "ICL_zh_male_youmoshushu_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "性感御姐",
+    "label": "Mulher Sensual e Madura",
     "value": "ICL_zh_female_xingganyujie_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "假小子",
+    "label": "Moleca",
     "value": "ICL_zh_female_jiaxiaozi_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "冷峻上司",
+    "label": "Chefe Rígido",
     "value": "ICL_zh_male_lengjunshangsi_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "温柔男同桌",
+    "label": "Colega de Classe Gentil",
     "value": "ICL_zh_male_wenrounantongzhuo_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "病娇弟弟",
+    "label": "Irmão Mais Novo Obcecado",
     "value": "ICL_zh_male_bingjiaodidi_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "幽默大爷",
+    "label": "Senhor Engraçado",
     "value": "ICL_zh_male_youmodaye_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "傲慢少爷",
+    "label": "Jovem Nobre Arrogante",
     "value": "ICL_zh_male_aomanshaoye_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "神秘法师",
+    "label": "Mago Misterioso",
     "value": "ICL_zh_male_shenmifashi_tob",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "和蔼奶奶",
+    "label": "Vovó Gentil",
     "value": "ICL_zh_female_heainainai_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "邻居阿姨",
+    "label": "Vizinha Tia",
     "value": "ICL_zh_female_linjuayi_tob",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "温柔小雅",
+    "label": "Xiaoya Gentil",
     "value": "zh_female_wenrouxiaoya_moon_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "天才童声",
+    "label": "Voz Infantil Genial",
     "value": "zh_male_tiancaitongsheng_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "猴哥",
+    "label": "Irmão Macaco",
     "value": "zh_male_sunwukong_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "熊二",
+    "label": "Urso Dois",
     "value": "zh_male_xionger_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "佩奇猪",
+    "label": "Peppa Pig",
     "value": "zh_female_peiqi_mars_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "武则天",
+    "label": "Wu Zetian",
     "value": "zh_female_wuzetian_mars_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "顾姐",
+    "label": "Irmã Gu",
     "value": "zh_female_gujie_mars_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "樱桃丸子",
+    "label": "Maruko Cereja",
     "value": "zh_female_yingtaowanzi_mars_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "广告解说",
+    "label": "Narrador de Publicidade",
     "value": "zh_male_chunhui_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "少儿故事",
+    "label": "Contador de Histórias Infantis",
     "value": "zh_female_shaoergushi_mars_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "四郎",
+    "label": "Silang",
     "value": "zh_male_silang_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "磁性解说男声/Morgan",
+    "label": "Voz Masculina Magnética de Narração/Morgan",
     "value": "zh_male_jieshuonansheng_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "鸡汤妹妹/Hope",
+    "label": "Irmã Motivacional/Hope",
     "value": "zh_female_jitangmeimei_mars_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "贴心女声/Candy",
+    "label": "Voz Feminina Atenciosa/Candy",
     "value": "zh_female_tiexinnvsheng_mars_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "俏皮女声",
+    "label": "Voz Feminina Brincalhona",
     "value": "zh_female_qiaopinvsheng_mars_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "萌丫头/Cutey",
+    "label": "Garota Fofa/Cutey",
     "value": "zh_female_mengyatou_mars_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "懒音绵宝",
+    "label": "Mianbao Preguiçoso",
     "value": "zh_male_lanxiaoyang_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "亮嗓萌仔",
+    "label": "Garoto Fofo de Voz Clara",
     "value": "zh_male_dongmanhaimian_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "悬疑解说",
+    "label": "Narrador de Suspense",
     "value": "zh_male_changtianyi_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "儒雅青年",
+    "label": "Jovem Erudito",
     "value": "zh_male_ruyaqingnian_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "霸气青叔",
+    "label": "Tio Imponente",
     "value": "zh_male_baqiqingshu_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "擎苍",
+    "label": "Qingcang",
     "value": "zh_male_qingcang_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "活力小哥",
+    "label": "Rapaz Enérgico",
     "value": "zh_male_yangguangqingnian_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"
   },
   {
-    "label": "古风少御",
+    "label": "Jovem Dama de Estilo Antigo",
     "value": "zh_female_gufengshaoyu_mars_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "温柔淑女",
+    "label": "Dama Gentil",
     "value": "zh_female_wenroushunv_mars_bigtts",
     "gender": "female",
     "provider": "volcengine"
   },
   {
-    "label": "反卷青年",
+    "label": "Jovem Antiestresse",
     "value": "zh_male_fanjuanqingnian_mars_bigtts",
     "gender": "male",
     "provider": "volcengine"

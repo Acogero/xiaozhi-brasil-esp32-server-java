@@ -16,7 +16,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-// 使用 composable
+// Usa o composable
 const {
   loading,
   configItems,
@@ -36,13 +36,13 @@ const {
   getModelsByProviderAndType,
 } = useConfigManager(props.configType)
 
-// 当前 provider 的 configName 预设选项（用于 AutoComplete）
+// Opções predefinidas de configName do provider atual (usado no AutoComplete)
 const currentConfigNameOptions = computed(() => {
   const option = typeOptions.value.find((item) => item.value === currentType.value)
   return option?.configNameOptions?.map((v) => ({ value: v })) ?? []
 })
 
-// 表单
+// Formulário
 const formRef = ref<FormInstance>()
 const formData = ref<Partial<Config>>({
   provider: undefined,
@@ -59,7 +59,7 @@ const formData = ref<Partial<Config>>({
   enableThinking: false,
 })
 
-// 表格列配置
+// Configuração das colunas da tabela
 const columns = computed(() => {
   const baseColumns: TableColumnsType = [
     {
@@ -80,7 +80,7 @@ const columns = computed(() => {
     },
   ]
 
-  // LLM 添加模型类型列
+  // LLM adiciona coluna de tipo de modelo
   if (props.configType === 'llm') {
     baseColumns.push({
       title: t('config.modelType'),
@@ -118,7 +118,7 @@ const columns = computed(() => {
     }
   )
 
-  // TTS 过滤掉默认列
+  // TTS filtra a coluna de padrão
   if (props.configType === 'tts') {
     return baseColumns.filter((col) => {
       return 'dataIndex' in col && col.dataIndex !== 'isDefault'
@@ -129,20 +129,20 @@ const columns = computed(() => {
 })
 
 /**
- * 处理类型变化
+ * Trata a mudança de tipo
  */
 function handleTypeChange(value: string) {
   currentType.value = value
   
-  // 清空模型名称
+  // Limpa o nome do modelo
   formData.value.configName = undefined
   
-  // 如果是 LLM，更新模型选项
+  // Se for LLM, atualiza as opções de modelo
   if (props.configType === 'llm' && formData.value.modelType) {
     updateModelOptions(value, formData.value.modelType)
   }
   
-  // 填充默认 URL
+  // Preenche a URL padrão
   const typeField = currentTypeFields.value.find((f: ConfigField) => f.name === 'apiUrl')
   if (typeField?.placeholder) {
     formData.value.apiUrl = typeField.placeholder
@@ -150,7 +150,7 @@ function handleTypeChange(value: string) {
 }
 
 /**
- * 处理模型类型变化
+ * Trata a mudança de tipo de modelo
  */
 function handleModelTypeChange(value: string) {
   if (currentType.value) {
@@ -160,7 +160,7 @@ function handleModelTypeChange(value: string) {
 }
 
 /**
- * 处理标签页切换
+ * Trata a troca de aba
  */
 function handleTabChange(key: string) {
   activeTabKey.value = key
@@ -172,28 +172,28 @@ function handleTabChange(key: string) {
 }
 
 /**
- * 编辑配置
+ * Editar configuração
  */
 function handleEdit(record: Config) {
   editingConfigId.value = record.configId
   currentType.value = record.provider || ''
   activeTabKey.value = '2'
 
-  // 设置表单值，将后端的 string ('0'/'1') 转换为 boolean
+  // Define os valores do formulário, convertendo o valor do backend ('0'/'1') em boolean
   formData.value = {
     ...record,
     isDefault: props.configType != 'tts' ? record.isDefault === '1' : false,
     enableThinking: !!record.enableThinking,
   }
 
-  // LLM 更新模型选项
+  // LLM atualiza as opções de modelo
   if (props.configType === 'llm') {
     updateModelOptions(record.provider, record.modelType || 'chat')
   }
 }
 
 /**
- * 提交表单
+ * Envia o formulário
  */
 async function handleSubmit() {
   if (!formRef.value) return
@@ -201,19 +201,19 @@ async function handleSubmit() {
   try {
     await formRef.value.validate()
     
-    // 准备提交数据
+    // Prepara os dados a enviar
     const submitData: Partial<Config> = {
       ...formData.value,
       configId: editingConfigId.value,
       configType: props.configType,
     }
 
-    // 处理 isDefault：将 boolean 转换为后端需要的 string enum ('0'/'1')
+    // Trata isDefault: converte boolean no string enum ('0'/'1') esperado pelo backend
     submitData.isDefault = formData.value.isDefault == '1' ? '1' : '0'
 
-    // LLM 特殊验证
+    // Validação especial de LLM
     if (props.configType === 'llm') {
-      // 验证模型名称
+      // Valida o nome do modelo
       if (submitData.configName && /[\u4e00-\u9fa5]/.test(submitData.configName)) {
         antMessage.error(t('config.modelNameNoChinese'))
         return
@@ -225,7 +225,7 @@ async function handleSubmit() {
       )
       const isValid = validModels.some((m: any) => m.llm_name === submitData.configName)
       
-      // 如果模型名称不存在，则提示用户是否继续
+      // Se o nome do modelo não existir, pergunta ao usuário se deseja continuar
       if (!isValid && validModels.length > 0) {
         try {
           await Modal.confirm({
@@ -234,9 +234,9 @@ async function handleSubmit() {
             okText: t('common.confirm'),
             cancelText: t('common.cancel'),
           })
-          // 用户点击确认，继续执行
+          // Usuário confirmou, continua a execução
         } catch {
-          // 用户点击取消，中断流程
+          // Usuário cancelou, interrompe o fluxo
           return
         }
       }
@@ -260,7 +260,7 @@ async function handleSubmit() {
     if (error && typeof error === 'object' && 'errorFields' in error) {
       antMessage.error(t('config.fillRequiredFields'))
     } else {
-      console.error('提交配置失败:', error)
+      console.error('Falha ao enviar configuração:', error)
       antMessage.error(t('common.operationFailed'))
     }
   } finally {
@@ -269,7 +269,7 @@ async function handleSubmit() {
 }
 
 /**
- * 重置表单
+ * Redefinir formulário
  */
 function resetForm() {
   formRef.value?.resetFields()
@@ -293,7 +293,7 @@ function resetForm() {
 }
 
 /**
- * 取消
+ * Cancelar
  */
 function handleCancel() {
   resetForm()
@@ -301,7 +301,7 @@ function handleCancel() {
 }
 
 /**
- * 获取默认标签颜色
+ * Obtém a cor padrão da tag
  */
 function getDefaultTagColor(record: Config) {
   if (props.configType === 'llm') {
@@ -317,7 +317,7 @@ function getDefaultTagColor(record: Config) {
 }
 
 /**
- * 获取默认标签文本
+ * Obtém o texto padrão da tag
  */
 function getDefaultTagText(record: Config) {
   if (props.configType === 'llm') {
@@ -333,7 +333,7 @@ function getDefaultTagText(record: Config) {
 }
 
 /**
- * 模型类型标签
+ * Tag de tipo de modelo
  */
 function getModelTypeTag(modelType: string) {
   const tags: Record<string, { text: string; color: string }> = {
@@ -345,20 +345,20 @@ function getModelTypeTag(modelType: string) {
   return tags[modelType] || { text: '-', color: 'default' }
 }
 
-// 处理表格变化
+// Trata a mudança da tabela
 const handleTableChangeWrapper = (pag: any) => {
   pagination.current = pag.current
   pagination.pageSize = pag.pageSize
   fetchData()
 }
 
-// 初始化
+// Inicialização
 fetchData()
 </script>
 
 <template>
   <div class="config-manager">
-    <!-- 查询表单 -->
+    <!-- Formulário de consulta -->
     <a-card :bordered="false" style="margin-bottom: 16px" class="search-card">
       <a-form layout="horizontal" :colon="false">
         <a-row :gutter="16">
@@ -403,13 +403,13 @@ fetchData()
       </a-form>
     </a-card>
 
-    <!-- 表格和表单 -->
+    <!-- Tabela e formulário -->
     <a-card :bordered="false" :body-style="{ padding: '0 24px 24px 24px' }">
       <a-tabs
         v-model:active-key="activeTabKey"
         @change="handleTabChange"
       >
-        <!-- 列表标签页 -->
+        <!-- Aba de listagem -->
         <a-tab-pane key="1" :tab="`${t(configTypeInfo.label)} ${t('config.list')}`">
           <a-table
             :columns="columns"
@@ -422,7 +422,7 @@ fetchData()
             size="middle"
           >
             <template #bodyCell="{ column, record }">
-              <!-- 模型类型列 -->
+              <!-- Coluna de tipo de modelo -->
               <template v-if="column.dataIndex === 'modelType' && configType === 'llm'">
                 <a-tag :color="getModelTypeTag(record.modelType).color">
                   {{ getModelTypeTag(record.modelType).text }}
@@ -432,7 +432,7 @@ fetchData()
                 </a-tag>
               </template>
 
-              <!-- 描述列 -->
+              <!-- Coluna de descrição -->
               <template v-else-if="column.dataIndex === 'configDesc'">
                 <a-tooltip :title="record.configDesc" :mouse-enter-delay="0.5" placement="topLeft">
                   <span v-if="record.configDesc" class="ellipsis-text">{{ record.configDesc }}</span>
@@ -440,7 +440,7 @@ fetchData()
                 </a-tooltip>
               </template>
 
-              <!-- 默认标识列 -->
+              <!-- Coluna de identificação padrão -->
               <template v-else-if="column.dataIndex === 'isDefault'">
                 <a-tag v-if="record.isDefault === '1'" :color="getDefaultTagColor(record)">
                   {{ getDefaultTagText(record) }}
@@ -448,7 +448,7 @@ fetchData()
                 <span v-else>-</span>
               </template>
 
-              <!-- 操作列 -->
+              <!-- Coluna de ações -->
               <template v-else-if="column.dataIndex === 'operation'">
                 <TableActionButtons
                   :record="record"
@@ -467,7 +467,7 @@ fetchData()
           </a-table>
         </a-tab-pane>
 
-        <!-- 创建/编辑标签页 -->
+        <!-- Aba de criação/edição -->
         <a-tab-pane
           v-permission="editingConfigId ? `${configTypeInfo.permissionPrefix}:update` : `${configTypeInfo.permissionPrefix}:create`"
           key="2"
@@ -504,7 +504,7 @@ fetchData()
                 </a-form-item>
               </a-col>
 
-              <!-- LLM 模型类型 -->
+              <!-- Tipo de modelo LLM -->
               <a-col v-if="configType === 'llm'" :xl="8" :lg="12" :xs="24">
                 <a-form-item
                   :label="t('config.modelType')"
@@ -530,7 +530,7 @@ fetchData()
                   name="configName"
                   :rules="[{ required: true, message: t('config.enterName', { type: t(configTypeInfo.label) }) }]"
                 >
-                  <!-- LLM 使用 AutoComplete（可选可填） -->
+                  <!-- LLM usa AutoComplete (opcional e editável) -->
                   <a-auto-complete
                     v-if="configType === 'llm' && currentType"
                     v-model:value="formData.configName"
@@ -542,7 +542,7 @@ fetchData()
                         option.label.toLowerCase().includes(input.toLowerCase())
                     "
                   />
-                  <!-- 有预设模型选项时使用 AutoComplete（可选可填） -->
+                  <!-- Quando há opções de modelo predefinidas, usa AutoComplete (opcional e editável) -->
                   <a-auto-complete
                     v-else-if="currentConfigNameOptions.length > 0"
                     v-model:value="formData.configName"
@@ -554,7 +554,7 @@ fetchData()
                     "
                     allow-clear
                   />
-                  <!-- 其他使用输入框 -->
+                  <!-- Demais casos usam campo de texto -->
                   <a-input
                     v-else
                     v-model:value="formData.configName"
@@ -572,7 +572,7 @@ fetchData()
               />
             </a-form-item>
 
-            <!-- 设为默认 -->
+            <!-- Definir como padrão -->
             <a-form-item
               v-if="configType !== 'tts'"
               v-permission="`${configTypeInfo.permissionPrefix}:update`"
@@ -585,7 +585,7 @@ fetchData()
               </span>
             </a-form-item>
 
-            <!-- 思考模式开关（仅 LLM） -->
+            <!-- Alternância de modo de raciocínio (apenas LLM) -->
             <a-form-item
               v-if="configType === 'llm'"
               :label="t('config.enableThinking')"
@@ -599,27 +599,27 @@ fetchData()
 
             <a-divider>{{ t('config.parameterConfig') }}</a-divider>
 
-            <!-- 动态参数字段 -->
+            <!-- Campos de parâmetros dinâmicos -->
             <a-card
               v-if="currentType"
               size="small"
               :bordered="false"
             >
-              <!-- 本地模型使用说明 -->
+              <!-- Instruções de uso do modelo local -->
               <a-alert
                 v-if="currentType === 'sherpa-onnx' && configType === 'tts'"
                 type="info"
                 show-icon
                 style="margin-bottom: 16px"
               >
-                <template #message>本地语音合成（Sherpa-ONNX）使用说明</template>
+                <template #message>Instruções de uso de síntese de voz local (Sherpa-ONNX)</template>
                 <template #description>
                   <div style="font-size: 13px; line-height: 2">
-                    <p style="margin: 0">无需填写任何参数，保存后即可在角色配置中选择本地音色。</p>
-                    <p style="margin: 0">支持 <strong>VITS</strong>、<strong>Kokoro</strong>、<strong>Matcha</strong> 三种模型架构，系统自动识别。</p>
-                    <p style="margin: 0">模型存放目录：<code>models/tts/</code>，每个子目录对应一个模型。</p>
-                    <p style="margin: 0">Matcha 模型需额外下载 vocoder 文件（如 <code>vocos-16khz-univ.onnx</code>）放入模型目录。</p>
-                    <p style="margin: 0">中文模型若缺少 <code>dict/</code> 目录，可软链接至其他模型的 dict 目录共用。</p>
+                    <p style="margin: 0">Não é necessário preencher nenhum parâmetro; após salvar, a voz local já pode ser selecionada na configuração de personagem.</p>
+                    <p style="margin: 0">Suporta as três arquiteturas de modelo <strong>VITS</strong>, <strong>Kokoro</strong> e <strong>Matcha</strong>, identificadas automaticamente pelo sistema.</p>
+                    <p style="margin: 0">Diretório de armazenamento dos modelos: <code>models/tts/</code>, cada subdiretório corresponde a um modelo.</p>
+                    <p style="margin: 0">O modelo Matcha requer o download adicional do arquivo vocoder (como <code>vocos-16khz-univ.onnx</code>) para colocar no diretório do modelo.</p>
+                    <p style="margin: 0">Se o modelo em chinês não tiver o diretório <code>dict/</code>, é possível criar um link simbólico para o diretório dict de outro modelo e compartilhá-lo.</p>
                   </div>
                 </template>
               </a-alert>
@@ -639,7 +639,7 @@ fetchData()
                   >
                     <a-input
                       v-model:value="formData[field.name]"
-                      :placeholder="(editingConfigId && ['apiKey', 'apiSecret', 'ak', 'sk'].includes(field.name) && currentType !== 'sherpa-onnx') ? '不修改请留空' : (field.placeholder || t('config.enterField', { field: field.label }))"
+                      :placeholder="(editingConfigId && ['apiKey', 'apiSecret', 'ak', 'sk'].includes(field.name) && currentType !== 'sherpa-onnx') ? 'Deixe em branco para não alterar' : (field.placeholder || t('config.enterField', { field: field.label }))"
                       :type="field.inputType || 'text'"
                     >
                       <template v-if="field.suffix" #suffix>

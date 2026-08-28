@@ -1,18 +1,18 @@
 /**
- * 系统中各类服务提供商配置
- * 统一管理各类服务的提供商信息，便于维护和扩展
+ * Configuração dos diversos provedores de serviço do sistema
+ * Gerencia de forma centralizada as informações dos provedores de cada tipo de serviço, facilitando a manutenção e a expansão
  */
 
 import type { ConfigTypeInfo } from '@/types/config'
 
-// 配置类型信息映射
+// Mapeamento de informações dos tipos de configuração
 export const configTypeMap: Record<string, ConfigTypeInfo> = {
   llm: {
     label: 'config.llm',
     permissionPrefix: 'system:config',
-    // 各类别对应的参数字段定义
+    // Definição dos campos de parâmetros correspondentes a cada categoria
     typeFields: {
-      // OpenAI 系列
+      // Série OpenAI
       'OpenAI': [
         {
           name: 'apiKey',
@@ -21,10 +21,10 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'sk-...',
           span: 12,
-          help: '在 https://platform.openai.com/api-keys 申请'
+          help: 'Obtenha em https://platform.openai.com/api-keys'
         }
       ],
-      // 阿里云系列
+      // Série Alibaba Cloud
       'Tongyi-Qianwen': [
         {
           name: 'apiKey',
@@ -33,10 +33,10 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://bailian.console.aliyun.com/?apiKey=1#/api-key 申请'
+          help: 'Obtenha em https://bailian.console.aliyun.com/?apiKey=1#/api-key'
         }
       ],
-      // 讯飞星火
+      // iFlytek Spark
       'XunFei Spark': [
         {
           name: 'appId',
@@ -45,7 +45,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'text',
           placeholder: 'your-app-id',
           span: 12,
-          help: '在 https://console.xfyun.cn/ 申请讯飞开放平台 AppID'
+          help: 'Obtenha o AppID da plataforma aberta iFlytek em https://console.xfyun.cn/'
         },
         {
           name: 'apiKey',
@@ -54,7 +54,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '讯飞开放平台 API Key'
+          help: 'API Key da plataforma aberta iFlytek'
         },
         {
           name: 'apiSecret',
@@ -63,10 +63,10 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-secret',
           span: 12,
-          help: '讯飞开放平台 API Secret'
+          help: 'API Secret da plataforma aberta iFlytek'
         }
       ],
-      // 智谱AI
+      // Zhipu AI
       'ZHIPU-AI': [
         {
           name: 'apiKey',
@@ -75,7 +75,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://bigmodel.cn/usercenter/proj-mgmt/apikeys 申请'
+          help: 'Obtenha em https://bigmodel.cn/usercenter/proj-mgmt/apikeys'
         }
       ],
       // DeepSeek
@@ -87,10 +87,10 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://platform.deepseek.com/ 申请'
+          help: 'Obtenha em https://platform.deepseek.com/'
         }
       ],
-      // 火山引擎
+      // Volcano Engine
       'VolcEngine': [
         {
           name: 'apiKey',
@@ -99,7 +99,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey 申请'
+          help: 'Obtenha em https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey'
         },
         {
           name: 'apiUrl',
@@ -109,7 +109,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://ark.cn-beijing.volces.com/api/v3',
           span: 12,
           suffix: '/chat/completions',
-          help: '火山引擎豆包大模型 API 接口地址'
+          help: 'Endereço da API do modelo Doubao da Volcano Engine'
         }
       ],
       // MiniMax
@@ -121,10 +121,10 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://platform.minimaxi.com/ 申请'
+          help: 'Obtenha em https://platform.minimaxi.com/'
         }
       ],
-      // 腾讯混元
+      // Tencent Hunyuan
       'Tencent Hunyuan': [
         {
           name: 'apiKey',
@@ -133,10 +133,10 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://console.cloud.tencent.com/hunyuan/start 申请混元 API Key'
+          help: 'Obtenha a API Key do Hunyuan em https://console.cloud.tencent.com/hunyuan/start'
         }
       ],
-      // 百度文心
+      // Baidu Wenxin
       'BaiChuan': [
         {
           name: 'apiKey',
@@ -145,7 +145,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在百度AI开放平台申请'
+          help: 'Obtenha na plataforma aberta de IA da Baidu'
         },
         {
           name: 'apiUrl',
@@ -155,10 +155,10 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.baichuan-ai.com/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: '百川智能 API 接口地址'
+          help: 'Endereço da API da Baichuan Intelligent'
         }
       ],
-      // Moonshot (月之暗面)
+      // Moonshot (Dark Side of the Moon)
       'Moonshot': [
         {
           name: 'apiKey',
@@ -167,10 +167,10 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://platform.moonshot.cn/console/api-keys 申请'
+          help: 'Obtenha em https://platform.moonshot.cn/console/api-keys'
         }
       ],
-      // 硅基流动
+      // SiliconFlow
       'SILICONFLOW': [
         {
           name: 'apiKey',
@@ -179,10 +179,10 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://cloud.siliconflow.cn/account/ak 申请'
+          help: 'Obtenha em https://cloud.siliconflow.cn/account/ak'
         }
       ],
-      // 百度文心一言
+      // Baidu ERNIE Bot
       'BaiduYiyan': [
         {
           name: 'apiKey',
@@ -191,7 +191,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://console.bce.baidu.com/qianfan/ais/console/applicationConsole/application 申请千帆平台 API Key'
+          help: 'Obtenha a API Key da plataforma Qianfan em https://console.bce.baidu.com/qianfan/ais/console/applicationConsole/application'
         },
         {
           name: 'apiSecret',
@@ -200,7 +200,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-secret-key',
           span: 12,
-          help: '千帆平台 Secret Key'
+          help: 'Secret Key da plataforma Qianfan'
         },
         {
           name: 'apiUrl',
@@ -210,10 +210,10 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1',
           span: 12,
           suffix: '/wenxinworkshop/chat/completions',
-          help: '百度千帆平台 API 接口地址'
+          help: 'Endereço da API da plataforma Qianfan da Baidu'
         }
       ],
-      // 其他本地服务
+      // Outros serviços locais
       'Ollama': [
         {
           name: 'apiUrl',
@@ -223,7 +223,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'http://localhost:11434/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: '本地 Ollama 服务地址，需要先安装并启动 Ollama'
+          help: 'Endereço do serviço local Ollama; é necessário instalar e iniciar o Ollama antes'
         }
       ],
       'LM-Studio': [
@@ -235,7 +235,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'http://localhost:1234/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: '本地 LM Studio 服务地址'
+          help: 'Endereço do serviço local LM Studio'
         }
       ],
       'Azure-OpenAI': [
@@ -246,7 +246,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 Azure 门户中申请'
+          help: 'Obtenha no portal do Azure'
         },
         {
           name: 'apiUrl',
@@ -256,7 +256,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://your-resource-name.openai.azure.com',
           span: 12,
           suffix: '/chat/completions',
-          help: 'Azure OpenAI 服务地址'
+          help: 'Endereço do serviço Azure OpenAI'
         }
       ],
       // xAI
@@ -268,7 +268,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://x.ai/api-keys 申请'
+          help: 'Obtenha em https://x.ai/api-keys'
         },
         {
           name: 'apiUrl',
@@ -278,7 +278,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.x.ai/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: 'xAI API 接口地址'
+          help: 'Endereço da API do xAI'
         }
       ],
       // Mistral
@@ -290,7 +290,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://console.mistral.ai/ 申请'
+          help: 'Obtenha em https://console.mistral.ai/'
         }
       ],
       // Google Gemini
@@ -302,7 +302,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://aistudio.google.com/apikey 申请'
+          help: 'Obtenha em https://aistudio.google.com/apikey'
         },
         {
           name: 'apiUrl',
@@ -312,7 +312,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://generativelanguage.googleapis.com',
           span: 12,
           suffix: '/chat/completions',
-          help: 'Google Gemini API 接口地址'
+          help: 'Endereço da API do Google Gemini'
         }
       ],
       // Groq
@@ -324,7 +324,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://console.groq.com/ 申请'
+          help: 'Obtenha em https://console.groq.com/'
         },
         {
           name: 'apiUrl',
@@ -334,7 +334,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.groq.com/openai/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: 'Groq API 接口地址'
+          help: 'Endereço da API do Groq'
         }
       ],
       // OpenRouter
@@ -346,7 +346,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://openrouter.ai/ 申请'
+          help: 'Obtenha em https://openrouter.ai/'
         },
         {
           name: 'apiUrl',
@@ -356,7 +356,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://openrouter.ai/api/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: 'OpenRouter API 接口地址'
+          help: 'Endereço da API do OpenRouter'
         }
       ],
       // StepFun
@@ -368,7 +368,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 StepFun 平台申请'
+          help: 'Obtenha na plataforma StepFun'
         },
         {
           name: 'apiUrl',
@@ -378,7 +378,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.stepfun.com/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: 'StepFun API 接口地址'
+          help: 'Endereço da API do StepFun'
         }
       ],
       // NVIDIA
@@ -390,7 +390,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 NVIDIA AI Foundation 申请'
+          help: 'Obtenha na NVIDIA AI Foundation'
         },
         {
           name: 'apiUrl',
@@ -400,7 +400,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://integrate.api.nvidia.com/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: 'NVIDIA API 接口地址'
+          help: 'Endereço da API da NVIDIA'
         }
       ],
       // 01.AI
@@ -412,7 +412,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://platform.01.ai/ 申请'
+          help: 'Obtenha em https://platform.01.ai/'
         },
         {
           name: 'apiUrl',
@@ -422,7 +422,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.01.ai/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: '01.AI API 接口地址'
+          help: 'Endereço da API da 01.AI'
         }
       ],
       // Anthropic
@@ -434,7 +434,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://console.anthropic.com/ 申请'
+          help: 'Obtenha em https://console.anthropic.com/'
         },
         {
           name: 'apiUrl',
@@ -444,7 +444,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.anthropic.com/v1',
           span: 12,
           suffix: '/messages',
-          help: 'Anthropic API 接口地址'
+          help: 'Endereço da API da Anthropic'
         }
       ],
       // Voyage AI
@@ -456,7 +456,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://dash.voyageai.com/ 申请'
+          help: 'Obtenha em https://dash.voyageai.com/'
         },
         {
           name: 'apiUrl',
@@ -466,7 +466,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.voyageai.com/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: 'Voyage AI API 接口地址'
+          help: 'Endereço da API da Voyage AI'
         }
       ],
       // GiteeAI
@@ -478,7 +478,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://ai.gitee.com/ 平台申请'
+          help: 'Obtenha na plataforma https://ai.gitee.com/'
         }
       ],
       // DeepInfra
@@ -490,7 +490,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://deepinfra.com/ 申请'
+          help: 'Obtenha em https://deepinfra.com/'
         },
         {
           name: 'apiUrl',
@@ -500,7 +500,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.deepinfra.com/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: 'DeepInfra API 接口地址'
+          help: 'Endereço da API da DeepInfra'
         }
       ],
       'LocalAI': [
@@ -511,7 +511,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '本地 LocalAI 服务密钥（可选）'
+          help: 'Chave do serviço local LocalAI (opcional)'
         },
         {
           name: 'apiUrl',
@@ -521,7 +521,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'http://localhost:8080/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: '本地 LocalAI 服务地址'
+          help: 'Endereço do serviço local LocalAI'
         }
       ],
       'VLLM': [
@@ -533,7 +533,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'http://localhost:8000/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: '本地 VLLM 服务地址'
+          help: 'Endereço do serviço local VLLM'
         }
       ],
       'Xinference': [
@@ -544,7 +544,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '本地 Xinference 服务密钥（可选）'
+          help: 'Chave do serviço local Xinference (opcional)'
         },
         {
           name: 'apiUrl',
@@ -554,7 +554,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'http://localhost:9997/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: '本地 Xinference 服务地址'
+          help: 'Endereço do serviço local Xinference'
         }
       ],
       // HuggingFace
@@ -566,7 +566,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'hf_...',
           span: 12,
-          help: '在 https://huggingface.co/settings/tokens 申请'
+          help: 'Obtenha em https://huggingface.co/settings/tokens'
         },
         {
           name: 'apiUrl',
@@ -576,7 +576,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api-inference.huggingface.co/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: 'HuggingFace Inference API 地址'
+          help: 'Endereço da API HuggingFace Inference'
         }
       ],
       // Cohere
@@ -588,7 +588,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://dashboard.cohere.com/api-keys 申请'
+          help: 'Obtenha em https://dashboard.cohere.com/api-keys'
         },
         {
           name: 'apiUrl',
@@ -598,7 +598,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.cohere.ai/v1',
           span: 12,
           suffix: '/chat',
-          help: 'Cohere API 接口地址'
+          help: 'Endereço da API da Cohere'
         }
       ],
       // TogetherAI
@@ -610,7 +610,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://api.together.xyz/settings/api-keys 申请'
+          help: 'Obtenha em https://api.together.xyz/settings/api-keys'
         },
         {
           name: 'apiUrl',
@@ -620,7 +620,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.together.xyz/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: 'Together AI API 接口地址'
+          help: 'Endereço da API da Together AI'
         }
       ],
       // Replicate
@@ -632,7 +632,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'r8_...',
           span: 12,
-          help: '在 https://replicate.com/account/api-tokens 申请'
+          help: 'Obtenha em https://replicate.com/account/api-tokens'
         },
         {
           name: 'apiUrl',
@@ -642,7 +642,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.replicate.com/v1',
           span: 12,
           suffix: '/predictions',
-          help: 'Replicate API 接口地址'
+          help: 'Endereço da API da Replicate'
         }
       ],
       // 302.AI
@@ -654,7 +654,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://302.ai/ 平台申请'
+          help: 'Obtenha na plataforma https://302.ai/'
         },
         {
           name: 'apiUrl',
@@ -664,7 +664,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.302.ai/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: '302.AI API 接口地址'
+          help: 'Endereço da API da 302.AI'
         }
       ],
       // Fish Audio
@@ -676,7 +676,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://fish.audio/ 平台申请'
+          help: 'Obtenha na plataforma https://fish.audio/'
         },
         {
           name: 'apiUrl',
@@ -686,7 +686,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.fish.audio/v1',
           span: 12,
           suffix: '/tts',
-          help: 'Fish Audio API 接口地址'
+          help: 'Endereço da API da Fish Audio'
         }
       ],
       // PPIO
@@ -698,7 +698,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://www.ppio.cloud/ 平台申请'
+          help: 'Obtenha na plataforma https://www.ppio.cloud/'
         },
         {
           name: 'apiUrl',
@@ -708,7 +708,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.ppio.cloud/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: 'PPIO API 接口地址'
+          help: 'Endereço da API da PPIO'
         }
       ],
       // NovitaAI
@@ -720,7 +720,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://novita.ai/settings 申请'
+          help: 'Obtenha em https://novita.ai/settings'
         },
         {
           name: 'apiUrl',
@@ -730,7 +730,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.novita.ai/v3',
           span: 12,
           suffix: '/openai/chat/completions',
-          help: 'NovitaAI API 接口地址'
+          help: 'Endereço da API da NovitaAI'
         }
       ],
       // GPUStack
@@ -742,7 +742,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '本地部署 GPUStack 的 API Key（可选）'
+          help: 'API Key do GPUStack implantado localmente (opcional)'
         },
         {
           name: 'apiUrl',
@@ -752,7 +752,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'http://localhost:80/v1-openai',
           span: 12,
           suffix: '/chat/completions',
-          help: 'GPUStack 服务地址'
+          help: 'Endereço do serviço GPUStack'
         }
       ],
       // Upstage
@@ -764,7 +764,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://console.upstage.ai/api-keys 申请'
+          help: 'Obtenha em https://console.upstage.ai/api-keys'
         },
         {
           name: 'apiUrl',
@@ -774,7 +774,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.upstage.ai/v1/solar',
           span: 12,
           suffix: '/chat/completions',
-          help: 'Upstage API 接口地址'
+          help: 'Endereço da API da Upstage'
         }
       ],
       // LeptonAI
@@ -786,7 +786,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-token',
           span: 12,
-          help: '在 https://dashboard.lepton.ai/ 申请'
+          help: 'Obtenha em https://dashboard.lepton.ai/'
         },
         {
           name: 'apiUrl',
@@ -796,7 +796,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.lepton.ai/api/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: 'Lepton AI API 接口地址'
+          help: 'Endereço da API da Lepton AI'
         }
       ],
       // PerfXCloud
@@ -808,7 +808,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://cloud.perfxlab.cn/ 平台申请'
+          help: 'Obtenha na plataforma https://cloud.perfxlab.cn/'
         },
         {
           name: 'apiUrl',
@@ -818,7 +818,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://cloud.perfxlab.cn/api/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: 'PerfXCloud API 接口地址'
+          help: 'Endereço da API da PerfXCloud'
         }
       ],
       // Google Cloud
@@ -830,7 +830,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://console.cloud.google.com/apis/credentials 申请'
+          help: 'Obtenha em https://console.cloud.google.com/apis/credentials'
         },
         {
           name: 'projectId',
@@ -839,7 +839,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'text',
           placeholder: 'your-project-id',
           span: 12,
-          help: 'Google Cloud 项目 ID'
+          help: 'ID do projeto do Google Cloud'
         },
         {
           name: 'apiUrl',
@@ -849,7 +849,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://generativelanguage.googleapis.com/v1',
           span: 12,
           suffix: '/models',
-          help: 'Google Cloud Vertex AI API 地址'
+          help: 'Endereço da API do Google Cloud Vertex AI'
         }
       ],
       // Bedrock (AWS)
@@ -861,7 +861,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-access-key-id',
           span: 12,
-          help: '在 https://console.aws.amazon.com/iam/ 申请 AWS Access Key'
+          help: 'Obtenha a AWS Access Key em https://console.aws.amazon.com/iam/'
         },
         {
           name: 'apiSecret',
@@ -879,7 +879,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'text',
           placeholder: 'us-east-1',
           span: 12,
-          help: 'AWS 区域，如 us-east-1'
+          help: 'Região da AWS, como us-east-1'
         }
       ],
       // CometAPI
@@ -891,7 +891,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://api.comet.com/ 平台申请'
+          help: 'Obtenha na plataforma https://api.comet.com/'
         },
         {
           name: 'apiUrl',
@@ -901,7 +901,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.comet.com/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: 'Comet API 接口地址'
+          help: 'Endereço da API da Comet'
         }
       ],
       // DeerAPI
@@ -913,7 +913,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           inputType: 'password',
           placeholder: 'your-api-key',
           span: 12,
-          help: '在 https://api.deerapi.com/ 平台申请'
+          help: 'Obtenha na plataforma https://api.deerapi.com/'
         },
         {
           name: 'apiUrl',
@@ -923,7 +923,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           placeholder: 'https://api.deerapi.com/v1',
           span: 12,
           suffix: '/chat/completions',
-          help: 'DeerAPI 接口地址'
+          help: 'Endereço da API da DeerAPI'
         }
       ]
     }
@@ -952,7 +952,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           'qwen3-asr-flash-realtime',
         ]
       },
-      { label: 'Aliyun（NLS标准版）', value: 'aliyun-nls', key: '2' },
+      { label: 'Aliyun (versão padrão NLS)', value: 'aliyun-nls', key: '2' },
       { label: 'Xfyun', value: 'xfyun', key: '3' },
       { label: 'FunASR', value: 'funasr', key: '4' },
       { label: 'Volcengine（doubao）', value: 'volcengine', key: '5' }
@@ -964,7 +964,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'App Id', 
           required: true, 
           span: 12,
-          help: '在 https://console.cloud.tencent.com/cam/capi 申请',
+          help: 'Obtenha em https://console.cloud.tencent.com/cam/capi',
           placeholder: 'your-app-id'
         },
         { 
@@ -972,7 +972,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'Secret Id', 
           required: true, 
           span: 12,
-          help: '腾讯云API密钥ID',
+          help: 'ID da chave de API da Tencent Cloud',
           placeholder: 'your-secret-id'
         },
         { 
@@ -980,7 +980,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'Secret Key', 
           required: true, 
           span: 12,
-          help: '腾讯云API密钥Key',
+          help: 'Key da chave de API da Tencent Cloud',
           placeholder: 'your-secret-key'
         },
       ],
@@ -990,7 +990,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'App Key', 
           required: true, 
           span: 12,
-          help: '在 https://bailian.console.aliyun.com/?apiKey=1#/api-key 申请',
+          help: 'Obtenha em https://bailian.console.aliyun.com/?apiKey=1#/api-key',
           placeholder: 'your-app-key'
         }
       ],
@@ -1000,7 +1000,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'Access Key',
           required: true,
           span: 12,
-          help: '阿里云Access Key，在 https://ram.console.aliyun.com/profile/access-keys 申请',
+          help: 'Access Key da Alibaba Cloud, obtenha em https://ram.console.aliyun.com/profile/access-keys',
           placeholder: 'your-access-key'
         },
         {
@@ -1009,7 +1009,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           required: true,
           inputType: 'password',
           span: 12,
-          help: '阿里云Secret Key，对应Access Key的密钥',
+          help: 'Secret Key da Alibaba Cloud, chave correspondente ao Access Key',
           placeholder: 'your-secret-key'
         },
         {
@@ -1017,7 +1017,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'App Key',
           required: true,
           span: 12,
-          help: '阿里云智能语音交互App Key，在 https://nls-portal.console.aliyun.com/applist 申请',
+          help: 'App Key da interação de voz inteligente da Alibaba Cloud, obtenha em https://nls-portal.console.aliyun.com/applist',
           placeholder: 'your-app-key'
         }
       ],
@@ -1027,7 +1027,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'App Id', 
           required: true, 
           span: 12,
-          help: '在 https://console.xfyun.cn/ 申请讯飞开放平台AppID',
+          help: 'Obtenha o AppID da plataforma aberta iFlytek em https://console.xfyun.cn/',
           placeholder: 'your-app-id'
         },
         { 
@@ -1035,7 +1035,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'Api Secret', 
           required: true, 
           span: 12,
-          help: '讯飞开放平台API Secret',
+          help: 'API Secret da plataforma aberta iFlytek',
           placeholder: 'your-api-secret'
         },
         { 
@@ -1043,7 +1043,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'Api Key', 
           required: true, 
           span: 12,
-          help: '讯飞开放平台API Key',
+          help: 'API Key da plataforma aberta iFlytek',
           placeholder: 'your-api-key'
         }
       ],
@@ -1054,7 +1054,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           required: true, 
           span: 12, 
           defaultUrl: "ws://127.0.0.1:10095",
-          help: '本地FunASR服务WebSocket地址，需要先部署FunASR服务',
+          help: 'Endereço WebSocket do serviço local FunASR; é necessário implantar o serviço FunASR antes',
           placeholder: 'ws://127.0.0.1:10095'
         }
       ],
@@ -1064,7 +1064,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'App ID', 
           required: true, 
           span: 12,
-          help: '在 https://console.volcengine.com/speech/app 获取应用ID',
+          help: 'Obtenha o ID do aplicativo em https://console.volcengine.com/speech/app',
           placeholder: 'your-app-id'
         },
         { 
@@ -1073,7 +1073,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           required: true, 
           inputType: 'password',
           span: 12,
-          help: '火山引擎语音识别服务访问令牌',
+          help: 'Token de acesso do serviço de reconhecimento de voz da Volcano Engine',
           placeholder: 'your-access-token'
         }
       ]
@@ -1089,7 +1089,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
       { label: 'Volcengine(doubao)', value: 'volcengine', key: '3' },
       { label: 'Xfyun', value: 'xfyun', key: '4' },
       { label: 'Minimax', value: 'minimax', key: '5' },
-      { label: 'Sherpa-ONNX（本地）', value: 'sherpa-onnx', key: '6' }
+      { label: 'Sherpa-ONNX (local)', value: 'sherpa-onnx', key: '6' }
     ],
     typeFields: {
       tencent: [
@@ -1098,7 +1098,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'App Id',
           required: true,
           span: 12,
-          help: '在 https://console.cloud.tencent.com/cam/capi 申请',
+          help: 'Obtenha em https://console.cloud.tencent.com/cam/capi',
           placeholder: 'your-app-id'
         },
         {
@@ -1106,7 +1106,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'Secret Id',
           required: true,
           span: 12,
-          help: '腾讯云API密钥ID',
+          help: 'ID da chave de API da Tencent Cloud',
           placeholder: 'your-secret-id'
         },
         {
@@ -1114,7 +1114,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'Secret Key',
           required: true,
           span: 12,
-          help: '腾讯云API密钥Key',
+          help: 'Key da chave de API da Tencent Cloud',
           placeholder: 'your-secret-key'
         },
       ],
@@ -1124,7 +1124,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'API Key', 
           required: true, 
           span: 12,
-          help: '在 https://bailian.console.aliyun.com/?apiKey=1#/api-key 申请',
+          help: 'Obtenha em https://bailian.console.aliyun.com/?apiKey=1#/api-key',
           placeholder: 'your-api-key'
         }
       ],
@@ -1134,7 +1134,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'Access Key',
           required: true,
           span: 12,
-          help: '阿里云Access Key，在 https://ram.console.aliyun.com/profile/access-keys 申请',
+          help: 'Access Key da Alibaba Cloud, obtenha em https://ram.console.aliyun.com/profile/access-keys',
           placeholder: 'your-access-key'
         },
         {
@@ -1143,7 +1143,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           required: true,
           inputType: 'password',
           span: 12,
-          help: '阿里云Secret Key，对应Access Key的密钥',
+          help: 'Secret Key da Alibaba Cloud, chave correspondente ao Access Key',
           placeholder: 'your-secret-key'
         },
         {
@@ -1151,7 +1151,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'App Key',
           required: true,
           span: 12,
-          help: '阿里云智能语音交互App Key，在 https://nls-portal.console.aliyun.com/applist 申请',
+          help: 'App Key da interação de voz inteligente da Alibaba Cloud, obtenha em https://nls-portal.console.aliyun.com/applist',
           placeholder: 'your-app-key'
         }
       ],
@@ -1161,7 +1161,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'App Id', 
           required: true, 
           span: 12,
-          help: '在 https://console.volcengine.com/speech/app 申请',
+          help: 'Obtenha em https://console.volcengine.com/speech/app',
           placeholder: 'your-app-id'
         },
         { 
@@ -1169,7 +1169,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'Access Token', 
           required: true, 
           span: 12,
-          help: '火山引擎语音合成服务访问令牌',
+          help: 'Token de acesso do serviço de síntese de voz da Volcano Engine',
           placeholder: 'your-access-token'
         }
       ],
@@ -1179,7 +1179,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'App Id', 
           required: true, 
           span: 12,
-          help: '在 https://console.xfyun.cn/ 申请讯飞开放平台AppID',
+          help: 'Obtenha o AppID da plataforma aberta iFlytek em https://console.xfyun.cn/',
           placeholder: 'your-app-id'
         },
         { 
@@ -1187,7 +1187,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'Api Secret', 
           required: true, 
           span: 12,
-          help: '讯飞开放平台API Secret',
+          help: 'API Secret da plataforma aberta iFlytek',
           placeholder: 'your-api-secret'
         },
         { 
@@ -1195,7 +1195,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'Api Key', 
           required: true, 
           span: 12,
-          help: '讯飞开放平台API Key',
+          help: 'API Key da plataforma aberta iFlytek',
           placeholder: 'your-api-key'
         }
       ],
@@ -1205,7 +1205,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'Group Id', 
           required: true, 
           span: 12,
-          help: '在 https://platform.minimaxi.com/user-center/basic-information 获取',
+          help: 'Obtenha em https://platform.minimaxi.com/user-center/basic-information',
           placeholder: 'your-group-id'
         },
         { 
@@ -1213,7 +1213,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           label: 'API Key', 
           required: true, 
           span: 12,
-          help: '在 https://platform.minimaxi.com/user-center/basic-information/interface-key 申请',
+          help: 'Obtenha em https://platform.minimaxi.com/user-center/basic-information/interface-key',
           placeholder: 'your-api-key'
         }
       ],
@@ -1224,9 +1224,9 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
     label: 'config.oss',
     permissionPrefix: 'system:config',
     typeOptions: [
-      { label: '本地存储', value: 'local', key: '0' },
-      { label: '腾讯云 COS', value: 'tencent', key: '1' },
-      { label: '阿里云 OSS', value: 'aliyun', key: '2' }
+      { label: 'Armazenamento local', value: 'local', key: '0' },
+      { label: 'Tencent Cloud COS', value: 'tencent', key: '1' },
+      { label: 'Alibaba Cloud OSS', value: 'aliyun', key: '2' }
     ],
     typeFields: {
       local: [],
@@ -1237,7 +1237,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           required: true,
           inputType: 'password',
           span: 12,
-          help: '在 https://console.cloud.tencent.com/cam/capi 获取',
+          help: 'Obtenha em https://console.cloud.tencent.com/cam/capi',
           placeholder: 'your-secret-id'
         },
         {
@@ -1246,7 +1246,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           required: true,
           inputType: 'password',
           span: 12,
-          help: '腾讯云 API 密钥 Key',
+          help: 'Key da chave de API da Tencent Cloud',
           placeholder: 'your-secret-key'
         },
         {
@@ -1255,7 +1255,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           required: true,
           inputType: 'text',
           span: 12,
-          help: '存储桶所在地域',
+          help: 'Região onde o bucket está localizado',
           placeholder: 'ap-guangzhou'
         },
         {
@@ -1264,16 +1264,16 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           required: true,
           inputType: 'text',
           span: 12,
-          help: '存储桶名称',
+          help: 'Nome do bucket',
           placeholder: 'my-bucket-1250000000'
         },
         {
           name: 'apiUrl',
-          label: '路径前缀',
+          label: 'Prefixo do caminho',
           required: false,
           inputType: 'text',
           span: 12,
-          help: 'COS 中的路径前缀（可选）',
+          help: 'Prefixo do caminho no COS (opcional)',
           placeholder: 'uploads/'
         }
       ],
@@ -1284,7 +1284,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           required: true,
           inputType: 'password',
           span: 12,
-          help: '在 https://ram.console.aliyun.com/profile/access-keys 获取',
+          help: 'Obtenha em https://ram.console.aliyun.com/profile/access-keys',
           placeholder: 'your-access-key-id'
         },
         {
@@ -1293,7 +1293,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           required: true,
           inputType: 'password',
           span: 12,
-          help: '对应 AccessKey ID 的密钥',
+          help: 'Chave correspondente ao AccessKey ID',
           placeholder: 'your-access-key-secret'
         },
         {
@@ -1302,7 +1302,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           required: true,
           inputType: 'text',
           span: 12,
-          help: 'OSS 访问域名',
+          help: 'Domínio de acesso do OSS',
           placeholder: 'oss-cn-hangzhou.aliyuncs.com'
         },
         {
@@ -1311,7 +1311,7 @@ export const configTypeMap: Record<string, ConfigTypeInfo> = {
           required: true,
           inputType: 'text',
           span: 12,
-          help: '存储桶名称',
+          help: 'Nome do bucket',
           placeholder: 'my-bucket'
         }
       ]

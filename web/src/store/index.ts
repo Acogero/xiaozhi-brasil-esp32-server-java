@@ -1,12 +1,12 @@
 /**
- * Store 统一导出
- * 便于集中管理和导入
+ * Exportação unificada das Stores
+ * Facilita o gerenciamento e importação centralizados
  */
 export { useUserStore } from './user'
 export { useLoadingStore } from './loading'
 export { useAppStore } from './app'
 export { useDeviceStore } from './device'
 
-// 导出类型
+// Exportação de tipos
 export type { UserInfo, WebSocketConfig } from './user'
 export type { Locale } from './app'

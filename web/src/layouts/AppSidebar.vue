@@ -13,16 +13,16 @@ const props = defineProps<{
 
 const { openKeys, selectedKeys, menuItems, handleOpenChange, handleMenuClick } = useMenu()
 
-// 获取图标组件
+// Obtém o componente de ícone
 function getIcon(iconName?: string) {
   if (!iconName) return null
   return (Icons as Record<string, unknown>)[iconName]
 }
 
-// 获取菜单标题（支持多语言）
+// Obtém o título do menu (com suporte a múltiplos idiomas)
 function getMenuTitle(title?: string) {
   if (!title) return ''
-  // 如果是多语言键，则翻译；否则直接返回
+  // Se for uma chave de múltiplos idiomas, traduz; caso contrário, retorna diretamente
   return title.startsWith('router.') ? t(title) : title
 }
 </script>
@@ -36,7 +36,7 @@ function getMenuTitle(title?: string) {
       </router-link>
     </div>
 
-    <!-- 菜单 -->
+    <!-- Menu -->
     <a-menu
       :open-keys="openKeys"
       v-model:selected-keys="selectedKeys"
@@ -45,7 +45,7 @@ function getMenuTitle(title?: string) {
       @open-change="handleOpenChange"
     >
       <template v-for="item in menuItems" :key="item.path">
-        <!-- 无子菜单的项 -->
+        <!-- Item sem submenu -->
         <a-menu-item v-if="!item.children || item.children.length === 0" :key="item.path" @click="() => handleMenuClick(item.path)">
           <template #icon>
             <component :is="getIcon(item.meta.icon)" v-if="item.meta.icon" />
@@ -53,7 +53,7 @@ function getMenuTitle(title?: string) {
           <span>{{ getMenuTitle(item.meta.title) }}</span>
         </a-menu-item>
 
-        <!-- 有子菜单的项 -->
+        <!-- Item com submenu -->
         <a-sub-menu v-else :key="`${item.path}`">
           <template #icon>
             <component :is="getIcon(item.meta.icon)" v-if="item.meta.icon" />

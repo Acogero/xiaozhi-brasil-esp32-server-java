@@ -12,8 +12,8 @@ export interface UserInfo {
   name?: string
   tel?: string
   avatar?: string
-  state?: string // 1-正常 0-禁用
-  isAdmin?: string // 1-管理员 0-普通用户
+  state?: string // 1-normal 0-desabilitado
+  isAdmin?: string // 1-administrador 0-usuário comum
   totalDevice?: number
   aliveNumber?: number
   totalMessage?: number
@@ -22,7 +22,7 @@ export interface UserInfo {
   authRoleId?: number
 }
 
-// 权限信息
+// Informações de permissão
 export interface Permission {
   permissionId: number
   parentId?: number
@@ -33,12 +33,12 @@ export interface Permission {
   component?: string
   icon?: string
   sort?: number
-  visible?: string // '1'-显示 '0'-隐藏
-  status?: string // '1'-启用 '0'-禁用
+  visible?: string // '1'-visível '0'-oculto
+  status?: string // '1'-habilitado '0'-desabilitado
   children?: Permission[]
 }
 
-// 登录响应数据
+// Dados de resposta do login
 export interface LoginResponse {
   user: UserInfo
   authRole: AuthRole
@@ -68,7 +68,7 @@ export const useUserStore = defineStore('user', () => {
     },
   })
 
-  // 权限信息
+  // Informações de permissão
   const permissions = useStorage<Permission[]>('permissions', [], localStorage, {
     serializer: {
       read: (v: any) => {
@@ -83,7 +83,7 @@ export const useUserStore = defineStore('user', () => {
     },
   })
 
-  // 后台权限角色信息
+  // Informações da função de permissão do backend
   const authRole = useStorage<AuthRole | null>('authRole', null, localStorage, {
     serializer: {
       read: (v: any) => {
@@ -98,11 +98,11 @@ export const useUserStore = defineStore('user', () => {
     },
   })
 
-  // Token 管理
+  // Gerenciamento do Token
   const token = useStorage<string>('token', '', localStorage)
   const refreshToken = useStorage<string>('refreshToken', '', localStorage)
 
-  // WebSocket 配置管理
+  // Gerenciamento de configuração do WebSocket
   const defaultWsConfig: WebSocketConfig = {
     url: import.meta.env.VITE_WS_URL || 'ws://localhost:8091/ws/xiaozhi/v1',
   }
@@ -173,12 +173,12 @@ export const useUserStore = defineStore('user', () => {
     refreshToken.value = ''
   }
 
-  // 计算属性 - 是否为管理员
+  // Propriedade computada - se é administrador
   const isAdmin = computed(() => userInfo.value?.isAdmin == '1')
 
-  // 权限检查方法
+  // Método de verificação de permissão
   const hasPermission = (permissionKey: string): boolean => {
-    // 管理员拥有所有权限
+    // Administrador possui todas as permissões
     if (isAdmin.value) {
       return true
     }

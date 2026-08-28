@@ -3,64 +3,64 @@ import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 
 /**
- * 文件验证器
+ * Validador de arquivo
  */
 export interface FileValidator {
   /**
-   * 验证文件是否合法
-   * @param file 要验证的文件
-   * @returns 验证结果，如果合法返回 true，否则返回错误消息
+   * Verifica se o arquivo é válido
+   * @param file Arquivo a ser validado
+   * @returns Resultado da validação: retorna true se for válido, ou a mensagem de erro caso contrário
    */
   validate: (file: File) => true | string
 }
 
 /**
- * 拖拽上传配置
+ * Configuração de upload por arrastar e soltar
  */
 export interface DragUploadOptions {
   /**
-   * 文件验证器
+   * Validador de arquivo
    */
   validator: FileValidator
 
   /**
-   * 文件处理回调
-   * @param file 上传的文件
+   * Callback de processamento do arquivo
+   * @param file Arquivo enviado
    */
   onDrop: (file: File) => void | Promise<void>
 
   /**
-   * 是否启用拖拽上传
-   * @returns 返回 true 表示启用，false 表示禁用
+   * Se o upload por arrastar e soltar está habilitado
+   * @returns Retorna true para habilitado, false para desabilitado
    */
   enabled?: () => boolean
 
   /**
-   * 拖拽提示文本配置
+   * Configuração dos textos de dica para arrastar e soltar
    */
   messages?: {
-    /** 主提示文本的 i18n key */
+    /** Chave i18n do texto de dica principal */
     dragText?: string
-    /** 辅助提示文本的 i18n key */
+    /** Chave i18n do texto de dica auxiliar */
     dragHint?: string
-    /** 成功提示文本的 i18n key */
+    /** Chave i18n do texto de dica de sucesso */
     successMessage?: string
   }
 
   /**
-   * 是否显示成功提示
+   * Se deve exibir a mensagem de sucesso
    */
   showSuccessMessage?: boolean
 }
 
 /**
- * 通用拖拽上传 Composable
+ * Composable genérico de upload por arrastar e soltar
  *
- * 提供全局文件拖拽上传功能，支持自定义文件验证和处理逻辑
+ * Fornece funcionalidade global de upload por arrastar e soltar, com suporte a validação e processamento de arquivo personalizados
  *
  * @example
  * ```ts
- * // 音频文件上传
+ * // Upload de arquivo de áudio
  * const audioValidator: FileValidator = {
  *   validate: (file) => {
  *     const isAudio = file.type.startsWith('audio/') ||
@@ -99,11 +99,11 @@ export function useDragUpload(options: DragUploadOptions) {
     showSuccessMessage = true
   } = options
 
-  // 拖拽状态
+  // Estado de arrastar
   const isDragging = ref(false)
   let dragCounter = 0
 
-  // 拖拽提示文本
+  // Texto de dica de arrastar
   const dragText = computed(() =>
     messages.dragText ? t(messages.dragText) : t('common.dragDropFile')
   )
@@ -113,20 +113,20 @@ export function useDragUpload(options: DragUploadOptions) {
   )
 
   /**
-   * 处理拖拽进入
+   * Trata a entrada do arrasto
    */
   const handleDragEnter = (e: DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
-    // 检查是否启用
+    // Verifica se está habilitado
     if (!enabled()) {
       return
     }
 
     dragCounter++
 
-    // 检查是否包含文件
+    // Verifica se contém arquivos
     if (e.dataTransfer) {
       const types = e.dataTransfer.types
       const hasFiles = types.includes('Files') ||
@@ -144,13 +144,13 @@ export function useDragUpload(options: DragUploadOptions) {
   }
 
   /**
-   * 处理拖拽悬停
+   * Trata o arrasto sobre a área
    */
   const handleDragOver = (e: DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
-    // 检查是否启用
+    // Verifica se está habilitado
     if (!enabled()) {
       return
     }
@@ -159,20 +159,20 @@ export function useDragUpload(options: DragUploadOptions) {
       e.dataTransfer.dropEffect = 'copy'
     }
 
-    // 确保拖拽状态保持
+    // Garante que o estado de arrastar seja mantido
     if (dragCounter > 0 && !isDragging.value) {
       isDragging.value = true
     }
   }
 
   /**
-   * 处理拖拽离开
+   * Trata a saída do arrasto
    */
   const handleDragLeave = (e: DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
-    // 检查是否启用
+    // Verifica se está habilitado
     if (!enabled()) {
       return
     }
@@ -185,7 +185,7 @@ export function useDragUpload(options: DragUploadOptions) {
   }
 
   /**
-   * 处理文件放置
+   * Trata a soltura do arquivo
    */
   const handleDrop = async (e: DragEvent) => {
     e.preventDefault()
@@ -193,30 +193,30 @@ export function useDragUpload(options: DragUploadOptions) {
     dragCounter = 0
     isDragging.value = false
 
-    // 检查是否启用
+    // Verifica se está habilitado
     if (!enabled()) {
       return
     }
 
     const files = e.dataTransfer?.files
     if (files && files.length > 0) {
-      const file = files[0] // 只取第一个文件
+      const file = files[0] // pega apenas o primeiro arquivo
 
-      // 确保文件存在
+      // Garante que o arquivo exista
       if (!file) return
 
-      // 验证文件
+      // Valida o arquivo
       const validationResult = validator.validate(file)
       if (validationResult !== true) {
         message.error(t(validationResult))
         return
       }
 
-      // 处理文件
+      // Processa o arquivo
       try {
         await onDrop(file)
 
-        // 显示成功提示
+        // Exibe a mensagem de sucesso
         if (showSuccessMessage && messages.successMessage) {
           message.success(t(messages.successMessage))
         }
@@ -229,10 +229,10 @@ export function useDragUpload(options: DragUploadOptions) {
   }
 
   /**
-   * 安装全局事件监听器
+   * Instala os listeners de eventos globais
    */
   const install = () => {
-    // 重置状态
+    // Reseta o estado
     dragCounter = 0
     isDragging.value = false
 
@@ -243,7 +243,7 @@ export function useDragUpload(options: DragUploadOptions) {
   }
 
   /**
-   * 卸载全局事件监听器
+   * Remove os listeners de eventos globais
    */
   const uninstall = () => {
     document.removeEventListener('dragenter', handleDragEnter)
@@ -251,12 +251,12 @@ export function useDragUpload(options: DragUploadOptions) {
     document.removeEventListener('dragleave', handleDragLeave)
     document.removeEventListener('drop', handleDrop)
 
-    // 清理状态
+    // Limpa o estado
     dragCounter = 0
     isDragging.value = false
   }
 
-  // 自动安装和卸载
+  // Instalação e remoção automáticas
   onMounted(install)
   onBeforeUnmount(uninstall)
 
@@ -270,11 +270,11 @@ export function useDragUpload(options: DragUploadOptions) {
 }
 
 /**
- * 预定义的文件验证器
+ * Validadores de arquivo predefinidos
  */
 export const fileValidators = {
   /**
-   * 音频文件验证器（10MB限制）
+   * Validador de arquivo de áudio (limite de 10 MB)
    */
   audio: {
     validate: (file: File) => {
@@ -295,7 +295,7 @@ export const fileValidators = {
   } as FileValidator,
 
   /**
-   * 图片文件验证器（2MB限制）
+   * Validador de arquivo de imagem (limite de 2 MB)
    */
   image: {
     validate: (file: File) => {
@@ -315,7 +315,7 @@ export const fileValidators = {
   } as FileValidator,
 
   /**
-   * 固件文件验证器（.bin/.hex文件，50MB限制）
+   * Validador de arquivo de firmware (arquivos .bin/.hex, limite de 50 MB)
    */
   firmware: {
     validate: (file: File) => {

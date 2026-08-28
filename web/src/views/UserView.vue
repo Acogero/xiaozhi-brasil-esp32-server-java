@@ -16,7 +16,7 @@ const { t } = useI18n()
 const { getAvatarUrl } = useAvatar()
 const { exporting, exportToCSV } = useExport()
 
-// 表格和分页
+// Tabela e paginação
 const {
   loading,
   data,
@@ -26,11 +26,11 @@ const {
   createDebouncedSearch
 } = useTable<User>()
 
-// 全局 Loading
+// Loading global
 const loadingStore = useLoadingStore()
 const authRoleOptions = ref<AuthRole[]>([])
 
-// 查询表单
+// Formulário de consulta
 const queryForm = reactive({
   name: '',
   email: '',
@@ -38,14 +38,14 @@ const queryForm = reactive({
   authRoleId: undefined as number | undefined,
 })
 
-// 查询过滤器配置
+// Configuração dos filtros de consulta
 const queryFilters = [
   { label: t('common.name'), key: 'name' as const, placeholder: t('common.name') },
   { label: t('user.email'), key: 'email' as const, placeholder: t('user.email') },
   { label: t('user.phone'), key: 'tel' as const, placeholder: t('user.phone') },
 ]
 
-// 表格列配置
+// Configuração das colunas da tabela
 const columns = computed(() => [
   {
     title: t('common.name'),
@@ -123,7 +123,7 @@ const columns = computed(() => [
   },
 ])
 
-// 获取用户数据
+// Buscar dados dos usuários
 async function fetchData() {
   await loadData((params) => {
     const queryParams: UserQueryParams = {
@@ -149,17 +149,17 @@ async function loadAuthRoleOptions() {
   }
 }
 
-// 防抖搜索
+// Busca com debounce
 const debouncedSearch = createDebouncedSearch(fetchData, 500)
 
-// 导出用户数据
+// Exportar dados dos usuários
 async function handleExport() {
   loadingStore.showLoading(t('common.exporting'))
   try {
-    // 先获取全部用户数据
+    // Primeiro, obter todos os dados dos usuários
     const queryParams: UserQueryParams = {
       pageNo: 1,
-      pageSize: 100000, // 获取全部数据
+      pageSize: 100000, // Obter todos os dados
     }
     
     if (queryForm.name) queryParams.name = queryForm.name
@@ -178,7 +178,7 @@ async function handleExport() {
     
     const allData = res.data.list
     
-    // 导出为 CSV 格式
+    // Exportar em formato CSV
     await exportToCSV(allData, {
       filename: `users_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}`,
       showLoading: false,
@@ -206,19 +206,19 @@ async function handleExport() {
     })
     message.success(t('common.exportSuccess'))
   } catch (error) {
-    console.error('导出失败:', error)
+    console.error('Falha na exportação:', error)
     message.error(t('common.exportFailed'))
   } finally {
     loadingStore.hideLoading()
   }
 }
 
-// 获取头像URL
+// Obter URL do avatar
 function getAvatar(avatar?: string) {
   return getAvatarUrl(avatar)
 }
 
-// 处理分页变化
+// Tratar mudança de paginação
 const onTableChange = (pag: TablePaginationConfig) => {
   handleTableChange(pag)
   fetchData()
@@ -231,7 +231,7 @@ fetchData()
 
 <template>
   <div class="user-view">
-    <!-- 查询表单 -->
+    <!-- Formulário de consulta -->
     <a-card :bordered="false" style="margin-bottom: 16px" class="search-card">
       <a-form layout="horizontal" :colon="false">
         <a-row :gutter="16">
@@ -273,7 +273,7 @@ fetchData()
       </a-form>
     </a-card>
 
-    <!-- 数据表格 -->
+    <!-- Tabela de dados -->
     <a-card :title="t('menu.user')" :bordered="false">
       <template #extra>
         <a-button v-permission="'system:user:export'" type="primary" @click="handleExport" :loading="exporting">
@@ -291,48 +291,48 @@ fetchData()
         size="middle"
         @change="onTableChange"
       >
-        <!-- 头像列 -->
+        <!-- Coluna de avatar -->
         <template #bodyCell="{ column, record }">
-          <!-- 姓名列 -->
+          <!-- Coluna de nome -->
           <template v-if="column.dataIndex === 'name'">
             <a-tooltip :title="record.name" placement="top">
               <span class="ellipsis-text">{{ record.name }}</span>
             </a-tooltip>
           </template>
 
-          <!-- 头像列 -->
+          <!-- Coluna de avatar -->
           <template v-else-if="column.dataIndex === 'avatar'">
             <a-avatar :src="getAvatar(record.avatar)" />
           </template>
           
-          <!-- 邮箱列 -->
+          <!-- Coluna de e-mail -->
           <template v-else-if="column.dataIndex === 'email'">
             <a-tooltip :title="record.email" placement="top">
               <span class="ellipsis-text">{{ record.email || '-' }}</span>
             </a-tooltip>
           </template>
           
-          <!-- 电话列 -->
+          <!-- Coluna de telefone -->
           <template v-else-if="column.dataIndex === 'tel'">
             <a-tooltip :title="record.tel" placement="top">
               <span class="ellipsis-text">{{ record.tel || '-' }}</span>
             </a-tooltip>
           </template>
           
-          <!-- 登录IP列 -->
+          <!-- Coluna de IP de login -->
           <template v-else-if="column.dataIndex === 'loginIp'">
             <a-tooltip :title="record.loginIp" placement="topRight">
               <span class="ellipsis-text">{{ record.loginIp || '-' }}</span>
             </a-tooltip>
           </template>
           
-          <!-- 状态列 -->
+          <!-- Coluna de status -->
           <template v-else-if="column.dataIndex === 'state'">
             <a-tag v-if="record.state == 1" color="green">{{ t('user.normal') }}</a-tag>
             <a-tag v-else color="red">{{ t('user.disabled') }}</a-tag>
           </template>
           
-          <!-- 账户类型列 -->
+          <!-- Coluna de tipo de conta -->
           <template v-else-if="column.dataIndex === 'isAdmin'">
             <a-tag v-if="record.isAdmin == 1" color="blue">{{ t('user.admin') }}</a-tag>
             <a-tag v-else>{{ t('user.normalUser') }}</a-tag>
@@ -345,7 +345,7 @@ fetchData()
       </a-table>
     </a-card>
 
-    <!-- 回到顶部 -->
+    <!-- Voltar ao topo -->
     <a-back-top />
   </div>
 </template>
@@ -359,7 +359,7 @@ fetchData()
   margin-bottom: 0;
 }
 
-// 表格文字省略样式
+// Estilo de truncamento de texto da tabela
 .ellipsis-text {
   display: inline-block;
   width: 100%;
@@ -368,7 +368,7 @@ fetchData()
   text-overflow: ellipsis;
 }
 
-// 表格单元格样式
+// Estilo das células da tabela
 :deep(.ant-table) {
   .ant-table-tbody > tr > td {
     max-width: 0;

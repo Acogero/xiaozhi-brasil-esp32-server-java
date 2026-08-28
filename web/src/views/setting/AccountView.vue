@@ -19,10 +19,10 @@ const { getAvatarUrl } = useAvatar()
 
 const userInfo = computed(() => userStore.userInfo || {})
 const avatarUrl = computed(() => getAvatarUrl(userInfo.value.avatar))
-// 头像上传相关状态
+// Estado relacionado ao upload de avatar
 const avatarLoading = ref(false)
 
-// 表单相关
+// Relacionado ao formulário
 const formRef = ref<FormInstance>()
 const formData = reactive({
   name: userInfo.value.name || '',
@@ -32,7 +32,7 @@ const formData = reactive({
   confirmPassword: '',
 })
 
-// 密码强度
+// Força da senha
 const passwordLevel = ref(0)
 const passwordLevelVisible = ref(false)
 
@@ -46,7 +46,7 @@ const passwordPercent = computed(() => {
   return passwordLevel.value * 30
 })
 
-// 表单验证规则
+// Regras de validação do formulário
 const rules: Record<string, Rule[]> = {
   name: [],
   tel: [
@@ -72,13 +72,13 @@ const rules: Record<string, Rule[]> = {
         }
 
         let level = 0
-        // 数字
+        // Número
         if (/[0-9]/.test(value)) level++
-        // 字母
+        // Letra
         if (/[a-zA-Z]/.test(value)) level++
-        // 特殊符号
+        // Símbolo especial
         if (/[^0-9a-zA-Z_]/.test(value)) level++
-        // 长度
+        // Comprimento
         if (value.length < 6) level = 0
 
         passwordLevel.value = level
@@ -104,19 +104,19 @@ const rules: Record<string, Rule[]> = {
   ]
 }
 
-// 密码输入框聚焦
+// Foco no campo de senha
 const handlePasswordFocus = () => {
   passwordLevelVisible.value = true
 }
 
-// 密码输入框失焦
+// Desfoco no campo de senha
 const handlePasswordBlur = () => {
   setTimeout(() => {
     passwordLevelVisible.value = false
   }, 200)
 }
 
-// 提交表单
+// Enviar formulário
 const submitLoading = ref(false)
 const handleSubmit = async () => {
   try {
@@ -132,7 +132,7 @@ const handleSubmit = async () => {
       email: formData.email,
     }
 
-    // 只有填写了密码才传递密码字段
+    // Só envia o campo de senha se ele foi preenchido
     if (formData.password) {
       updateData.password = formData.password
     }
@@ -140,7 +140,7 @@ const handleSubmit = async () => {
     const res = await updateUser(updateData)
     
     if (res.code === 200) {
-      // 更新本地用户信息
+      // Atualiza as informações locais do usuário
       const userData = res.data as Partial<User>
       userStore.updateUserInfo({
         ...userData,
@@ -149,7 +149,7 @@ const handleSubmit = async () => {
       })
       message.success(t('account.updateSuccess'))
       
-      // 清空密码字段
+      // Limpa o campo de senha
       formData.password = ''
       formData.confirmPassword = ''
       passwordLevel.value = 0
@@ -157,13 +157,13 @@ const handleSubmit = async () => {
       message.error(res.message || t('account.updateFailed'))
     }
   } catch (error) {
-    console.error('表单验证失败:', error)
+    console.error('Falha na validação do formulário:', error)
   } finally {
     submitLoading.value = false
   }
 }
 
-// 头像上传前检查
+// Verificação antes do upload do avatar
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (file) => {
   const isImage = file.type.startsWith('image/')
   const isLt2M = file.size / 1024 / 1024 < 2
@@ -190,10 +190,10 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (file) => {
   return false
 }
 
-// 更新用户头像
+// Atualiza o avatar do usuário
 const updateUserAvatar = async (avatarUrl: string) => {
   try {
-    // 将完整URL转换为相对路径存储
+    // Converte a URL completa em caminho relativo para armazenamento
     const relativePath = getRelativePath(avatarUrl)
     
     const updateData: UpdateUserParams = {
@@ -205,7 +205,7 @@ const updateUserAvatar = async (avatarUrl: string) => {
     const res = await updateUser(updateData)
     
     if (res.code === 200) {
-      // 更新本地用户信息，存储相对路径
+      // Atualiza as informações locais do usuário, armazenando o caminho relativo
       userStore.updateUserInfo({
         ...userInfo.value,
         avatar: relativePath
@@ -221,23 +221,23 @@ const updateUserAvatar = async (avatarUrl: string) => {
   }
 }
 
-// 将完整URL转换为相对路径
+// Converte a URL completa em caminho relativo
 const getRelativePath = (fullUrl: string): string => {
   if (!fullUrl) return ''
   
-  // 如果已经是相对路径，直接返回
+  // Se já for um caminho relativo, retorna diretamente
   if (!fullUrl.startsWith('http://') && !fullUrl.startsWith('https://')) {
     return fullUrl
   }
   
-  // 提取相对路径部分
-  // 例如：http://192.168.5.165:8091/uploads/avatar/2025/10/06/xxx.jpg
-  // 转换为：uploads/avatar/2025/10/06/xxx.jpg
+  // Extrai a parte do caminho relativo
+  // Exemplo: http://192.168.5.165:8091/uploads/avatar/2025/10/06/xxx.jpg
+  // Convertido para: uploads/avatar/2025/10/06/xxx.jpg
   try {
     const url = new URL(fullUrl)
     return url.pathname.startsWith('/') ? url.pathname.substring(1) : url.pathname
   } catch {
-    // 如果URL解析失败，尝试简单的字符串处理
+    // Se a análise da URL falhar, tenta um processamento simples de string
     const parts = fullUrl.split('/')
     const uploadIndex = parts.findIndex(part => part === 'uploads')
     if (uploadIndex !== -1) {
@@ -252,7 +252,7 @@ const getRelativePath = (fullUrl: string): string => {
   <div class="account-view">
     <a-card :title="t('common.personalSettings')" :bordered="false">
       <a-row :gutter="24">
-        <!-- 左侧：信息编辑 -->
+        <!-- Esquerda: edição de informações -->
         <a-col :xs="24" :lg="12">
           <a-form
             ref="formRef"
@@ -335,7 +335,7 @@ const getRelativePath = (fullUrl: string): string => {
           </a-form>
         </a-col>
 
-        <!-- 右侧：头像预览 -->
+        <!-- Direita: pré-visualização do avatar -->
         <a-col :xs="24" :lg="12">
           <div class="avatar-section">
             <a-upload

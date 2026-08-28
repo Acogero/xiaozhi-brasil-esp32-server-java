@@ -1,10 +1,10 @@
 /**
- * 枚举常量定义
- * 用于替代魔法数字，提高代码可读性和维护性
+ * Definição de constantes enumeradas
+ * Usado para substituir números mágicos, melhorando a legibilidade e a manutenibilidade do código
  */
 
 /**
- * HTTP 状态码
+ * Código de status HTTP
  */
 export enum HttpStatus {
   SUCCESS = 200,
@@ -15,7 +15,7 @@ export enum HttpStatus {
 }
 
 /**
- * API 响应码
+ * Código de resposta da API
  */
 export enum ApiCode {
   SUCCESS = 200,
@@ -25,31 +25,31 @@ export enum ApiCode {
 }
 
 /**
- * 用户状态
+ * Status do usuário
  */
 export enum UserState {
-  DISABLED = 0, // 禁用
-  NORMAL = 1,   // 正常
+  DISABLED = 0, // Desativado
+  NORMAL = 1,   // Normal
 }
 
 /**
- * 用户类型
+ * Tipo de usuário
  */
 export enum UserType {
-  NORMAL = 0,   // 普通用户
-  ADMIN = 1,    // 管理员
+  NORMAL = 0,   // Usuário comum
+  ADMIN = 1,    // Administrador
 }
 
 /**
- * 设备状态
+ * Status do dispositivo
  */
 export enum DeviceState {
-  OFFLINE = 0,  // 离线
-  ONLINE = 1,   // 在线
+  OFFLINE = 0,  // Offline
+  ONLINE = 1,   // Online
 }
 
 /**
- * 消息类型
+ * Tipo de mensagem
  */
 export enum MessageType {
   TEXT = 'text',
@@ -59,7 +59,7 @@ export enum MessageType {
 }
 
 /**
- * 消息发送者类型
+ * Tipo de remetente da mensagem
  */
 export enum SenderType {
   USER = 'user',
@@ -68,17 +68,17 @@ export enum SenderType {
 }
 
 /**
- * WebSocket 状态
+ * Status do WebSocket
  */
 export enum WebSocketState {
-  CONNECTING = 0, // 连接中
-  OPEN = 1,       // 已连接
-  CLOSING = 2,    // 关闭中
-  CLOSED = 3,     // 已关闭
+  CONNECTING = 0, // Conectando
+  OPEN = 1,       // Conectado
+  CLOSING = 2,    // Fechando
+  CLOSED = 3,     // Fechado
 }
 
 /**
- * 主题模式
+ * Modo de tema
  */
 export enum ThemeMode {
   LIGHT = 'light',
@@ -87,7 +87,7 @@ export enum ThemeMode {
 }
 
 /**
- * 语言
+ * Idioma
  */
 export enum Locale {
   ZH_CN = 'zh-CN',
@@ -95,7 +95,7 @@ export enum Locale {
 }
 
 /**
- * 导航风格
+ * Estilo de navegação
  */
 export enum NavigationStyle {
   SIDEBAR = 'sidebar',
@@ -103,7 +103,7 @@ export enum NavigationStyle {
 }
 
 /**
- * 表格操作类型
+ * Tipo de operação da tabela
  */
 export enum TableAction {
   ADD = 'add',
@@ -113,7 +113,7 @@ export enum TableAction {
 }
 
 /**
- * 文件上传状态
+ * Status de upload de arquivo
  */
 export enum UploadStatus {
   READY = 'ready',
@@ -123,7 +123,7 @@ export enum UploadStatus {
 }
 
 /**
- * 角色类型
+ * Tipo de função
  */
 export enum RoleType {
   CUSTOM = 'custom',
@@ -131,23 +131,23 @@ export enum RoleType {
 }
 
 /**
- * 配置类型
+ * Tipo de configuração
  */
 export enum ConfigType {
-  LLM = 'llm',           // 大语言模型
-  STT = 'stt',           // 语音识别
-  TTS = 'tts',           // 语音合成
-  AGENT = 'agent',       // 智能体
+  LLM = 'llm',           // Modelo de linguagem grande
+  STT = 'stt',           // Reconhecimento de voz
+  TTS = 'tts',           // Síntese de voz
+  AGENT = 'agent',       // Agente inteligente
 }
 
 /**
- * 成功/失败标识
+ * Indicador de sucesso/falha
  */
 export const SUCCESS = true
 export const FAILURE = false
 
 /**
- * 是/否标识
+ * Indicador de sim/não
  */
 export const YES = 1
 export const NO = 0

@@ -1,5 +1,5 @@
 /**
- * 设备信息接口
+ * Interface de informações do dispositivo
  */
 export interface Device {
   createTime?: string
@@ -37,13 +37,13 @@ export interface Device {
   version?: string
   functionNames?: string
   location?: string
-  editable?: boolean // 表格编辑状态
+  editable?: boolean // Estado de edição na tabela
 }
 
 import type { PageQueryParams } from './api'
 
 /**
- * 设备查询参数
+ * Parâmetros de consulta de dispositivo
  */
 export interface DeviceQueryParams extends PageQueryParams {
   deviceId?: string
@@ -52,10 +52,10 @@ export interface DeviceQueryParams extends PageQueryParams {
   state?: string | number
 }
 
-// 移除重复的响应类型定义，使用统一的 PageResponse<Device>
+// Removida a definição de tipo de resposta duplicada, usa PageResponse<Device> unificado
 
 /**
- * 角色信息接口
+ * Interface de informações de função (role)
  */
 export interface Role {
   roleId: number

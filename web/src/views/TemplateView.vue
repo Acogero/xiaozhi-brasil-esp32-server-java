@@ -1,6 +1,6 @@
 <template>
   <div class="template-container">
-    <!-- 搜索区域 -->
+    <!-- Área de busca -->
     <a-card class="search-card">
       <a-form layout="inline">
         <a-form-item :label="t('template.templateName')">
@@ -31,7 +31,7 @@
       </a-form>
     </a-card>
 
-    <!-- 表格区域 -->
+    <!-- Área da tabela -->
     <a-card :title="t('template.templateList')" :bordered="false" style="margin-top: 16px">
       <template #extra>
         <a-button v-permission="'system:prompt-template:create'" type="primary" @click="handleCreate">
@@ -81,10 +81,10 @@
       </a-table>
     </a-card>
 
-    <!-- 回到顶部 -->
+    <!-- Voltar ao topo -->
     <a-back-top />
 
-    <!-- 创建/编辑对话框 -->
+    <!-- Diálogo de criação/edição -->
     <a-modal
       v-model:open="modal.visible.value"
       :title="modal.isEdit.value ? t('template.editTemplate') : t('template.createTemplate')"
@@ -175,7 +175,7 @@
       </a-form>
     </a-modal>
 
-    <!-- 预览对话框 -->
+    <!-- Diálogo de pré-visualização -->
     <a-modal
       v-model:open="previewVisible"
       :title="t('template.templatePreview')"
@@ -278,25 +278,25 @@ const columns = computed(() => [
   }
 ])
 
-// 搜索表单
+// Formulário de busca
 const searchForm = reactive({
   templateName: '',
   category: ''
 })
 
-// 默认分类选项
+// Opções de categoria padrão
 const defaultCategoryOptions = computed<CategoryOption[]>(() => [
   { label: t('common.all'), value: '' },
-  { label: t('template.categoryBasic'), value: '基础角色' },
-  { label: t('template.categoryProfessional'), value: '专业角色' },
-  { label: t('template.categorySocial'), value: '社交角色' },
-  { label: t('template.categoryEntertainment'), value: '娱乐角色' }
+  { label: t('template.categoryBasic'), value: 'Persona Basica' },
+  { label: t('template.categoryProfessional'), value: 'Persona Profissional' },
+  { label: t('template.categorySocial'), value: 'Persona Social' },
+  { label: t('template.categoryEntertainment'), value: 'Persona de Entretenimento' }
 ])
 
-// 分类选项（包含动态加载的自定义分类）
+// Opções de categoria (inclui categorias personalizadas carregadas dinamicamente)
 const categoryOptions = ref<CategoryOption[]>([...defaultCategoryOptions.value])
 
-// 使用表格组合式函数
+// Usa a função composable de tabela
 const {
   data: dataSource,
   loading,
@@ -309,7 +309,7 @@ const formRef = ref<FormInstance>()
 const modal = useModal({
   formRef,
   onSubmit: async (data, isEdit) => {
-    // Modal 内已有 submitLoading，不需要全局 loading
+    // O Modal já possui submitLoading, não precisa de loading global
     try {
       const category = formData.category === 'custom' && formData.customCategory 
         ? formData.customCategory 
@@ -362,7 +362,7 @@ const modal = useModal({
     } else {
       showCustomCategory.value = false
       resetForm()
-      formData.category = '基础角色'
+      formData.category = 'Persona Basica'
       formData.isDefault = false
     }
   }
@@ -370,7 +370,7 @@ const modal = useModal({
 
 const showCustomCategory = ref(false)
 
-// 表单数据
+// Dados do formulário
 const formData = reactive<TemplateFormData>({
   templateName: '',
   category: '',
@@ -380,16 +380,16 @@ const formData = reactive<TemplateFormData>({
   isDefault: false
 })
 
-// 预览相关
+// Relacionado à pré-visualização
 const previewVisible = ref(false)
 const previewTemplate = ref<PromptTemplate | null>(null)
 
-// 搜索
+// Busca
 const handleSearch = () => {
   fetchData()
 }
 
-// 加载数据
+// Carrega dados
 const fetchData = async () => {
   await loadData(async ({ pageNo, pageSize }) => {
     const res = await queryTemplates({
@@ -398,7 +398,7 @@ const fetchData = async () => {
       pageSize
     })
     
-    // 更新分类选项
+    // Atualiza as opções de categoria
     if (res.data?.list) {
       const categories = new Set<string>()
       res.data.list.forEach((item: PromptTemplate) => {
@@ -424,7 +424,7 @@ const fetchData = async () => {
   })
 }
 
-// 创建
+// Criar
 const handleCreate = () => {
   modal.openCreate()
 }
@@ -433,7 +433,7 @@ const handleEdit = (record: PromptTemplate) => {
   modal.openEdit(record)
 }
 
-// 删除（快速操作，只用 table loading）
+// Excluir (ação rápida, usa apenas o loading da tabela)
 const handleDelete = async (record: PromptTemplate) => {
   if (!record.templateId) return
   
@@ -453,7 +453,7 @@ const handleDelete = async (record: PromptTemplate) => {
   }
 }
 
-// 设为默认（快速操作，只用 table loading）
+// Definir como padrão (ação rápida, usa apenas o loading da tabela)
 const handleSetDefault = async (record: PromptTemplate) => {
   if (!record.templateId) return
   
@@ -473,13 +473,13 @@ const handleSetDefault = async (record: PromptTemplate) => {
   }
 }
 
-// 预览
+// Pré-visualizar
 const handlePreview = (record: PromptTemplate) => {
   previewTemplate.value = record
   previewVisible.value = true
 }
 
-// 处理分类变化
+// Trata a mudança de categoria
 const handleCategoryChange = (value: string) => {
   showCustomCategory.value = value === 'custom'
   if (value !== 'custom') {
@@ -492,11 +492,11 @@ const handleSubmit = async () => {
     await formRef.value?.validate()
     await modal.submit(formData)
   } catch (error) {
-    console.error('表单验证失败:', error)
+    console.error('Falha na validação do formulário:', error)
   }
 }
 
-// 重置表单
+// Reseta o formulário
 const resetForm = () => {
   formRef.value?.resetFields()
   formData.templateName = ''
@@ -508,12 +508,12 @@ const resetForm = () => {
   showCustomCategory.value = false
 }
 
-// 表格变化处理
+// Trata a mudança da tabela
 const handleTableChange: TableProps['onChange'] = (pag) => {
   onTableChange(pag)
 }
 
-// 初始化（非阻塞式加载）
+// Inicialização (carregamento não bloqueante)
 fetchData()
 </script>
 

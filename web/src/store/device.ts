@@ -3,50 +3,50 @@ import { defineStore } from 'pinia'
 import type { Device } from '@/types/device'
 
 /**
- * 设备状态 Store
- * 管理设备列表、在线状态等
+ * Store de estado de dispositivos
+ * Gerencia lista de dispositivos, status online, etc.
  */
 export const useDeviceStore = defineStore('device', () => {
-  // ========== 设备列表 ==========
+  // ========== Lista de dispositivos ==========
   const devices = ref<Device[]>([])
   
-  // 在线设备列表
+  // Lista de dispositivos online
   const onlineDevices = computed(() => {
     return devices.value.filter(device => device.state == '1')
   })
 
-  // 离线设备列表
+  // Lista de dispositivos offline
   const offlineDevices = computed(() => {
     return devices.value.filter(device => device.state == '0')
   })
 
-  // 设备总数
+  // Total de dispositivos
   const totalDevices = computed(() => devices.value.length)
 
-  // 在线设备数
+  // Número de dispositivos online
   const onlineCount = computed(() => onlineDevices.value.length)
 
-  // ========== 当前选中设备 ==========
+  // ========== Dispositivo atualmente selecionado ==========
   const currentDevice = ref<Device | null>(null)
 
-  // ========== 操作方法 ==========
+  // ========== Métodos de operação ==========
   
   /**
-   * 设置设备列表
+   * Define a lista de dispositivos
    */
   const setDevices = (list: Device[]) => {
     devices.value = list
   }
 
   /**
-   * 添加设备
+   * Adiciona dispositivo
    */
   const addDevice = (device: Device) => {
     devices.value.push(device)
   }
 
   /**
-   * 更新设备
+   * Atualiza dispositivo
    */
   const updateDevice = (deviceId: string, updates: Partial<Device>) => {
     const index = devices.value.findIndex(d => d.deviceId === deviceId)
@@ -64,7 +64,7 @@ export const useDeviceStore = defineStore('device', () => {
   }
 
   /**
-   * 删除设备
+   * Remove dispositivo
    */
   const removeDevice = (deviceId: string) => {
     const index = devices.value.findIndex(d => d.deviceId === deviceId)
@@ -74,28 +74,28 @@ export const useDeviceStore = defineStore('device', () => {
   }
 
   /**
-   * 更新设备在线状态
+   * Atualiza o status online do dispositivo
    */
   const updateDeviceStatus = (deviceId: string, online: boolean) => {
     updateDevice(deviceId, { state: online ? '1' : '0' })
   }
 
   /**
-   * 设置当前选中设备
+   * Define o dispositivo atualmente selecionado
    */
   const setCurrentDevice = (device: Device | null) => {
     currentDevice.value = device
   }
 
   /**
-   * 根据 ID 获取设备
+   * Obtém dispositivo pelo ID
    */
   const getDeviceById = (deviceId: string): Device | undefined => {
     return devices.value.find(d => d.deviceId === deviceId)
   }
 
   /**
-   * 清空设备列表
+   * Limpa a lista de dispositivos
    */
   const clearDevices = () => {
     devices.value = []
@@ -103,7 +103,7 @@ export const useDeviceStore = defineStore('device', () => {
   }
 
   return {
-    // 状态
+    // Estado
     devices,
     onlineDevices,
     offlineDevices,
@@ -111,7 +111,7 @@ export const useDeviceStore = defineStore('device', () => {
     onlineCount,
     currentDevice,
     
-    // 方法
+    // Métodos
     setDevices,
     addDevice,
     updateDevice,

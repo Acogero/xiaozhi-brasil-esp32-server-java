@@ -45,7 +45,7 @@ const loadingStore = useLoadingStore()
   font-weight: 500;
 }
 
-/* 过渡动画 */
+/* Animação de transição */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
@@ -58,21 +58,21 @@ const loadingStore = useLoadingStore()
 </style>
 
 <!-- 
-使用方法：
-1. 在 App.vue 中添加：
+Como usar:
+1. Adicione em App.vue:
 <template>
   <GlobalLoading />
   <RouterView />
 </template>
 
-2. 在任何组件中使用：
+2. Use em qualquer componente:
 <script setup>
 import { useLoadingStore } from '@/store/loading'
 
 const loadingStore = useLoadingStore()
 
 const handleSave = async () => {
-  loadingStore.showLoading('正在保存...')
+  loadingStore.showLoading('Salvando...')
   try {
     await saveData()
   } finally {

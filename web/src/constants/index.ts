@@ -1,5 +1,5 @@
 /**
- * 常量统一导出
+ * Exportação unificada de constantes
  */
 export * from './enums'
 export * from './storage'

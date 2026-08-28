@@ -7,16 +7,16 @@ export interface MemoryViewParams {
 }
 
 /**
- * 记忆管理视图跳转 Composable
- * 提供统一的方法来跳转到记忆管理页面
- * 支持传入 roleId 和可选的 deviceId
+ * Composable de navegação para a visualização de gerenciamento de memória
+ * Fornece um método unificado para navegar até a página de gerenciamento de memória
+ * Suporta o envio de roleId e, opcionalmente, deviceId
  */
 export function useMemoryView() {
   const router = useRouter()
 
   /**
-   * 跳转到记忆管理页面
-   * @param params 查询参数：roleId（必填）和 deviceId（可选）
+   * Navega até a página de gerenciamento de memória
+   * @param params Parâmetros de consulta: roleId (obrigatório) e deviceId (opcional)
    */
   const navigateToMemory = (params: MemoryViewParams) => {
     const query: Record<string, string> = {}

@@ -1,6 +1,6 @@
 /**
- * AudioWorklet 处理器 - 用于录音
- * 替代已废弃的 ScriptProcessorNode
+ * Processador AudioWorklet - usado para gravação de áudio
+ * Substitui o ScriptProcessorNode, que está obsoleto
  */
 class AudioRecorderProcessor extends AudioWorkletProcessor {
   constructor() {
@@ -13,22 +13,22 @@ class AudioRecorderProcessor extends AudioWorkletProcessor {
   process(inputs, outputs, parameters) {
     const input = inputs[0]
     
-    // 如果有输入音频数据
+    // Se houver dados de áudio de entrada
     if (input && input.length > 0) {
-      const channelData = input[0] // 获取第一个声道
+      const channelData = input[0] // Obtém o primeiro canal
       
       if (channelData && channelData.length > 0) {
-        // 复制音频数据（避免引用问题）
+        // Copia os dados de áudio (evita problemas de referência)
         const copy = new Float32Array(channelData.length)
         copy.set(channelData)
         
-        // 添加到缓冲区
+        // Adiciona ao buffer
         this.buffer.push(copy)
         this.bufferLength += copy.length
         
-        // 当缓冲区达到指定大小时，发送数据
+        // Quando o buffer atinge o tamanho especificado, envia os dados
         if (this.bufferLength >= this.bufferSize) {
-          // 合并缓冲区数据
+          // Mescla os dados do buffer
           const mergedBuffer = new Float32Array(this.bufferLength)
           let offset = 0
           
@@ -37,24 +37,24 @@ class AudioRecorderProcessor extends AudioWorkletProcessor {
             offset += buf.length
           }
           
-          // 发送音频数据到主线程
+          // Envia os dados de áudio para a thread principal
           this.port.postMessage({
             type: 'audio-data',
             data: mergedBuffer
           })
           
-          // 清空缓冲区
+          // Limpa o buffer
           this.buffer = []
           this.bufferLength = 0
         }
       }
     }
     
-    // 返回 true 表示继续处理
+    // Retorna true para indicar que o processamento deve continuar
     return true
   }
 }
 
-// 注册处理器
+// Registra o processador
 registerProcessor('audio-recorder-processor', AudioRecorderProcessor)
 

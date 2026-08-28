@@ -1,9 +1,9 @@
 /**
- * 统一的 API 类型定义
+ * Definição de tipos unificada da API
  */
 
 /**
- * API 响应基础接口
+ * Interface base de resposta da API
  */
 export interface ApiResponse<T = unknown> {
   code: number
@@ -14,7 +14,7 @@ export interface ApiResponse<T = unknown> {
 }
 
 /**
- * 分页数据接口
+ * Interface de dados paginados
  */
 export interface PageData<T = unknown> {
   list: T[]
@@ -38,42 +38,42 @@ export interface PageData<T = unknown> {
 }
 
 /**
- * 分页响应接口
+ * Interface de resposta paginada
  */
 export interface PageResponse<T = unknown> extends ApiResponse<PageData<T>> {
   data: PageData<T>
 }
 
 /**
- * 列表响应接口（不带分页）
+ * Interface de resposta em lista (sem paginação)
  */
 export interface ListResponse<T = unknown> extends ApiResponse<T[]> {
   data: T[]
 }
 
 /**
- * 通用响应接口（无数据）
+ * Interface de resposta genérica (sem dados)
  */
 export interface EmptyResponse extends ApiResponse<null> {
   data: null
 }
 
 /**
- * 通用响应接口（任意数据）
+ * Interface de resposta genérica (dados quaisquer)
  */
 export interface DataResponse<T = unknown> extends ApiResponse<T> {
   data: T
 }
 
 /**
- * 查询参数基础接口
+ * Interface base de parâmetros de consulta
  */
 export interface BaseQueryParams {
   [key: string]: unknown
 }
 
 /**
- * 分页查询参数
+ * Parâmetros de consulta paginada
  */
 export interface PageQueryParams extends BaseQueryParams {
   pageNo?: number

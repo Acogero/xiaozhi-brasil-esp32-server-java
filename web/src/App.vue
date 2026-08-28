@@ -11,7 +11,7 @@ const { antdLocale } = useLocale()
 const { antdTheme } = useAntdTheme()
 const appStore = useAppStore()
 
-// 初始化和监听窗口大小变化
+// Inicializa e observa mudanças no tamanho da janela
 onMounted(() => {
   appStore.updateScreenSize()
   window.addEventListener('resize', appStore.updateScreenSize)
@@ -25,12 +25,12 @@ onUnmounted(() => {
 <template>
   <a-config-provider :locale="antdLocale" :theme="antdTheme">
     <div id="app">
-      <!-- 全局 Loading 组件 -->
+      <!-- Componente de Loading global -->
       <GlobalLoading />
       
-      <!-- 错误边界 -->
+      <!-- Limite de erro -->
       <ErrorBoundary>
-        <!-- 路由视图 -->
+        <!-- Visualização de rota -->
         <RouterView />
       </ErrorBoundary>
     </div>

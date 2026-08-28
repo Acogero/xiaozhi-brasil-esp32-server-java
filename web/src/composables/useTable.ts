@@ -7,14 +7,14 @@ import type { PageResponse } from '@/types/api'
 import { shouldIgnoreRequestError } from '@/services/request'
 
 /**
- * 表格分页管理 Composable（增强版）
+ * Composable de gerenciamento de paginação de tabela (versão aprimorada)
  */
 export function useTable<T = any>() {
   const { t } = useI18n()
   const loading = ref<boolean>(false)
   const data = ref<T[]>([])
 
-  // 分页配置
+  // Configuração de paginação
   const pagination = reactive<TablePaginationConfig>({
     current: 1,
     pageSize: 10,
@@ -26,7 +26,7 @@ export function useTable<T = any>() {
   })
 
   /**
-   * 处理分页变化
+   * Processa a mudança de paginação
    */
   const handleTableChange = (pag: TablePaginationConfig) => {
     pagination.current = pag.current
@@ -34,14 +34,14 @@ export function useTable<T = any>() {
   }
 
   /**
-   * 重置到第一页
+   * Reinicia para a primeira página
    */
   const resetPagination = () => {
     pagination.current = 1
   }
 
   /**
-   * 加载数据（带错误处理）
+   * Carrega dados (com tratamento de erros)
    */
   const loadData = async (
     fetchFn: (params: { pageNo: number; pageSize: number }) => Promise<PageResponse<T>>,
@@ -89,7 +89,7 @@ export function useTable<T = any>() {
   }
 
   /**
-   * 创建防抖的搜索函数
+   * Cria uma função de busca com debounce
    */
   const createDebouncedSearch = (searchFn: () => void, delay = 500) => {
     return useDebounceFn(() => {

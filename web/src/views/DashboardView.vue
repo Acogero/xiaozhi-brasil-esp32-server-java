@@ -1,11 +1,11 @@
 <template>
   <div class="dashboard-view">
-    <!-- 用户信息与基础统计 -->
+    <!-- Informações do usuário e estatísticas básicas -->
     <a-card :bordered="false" class="user-info-card" :loading="loading">
       <div class="user-info-content">
         <a-avatar :src="userAvatar" :size="72" class="user-avatar" />
         <div class="user-greeting">
-          <h2>{{ timeFix }}，{{ userInfo?.name || userInfo?.username || '用户' }}，{{ welcomeText }}</h2>
+          <h2>{{ timeFix }}，{{ userInfo?.name || userInfo?.username || 'Usuário' }}，{{ welcomeText }}</h2>
           <a-tooltip :title="t('dashboard.clickToTranslate')" placement="bottomLeft">
             <p class="daily-sentence" @click="sentenceShow = !sentenceShow">
               {{ sentenceShow ? sentence.content : sentence.note }}
@@ -32,9 +32,9 @@
       </div>
     </a-card>
 
-    <!-- 内容区域 -->
+    <!-- Área de conteúdo -->
     <a-row :gutter="[20, 20]" class="content-row">
-      <!-- 聊天记录 -->
+      <!-- Histórico de conversas -->
       <a-col :xl="14" :lg="12" :xs="24">
         <a-card :title="t('menu.message')" :bordered="false" :loading="loading">
           <div class="chat-messages">
@@ -60,7 +60,7 @@
         </a-card>
       </a-col>
 
-      <!-- 设备列表 & 社区指引 -->
+      <!-- Lista de dispositivos e guia da comunidade -->
       <a-col :xl="10" :lg="12" :xs="24">
         <a-card :title="t('menu.device')" :bordered="false" :loading="loading" style="margin-bottom: 20px;">
           <a-table
@@ -107,7 +107,7 @@ const router = useRouter()
 const userStore = useUserStore()
 const { getAvatarUrl } = useAvatar()
 
-// 类型定义
+// Definições de tipo
 interface DailySentence {
   content: string
   note: string
@@ -121,11 +121,11 @@ interface FormattedMessage {
   timestamp: Date
 }
 
-// 状态
+// Estado
 const loading = ref(true)
 const sentenceShow = ref(true)
 const sentence = ref<DailySentence>({
-  content: '每一天都是新的开始',
+  content: 'Cada dia é um novo começo',
   note: 'Every day is a new beginning'
 })
 
@@ -136,13 +136,13 @@ const stats = ref({
   users: 0
 })
 
-// 设备列表
+// Lista de dispositivos
 const devices = ref<Device[]>([])
 
-// 消息列表
+// Lista de mensagens
 const messages = ref<Message[]>([])
 
-// 表格列定义
+// Definição das colunas da tabela
 const columns = computed(() => [
   {
     title: t('device.deviceName'),
@@ -177,7 +177,7 @@ const columns = computed(() => [
   }
 ])
 
-// 计算属性
+// Propriedades computadas
 const timeFix = computed(() => {
   const hour = dayjs().hour()
   if (hour < 9) return t('dashboard.greeting.morning')
@@ -208,12 +208,12 @@ const userAvatar = computed(() => {
   return '/user-avatar.png'
 })
 
-// 格式化聊天消息
+// Formata mensagens de chat
 const formattedChatMessages = computed<FormattedMessage[]>(() => {
   return messages.value.map(item => {
     const content = item.sender === 'user' 
-      ? `${item.deviceName || '用户'} 于 ${item.createTime} 发送: ${item.message}`
-      : `${item.roleName || 'AI'} 于 ${item.createTime} 回复: ${item.message}`
+      ? `${item.deviceName || 'Usuário'} em ${item.createTime} enviou: ${item.message}`
+      : `${item.roleName || 'AI'} em ${item.createTime} respondeu: ${item.message}`
     
     return {
       id: String(item.messageId),
@@ -225,7 +225,7 @@ const formattedChatMessages = computed<FormattedMessage[]>(() => {
   })
 })
 
-// 获取每日一句
+// Obtém a frase do dia
 const getSentence = () => {
   const day = dayjs().format('YYYY-MM-DD')
   jsonp(`https://sentence.iciba.com/index.php?c=dailysentence&m=getdetail&title=${day}`, {
@@ -243,35 +243,35 @@ const getSentence = () => {
   })
 }
 
-// 获取设备列表
+// Obtém a lista de dispositivos
 const fetchDevices = async () => {
   try {
     const res = await queryDevices({ start: 1, limit: 10 })
     if (res.code === 200) {
       devices.value = res.data.list || []
     } else {
-      message.error(res.message || '获取设备列表失败')
+      message.error(res.message || 'Falha ao obter a lista de dispositivos')
     }
   } catch (error) {
-    message.error('获取设备列表失败')
+    message.error('Falha ao obter a lista de dispositivos')
   }
 }
 
-// 获取消息列表
+// Obtém a lista de mensagens
 const fetchMessages = async () => {
   try {
     const res = await queryMessages({ start: 1, limit: 20 })
     if (res.code === 200) {
       messages.value = res.data.list || []
     } else {
-      message.error(res.message || '获取消息列表失败')
+      message.error(res.message || 'Falha ao obter a lista de mensagens')
     }
   } catch (error) {
-    message.error('获取消息列表失败')
+    message.error('Falha ao obter a lista de mensagens')
   }
 }
 
-// 统计总数
+// Estatísticas totais
 async function fetchStats() {
   try {
     const params = { pageNum: 1, pageSize: 1 }
@@ -308,7 +308,7 @@ onMounted(async () => {
   margin: 0 auto;
 }
 
-// 用户信息卡片
+// Cartão de informações do usuário
 .user-info-card {
   margin-bottom: 20px;
   border-radius: 12px;
@@ -377,12 +377,12 @@ onMounted(async () => {
   }
 }
 
-// 内容区域
+// Área de conteúdo
 .content-row {
   margin-bottom: 20px;
 }
 
-// 聊天消息
+// Mensagens de chat
 .chat-messages {
   min-height: 400px;
   max-height: 500px;
@@ -457,7 +457,7 @@ onMounted(async () => {
   color: var(--text-secondary);
 }
 
-// 响应式
+// Responsivo
 @media (max-width: 768px) {
   .dashboard-view {
     padding: 16px;
@@ -493,7 +493,7 @@ onMounted(async () => {
   }
 }
 
-// 卡片样式统一
+// Estilo unificado dos cartões
 :deep(.ant-card) {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);

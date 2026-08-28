@@ -1,11 +1,11 @@
 <script setup lang="ts">
-// 个人设置页面 - 占位
+// Página de configurações pessoais - placeholder
 </script>
 
 <template>
   <div class="config-view">
-    <a-card title="个人设置">
-      <p>个人设置功能开发中...</p>
+    <a-card title="Configurações Pessoais">
+      <p>Funcionalidade de configurações pessoais em desenvolvimento...</p>
     </a-card>
   </div>
 </template>

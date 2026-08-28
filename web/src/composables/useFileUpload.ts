@@ -3,52 +3,52 @@ import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 
 /**
- * 文件上传管理 Composable
- * 统一管理文件上传、验证、进度等功能
+ * Composable de gerenciamento de upload de arquivos
+ * Gerencia de forma unificada o upload, a validação, o progresso etc. de arquivos
  */
 
 export interface UseFileUploadOptions {
   /**
-   * 接受的文件类型
-   * 例如: '.pdf,.docx' 或 'image/*' 或 'application/pdf'
+   * Tipos de arquivo aceitos
+   * Exemplo: '.pdf,.docx' ou 'image/*' ou 'application/pdf'
    */
   accept?: string
   
   /**
-   * 最大文件大小（MB）
+   * Tamanho máximo do arquivo (em MB)
    */
   maxSize?: number
   
   /**
-   * 是否支持多文件上传
+   * Se o upload de múltiplos arquivos é suportado
    */
   multiple?: boolean
   
   /**
-   * 自动上传（选择文件后立即上传）
+   * Upload automático (envia imediatamente após selecionar o arquivo)
    */
   autoUpload?: boolean
   
   /**
-   * 上传回调函数
-   * @param files 要上传的文件列表
-   * @returns 上传是否成功
+   * Função de callback do upload
+   * @param files Lista de arquivos a serem enviados
+   * @returns Se o upload foi bem-sucedido
    */
   onUpload?: (files: File[]) => Promise<boolean | void>
   
   /**
-   * 文件变化回调
+   * Callback de alteração de arquivo
    */
   onChange?: (files: File[]) => void
   
   /**
-   * 上传进度回调
+   * Callback de progresso do upload
    */
   onProgress?: (progress: number) => void
   
   /**
-   * 验证回调（自定义验证逻辑）
-   * @returns true 表示验证通过，false 或错误消息表示验证失败
+   * Callback de validação (lógica de validação personalizada)
+   * @returns true indica que a validação passou; false ou uma mensagem de erro indica falha na validação
    */
   customValidate?: (file: File) => boolean | string
 }
@@ -63,40 +63,40 @@ export interface FileItem {
   progress: number
   url?: string
   error?: string
-  response?: unknown  // 上传响应数据
+  response?: unknown  // dados de resposta do upload
 }
 
 export function useFileUpload(options: UseFileUploadOptions = {}) {
   const { t } = useI18n()
   
-  // 上传状态
+  // Estado do upload
   const uploading = ref(false)
   
-  // 文件列表
+  // Lista de arquivos
   const fileList = ref<FileItem[]>([])
   
-  // 总进度
+  // Progresso total
   const totalProgress = ref(0)
   
-  // 文件数量
+  // Quantidade de arquivos
   const fileCount = computed(() => fileList.value.length)
   
-  // 是否有文件
+  // Se há arquivos
   const hasFiles = computed(() => fileCount.value > 0)
   
-  // 是否全部上传成功
+  // Se todos foram enviados com sucesso
   const allSuccess = computed(() => {
     if (fileCount.value === 0) return false
     return fileList.value.every(item => item.status === 'success')
   })
   
-  // 是否有错误
+  // Se há erros
   const hasError = computed(() => {
     return fileList.value.some(item => item.status === 'error')
   })
   
   /**
-   * 验证文件类型
+   * Valida o tipo do arquivo
    */
   const validateFileType = (file: File): boolean => {
     if (!options.accept) return true
@@ -106,17 +106,17 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
     const fileType = file.type.toLowerCase()
     
     const isValid = acceptTypes.some(type => {
-      // 通配符匹配，如 image/*
+      // Correspondência por wildcard, como image/*
       if (type.includes('*')) {
         const [mainType] = type.split('/')
         if (!mainType) return false
         return fileType.startsWith(mainType)
       }
-      // 扩展名匹配
+      // Correspondência por extensão
       if (type.startsWith('.')) {
         return type === fileExt
       }
-      // MIME 类型匹配
+      // Correspondência por tipo MIME
       return type === fileType
     })
     
@@ -128,7 +128,7 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
   }
   
   /**
-   * 验证文件大小
+   * Valida o tamanho do arquivo
    */
   const validateFileSize = (file: File): boolean => {
     if (!options.maxSize) return true
@@ -144,14 +144,14 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
   }
   
   /**
-   * 验证文件
+   * Valida o arquivo
    */
   const validateFile = (file: File): boolean => {
-    // 基础验证
+    // Validação básica
     if (!validateFileType(file)) return false
     if (!validateFileSize(file)) return false
     
-    // 自定义验证
+    // Validação personalizada
     if (options.customValidate) {
       const result = options.customValidate(file)
       if (result === false) {
@@ -168,7 +168,7 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
   }
   
   /**
-   * 创建文件项
+   * Cria o item de arquivo
    */
   const createFileItem = (file: File): FileItem => {
     return {
@@ -183,17 +183,17 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
   }
   
   /**
-   * 处理文件选择
+   * Trata a seleção de arquivo
    */
   const handleFileChange = async (files: File[] | FileList) => {
     const fileArray = Array.from(files)
 
-    // 验证文件
+    // Valida o arquivo
     const validFiles = fileArray.filter(validateFile)
     if (validFiles.length === 0) return
     
-    // 单文件模式：替换文件列表
-    // 多文件模式：追加文件
+    // Modo de arquivo único: substitui a lista de arquivos
+    // Modo de múltiplos arquivos: adiciona o arquivo
     const newFileItems = validFiles.map(createFileItem)
     
     if (options.multiple) {
@@ -202,25 +202,25 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
       fileList.value = newFileItems
     }
     
-    // 触发变化回调
+    // Dispara o callback de alteração
     options.onChange?.(validFiles)
     
-    // 自动上传
+    // Upload automático
     if (options.autoUpload && options.onUpload) {
       await upload(validFiles)
     }
   }
   
   /**
-   * 上传文件
+   * Envia o arquivo
    */
   const upload = async (files?: File[]): Promise<boolean> => {
     if (!options.onUpload) {
-      console.warn('未配置上传函数')
+      console.warn('Função de upload não configurada')
       return false
     }
     
-    // 如果没有指定文件，上传所有未上传的文件
+    // Se nenhum arquivo for especificado, envia todos os arquivos ainda não enviados
     const filesToUpload = files || fileList.value
       .filter(item => item.status === 'ready' || item.status === 'error')
       .map(item => item.file)
@@ -234,7 +234,7 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
     totalProgress.value = 0
     
     try {
-      // 更新文件状态为上传中
+      // Atualiza o estado do arquivo para "enviando"
       filesToUpload.forEach(file => {
         const item = fileList.value.find(f => f.file === file)
         if (item) {
@@ -243,10 +243,10 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
         }
       })
       
-      // 执行上传
+      // Executa o upload
       const result = await options.onUpload(filesToUpload)
       
-      // 上传成功
+      // Upload bem-sucedido
       if (result !== false) {
         filesToUpload.forEach(file => {
           const item = fileList.value.find(f => f.file === file)
@@ -259,7 +259,7 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
         message.success(t('upload.success'))
         return true
       } else {
-        // 上传失败
+        // Falha no upload
         filesToUpload.forEach(file => {
           const item = fileList.value.find(f => f.file === file)
           if (item) {
@@ -270,9 +270,9 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
         return false
       }
     } catch (error: any) {
-      console.error('上传失败:', error)
+      console.error('Falha no upload:', error)
       
-      // 标记为失败
+      // Marca como falha
       filesToUpload.forEach(file => {
         const item = fileList.value.find(f => f.file === file)
         if (item) {
@@ -289,14 +289,14 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
   }
   
   /**
-   * 更新文件进度
+   * Atualiza o progresso do arquivo
    */
   const updateProgress = (fileUid: string, progress: number) => {
     const item = fileList.value.find(f => f.uid === fileUid)
     if (item) {
       item.progress = progress
       
-      // 计算总进度
+      // Calcula o progresso total
       const total = fileList.value.reduce((sum, f) => sum + f.progress, 0)
       totalProgress.value = Math.round(total / fileList.value.length)
       
@@ -305,7 +305,7 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
   }
   
   /**
-   * 移除文件
+   * Remove o arquivo
    */
   const removeFile = (fileUid: string) => {
     const index = fileList.value.findIndex(f => f.uid === fileUid)
@@ -315,7 +315,7 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
   }
   
   /**
-   * 清空文件列表
+   * Limpa a lista de arquivos
    */
   const clearFiles = () => {
     fileList.value = []
@@ -323,7 +323,7 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
   }
   
   /**
-   * 重试上传失败的文件
+   * Tenta reenviar os arquivos com falha no upload
    */
   const retryFailed = async () => {
     const failedFiles = fileList.value
@@ -336,7 +336,7 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
   }
   
   return {
-    // 状态
+    // Estado
     uploading,
     fileList,
     totalProgress,
@@ -345,7 +345,7 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
     allSuccess,
     hasError,
     
-    // 方法
+    // Métodos
     handleFileChange,
     upload,
     updateProgress,

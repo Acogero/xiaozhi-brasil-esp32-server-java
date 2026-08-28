@@ -14,7 +14,7 @@ const props = withDefaults(defineProps<Props>(), {
   autoPlay: false,
 })
 
-// 状态
+// Estado
 const wavesurfer = ref<WaveSurfer | null>(null)
 const isPlaying = ref(false)
 const loading = ref(true)
@@ -22,21 +22,21 @@ const loadError = ref(false)
 const playerId = ref('')
 const waveformRef = ref<HTMLDivElement>()
 
-// 使用 VueUse 的事件总线
+// Usa o barramento de eventos do VueUse
 const audioPlayBus = useEventBus<string>('audio-play')
 const stopAllAudioBus = useEventBus<void>('stop-all-audio')
 
 /**
- * 初始化 WaveSurfer
+ * Inicializa o WaveSurfer
  */
 function initWaveSurfer() {
   if (!waveformRef.value) {
-    console.error('WaveSurfer 容器未找到')
+    console.error('Contêiner do WaveSurfer não encontrado')
     return
   }
 
   try {
-    // 创建 wavesurfer 实例
+    // Cria a instância do wavesurfer
     wavesurfer.value = WaveSurfer.create({
       container: waveformRef.value,
       waveColor: 'var(--ant-color-border)',
@@ -49,13 +49,13 @@ function initWaveSurfer() {
       normalize: true,
     })
   } catch (error) {
-    console.error('WaveSurfer 初始化失败:', error)
+    console.error('Falha ao inicializar o WaveSurfer:', error)
     loading.value = false
     loadError.value = true
     return
   }
 
-  // 事件监听
+  // Escuta de eventos
   wavesurfer.value.on('ready', () => {
     loading.value = false
     if (props.autoPlay && wavesurfer.value) {
@@ -65,7 +65,7 @@ function initWaveSurfer() {
 
   wavesurfer.value.on('play', () => {
     isPlaying.value = true
-    // 通知其他播放器暂停
+    // Notifica outros players para pausar
     audioPlayBus.emit(playerId.value)
   })
 
@@ -75,7 +75,7 @@ function initWaveSurfer() {
 
   wavesurfer.value.on('finish', () => {
     isPlaying.value = false
-    // 播放结束后将游标重置到开始位置
+    // Reposiciona o cursor para o início após o término da reprodução
     if (wavesurfer.value) {
       wavesurfer.value.seekTo(0)
     }
@@ -86,14 +86,14 @@ function initWaveSurfer() {
     loadError.value = true
   })
 
-  // 加载音频
+  // Carrega o áudio
   if (props.audioUrl) {
     loadAudio(props.audioUrl)
   }
 }
 
 /**
- * 加载音频
+ * Carrega o áudio
  */
 function loadAudio(url: string) {
   if (!url) {
@@ -109,12 +109,12 @@ function loadAudio(url: string) {
   loadError.value = false
 
   try {
-    // 检查是否为 Blob URL 或 Data URL
+    // Verifica se é uma Blob URL ou Data URL
     if (url.startsWith('blob:') || url.startsWith('data:')) {
-      // 对于 blob URL，直接加载
+      // Para blob URL, carrega diretamente
       wavesurfer.value.load(url)
     } else {
-      // 使用统一的资源 URL 处理函数
+      // Usa a função unificada de tratamento de URL de recurso
       const audioUrl = getResourceUrl(url)
       if (audioUrl) {
         wavesurfer.value.load(audioUrl)
@@ -130,28 +130,28 @@ function loadAudio(url: string) {
 }
 
 /**
- * 切换播放/暂停
+ * Alterna reprodução/pausa
  */
 function togglePlay() {
   if (loading.value || !wavesurfer.value) return
   wavesurfer.value.playPause()
 }
 
-// 监听其他播放器的播放事件
+// Escuta o evento de reprodução de outros players
 audioPlayBus.on((id) => {
   if (id !== playerId.value && isPlaying.value && wavesurfer.value) {
     wavesurfer.value.pause()
   }
 })
 
-// 监听全局停止事件
+// Escuta o evento global de parada
 stopAllAudioBus.on(() => {
   if (isPlaying.value && wavesurfer.value) {
     wavesurfer.value.pause()
   }
 })
 
-// 监听 audioUrl 变化
+// Observa a mudança de audioUrl
 watch(
   () => props.audioUrl,
   (newUrl) => {
@@ -166,7 +166,7 @@ watch(
 )
 
 onMounted(() => {
-  // 生成唯一 ID
+  // Gera um ID único
   playerId.value = `player_${Date.now()}_${Math.floor(Math.random() * 1000)}`
   initWaveSurfer()
 })
@@ -183,7 +183,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div v-if="loadError" class="audio-error">
-    <span style="color: var(--ant-color-text-tertiary)">音频加载失败</span>
+    <span style="color: var(--ant-color-text-tertiary)">Falha ao carregar o áudio</span>
   </div>
   <div v-else class="audio-player-container">
     <div class="player-controls">

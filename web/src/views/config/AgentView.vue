@@ -16,26 +16,26 @@ import { queryAgents } from '@/services/agent'
 const { t } = useI18n()
 const loadingStore = useLoadingStore()
 
-// ==================== 配置管理 ====================
+// ==================== Gerenciamento de configuração ====================
 const { setAsDefault } = useConfigManager('llm')
 
-// ==================== 查询表单 ====================
+// ==================== Formulário de busca ====================
 const searchForm = ref({
   provider: 'coze' as string,
   agentName: ''
 })
 
-// 平台选项
+// Opções de plataforma
 const providerOptions = computed<ProviderOption[]>(() => [
   { label: t('agent.coze'), value: 'coze' },
   { label: t('agent.dify'), value: 'dify' },
   { label: t('agent.xingchen'), value: 'xingchen' }
 ])
 
-// ==================== 表格 ====================
+// ==================== Tabela ====================
 const { loading, data: agentList, pagination, handleTableChange, loadData, createDebouncedSearch } = useTable<Agent>()
 
-// 基础表格列
+// Colunas básicas da tabela
 const baseColumns = computed<TableColumnsType>(() => [
   {
     title: t('common.avatar'),
@@ -83,7 +83,7 @@ const baseColumns = computed<TableColumnsType>(() => [
   }
 ])
 
-// 动态表格列（根据平台添加智能体ID列）
+// Colunas dinâmicas da tabela (adiciona a coluna de ID do agente conforme a plataforma)
 const tableColumns = computed(() => {
   if (searchForm.value.provider === 'coze') {
     const cols = [...baseColumns.value]
@@ -93,14 +93,14 @@ const tableColumns = computed(() => {
       width: 180,
       align: 'center' as const
     }
-    // 在第三列插入智能体ID列
+    // Insere a coluna de ID do agente na terceira posição
     cols.splice(2, 0, botIdColumn)
     return cols
   }
   return baseColumns.value
 })
 
-// 加载数据
+// Carrega dados
 const fetchData = async () => {
   await loadData((params) => queryAgents({
     provider: searchForm.value.provider,
@@ -110,20 +110,20 @@ const fetchData = async () => {
   }))
 }
 
-// 防抖搜索
+// Busca com debounce
 const debouncedSearch = createDebouncedSearch(fetchData, 500)
 
-// 处理表格分页变化
+// Trata a mudança de paginação da tabela
 const onTableChange = (pag: TablePaginationConfig) => {
   handleTableChange(pag)
   fetchData()
 }
 
-// ==================== 平台配置 ====================
+// ==================== Configuração da plataforma ====================
 const currentConfigId = ref<number | null>(null)
 const platformFormRef = ref<FormInstance>()
 
-// 平台表单数据
+// Dados do formulário de plataforma
 const platformForm = reactive<PlatformConfig>({
   configType: 'agent',
   provider: 'coze',
@@ -137,13 +137,13 @@ const platformForm = reactive<PlatformConfig>({
   sk: ''
 })
 
-// 使用 modal composable
+// Usa o composable modal
 const platformModal = useModal<PlatformConfig>({
   formRef: platformFormRef,
   onSubmit: async (data, isEdit) => {
-    // Modal 内已有 submitLoading，不需要全局 loading
+    // O Modal já possui submitLoading, não precisa de loading global
     try {
-      // 如果是Dify平台，确保apiUrl有正确的格式
+      // Se for a plataforma Dify, garante que a apiUrl tenha o formato correto
       if (data.provider === 'dify' && data.apiUrl) {
         let baseUrl = data.apiUrl
         if (baseUrl.endsWith('/')) {
@@ -152,11 +152,11 @@ const platformModal = useModal<PlatformConfig>({
         data.apiUrl = baseUrl
       }
       
-      // 如果是编辑模式，添加configId
+      // Se for modo de edição, adiciona o configId
       if (isEdit && currentConfigId.value) {
         data.configId = currentConfigId.value
 
-        // 编辑模式下，移除空的敏感字段（留空表示保持原值）
+        // No modo de edição, remove os campos sensíveis vazios (vazio significa manter o valor original)
         const sensitiveFields: (keyof PlatformConfig)[] = ['apiKey', 'apiSecret', 'ak', 'sk']
         sensitiveFields.forEach(field => {
           if (!data[field]) {
@@ -165,7 +165,7 @@ const platformModal = useModal<PlatformConfig>({
         })
       }
 
-      // 调用API
+      // Chama a API
       const apiFunc = isEdit ? updatePlatformConfig : addPlatformConfig
       const res = await apiFunc(data)
       
@@ -185,7 +185,7 @@ const platformModal = useModal<PlatformConfig>({
   },
   onOpen: async (item) => {
     if (item) {
-      // 编辑模式：填充已有配置
+      // Modo de edição: preenche a configuração existente
       currentConfigId.value = item.configId ?? null
       Object.assign(platformForm, {
         configType: item.configType || 'agent',
@@ -200,8 +200,8 @@ const platformModal = useModal<PlatformConfig>({
         sk: item.sk || ''
       })
     } else {
-      // 新增模式：使用默认值
-      // configName 用 provider 名作为默认值（每用户每 provider 仅一份平台凭据，不会重名），
+      // Modo de criação: usa os valores padrão
+      // configName usa o nome do provider como valor padrão (cada usuário tem apenas uma credencial de plataforma por provider, sem risco de duplicidade),
       currentConfigId.value = null
       Object.assign(platformForm, {
         configType: 'agent',
@@ -219,7 +219,7 @@ const platformModal = useModal<PlatformConfig>({
   }
 })
 
-// 表单项配置
+// Configuração dos itens do formulário
 const formItems = computed<PlatformFormItems>(() => ({
   coze: [
     {
@@ -277,26 +277,26 @@ const formItems = computed<PlatformFormItems>(() => ({
   ]
 }))
 
-// 表单验证规则
+// Regras de validação do formulário
 const platformRules = computed(() => {
   const isEditMode = currentConfigId.value !== null
 
-  // 敏感字段列表
+  // Lista de campos sensíveis
   const sensitiveFields = ['apiKey', 'apiSecret', 'ak', 'sk']
 
   const rules: Record<string, any[]> = {}
 
-  // appId 和 apiUrl 始终必填
+  // appId e apiUrl são sempre obrigatórios
   rules.appId = [{ required: true, message: t('agent.enterAppId'), trigger: 'blur' }]
   rules.apiUrl = [{ required: true, message: t('agent.enterApiUrl'), trigger: 'blur' }]
 
-  // 敏感字段：编辑模式下不要求必填（留空则保持原值）
+  // Campos sensíveis: não obrigatórios no modo de edição (deixar em branco mantém o valor original)
   sensitiveFields.forEach(field => {
     if (isEditMode) {
-      // 编辑模式下不要求必填
+      // No modo de edição não é obrigatório
       rules[field] = []
     } else {
-      // 新增模式下必填
+      // No modo de criação é obrigatório
       const messageMap: Record<string, string> = {
         apiKey: t('agent.enterApiKey'),
         apiSecret: t('agent.enterSpaceId'),
@@ -310,24 +310,24 @@ const platformRules = computed(() => {
   return rules
 })
 
-// 当前平台的表单项
+// Itens do formulário da plataforma atual
 const currentFormItems = computed(() => {
   return formItems.value[searchForm.value.provider] || []
 })
 
-// 获取敏感字段的 placeholder
+// Obtém o placeholder dos campos sensíveis
 function getSensitivePlaceholder(field: string, defaultPlaceholder: string): string {
   const isEditMode = currentConfigId.value !== null
   const sensitiveFields = ['apiKey', 'apiSecret', 'ak', 'sk']
 
   if (isEditMode && sensitiveFields.includes(field)) {
-    return '留空则保持原值'
+    return 'Deixe em branco para manter o valor original'
   }
 
   return defaultPlaceholder
 }
 
-// 平台配置标题
+// Título da configuração da plataforma
 const platformModalTitle = computed(() => {
   const platformMap: Record<string, string> = {
     'coze': t('agent.coze'),
@@ -338,11 +338,11 @@ const platformModalTitle = computed(() => {
   return `${t('common.platformConfig')} - ${platformName}`
 })
 
-// 打开平台配置对话框
+// Abre o diálogo de configuração da plataforma
 const handleConfigPlatform = async () => {
   loadingStore.showLoading(t('common.loading'))
   try {
-    // 先查询是否已有配置
+    // Primeiro verifica se já existe uma configuração
     const [res] = await Promise.all([
       queryPlatformConfig('agent', searchForm.value.provider),
       loadingStore.awaitMinDisplay()
@@ -352,10 +352,10 @@ const handleConfigPlatform = async () => {
       const configs = (res.data as { list: any[] })?.list || []
 
       if (configs.length > 0) {
-        // 有配置，以编辑模式打开
+        // Configuração existente, abre em modo de edição
         await platformModal.openEdit(configs[0])
       } else {
-        // 没有配置，以新增模式打开
+        // Sem configuração, abre em modo de criação
         await platformModal.openCreate()
       }
     } else {
@@ -370,20 +370,20 @@ const handleConfigPlatform = async () => {
   }
 }
 
-// 平台配置提交
+// Envio da configuração da plataforma
 const handlePlatformModalOk = async () => {
   try {
     await platformFormRef.value?.validate()
     await platformModal.submit(platformForm)
   } catch (error) {
-    // 表单验证失败，不执行任何操作
-    console.error('表单验证失败:', error)
+    // Falha na validação do formulário, não executa nenhuma ação
+    console.error('Falha na validação do formulário:', error)
   }
 }
 
-// ==================== 设为默认 ====================
+// ==================== Definir como padrão ====================
 const handleSetDefault = async (record: Agent) => {
-  // 将Agent转换为Config格式，然后调用统一的setAsDefault
+  // Converte o Agent para o formato Config e então chama o setAsDefault unificado
   const configRecord = {
     configId: record.configId,
     configName: record.agentName || record.configName || '',
@@ -393,17 +393,17 @@ const handleSetDefault = async (record: Agent) => {
   }
   
   await setAsDefault(configRecord)
-  // 刷新数据
+  // Atualiza os dados
   await fetchData()
 }
 
-// ==================== 初始化（非阻塞式加载）====================
+// ==================== Inicialização (carregamento não bloqueante) ====================
 fetchData()
 </script>
 
 <template>
   <div class="agent-view">
-    <!-- 查询框 -->
+    <!-- Caixa de busca -->
     <a-card :bordered="false" style="margin-bottom: 16px" class="search-card">
       <a-form layout="horizontal" :colon="false">
         <a-row :gutter="16">
@@ -430,7 +430,7 @@ fetchData()
       </a-form>
     </a-card>
 
-    <!-- 表格数据 -->
+    <!-- Dados da tabela -->
     <a-card :title="t('menu.agent')" :bordered="false">
       <template #extra>
         <a-button
@@ -455,13 +455,13 @@ fetchData()
         size="middle"
         :scroll="{ x: 1000 }"
       >
-        <!-- 头像 -->
+        <!-- Avatar -->
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'iconUrl'">
             <a-avatar :src="record.iconUrl" shape="square" :size="48" />
           </template>
 
-          <!-- 智能体名称 -->
+          <!-- Nome do agente -->
           <template v-else-if="column.dataIndex === 'agentName'">
             <a-tooltip :title="record.agentName" :mouse-enter-delay="0.5" placement="topLeft">
               <span v-if="record.agentName" class="ellipsis-text">{{ record.agentName }}</span>
@@ -469,12 +469,12 @@ fetchData()
             </a-tooltip>
           </template>
 
-          <!-- 平台 -->
+          <!-- Plataforma -->
           <template v-else-if="column.dataIndex === 'provider'">
             <a-tag color="blue">{{ record.provider }}</a-tag>
           </template>
 
-          <!-- 智能体描述 -->
+          <!-- Descrição do agente -->
           <template v-else-if="column.dataIndex === 'agentDesc'">
             <a-tooltip :title="record.agentDesc" :mouse-enter-delay="0.5" placement="topLeft">
               <span v-if="record.agentDesc" class="ellipsis-text">{{ record.agentDesc }}</span>
@@ -482,13 +482,13 @@ fetchData()
             </a-tooltip>
           </template>
 
-          <!-- 默认状态 -->
+          <!-- Status padrão -->
           <template v-else-if="column.dataIndex === 'isDefault'">
             <a-tag v-if="record.isDefault == 1" color="green">{{ t('common.default') }}</a-tag>
             <span v-else>-</span>
           </template>
 
-          <!-- 操作 -->
+          <!-- Ações -->
           <template v-else-if="column.key === 'operation'">
             <TableActionButtons
               :record="record"
@@ -502,7 +502,7 @@ fetchData()
       </a-table>
     </a-card>
 
-    <!-- 平台配置对话框 -->
+    <!-- Diálogo de configuração da plataforma -->
     <a-modal
       :title="platformModalTitle"
       :open="platformModal.visible.value"

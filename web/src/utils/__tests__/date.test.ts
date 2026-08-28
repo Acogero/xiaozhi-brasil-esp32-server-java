@@ -2,37 +2,37 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { formatDate, formatDateTime, getRelativeTime } from '../date'
 
 describe('formatDate', () => {
-  it('返回默认值 "-" 当输入为空', () => {
+  it('retorna o valor padrão "-" quando a entrada está vazia', () => {
     expect(formatDate()).toBe('-')
     expect(formatDate(undefined)).toBe('-')
     expect(formatDate('')).toBe('-')
   })
 
-  it('自定义默认值', () => {
+  it('valor padrão customizado', () => {
     expect(formatDate(undefined, 'N/A')).toBe('N/A')
-    expect(formatDate('', '暂无')).toBe('暂无')
+    expect(formatDate('', 'Não disponível')).toBe('Não disponível')
   })
 
-  it('格式化有效日期字符串', () => {
+  it('formata uma string de data válida', () => {
     const result = formatDate('2026-03-12')
-    // toLocaleDateString 输出因环境而异，只验证返回了非默认值
+    // A saída de toLocaleDateString varia conforme o ambiente; apenas verifica que o retorno não é o valor padrão
     expect(result).not.toBe('-')
     expect(typeof result).toBe('string')
   })
 })
 
 describe('formatDateTime', () => {
-  it('返回默认值 "-" 当输入为空', () => {
+  it('retorna o valor padrão "-" quando a entrada está vazia', () => {
     expect(formatDateTime()).toBe('-')
     expect(formatDateTime(undefined)).toBe('-')
     expect(formatDateTime('')).toBe('-')
   })
 
-  it('自定义默认值', () => {
+  it('valor padrão customizado', () => {
     expect(formatDateTime(undefined, 'N/A')).toBe('N/A')
   })
 
-  it('格式化有效日期时间字符串', () => {
+  it('formata uma string de data e hora válida', () => {
     const result = formatDateTime('2026-03-12T10:30:00')
     expect(result).not.toBe('-')
     expect(typeof result).toBe('string')
@@ -49,40 +49,40 @@ describe('getRelativeTime', () => {
     vi.useRealTimers()
   })
 
-  it('返回 "-" 当输入为空', () => {
+  it('retorna "-" quando a entrada está vazia', () => {
     expect(getRelativeTime()).toBe('-')
     expect(getRelativeTime(undefined)).toBe('-')
     expect(getRelativeTime('')).toBe('-')
   })
 
-  it('返回 "刚刚" 当时间差小于60秒', () => {
+  it('retorna "agora mesmo" quando a diferença é menor que 60 segundos', () => {
     const now = new Date('2026-03-12T11:59:30')
-    expect(getRelativeTime(now.toISOString())).toBe('刚刚')
+    expect(getRelativeTime(now.toISOString())).toBe('agora mesmo')
   })
 
-  it('返回 "N分钟前" 当时间差小于60分钟', () => {
+  it('retorna "há N minutos" quando a diferença é menor que 60 minutos', () => {
     const fiveMinAgo = new Date('2026-03-12T11:55:00')
-    expect(getRelativeTime(fiveMinAgo.toISOString())).toBe('5分钟前')
+    expect(getRelativeTime(fiveMinAgo.toISOString())).toBe('há 5 minutos')
 
     const thirtyMinAgo = new Date('2026-03-12T11:30:00')
-    expect(getRelativeTime(thirtyMinAgo.toISOString())).toBe('30分钟前')
+    expect(getRelativeTime(thirtyMinAgo.toISOString())).toBe('há 30 minutos')
   })
 
-  it('返回 "N小时前" 当时间差小于24小时', () => {
+  it('retorna "há N horas" quando a diferença é menor que 24 horas', () => {
     const twoHoursAgo = new Date('2026-03-12T10:00:00')
-    expect(getRelativeTime(twoHoursAgo.toISOString())).toBe('2小时前')
+    expect(getRelativeTime(twoHoursAgo.toISOString())).toBe('há 2 horas')
   })
 
-  it('返回 "N天前" 当时间差小于7天', () => {
+  it('retorna "há N dias" quando a diferença é menor que 7 dias', () => {
     const threeDaysAgo = new Date('2026-03-09T12:00:00')
-    expect(getRelativeTime(threeDaysAgo.toISOString())).toBe('3天前')
+    expect(getRelativeTime(threeDaysAgo.toISOString())).toBe('há 3 dias')
   })
 
-  it('返回格式化日期 当时间差>=7天', () => {
+  it('retorna data formatada quando a diferença é >= 7 dias', () => {
     const tenDaysAgo = new Date('2026-03-02T12:00:00')
     const result = getRelativeTime(tenDaysAgo.toISOString())
-    // 超过7天应回退到 formatDate, 非 "天前" 格式
-    expect(result).not.toContain('天前')
+    // Acima de 7 dias deve recair para formatDate, não no formato "há X dias"
+    expect(result).not.toContain('dias')
     expect(result).not.toBe('-')
   })
 })

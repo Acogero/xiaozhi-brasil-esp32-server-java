@@ -3,8 +3,8 @@ import { GithubOutlined, QqOutlined, CopyrightOutlined, WechatOutlined } from '@
 
 const currentYear = new Date().getFullYear()
 
-// 微信号或微信二维码链接
-const wechatQrCodeValue = '/public/static/img/wechat.jpg' // 可以替换为你的微信号或链接
+// Número do WeChat ou link do QR code do WeChat
+const wechatQrCodeValue = '/public/static/img/wechat.jpg' // Pode ser substituído pelo seu número ou link do WeChat
 </script>
 
 <template>
