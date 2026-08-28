@@ -35,19 +35,19 @@ import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 对话处理服务
- * 负责处理语音识别和对话生成的业务逻辑
- * 核心对话逻辑已委托给 Persona，DialogueService 主要负责：
- * 1. 音频数据接收与VAD处理
- * 2. STT流式识别的启动与音频流管理
- * 3. 唤醒词处理
- * 4. 对话中止（abort）
- * 5. 监控数据记录
+ * Serviço de processamento de diálogo
+ * Responsável pela lógica de negócio do reconhecimento de voz e da geração do diálogo
+ * A lógica principal do diálogo foi delegada ao Persona; o DialogueService é responsável principalmente por:
+ * 1. Recepção de dados de áudio e processamento de VAD
+ * 2. Início do reconhecimento em streaming (STT) e gerenciamento do fluxo de áudio
+ * 3. Tratamento da palavra de ativação
+ * 4. Interrupção do diálogo (abort)
+ * 5. Registro de dados de monitoramento
  */
 @Slf4j
 @Service
 public class DialogueService{
-    private static final String ABORT_REASON_VAD = "检测到vad";
+    private static final String ABORT_REASON_VAD = "vad detectado";
 
     @Resource
     private PersonaFactory personaFactory;
@@ -78,7 +78,7 @@ public class DialogueService{
     }
 
     /**
-     * 处理音频数据
+     * Trata os dados de áudio
      */
     public void processAudioData(ChatSession session, byte[] opusData) {
         if (session == null || opusData == null || opusData.length == 0) {
@@ -87,34 +87,34 @@ public class DialogueService{
         String sessionId = session.getSessionId();
 
         try {
-            // 如果播放器正在执行后续回调（如告别语播放中），忽略音频数据
+            // Se o player estiver executando um callback subsequente (como a reprodução da mensagem de despedida), ignora os dados de áudio
             Player player = session.getPlayer();
             if (player != null && player.getFunctionAfterChat() != null) {
                 return;
             }
 
             DeviceBO device = session.getDevice();
-            // 如果设备未注册或未绑定，忽略音频数据
+            // Se o dispositivo não estiver registrado ou vinculado, ignora os dados de áudio
             if (device == null || ObjectUtils.isEmpty(device.getRoleId())) {
                 return;
             }
 
-            // 处理VAD
+            // Processa o VAD
             VadService.VadResult vadResult = vadService.processAudio(sessionId, opusData);
             if (vadResult == null || vadResult.getStatus() == VadStatus.ERROR
                     || vadResult.getProcessedData() == null) {
                 return;
             }
 
-            // 检测到语音活动，更新最后活动时间
+            // Atividade de voz detectada, atualizando o horário da última atividade
             sessionManager.updateLastActivity(sessionId);
-            // 根据VAD状态处理
+            // Trata de acordo com o estado do VAD
             switch (vadResult.getStatus()) {
                 case SPEECH_START:
-                    // 先启动STT（同步创建音频流），确保流已准备好
+                    // Inicia o STT primeiro (cria o fluxo de áudio de forma síncrona), garantindo que o fluxo já esteja pronto
                     startStt(session, sessionId, vadResult.getProcessedData());
-                    // 再触发abort停止当前播放中的TTS
-                    // 通过Persona.isActive()综合判断整个管道是否活跃（LLM/TTS/Player任一层）
+                    // Em seguida, dispara o abort para parar o TTS em reprodução
+                    // Usa Persona.isActive() para avaliar de forma abrangente se todo o pipeline está ativo (qualquer uma das camadas LLM/TTS/Player)
                     Persona persona = session.getPersona();
                     if (persona != null && persona.isActive()) {
                         abortDialogue(session, ABORT_REASON_VAD);
@@ -122,14 +122,14 @@ public class DialogueService{
                     break;
 
                 case SPEECH_CONTINUE:
-                    // 语音继续，发送数据到流式识别
+                    // Voz continua, enviando dados para o reconhecimento em streaming
                     if (session.getDeviceState() == DeviceState.LISTENING) {
                         session.sendAudioData(vadResult.getProcessedData());
                     }
                     break;
 
                 case SPEECH_END:
-                    // 语音结束，完成流式识别；状态切换为 THINKING 等待 LLM 响应
+                    // Voz encerrada, finalizando o reconhecimento em streaming; estado alterado para THINKING aguardando a resposta do LLM
                     if (session.getDeviceState() == DeviceState.LISTENING) {
                         session.completeAudioStream();
                         session.transitionTo(DeviceState.THINKING);
@@ -140,29 +140,29 @@ public class DialogueService{
                     break;
             }
         } catch (Exception e) {
-            log.error("处理音频数据失败: {}", e.getMessage(), e);
+            log.error("Falha ao processar os dados de áudio: {}", e.getMessage(), e);
         }
     }
 
     /**
-     * 启动语音识别
-     * 同步创建音频流（避免竞态条件），然后在虚拟线程中执行 STT 及后续处理
+     * Inicia o reconhecimento de voz
+     * Cria o fluxo de áudio de forma síncrona (evitando condição de corrida) e então executa o STT e o processamento subsequente em uma virtual thread
      */
     private void startStt(
             ChatSession session,
             String sessionId,
             byte[] initialAudio) {
-        Assert.notNull(session, "session不能为空");
+        Assert.notNull(session, "session não pode ser nulo");
 
-        // 同步部分：先创建音频流和设置状态，避免竞态条件
-        // 这样可以确保后续的SPEECH_CONTINUE能正确发送数据
+        // Parte síncrona: cria o fluxo de áudio e define o estado primeiro, evitando condição de corrida
+        // Isso garante que o SPEECH_CONTINUE subsequente consiga enviar os dados corretamente
         session.closeAudioStream();
         session.createAudioStream();
         session.transitionTo(DeviceState.LISTENING);
 
         Thread.startVirtualThread(() -> {
             try {
-                // 发送初始音频数据
+                // Envia os dados de áudio iniciais
                 if (initialAudio != null && initialAudio.length > 0) {
                     session.sendAudioData(initialAudio);
                 }
@@ -182,14 +182,14 @@ public class DialogueService{
                     return;
                 }
 
-                // 发送STT识别结果到设备
+                // Envia o resultado do reconhecimento STT ao dispositivo
                 persona.getPlayer().sendStt(sttResult.text());
 
-                // 发布语音识别完成事件
+                // Publica o evento de conclusão do reconhecimento de voz
                 eventPublisher.publishEvent(new SpeechRecognizedEvent(this, sessionId, sttResult.text(),
                         sttResult.hasEmotion() ? sttResult.emotion() : null));
 
-                // 音频保存
+                // Salvamento de áudio
                 Instant userInstant = Instant.now();
                 Path userAudioPath = session.getAudioPath(MessageBO.SENDER_USER, userInstant);
                 session.setUserAudioPath(userAudioPath);
@@ -198,18 +198,18 @@ public class DialogueService{
                 handleText(session, sttResult);
 
             } catch (Exception e) {
-                log.error("流式识别错误: {}", e.getMessage(), e);
+                log.error("Erro no reconhecimento em streaming: {}", e.getMessage(), e);
             }
         });
     }
 
     /**
-     * 处理语音唤醒
+     * Trata a ativação por voz
      */
     public void handleWakeWord(ChatSession session, String text) {
-        log.info("检测到唤醒词: {}", text);
+        log.info("Palavra de ativação detectada: {}", text);
         try {
-            // 设置为 SPEAKING 状态，在唤醒响应期间忽略 VAD 检测
+            // Define o estado como SPEAKING, ignorando a detecção de VAD durante a resposta de ativação
             session.transitionTo(DeviceState.SPEAKING);
 
             DeviceBO device = session.getDevice();
@@ -219,15 +219,15 @@ public class DialogueService{
 
             personaFactory.buildPersona(session).chat(text, false);
         } catch (Exception e) {
-            log.error("处理唤醒词失败: {}", e.getMessage(), e);
+            log.error("Falha ao tratar a palavra de ativação: {}", e.getMessage(), e);
         }
     }
 
     /**
-     * 统一的文本处理入口：情感标签 → 意图检测 → LLM+TTS
+     * Ponto de entrada unificado para o processamento de texto: rótulo de emoção → detecção de intenção → LLM+TTS
      *
-     * @param session 当前会话
-     * @param sttResult STT结果（纯文本使用 SttResult.textOnly() 包装）
+     * @param session sessão atual
+     * @param sttResult resultado do STT (texto puro é encapsulado com SttResult.textOnly())
      */
     public void handleText(ChatSession session, SttResult sttResult) {
         try {
@@ -237,7 +237,7 @@ public class DialogueService{
 
             UserMessage userMessage = buildUserMessage(text, sttResult);
 
-            // 意图检测
+            // Detecção de intenção
             if (intentService.detect(text) == IntentService.Intent.EXIT) {
                 sendGoodbyeMessage(session);
                 return;
@@ -247,21 +247,21 @@ public class DialogueService{
             try {
                 persona.chat(userMessage, true);
             } catch (Exception e) {
-                log.error("LLM对话处理失败: {}", e.getMessage(), e);
+                log.error("Falha no processamento do diálogo com o LLM: {}", e.getMessage(), e);
             }
 
         } catch (Exception e) {
-            log.error("处理文本失败: {}", e.getMessage(), e);
+            log.error("Falha ao processar o texto: {}", e.getMessage(), e);
         }
     }
 
     /**
-     * 构造带结构化元数据与时间戳的 UserMessage。
-     * 元数据不在 text 上做前缀拼接，而是走 UserMessage.metadata Map，
-     * 由 {@code UserMessageAssembler#assemble(Message)} 在送 LLM 前统一装配。
+     * Constrói um UserMessage com metadados estruturados e timestamp.
+     * Os metadados não são concatenados como prefixo no text; em vez disso, passam pelo Map UserMessage.metadata,
+     * que é montado de forma unificada por {@code UserMessageAssembler#assemble(Message)} antes de ser enviado ao LLM.
      *
-     * @param text     用户裸文本
-     * @param sttResult STT 结果，可能含情绪信息
+     * @param text     texto puro do usuário
+     * @param sttResult resultado do STT, pode conter informações de emoção
      */
     private static UserMessage buildUserMessage(String text, SttResult sttResult) {
         MessageMetadataBO metadataBO = MessageMetadataBO.builder()
@@ -270,21 +270,21 @@ public class DialogueService{
                 .emotionDegree(sttResult.hasEmotion() ? sttResult.emotionDegree() : null)
                 .build();
         Map<String, Object> msgMeta = new HashMap<>();
-        // 只要任一字段有值就挂载；全空时不挂，保持 UserMessage.metadata 干净
+        // Anexa se qualquer campo tiver valor; se todos estiverem vazios, não anexa, mantendo o UserMessage.metadata limpo
         if (StringUtils.hasText(metadataBO.getEmotion())) {
             msgMeta.put(MessageMetadataBO.METADATA_KEY, metadataBO);
         }
         UserMessage userMessage = UserMessage.builder().text(text).metadata(msgMeta).build();
-        // 消息时间戳（投影层据此拼 [yyyy-MM-ddTHH:mm:ss] 前缀）
+        // Timestamp da mensagem (usado pela camada de projeção para montar o prefixo [yyyy-MM-ddTHH:mm:ss])
         MessageTimeMetadata.setTimeMillis(userMessage, Instant.now());
         return userMessage;
     }
 
     /**
-     * 发送告别语并在播放完成后关闭会话
-     * 委托给Persona处理告别流程
+     * Envia a mensagem de despedida e fecha a sessão após a reprodução terminar
+     * Delega o fluxo de despedida ao Persona
      *
-     * @param session WebSocket会话
+     * @param session sessão WebSocket
      */
     public void sendGoodbyeMessage(ChatSession session) {
         if (session == null || !session.isAudioChannelOpen()) {
@@ -299,43 +299,43 @@ public class DialogueService{
     }
 
     /**
-     * 中止当前对话
-     * 先取消Synthesizer的上游Flux订阅，再停止Player。
-     * 如果不先取消Synthesizer，SentenceHelper会继续分句并调用player.play(newFlux)，
-     * 导致音频重叠或播放被清空后又有新音频进来。
+     * Interrompe o diálogo atual
+     * Cancela primeiro a assinatura do Flux upstream do Synthesizer, depois para o Player.
+     * Se o Synthesizer não for cancelado primeiro, o SentenceHelper continuará segmentando frases e chamando player.play(newFlux),
+     * causando sobreposição de áudio ou a chegada de novo áudio depois que a reprodução já foi limpa.
      */
     public void abortDialogue(ChatSession session, String reason) {
         try {
             String sessionId = session.getSessionId();
-            log.info("中止对话 - SessionId: {}, Reason: {}", sessionId, reason);
+            log.info("Interrompendo o diálogo - SessionId: {}, Reason: {}", sessionId, reason);
 
-            // 关闭音频流
-            // 注意：当reason是"检测到vad"时，不关闭音频流和重置状态
-            // 因为这是用户打断TTS继续说话，startStt已经创建了新的音频流并设置为LISTENING
+            // Fecha o fluxo de áudio
+            // Atenção: quando o reason é "vad detectado", não fecha o fluxo de áudio nem reseta o estado
+            // porque isso significa que o usuário interrompeu o TTS para continuar falando; o startStt já criou um novo fluxo de áudio e definiu o estado como LISTENING
             if (!ABORT_REASON_VAD.equals(reason)) {
                 session.closeAudioStream();
-                // abort 后服务端发 tts stop，设备切回聆听，服务端同步为 LISTENING
+                // Após o abort, o servidor envia tts stop, o dispositivo volta a escutar e o servidor sincroniza o estado para LISTENING
                 session.transitionTo(DeviceState.LISTENING);
             }
 
-            // 先取消语音合成器的上游Flux订阅，停止产生新的音频数据
+            // Cancela primeiro a assinatura do Flux upstream do sintetizador de voz, interrompendo a geração de novos dados de áudio
             Persona persona = session.getPersona();
             if (persona != null && persona.getSynthesizer() != null) {
                 persona.getSynthesizer().cancel();
             }
 
-            // 再终止音频播放，清空播放队列
+            // Em seguida, encerra a reprodução de áudio, limpando a fila de reprodução
             Player player = session.getPlayer();
             if(player!=null){
                 player.stop();
             }
 
-            // 无论player是否存在，都需要发送stop消息通知设备进入聆听状态
-            // 这是因为设备可能在还未创建player时就发送了abort消息
+            // Independentemente de o player existir ou não, é necessário enviar a mensagem stop para notificar o dispositivo a entrar em estado de escuta
+            // Isso ocorre porque o dispositivo pode ter enviado a mensagem abort antes mesmo de o player ser criado
             messageService.sendTtsMessage(session, null, "stop");
 
-            // 如果在goodbye流程中被打断（functionAfterChat已设置），
-            // 需要执行清理回调（关闭session等），并清除回调防止重复执行
+            // Se for interrompido durante o fluxo de goodbye (functionAfterChat já definido),
+            // é necessário executar o callback de limpeza (fechar a session etc.) e removê-lo para evitar execução duplicada
             if (player != null) {
                 Runnable afterChat = player.getFunctionAfterChat();
                 if (afterChat != null) {
@@ -344,12 +344,12 @@ public class DialogueService{
                 }
             }
         } catch (Exception e) {
-            log.error("中止对话失败: {}", e.getMessage(), e);
+            log.error("Falha ao interromper o diálogo: {}", e.getMessage(), e);
         }
     }
 
     /**
-     * 保存用户音频数据为WAV文件
+     * Salva os dados de áudio do usuário como um arquivo WAV
      */
     private void saveUserAudio(ChatSession session, Path path) {
         List<byte[]> pcmFrames = vadService.getPcmData(session.getSessionId());
@@ -358,13 +358,13 @@ public class DialogueService{
             return;
         }
         AudioUtils.saveAsWav(path, fullPcmData);
-        log.debug("用户音频已保存: {}", path);
+        log.debug("Áudio do usuário salvo: {}", path);
 
         try {
             String storedPath = storageServiceFactory.getStorageService().upload(path, path.toString());
             session.setUserAudioPath(Path.of(storedPath));
         } catch (Exception e) {
-            log.warn("上传用户音频失败，保留本地路径: {}", path, e);
+            log.warn("Falha ao enviar o áudio do usuário, mantendo o caminho local: {}", path, e);
         }
     }
 
