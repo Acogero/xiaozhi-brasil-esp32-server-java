@@ -27,13 +27,13 @@ const { getAvatarUrl } = useAvatar()
 const { currentLocale, localeName, setLocale, availableLocales, localeNames } = useLocale()
 const { themeMode, actualTheme, toggleTheme, setTheme } = useAntdTheme()
 
-// 用户信息
+// Informações do usuário
 const user = computed(() => userStore.userInfo || {})
 
-// 头像URL
+// URL do avatar
 const avatarUrl = computed(() => getAvatarUrl(user.value.avatar))
 console.log(avatarUrl.value)
-// 主题图标
+// Ícone do tema
 const themeIcon = computed(() => {
   switch (actualTheme.value) {
     case 'light':
@@ -45,7 +45,7 @@ const themeIcon = computed(() => {
   }
 })
 
-// 主题文本
+// Texto do tema
 const themeText = computed(() => {
   switch (themeMode.value) {
     case 'light':
@@ -60,40 +60,40 @@ const themeText = computed(() => {
 })
 
 /**
- * 退出登录
+ * Sair da conta
  */
 function handleLogout() {
-  // 清除用户信息
+  // Limpa as informações do usuário
   userStore.clearUserInfo()
-  // 清除token
+  // Limpa o token
   userStore.clearToken()
-  // 跳转到登录页
+  // Redireciona para a página de login
   router.push(ROUTES.LOGIN)
 }
 
 /**
- * 跳转到个人中心
+ * Redireciona para o centro pessoal
  */
 function goToAccount() {
   router.push(ROUTES.SETTING_ACCOUNT)
 }
 
 /**
- * 跳转到个人设置
+ * Redireciona para as configurações pessoais
  */
 function goToSettings() {
   router.push(ROUTES.SETTING_CONFIG)
 }
 
 /**
- * 切换语言
+ * Alterna o idioma
  */
 function handleLocaleChange(locale: string) {
-  setLocale(locale as 'zh-CN' | 'en-US')
+  setLocale(locale as 'zh-CN' | 'en-US' | 'pt-BR')
 }
 
 /**
- * 切换主题
+ * Alterna o tema
  */
 function handleThemeChange(theme: string) {
   setTheme(theme as 'light' | 'dark' | 'auto')
@@ -103,11 +103,11 @@ function handleThemeChange(theme: string) {
 <template>
   <div class="app-header">
     <div class="header-left">
-      <!-- 预留左侧空间，可以放置面包屑等 -->
+      <!-- Espaço reservado à esquerda, pode receber breadcrumbs, etc. -->
     </div>
     
     <div class="header-right">
-      <!-- 语言选择 -->
+      <!-- Seleção de idioma -->
       <a-dropdown class="locale-dropdown">
         <a-button type="text" class="header-btn">
           <GlobalOutlined />
@@ -127,7 +127,7 @@ function handleThemeChange(theme: string) {
         </template>
       </a-dropdown>
 
-      <!-- 主题切换 -->
+      <!-- Alternância de tema -->
       <a-dropdown class="theme-dropdown">
         <a-button type="text" class="header-btn">
           <component :is="themeIcon" />
@@ -161,7 +161,7 @@ function handleThemeChange(theme: string) {
         </template>
       </a-dropdown>
 
-      <!-- 用户信息下拉菜单 -->
+      <!-- Menu suspenso de informações do usuário -->
       <a-dropdown class="user-dropdown">
         <div class="user-info">
           <a-avatar
@@ -182,7 +182,7 @@ function handleThemeChange(theme: string) {
               <UserOutlined />
               <span class="menu-text">{{ t('common.personalCenter') }}</span>
             </a-menu-item>
-            <!-- 个人设置（暂时禁用）
+            <!-- Configurações pessoais (temporariamente desativado)
             <a-menu-item @click="() => goToSettings()">
               <SettingOutlined />
               <span class="menu-text">{{ t('common.personalSettings') }}</span>
