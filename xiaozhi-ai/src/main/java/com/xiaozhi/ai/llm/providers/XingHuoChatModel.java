@@ -22,19 +22,19 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 讯飞星火大模型实现
- * 支持的模型版本:
- * - X1 (x1): 深度推理模型,对标OpenAI o1和DeepSeek R1,支持推理、数学、代码等任务
- * - 4.0Ultra (generalv4): 最强大的星火大模型,32K输入/32K输出
- * - Max (generalv3.5): 旗舰级大语言模型,8K输入/8K输出
- * - Max-32K (generalv3.5-32k): Max的32K版本
- * - Pro (generalv3): 专业级大语言模型,8K输入/8K输出
- * - Pro-128K (generalv3-128k): Pro的128K版本,128K输入/4K输出
- * - Lite (general): 轻量级大语言模型,8K输入/4K输出,免费使用
+ * Implementação do modelo de grande porte XingHuo (iFLYTEK)
+ * Versões de modelo suportadas:
+ * - X1 (x1): modelo de raciocínio profundo, comparável ao OpenAI o1 e ao DeepSeek R1, com suporte a tarefas de raciocínio, matemática, código, entre outras
+ * - 4.0Ultra (generalv4): o modelo XingHuo mais potente, 32K de entrada/32K de saída
+ * - Max (generalv3.5): modelo de linguagem de grande porte topo de linha, 8K de entrada/8K de saída
+ * - Max-32K (generalv3.5-32k): versão 32K do Max
+ * - Pro (generalv3): modelo de linguagem de grande porte de nível profissional, 8K de entrada/8K de saída
+ * - Pro-128K (generalv3-128k): versão 128K do Pro, 128K de entrada/4K de saída
+ * - Lite (general): modelo de linguagem leve, 8K de entrada/4K de saída, uso gratuito
  * 
- * API文档: 
- * - V1模型: https://www.xfyun.cn/doc/spark/HTTP%E8%B0%83%E7%94%A8%E6%96%87%E6%A1%A3.html
- * - X1模型: https://www.xfyun.cn/doc/spark/X1http.html
+ * Documentação da API: 
+ * - Modelos V1: https://www.xfyun.cn/doc/spark/HTTP%E8%B0%83%E7%94%A8%E6%96%87%E6%A1%A3.html
+ * - Modelo X1: https://www.xfyun.cn/doc/spark/X1http.html
  */
 @Slf4j
 public class XingHuoChatModel implements ChatModel {
@@ -42,7 +42,7 @@ public class XingHuoChatModel implements ChatModel {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     
-    // 讯飞星火API地址
+    // Endereço da API XingHuo (iFLYTEK)
     private static final String SPARK_V1_API_URL = "https://spark-api-open.xf-yun.com/v1/chat/completions";
     private static final String SPARK_X1_API_URL = "https://spark-api-open.xf-yun.com/v2/chat/completions";
     
@@ -52,15 +52,15 @@ public class XingHuoChatModel implements ChatModel {
     private final String baseUrl;
 
     /**
-     * 构造函数
+     * Construtor
      * 
-     * @param apiPassword API密码,从控制台获取
-     * @param model 模型名称,如: generalv4, generalv3.5, generalv3, general
+     * @param apiPassword Senha de API, obtida no console
+     * @param model Nome do modelo, ex.: generalv4, generalv3.5, generalv3, general
      */
     public XingHuoChatModel(String apiPassword, String model) {
         this.apiPassword = apiPassword;
         this.model = model;
-        // 根据模型选择API地址: X1模型使用v2接口,其他使用v1接口
+        // Seleciona o endereço da API de acordo com o modelo: o modelo X1 usa a interface v2, os demais usam a v1
         this.baseUrl = "x1".equalsIgnoreCase(model) ? SPARK_X1_API_URL : SPARK_V1_API_URL;
         this.httpClient = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)
@@ -78,15 +78,15 @@ public class XingHuoChatModel implements ChatModel {
     public ChatResponse call(Prompt prompt) {
         
         try {
-            // 构建请求体
+            // Monta o corpo da requisição
             Map<String, Object> requestBody = buildRequestBody(prompt, false);
             
-            // 发送请求
+            // Envia a requisição
             Request request = buildRequest(requestBody);
             
             try (Response response = httpClient.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
-                    log.error("星火API请求失败: code={}, message={}", response.code(), response.message());
+                    log.error("Falha na requisição da API XingHuo: code={}, message={}", response.code(), response.message());
                     return ChatResponse.builder().generations(Collections.emptyList()).build();
                 }
                 
@@ -94,7 +94,7 @@ public class XingHuoChatModel implements ChatModel {
                 
                 Map<String, Object> responseMap = objectMapper.readValue(responseBody, Map.class);
                 
-                // 解析响应
+                // Interpreta a resposta
                 
                 List<Map<String, Object>> choices = (List<Map<String, Object>>) responseMap.get("choices");
                 if (choices != null && !choices.isEmpty()) {
@@ -118,7 +118,7 @@ public class XingHuoChatModel implements ChatModel {
                 
             }
         } catch (Exception e) {
-            log.error("星火大模型调用失败", e);
+            log.error("Falha ao chamar o modelo de grande porte XingHuo", e);
             return ChatResponse.builder().generations(Collections.emptyList()).build();
         }
     }
@@ -126,39 +126,39 @@ public class XingHuoChatModel implements ChatModel {
     @Override
     public Flux<ChatResponse> stream(Prompt prompt) {
         return Flux.create(sink -> {
-            log.debug("星火大模型流式调用: model={}", model);
+            log.debug("Chamada em streaming do modelo XingHuo: model={}", model);
             
-            // 使用数组来存储标志(因为在匿名内部类中需要修改)
+            // Usa um array para armazenar a flag (necessário por ser modificada dentro de uma classe anônima interna)
             final boolean[] hasToolCall = {false};
             
-            // 累积工具调用信息 - 星火流式返回会分多次发送
+            // Acumula as informações da chamada de ferramenta — o retorno em streaming do XingHuo é enviado em múltiplas partes
             final Map<String, Map<String, Object>> toolCallsAccumulator = new HashMap<>();
             
             try {
-                // 构建请求体
+                // Monta o corpo da requisição
                 Map<String, Object> requestBody = buildRequestBody(prompt, true);
                 
-                // 发送流式请求
+                // Envia a requisição em streaming
                 Request request = buildRequest(requestBody);
                 
                 httpClient.newCall(request).enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
-                        log.error("星火API流式请求失败", e);
+                        log.error("Falha na requisição em streaming da API XingHuo", e);
                         sink.error(e);
                     }
 
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
                         if (!response.isSuccessful()) {
-                            String errorBody = response.body() != null ? response.body().string() : "无响应体";
-                            sink.error(new IOException("星火API请求失败: " + response.code() + " " + response.message() + ", 详情: " + errorBody));
+                            String errorBody = response.body() != null ? response.body().string() : "sem corpo de resposta";
+                            sink.error(new IOException("Falha na requisição da API XingHuo: " + response.code() + " " + response.message() + ", detalhes: " + errorBody));
                             return;
                         }
                         
                         try (ResponseBody responseBody = response.body()) {
                             if (responseBody == null) {
-                                sink.error(new IOException("响应体为空"));
+                                sink.error(new IOException("Corpo da resposta vazio"));
                                 return;
                             }
                             
@@ -177,12 +177,12 @@ public class XingHuoChatModel implements ChatModel {
                                     }
                                 }
                                 
-                                // 流读取完成后的处理
+                                // Processamento após a leitura do stream ser concluída
                                 if (!hasToolCall[0]) {
-                                    // 没有工具调用,正常结束
+                                    // Sem chamada de ferramenta, encerramento normal
                                     sink.complete();
                                 } else if (!toolCallsAccumulator.isEmpty()) {
-                                    // 验证累积的工具调用是否完整
+                                    // Valida se a chamada de ferramenta acumulada está completa
                                     boolean hasValidToolCall = toolCallsAccumulator.values().stream().anyMatch(tool -> {
                                         
                                         Map<String, Object> func = (Map<String, Object>) tool.get("function");
@@ -192,13 +192,13 @@ public class XingHuoChatModel implements ChatModel {
                                     });
                                     
                                     if (hasValidToolCall) {
-                                        // 有工具调用且name不为空,执行工具调用
+                                        // Há chamada de ferramenta e o name não é vazio; executa a chamada
                                         List<Map<String, Object>> finalToolCalls = new ArrayList<>(toolCallsAccumulator.values());
                                         processToolCalls(finalToolCalls, sink, prompt);
                                         sink.complete();
                                     } else {
-                                        // name为空,说明工具调用不完整,发送错误提示并结束
-                                        String errorMessage = "抱歉,工具调用失败了。请重新描述您的需求。";
+                                        // name vazio indica que a chamada de ferramenta está incompleta; envia mensagem de erro e encerra
+                                        String errorMessage = "Desculpe, a chamada de ferramenta falhou. Por favor, descreva novamente o que você precisa.";
                                         AssistantMessage assistantMessage = new AssistantMessage(errorMessage);
                                         ChatResponse errorResponse = new ChatResponse(
                                                 List.of(new Generation(assistantMessage))
@@ -207,8 +207,8 @@ public class XingHuoChatModel implements ChatModel {
                                         sink.complete();
                                     }
                                 } else {
-                                    // 有hasToolCall标记但accumulator为空,异常情况
-                                    String errorMessage = "抱歉,工具调用失败了。请重新描述您的需求。";
+                                    // hasToolCall marcado, porém accumulator vazio — situação anômala
+                                    String errorMessage = "Desculpe, a chamada de ferramenta falhou. Por favor, descreva novamente o que você precisa.";
                                     AssistantMessage assistantMessage = new AssistantMessage(errorMessage);
                                     ChatResponse errorResponse = new ChatResponse(
                                             List.of(new Generation(assistantMessage))
@@ -218,27 +218,27 @@ public class XingHuoChatModel implements ChatModel {
                                 }
                             }
                         } catch (Exception e) {
-                            log.error("处理流式响应失败", e);
+                            log.error("Falha ao processar a resposta em streaming", e);
                             sink.error(e);
                         }
                     }
                 });
                 
             } catch (Exception e) {
-                log.error("星火大模型流式调用失败", e);
+                log.error("Falha na chamada em streaming do modelo XingHuo", e);
                 sink.error(e);
             }
         });
     }
 
     /**
-     * 处理流式响应的每一行
+     * Processa cada linha da resposta em streaming
      */
     private void processStreamLine(String jsonData, reactor.core.publisher.FluxSink<ChatResponse> sink, 
                                    Prompt prompt, boolean[] hasToolCall,
                                    Map<String, Map<String, Object>> toolCallsAccumulator) {
         try {
-            // 添加原始JSON日志
+            // Adiciona o log do JSON bruto
             
             
             Map<String, Object> data = objectMapper.readValue(jsonData, Map.class);
@@ -257,7 +257,7 @@ public class XingHuoChatModel implements ChatModel {
                 return;
             }
             
-            // 处理普通内容
+            // Processa o conteúdo comum
             if (delta.containsKey("content")) {
                 String content = (String) delta.get("content");
                 if (content != null && !content.isEmpty()) {
@@ -271,32 +271,32 @@ public class XingHuoChatModel implements ChatModel {
                 }
             }
             
-            // 处理工具调用 - 累积参数,不立即执行
+            // Processa a chamada de ferramenta — acumula os parâmetros, sem executar imediatamente
             if (delta.containsKey("tool_calls")) {
                 hasToolCall[0] = true;
                 
                 Object toolCallsObj = delta.get("tool_calls");
                 String toolCallsJson = objectMapper.writeValueAsString(toolCallsObj);
                 
-                // 累积工具调用信息
+                // Acumula as informações da chamada de ferramenta
                 accumulateToolCalls(toolCallsObj, toolCallsAccumulator);
             }
             
-            // 检查是否结束 - 流结束时才执行工具调用
+            // Verifica se terminou — a chamada de ferramenta só é executada ao final do stream
             String finishReason = (String) choice.get("finish_reason");
             if (finishReason != null && !finishReason.isEmpty()) {
                 
-                // 有工具调用时检查是否完整
+                // Quando há chamada de ferramenta, verifica se está completa
                 if (hasToolCall[0] && !toolCallsAccumulator.isEmpty()) {
-                    // 验证工具调用是否完整(有name且有arguments)
-                    // 注意: arguments可以是空字符串"",但必须存在且不是null
+                    // Valida se a chamada de ferramenta está completa (tem name e arguments)
+                    // Observação: arguments pode ser uma string vazia "", mas deve existir e não ser null
                     boolean allToolsComplete = toolCallsAccumulator.values().stream().allMatch(tool -> {
                         
                         Map<String, Object> func = (Map<String, Object>) tool.get("function");
                         if (func == null) return false;
                         String name = (String) func.get("name");
                         String args = (String) func.get("arguments");
-                        // name必须不为空,arguments必须存在(可以是"")
+                        // name não pode ser vazio; arguments deve existir (pode ser "")
                         boolean hasName = name != null && !name.isEmpty();
                         boolean hasArgs = args != null;
                         boolean complete = hasName && hasArgs;
@@ -309,19 +309,19 @@ public class XingHuoChatModel implements ChatModel {
                         sink.complete();
                     }
                 } else if (!hasToolCall[0]) {
-                    // 没有工具调用,正常结束
+                    // Sem chamada de ferramenta, encerramento normal
                     sink.complete();
                 }
             }
             
         } catch (Exception e) {
-            log.error("❌ 解析流式响应失败: {}", jsonData, e);
+            log.error("❌ Falha ao interpretar a resposta em streaming: {}", jsonData, e);
         }
     }
     
     /**
-     * 累积工具调用信息 - 星火流式返回会分多次发送tool_calls
-     * 策略: 使用index作为key(如果有),否则使用"tool_0"作为默认key
+     * Acumula as informações da chamada de ferramenta — o retorno em streaming do XingHuo envia tool_calls em múltiplas partes
+     * Estratégia: usa index como chave (se houver); caso contrário, usa "tool_0" como chave padrão
      */
     private void accumulateToolCalls(Object toolCallsObj, Map<String, Map<String, Object>> accumulator) {
         try {
@@ -345,34 +345,34 @@ public class XingHuoChatModel implements ChatModel {
                     Map<String, Object> function = (Map<String, Object>) functionObj;
                     String name = (String) function.get("name");
                     
-                    // 使用name作为key,如果name为空使用索引
+                    // Usa name como chave; se name estiver vazio, usa o índice
                     String key = (name != null && !name.isEmpty()) ? name : "tool_" + i;
                     
-                    // 获取或创建累积对象
+                    // Obtém ou cria o objeto acumulador
                     Map<String, Object> existing = accumulator.getOrDefault(key, new HashMap<>());
                     
-                    // 合并type
+                    // Mescla o type
                     String type = (String) toolCall.get("type");
                     if (type != null && !type.isEmpty()) {
                         existing.put("type", type);
                     }
                     
-                    // 获取或创建function对象
+                    // Obtém ou cria o objeto function
                     
                     Map<String, Object> existingFunc = (Map<String, Object>) existing.getOrDefault("function", new HashMap<>());
                     
-                    // 累积name - 可能第一次为空,后续才有值
+                    // Acumula o name — pode vir vazio na primeira vez e receber valor depois
                     if (name != null && !name.isEmpty()) {
                         existingFunc.put("name", name);
                     }
                     
-                    // 累积description
+                    // Acumula a description
                     String description = (String) function.get("description");
                     if (description != null && !description.isEmpty()) {
                         existingFunc.put("description", description);
                     }
                     
-                    // 累积arguments - 可能分多次返回
+                    // Acumula os arguments — pode retornar em múltiplas partes
                     Object argsObj = function.get("arguments");
                     if (argsObj != null) {
                         String currentArgs = (argsObj instanceof String) ? (String) argsObj : "";
@@ -385,12 +385,12 @@ public class XingHuoChatModel implements ChatModel {
                 }
             }
         } catch (Exception e) {
-            log.error("❌ 累积工具调用失败", e);
+            log.error("❌ Falha ao acumular a chamada de ferramenta", e);
         }
     }
 
     /**
-     * 处理工具调用
+     * Processa a chamada de ferramenta
      */
     private void processToolCalls(List<Map<String, Object>> toolCalls, 
                                   reactor.core.publisher.FluxSink<ChatResponse> sink,
@@ -405,12 +405,12 @@ public class XingHuoChatModel implements ChatModel {
             for (int i = 0; i < toolCalls.size(); i++) {
                 Map<String, Object> toolCall = toolCalls.get(i);
                 
-                // 提取字段 - 使用JSON重新解析确保类型正确
+                // Extrai os campos — reanalisa como JSON para garantir o tipo correto
                 String type = (String) toolCall.get("type");
                 Object functionObj = toolCall.get("function");
                 
                 if (functionObj != null) {
-                    // 统一转换为Map
+                    // Converte uniformemente para Map
                     
                     Map<String, Object> function = (functionObj instanceof Map) 
                         ? (Map<String, Object>) functionObj
@@ -418,17 +418,17 @@ public class XingHuoChatModel implements ChatModel {
                     
                     String name = (String) function.get("name");
                     Object argsObj = function.get("arguments");
-                    // arguments可能是字符串或对象
+                    // arguments pode ser uma string ou um objeto
                     String arguments = (argsObj instanceof String) 
                         ? (String) argsObj 
                         : objectMapper.writeValueAsString(argsObj);
                     
-                    // 如果arguments为空字符串,转为空对象(表示无参数)
+                    // Se arguments for uma string vazia, converte para um objeto vazio (indicando ausência de parâmetros)
                     if (arguments == null || arguments.trim().isEmpty()) {
                         arguments = "{}";
                     }
                     
-                    // 生成唯一ID
+                    // Gera um ID único
                     String id = (String) toolCall.getOrDefault("id", "tool_" + System.currentTimeMillis() + "_" + i);
                     
                     assistantToolCalls.add(new AssistantMessage.ToolCall(
@@ -451,19 +451,19 @@ public class XingHuoChatModel implements ChatModel {
                         .generations(List.of(new Generation(assistantMessage)))
                         .build();
                 
-                // 执行工具调用
+                // Executa a chamada de ferramenta
                 var toolExecutionResult = ToolCallingManager.builder().build()
                         .executeToolCalls(prompt, chatResponse);
                 
                 if (toolExecutionResult.returnDirect()) {
-                    // 直接返回工具执行结果
+                    // Retorna diretamente o resultado da execução da ferramenta
                     sink.next(ChatResponse.builder().from(chatResponse)
                             .generations(ToolExecutionResult.buildGenerations(toolExecutionResult))
                             .build());
                     sink.complete();
                 } else {
-                    // 工具执行结果需要发回模型继续对话
-                    // 星火大模型暂不支持工具调用后继续对话,直接返回结果
+                    // O resultado da execução da ferramenta precisa ser enviado de volta ao modelo para continuar a conversa
+                    // O modelo XingHuo ainda não suporta continuar a conversa após a chamada de ferramenta; o resultado é retornado diretamente
                     sink.next(ChatResponse.builder().from(chatResponse)
                             .generations(ToolExecutionResult.buildGenerations(toolExecutionResult))
                             .build());
@@ -471,25 +471,25 @@ public class XingHuoChatModel implements ChatModel {
                 }
             }
         } catch (Exception e) {
-            log.error("❌ 处理工具调用失败", e);
+            log.error("❌ Falha ao processar a chamada de ferramenta", e);
             sink.error(e);
         }
     }
 
     /**
-     * 构建请求体
+     * Monta o corpo da requisição
      */
     private Map<String, Object> buildRequestBody(Prompt prompt, boolean stream) {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", model);
         requestBody.put("stream", stream);
         
-        // 转换消息格式 - 简化版本,只处理用户消息
+        // Converte o formato das mensagens — versão simplificada, processa apenas mensagens do usuário
         List<Map<String, String>> messages = new ArrayList<>();
         
-        // 添加系统消息(如果有)
+        // Adiciona a mensagem de sistema (se houver)
         if (prompt.getInstructions().size() > 1) {
-            // 第一条可能是系统消息
+            // A primeira pode ser a mensagem de sistema
             Message firstMsg = prompt.getInstructions().get(0);
             if ("system".equals(firstMsg.getMessageType().getValue())) {
                 Map<String, String> systemMsg = new HashMap<>();
@@ -499,7 +499,7 @@ public class XingHuoChatModel implements ChatModel {
             }
         }
         
-        // 添加用户消息
+        // Adiciona a mensagem do usuário
         Map<String, String> userMsg = new HashMap<>();
         userMsg.put("role", "user");
         userMsg.put("content", prompt.getUserMessage().getText());
@@ -507,23 +507,23 @@ public class XingHuoChatModel implements ChatModel {
         
         requestBody.put("messages", messages);
         
-        // 添加工具定义(如果有) - 星火Max和Ultra支持Function Call
+        // Adiciona a definição de ferramentas (se houver) — o XingHuo Max e Ultra suportam Function Call
         ToolCallingChatOptions chatOptions = (ToolCallingChatOptions) prompt.getOptions();
         if (chatOptions != null && chatOptions.getToolCallbacks() != null && !chatOptions.getToolCallbacks().isEmpty()) {
             List<Map<String, Object>> tools = new ArrayList<>();
             chatOptions.getToolCallbacks().forEach(toolCallback -> {
                 try {
-                    // 获取工具定义
+                    // Obtém a definição da ferramenta
                     var toolDefinition = toolCallback.getToolDefinition();
                     if (toolDefinition != null) {
-                        // 将ToolDefinition转为JSON字符串,再解析为Map
+                        // Converte o ToolDefinition para string JSON e depois interpreta como Map
                         String toolJson = com.xiaozhi.utils.JsonUtil.toJson(toolDefinition);
                         
                         Map<String, Object> toolMap = com.xiaozhi.utils.JsonUtil.fromJson(toolJson, Map.class);
                         
                         if (toolMap != null) {
-                            // 构建符合讯飞星火格式的工具定义
-                            // 格式: {"type":"function", "function":{"name": "...", "description": "...", "parameters": {...}}}
+                            // Monta a definição de ferramenta no formato exigido pelo XingHuo
+                            // Formato: {"type":"function", "function":{"name": "...", "description": "...", "parameters": {...}}}
                             Map<String, Object> xinghuoTool = new HashMap<>();
                             xinghuoTool.put("type", "function");
                             
@@ -531,32 +531,32 @@ public class XingHuoChatModel implements ChatModel {
                             function.put("name", toolMap.get("name"));
                             function.put("description", toolMap.get("description"));
                             
-                            // 处理 parameters: inputSchema可能是字符串或对象,必须转换为对象!
+                            // Processa parameters: inputSchema pode ser string ou objeto — deve ser convertido para objeto!
                             Object inputSchema = toolMap.get("inputSchema");
                             Map<String, Object> parameters = null;
                             
                             if (inputSchema instanceof String) {
-                                // 字符串转对象
+                                // Converte string para objeto
                                 String schemaStr = (String) inputSchema;
                                 if (!schemaStr.isEmpty()) {
                                     try {
                                         parameters = objectMapper.readValue(schemaStr, Map.class);
                                     } catch (Exception e) {
-                                        log.warn("解析inputSchema失败: {}", schemaStr, e);
+                                        log.warn("Falha ao interpretar inputSchema: {}", schemaStr, e);
                                     }
                                 }
                             } else if (inputSchema instanceof Map) {
-                                // 已经是对象
+                                // Já é um objeto
                                 
                                 Map<String, Object> map = (Map<String, Object>) inputSchema;
                                 parameters = map;
                             }
                             
-                            // 确保parameters是对象而不是字符串
+                            // Garante que parameters seja um objeto, e não uma string
                             if (parameters != null) {
                                 function.put("parameters", parameters);
                             } else {
-                                // 使用空对象作为默认值
+                                // Usa um objeto vazio como valor padrão
                                 function.put("parameters", Map.of("type", "object", "properties", Map.of()));
                             }
                             
@@ -565,7 +565,7 @@ public class XingHuoChatModel implements ChatModel {
                         }
                     }
                 } catch (Exception e) {
-                    log.warn("添加工具定义失败: {}", e.getMessage(), e);
+                    log.warn("Falha ao adicionar a definição de ferramenta: {}", e.getMessage(), e);
                 }
             });
             
@@ -578,7 +578,7 @@ public class XingHuoChatModel implements ChatModel {
     }
 
     /**
-     * 构建HTTP请求
+     * Monta a requisição HTTP
      */
     private Request buildRequest(Map<String, Object> requestBody) throws Exception {
         String jsonBody = objectMapper.writeValueAsString(requestBody);

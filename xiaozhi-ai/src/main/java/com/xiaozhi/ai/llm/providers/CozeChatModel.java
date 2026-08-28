@@ -26,7 +26,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Coze LLM服务实现
+ * Implementação do serviço LLM Coze
  */
 @Slf4j
 public class CozeChatModel implements ChatModel {
@@ -38,44 +38,44 @@ public class CozeChatModel implements ChatModel {
 
 
     /**
-     * 构造函数
-     * @param apiSecret Coze API密钥
-     * @param model     模型名称 (在Coze中不使用)
+     * Construtor
+     * @param apiSecret Chave de API do Coze
+     * @param model     Nome do modelo (não utilizado no Coze)
      */
     public CozeChatModel(String apiSecret, String model) {
 
-        // 使用apiSecret作为access_token
+        // Usa apiSecret como access_token
         TokenAuth authCli = new TokenAuth(apiSecret);
 
-        // 使用endpoint或默认的Coze API地址
+        // Usa o endpoint ou o endereço padrão da API Coze
         String baseUrl = "https://api.coze.cn";
 
-        // 初始化Coze API客户端
+        // Inicializa o cliente da API Coze
         this.coze = new CozeAPI.Builder()
                 .baseURL(baseUrl)
                 .auth(authCli)
-                .readTimeout(60000) // 60秒超时
+                .readTimeout(60000) // timeout de 60 segundos
                 .build();
 
-        // 数据库coze相关的配置行，其字段里的appId已用作token的作用，configName字段实际作为coze 的botId。也相当于入参的model。
+        // Linha de configuração do coze no banco de dados: o campo appId já é usado como token, e o campo configName atua, na prática, como o botId do coze — equivalente ao parâmetro model.
         this.botId = model;
 
-        log.info("初始化Coze服务，botId: {}, baseUrl: {}", botId, baseUrl);
+        log.info("Inicializando o serviço Coze, botId: {}, baseUrl: {}", botId, baseUrl);
     }
 
     @Override
     public ChatResponse call(Prompt prompt) {
         var messages = prompt.getInstructions();
         if (messages == null || messages.isEmpty()) {
-            throw new IllegalArgumentException("消息列表不能为空");
+            throw new IllegalArgumentException("A lista de mensagens não pode ser vazia");
         }
 
-        // 将消息格式转换为Coze API所需格式
+        // Converte o formato das mensagens para o formato exigido pela API Coze
         List<Message> cozeMessages = convertToCozeMessages(messages);
 
         String userId = resolveUserId(prompt);
 
-        // 创建聊天请求
+        // Cria a requisição de chat
         CreateChatReq req = CreateChatReq.builder()
                 .botID(botId)
                 .userID(userId)
@@ -110,7 +110,7 @@ public class CozeChatModel implements ChatModel {
             var assistantMessage = AssistantMessage.builder().content(message.getContent()).properties(messageMetadata).build();
             var generation = new Generation(assistantMessage,
                     ChatGenerationMetadata.builder().metadata(BeanUtil.beanToMap(chatPoll.getChat())).build());
-            log.info("耗时：{}ms", System.currentTimeMillis() - start);
+            log.info("Tempo decorrido: {}ms", System.currentTimeMillis() - start);
             return ChatResponse.builder().generations(List.of(generation)).build();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -122,28 +122,28 @@ public class CozeChatModel implements ChatModel {
     public Flux<ChatResponse> stream(Prompt prompt) {
         var messages = prompt.getInstructions();
         if (messages == null || messages.isEmpty()) {
-            throw new IllegalArgumentException("消息列表不能为空");
+            throw new IllegalArgumentException("A lista de mensagens não pode ser vazia");
         }
 
-        // 将消息格式转换为Coze API所需格式
+        // Converte o formato das mensagens para o formato exigido pela API Coze
         List<Message> cozeMessages = convertToCozeMessages(messages);
 
         String userId = resolveUserId(prompt);
-        // 创建聊天请求
+        // Cria a requisição de chat
         CreateChatReq req = CreateChatReq.builder()
                 .botID(botId)
                 .userID(userId)
                 .messages(cozeMessages)
                 .build();
 
-        // 发送请求
+        // Envia a requisição
         try {
             Flowable<ChatEvent> resp = coze.chat().stream(req);
-            // 转换为 Reactor Flux
+            // Converte para Reactor Flux
             Flux<ChatEvent> flux = Flux.from(resp);
 
             Flux<ChatResponse> chatResponse = flux
-                    .filter(event -> event != null) // 过滤掉 null 事件
+                    .filter(event -> event != null) // Filtra eventos null
                     .map(event -> {
                         List<AssistantMessage.ToolCall> toolCalls = List.of();
                         String content = "";
@@ -200,7 +200,7 @@ public class CozeChatModel implements ChatModel {
                         Map<String, Object> chatMetadata = Optional.ofNullable(event.getChat())
                                 .map(chat -> {
                                     Map<String, Object> beanMap = BeanUtil.beanToMap(chat);
-                                    // 过滤掉 null 值
+                                    // Filtra valores null
                                     return beanMap.entrySet().stream()
                                             .filter(entry -> entry.getValue() != null)
                                             .collect(Collectors.toMap(
@@ -224,14 +224,14 @@ public class CozeChatModel implements ChatModel {
 
             return new MessageAggregator().aggregate(chatResponse, observationContext::setResponse);
         } catch (Exception e) {
-            log.error("创建流式请求时出错: {}", e.getMessage(), e);
+            log.error("Erro ao criar a requisição em streaming: {}", e.getMessage(), e);
             return Flux.error(e);
         }
     }
 
     /**
-     * 从Prompt的ChatOptions中提取设备ID，生成确定性的用户ID。
-     * 如果无法提取设备ID，则回退到基于UUID的用户ID。
+     * Extrai o deviceId do ChatOptions do Prompt e gera um userId determinístico.
+     * Caso não seja possível extrair o deviceId, recorre a um userId baseado em UUID.
      */
     private String resolveUserId(Prompt prompt) {
         if (prompt.getOptions() instanceof ToolCallingChatOptions toolCallingChatOptions) {
@@ -247,10 +247,10 @@ public class CozeChatModel implements ChatModel {
     }
 
     /**
-     * 将通用消息格式转换为Coze API所需的消息格式
+     * Converte o formato de mensagem genérico para o formato exigido pela API Coze
      *
-     * @param messages 通用格式的消息列表
-     * @return Coze格式的消息列表
+     * @param messages Lista de mensagens no formato genérico
+     * @return Lista de mensagens no formato Coze
      */
     private List<Message> convertToCozeMessages(List<org.springframework.ai.chat.messages.Message> messages) {
         List<Message> cozeMessages = new ArrayList<>();
@@ -270,7 +270,7 @@ public class CozeChatModel implements ChatModel {
                     cozeMessages.add(Message.buildAssistantAnswer(msg.getText(), metadata));
                     break;
                 default:
-                    // coze 系统提示默认不在这里设定，需要在 coze 中设定
+                    // O prompt de sistema do coze não é definido aqui por padrão; deve ser configurado no próprio coze
             }
         }
 

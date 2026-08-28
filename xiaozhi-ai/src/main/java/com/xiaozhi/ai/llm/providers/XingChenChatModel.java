@@ -23,7 +23,7 @@ public class XingChenChatModel implements ChatModel {
     private XingChenClient chatClient;
 
     /**
-     * 构造函数
+     * Construtor
      */
     public XingChenChatModel(String endpoint, String apiKey, String secret) {
         chatClient = new XingChenClient(endpoint, apiKey, secret);
@@ -42,14 +42,14 @@ public class XingChenChatModel implements ChatModel {
                     "AGENT_USER_INPUT", prompt.getUserMessage().getText(),
                     "func_call", chatOptions.getToolCallbacks()
             );
-            log.info("工具支持如下：{}", JsonUtil.toJson(chatOptions.getToolCallbacks()));
+            log.info("Ferramentas suportadas: {}", JsonUtil.toJson(chatOptions.getToolCallbacks()));
         } else {
             input = Map.of(
                     "AGENT_USER_INPUT", prompt.getUserMessage().getText(),
                     "func_call", new ArrayList<>()
             );
         }
-        // 创建聊天消息
+        // Cria a mensagem de chat
         XingChenRequest message = XingChenRequest.builder()
                 .flowId(chatClient.getFlowId())
                 .uid("1")
@@ -62,7 +62,7 @@ public class XingChenChatModel implements ChatModel {
                 .chatId("1")
                 .build();
         try {
-            // 发送消息并获取响应
+            // Envia a mensagem e obtém a resposta
             XingChenResponse response = chatClient.sendChatMessage(message);
             return new ChatResponse(List.of(new Generation(
                     AssistantMessage.builder()
@@ -72,7 +72,7 @@ public class XingChenChatModel implements ChatModel {
             )));
 
         } catch (IOException e) {
-            log.error("错误: ", e);
+            log.error("Erro: ", e);
             return ChatResponse.builder().generations(Collections.emptyList()).build();
         }
 
@@ -83,7 +83,7 @@ public class XingChenChatModel implements ChatModel {
         Flux<ChatResponse> responseFlux = Flux.create(sink -> {
 
             ToolCallingChatOptions chatOptions = (ToolCallingChatOptions) prompt.getOptions();
-            // 创建聊天消息
+            // Cria a mensagem de chat
             XingChenRequest message = XingChenRequest.builder()
                     .flowId(chatClient.getFlowId())
                     .uid("1")
@@ -99,23 +99,23 @@ public class XingChenChatModel implements ChatModel {
                     .chatId("1")
                     .build();
 
-            // 使用数组来存储标志(因为在匿名内部类中需要修改)
+            // Usa um array para armazenar a flag (necessário por ser modificada dentro de uma classe anônima interna)
             final boolean[] hasToolCall = {false};
             
-            // 发送流式消息
+            // Envia a mensagem em streaming
             try {
                 chatClient.sendChatMessageStream(message, new XingChenChatStreamCallback() {
                     @Override
                     public void onMessage(XingChenResponse event) {
-                        // 安全检查: 确保 choices 不为空
+                        // Verificação de segurança: garante que choices não seja vazio
                         if (event.getChoices() == null || event.getChoices().isEmpty()) {
-                            log.warn("收到空的 choices,跳过此消息");
+                            log.warn("Choices vazio recebido, pulando esta mensagem");
                             return;
                         }
                         
                         XingChenResponse.Choices choice = event.getChoices().get(0);
                         if (choice.getDelta() == null) {
-                            log.warn("收到空的 delta,跳过此消息");
+                            log.warn("Delta vazio recebido, pulando esta mensagem");
                             return;
                         }
                         
@@ -133,33 +133,33 @@ public class XingChenChatModel implements ChatModel {
 
                     @Override
                     public void onMessageEnd(XingChenResponse event) {
-                        // 如果没有触发工具调用,这里就是真正的结束点
+                        // Se nenhuma chamada de ferramenta foi disparada, este é de fato o ponto final
                         if (!hasToolCall[0]) {
-                            log.debug("初始流结束且无工具调用,完成流程");
+                            log.debug("Stream inicial encerrado sem chamada de ferramenta; processo concluído");
                             sink.complete();
                         } else {
-                            log.debug("初始流结束但有工具调用,等待 resume 完成");
+                            log.debug("Stream inicial encerrado, mas com chamada de ferramenta; aguardando conclusão do resume");
                         }
                     }
 
                     @Override
                     public void onFunctionCall(XingChenResponse event) {
-                        // 标记有工具调用
+                        // Marca que há chamada de ferramenta
                         hasToolCall[0] = true;
-                        log.debug("触发工具调用");
+                        log.debug("Chamada de ferramenta disparada");
                         
-                        // 安全检查
+                        // Verificação de segurança
                         if (event.getEventData() == null || event.getEventData().getValue() == null) {
-                            log.error("EventData 或 Value 为空,无法执行工具调用");
-                            sink.error(new IllegalStateException("无效的工具调用数据"));
+                            log.error("EventData ou Value vazio; não é possível executar a chamada de ferramenta");
+                            sink.error(new IllegalStateException("Dados de chamada de ferramenta inválidos"));
                             return;
                         }
                         
                         XingChenResponse.EventData eventData = event.getEventData();
                         String content = eventData.getValue().getContent();
                         if (content == null || content.isEmpty()) {
-                            log.error("工具调用内容为空");
-                            sink.error(new IllegalStateException("工具调用内容为空"));
+                            log.error("Conteúdo da chamada de ferramenta vazio");
+                            sink.error(new IllegalStateException("Conteúdo da chamada de ferramenta vazio"));
                             return;
                         }
                         
@@ -168,8 +168,8 @@ public class XingChenChatModel implements ChatModel {
                         Map<String, Object> map = JsonUtil.fromJson(content, Map.class);
                         
                         if (map == null || !map.containsKey("name")) {
-                            log.error("工具调用解析失败,无法获取工具名称: {}", content);
-                            sink.error(new IllegalStateException("工具调用格式错误"));
+                            log.error("Falha ao interpretar a chamada de ferramenta; não foi possível obter o nome da ferramenta: {}", content);
+                            sink.error(new IllegalStateException("Formato de chamada de ferramenta inválido"));
                             return;
                         }
                         
@@ -181,7 +181,7 @@ public class XingChenChatModel implements ChatModel {
                                         JsonUtil.toJson(map.get("arguments")))
                         );
                         
-                        // 获取消息内容(可能为空)
+                        // Obtém o conteúdo da mensagem (pode ser vazio)
                         String messageContent = "";
                         if (event.getChoices() != null && !event.getChoices().isEmpty() 
                                 && event.getChoices().get(0).getDelta() != null) {
@@ -210,16 +210,16 @@ public class XingChenChatModel implements ChatModel {
                             sink.next(ChatResponse.builder().from(chatResponse)
                                     .generations(ToolExecutionResult.buildGenerations(toolExecutionResult))
                                     .build());
-                            // 如果直接返回,需要完成流
+                            // Se retornar diretamente, é preciso concluir o stream
                             sink.complete();
                         } else {
                             // Send the tool execution result back to the model.
                             XingChenResume resume = XingChenResume.builder()
                                     .eventId(eventData.getEventId())
                                     .eventType("resume")
-                                    .content("操作成功")
+                                    .content("Operação bem-sucedida")
                                     .build();
-                            // 将sink传递给resume方法,让resume的响应也能发送给客户端
+                            // Repassa o sink ao método resume, para que a resposta do resume também seja enviada ao cliente
                             resume(resume, sink);
                         }
                     }
@@ -231,7 +231,7 @@ public class XingChenChatModel implements ChatModel {
 
                     @Override
                     public void onException(Throwable throwable) {
-                        log.error("异常: {}", throwable.getMessage());
+                        log.error("Exceção: {}", throwable.getMessage());
                         sink.error(throwable);
                     }
                 });
@@ -244,27 +244,27 @@ public class XingChenChatModel implements ChatModel {
 
     public void resume(XingChenResume resume, reactor.core.publisher.FluxSink<ChatResponse> sink) {
         try {
-            log.debug("XingChen resume消息: {}", JsonUtil.toJson(resume));
+            log.debug("Mensagem de resume do XingChen: {}", JsonUtil.toJson(resume));
             chatClient.resume(resume, new XingChenChatStreamCallback() {
                 @Override
                 public void onMessage(XingChenResponse event) {
                     log.info("Resume onMessage: {}", JsonUtil.toJson(event));
                     
-                    // 安全检查: 确保 choices 不为空
+                    // Verificação de segurança: garante que choices não seja vazio
                     if (event.getChoices() == null || event.getChoices().isEmpty()) {
-                        log.warn("Resume 收到空的 choices,跳过此消息");
+                        log.warn("Resume recebeu choices vazio, pulando esta mensagem");
                         return;
                     }
                     
                     XingChenResponse.Choices choice = event.getChoices().get(0);
                     if (choice.getDelta() == null) {
-                        log.warn("Resume 收到空的 delta,跳过此消息");
+                        log.warn("Resume recebeu delta vazio, pulando esta mensagem");
                         return;
                     }
                     
                     String content = choice.getDelta().getContent();
                     if (content != null && !content.isEmpty()) {
-                        // 将resume的响应也发送给客户端
+                        // Envia também a resposta do resume ao cliente
                         sink.next(ChatResponse.builder().generations(
                                         List.of(new Generation(AssistantMessage.builder()
                                                 .content(content)
@@ -276,35 +276,35 @@ public class XingChenChatModel implements ChatModel {
 
                 @Override
                 public void onMessageEnd(XingChenResponse event) {
-                    log.info("Resume onMessageEnd,流程完成: {}", JsonUtil.toJson(event));
-                    // Resume流程结束,通知完成
+                    log.info("Resume onMessageEnd, processo concluído: {}", JsonUtil.toJson(event));
+                    // Processo de resume encerrado, notificando conclusão
                     sink.complete();
                 }
 
                 @Override
                 public void onFunctionCall(XingChenResponse event) {
-                    log.warn("Resume过程中又触发了FunctionCall,这可能不是预期行为: {}", JsonUtil.toJson(event));
-                    // 如果 resume 后又触发了工具调用,需要递归处理
-                    // 但这种情况比较特殊,暂时只记录警告
+                    log.warn("Um novo FunctionCall foi disparado durante o resume; isso pode não ser o comportamento esperado: {}", JsonUtil.toJson(event));
+                    // Se uma nova chamada de ferramenta for disparada após o resume, é necessário tratamento recursivo
+                    // Mas esse caso é particular; por ora, apenas o aviso é registrado
                 }
 
                 @Override
                 public void onError(XingChenResponse event) {
-                    log.error("Resume错误: code={}, message={}", event.getCode(), event.getMessage());
-                    sink.error(new IOException("Resume错误: " + event.getMessage()));
+                    log.error("Erro no Resume: code={}, message={}", event.getCode(), event.getMessage());
+                    sink.error(new IOException("Erro no Resume: " + event.getMessage()));
                 }
 
                 @Override
                 public void onException(Throwable throwable) {
-                    log.error("Resume异常: {}", throwable.getMessage());
+                    log.error("Exceção no Resume: {}", throwable.getMessage());
                     sink.error(throwable);
                 }
             });
         } catch (IOException e) {
-            log.error("发送resume请求失败", e);
+            log.error("Falha ao enviar a requisição de resume", e);
             sink.error(e);
         } catch (Exception e) {
-            log.error("Resume过程发生未预期异常", e);
+            log.error("Exceção inesperada durante o processo de resume", e);
             sink.error(e);
         }
     }

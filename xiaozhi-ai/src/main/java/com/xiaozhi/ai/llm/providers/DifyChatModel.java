@@ -27,24 +27,24 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DifyChatModel implements ChatModel {
     /**
-     * Persona 在 ToolContext 中放入的 sessionId 键，与
-     * {@code com.xiaozhi.dialogue.runtime.Persona.TOOL_CONTEXT_SESSION_ID_KEY} 保持一致。
-     * 此处用字面量是因为 xiaozhi-ai 模块不依赖 xiaozhi-dialogue。
+     * Chave sessionId que a Persona coloca no ToolContext, consistente com
+     * {@code com.xiaozhi.dialogue.runtime.Persona.TOOL_CONTEXT_SESSION_ID_KEY}.
+     * Aqui é usado um literal porque o módulo xiaozhi-ai não depende de xiaozhi-dialogue.
      */
     private static final String TOOL_CONTEXT_SESSION_ID_KEY = "sessionId";
 
     private DifyChatClient chatClient;
 
     /**
-     * 按 sessionId 缓存 Dify 返回的 conversation_id，使多轮对话能延续 Dify 智能体侧的会话记忆。
+     * Armazena em cache o conversation_id retornado pelo Dify, indexado por sessionId, para que conversas de múltiplas rodadas mantenham a memória de sessão do agente Dify.
      */
     private final Map<String, String> conversationIds = new ConcurrentHashMap<>();
 
     /**
-     * 构造函数
+     * Construtor
      *
-     * @param endpoint  API端点
-     * @param apiKey    API密钥
+     * @param endpoint  Endpoint da API
+     * @param apiKey    Chave de API
      */
     public DifyChatModel(String endpoint, String apiKey) {
         chatClient = DifyClientFactory.createChatClient(endpoint, apiKey);
@@ -57,9 +57,9 @@ public class DifyChatModel implements ChatModel {
     @Override
     public ChatResponse call(Prompt prompt) {
 
-        // 创建聊天消息
-        // inputs 必须为非 null（即使没有 App 变量也要传空对象），否则 Dify 服务端会拒绝请求。
-        // conversationId 用上一轮 Dify 返回的会话 ID，使智能体能延续上下文记忆。
+        // Cria a mensagem de chat
+        // inputs deve ser não nulo (mesmo sem variáveis de App, é preciso enviar um objeto vazio), caso contrário o servidor Dify rejeitará a requisição.
+        // conversationId usa o ID de sessão retornado pelo Dify na rodada anterior, permitindo que o agente mantenha a memória de contexto.
         ChatMessage message = ChatMessage.builder()
                 .query(prompt.getContents())
                 .inputs(Map.of())
@@ -68,11 +68,11 @@ public class DifyChatModel implements ChatModel {
                 .responseMode(ResponseMode.BLOCKING)
                 .build();
         try {
-            // 发送消息并获取响应
+            // Envia a mensagem e obtém a resposta
             ChatMessageResponse response = chatClient.sendChatMessage(message);
-            log.debug("回复: {}", response.getAnswer());
-            log.debug("会话ID: {}", response.getConversationId());
-            log.debug("消息ID: {}", response.getMessageId());
+            log.debug("Resposta: {}", response.getAnswer());
+            log.debug("ID da sessão: {}", response.getConversationId());
+            log.debug("ID da mensagem: {}", response.getMessageId());
             saveCurrentConversationId(prompt, response.getConversationId());
             return new ChatResponse(List.of(new Generation(AssistantMessage.builder()
                     .content(response.getAnswer())
@@ -80,7 +80,7 @@ public class DifyChatModel implements ChatModel {
                     .build())));
 
         } catch (IOException e) {
-            log.error("错误: ", e);
+            log.error("Erro: ", e);
             return ChatResponse.builder().generations(Collections.emptyList()).build();
         }
 
@@ -90,8 +90,8 @@ public class DifyChatModel implements ChatModel {
     public Flux<ChatResponse> stream(Prompt prompt) {
         Flux<ChatResponse> responseFlux = Flux.create(sink -> {
 
-            // inputs 必须为非 null（即使没有 App 变量也要传空对象），否则 Dify 服务端会拒绝请求。
-            // conversationId 用上一轮 Dify 返回的会话 ID，使智能体能延续上下文记忆。
+            // inputs deve ser não nulo (mesmo sem variáveis de App, é preciso enviar um objeto vazio), caso contrário o servidor Dify rejeitará a requisição.
+            // conversationId usa o ID de sessão retornado pelo Dify na rodada anterior, permitindo que o agente mantenha a memória de contexto.
             ChatMessage message = ChatMessage.builder()
                     .user(resolveUserId(prompt))
                     .query(prompt.getUserMessage().getText())
@@ -100,7 +100,7 @@ public class DifyChatModel implements ChatModel {
                     .responseMode(ResponseMode.STREAMING)
                     .build();
 
-            // 发送流式消息
+            // Envia a mensagem em streaming
             try {
                 chatClient.sendChatMessageStream(message, new ChatStreamCallback() {
                     @Override
@@ -129,7 +129,7 @@ public class DifyChatModel implements ChatModel {
 
                     @Override
                     public void onMessageEnd(MessageEndEvent event) {
-                        // 必须先持久化 conversationId 再 complete，避免下一轮 chatStream 在 save 之前就读取到旧值。
+                        // É necessário persistir o conversationId antes de chamar complete, para evitar que a próxima chamada de chatStream leia o valor antigo antes do save.
                         saveCurrentConversationId(prompt, event.getConversationId());
                         sink.complete();
                     }
@@ -141,7 +141,7 @@ public class DifyChatModel implements ChatModel {
 
                     @Override
                     public void onException(Throwable throwable) {
-                        log.error("异常: {}", throwable.getMessage());
+                        log.error("Exceção: {}", throwable.getMessage());
                         sink.error(throwable);
                     }
 
@@ -154,8 +154,8 @@ public class DifyChatModel implements ChatModel {
     }
 
     /**
-     * 从Prompt的ChatOptions中提取设备ID，生成确定性的用户ID。
-     * 如果无法提取设备ID，则回退到基于UUID的用户ID。
+     * Extrai o deviceId do ChatOptions do Prompt e gera um userId determinístico.
+     * Caso não seja possível extrair o deviceId, recorre a um userId baseado em UUID.
      */
     private String resolveUserId(Prompt prompt) {
         if (prompt.getOptions() instanceof ToolCallingChatOptions toolCallingChatOptions) {
@@ -171,8 +171,8 @@ public class DifyChatModel implements ChatModel {
     }
 
     /**
-     * 从 ToolContext 取出 sessionId，回查上一轮 Dify 返回的 conversation_id。
-     * 拿不到时返回 null：Dify 接口将其视为开启全新会话。
+     * Obtém o sessionId a partir do ToolContext e consulta o conversation_id retornado pelo Dify na rodada anterior.
+     * Quando não encontrado, retorna null: a API do Dify interpreta isso como o início de uma nova sessão.
      */
     private String getCurrentConversationId(Prompt prompt) {
         String sessionId = extractSessionId(prompt);
@@ -183,7 +183,7 @@ public class DifyChatModel implements ChatModel {
     }
 
     /**
-     * 持久化 Dify 返回的 conversation_id。仅在拿到有效 sessionId 与 conversationId 时写入。
+     * Persiste o conversation_id retornado pelo Dify. Só grava quando há sessionId e conversationId válidos.
      */
     private void saveCurrentConversationId(Prompt prompt, String conversationId) {
         if (conversationId == null || conversationId.isBlank()) {
