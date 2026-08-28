@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 
 /**
- * 自定义处理mcp的实现
+ * Implementação customizada de tratamento do MCP
  */
 @Component
 public class CustomMcpSyncClientCustomizer implements McpSyncClientCustomizer {
