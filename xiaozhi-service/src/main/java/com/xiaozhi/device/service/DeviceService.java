@@ -9,10 +9,10 @@ import java.util.List;
 
 public interface DeviceService {
 
-    /** 设备缓存名称（DeviceServiceImpl 读缓存、DeviceRepositoryImpl 写后失效均使用此常量） */
+    /** Nome do cache de dispositivos (usado por DeviceServiceImpl para leitura e por DeviceRepositoryImpl para invalidação após escrita) */
     String CACHE_NAME = "XiaoZhi:Device";
 
-    // ===================== 查询操作 =====================
+    // ===================== Operações de consulta =====================
 
     PageResp<DeviceResp> page(int pageNo, int pageSize, String deviceId, String deviceName,
                               String roleName, String state, Integer roleId, Integer userId);
@@ -23,7 +23,7 @@ public interface DeviceService {
 
     DeviceResp get(String deviceId);
 
-    // ===================== 验证码操作（独立表，非 Device 聚合） =====================
+    // ===================== Operações de código de verificação (tabela independente, fora do agregado Device) =====================
 
     VerifyCodeBO generateCode(String deviceId, String sessionId, String type);
 
