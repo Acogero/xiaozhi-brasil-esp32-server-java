@@ -8,18 +8,18 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Device 聚合根。
+ * Device Raiz de agregação.
  * <p>
- * 职责：持有设备状态，通过行为方法（非 setter）修改状态并收集领域信号。
- * 无 public setter，状态变更必须通过行为方法。
+ * Responsabilidade: mantém o estado do dispositivo, altera o estado por meio de métodos de comportamento (não setters) e coleta sinais de domínio.
+ * Sem setter público; a mudança de estado deve ocorrer por meio de métodos de comportamento.
  */
 @Getter
 public class Device {
 
-    /** 领域信号：由 Repository.save() 转译为 Spring ApplicationEvent 发布 */
+    /** Sinais de domínio: traduzidos pelo Repository.save() em publicação de Spring ApplicationEvent */
     public enum DomainSignal { UPDATED, ONLINE, ROLE_CHANGED, SESSION_CLOSED }
 
-    /** 持久化设备状态常量 */
+    /** Constantes de estado persistido do dispositivo */
     public static final String STATE_OFFLINE = "0";
     public static final String STATE_ONLINE  = "1";
     public static final String STATE_STANDBY = "2";
@@ -48,7 +48,7 @@ public class Device {
 
     private final List<DomainSignal> signals = new ArrayList<>();
 
-    /** 从持久层重建聚合根（Repository 专用） */
+    /** Reconstrói a raiz de agregação a partir da camada de persistência (uso exclusivo do Repository) */
     public Device(String deviceId, String deviceName, Integer userId, Integer roleId,
            String mcpList, String ip, String location, String wifiName,
            String chipModelName, String type, String version, String state,
@@ -69,12 +69,12 @@ public class Device {
         this.updateTime = updateTime;
     }
 
-    /** 工厂方法：创建全新设备（首次激活） */
+    /** Método de fábrica: cria um dispositivo totalmente novo (primeira ativação) */
     public static Device newDevice(String deviceId, String deviceName, String type,
                                    Integer userId, Integer roleId) {
         Device device = new Device(
                 deviceId,
-                deviceName != null && !deviceName.isBlank() ? deviceName : (type != null ? type : "小智"),
+                deviceName != null && !deviceName.isBlank() ? deviceName : (type != null ? type : "Xiaozhi"),
                 userId, roleId, null, null, null, null, null, type,
                 null, STATE_OFFLINE, null, null);
         device.signals.add(DomainSignal.UPDATED);
@@ -82,19 +82,19 @@ public class Device {
         return device;
     }
 
-    // ===================== 行为方法 =====================
+    // ===================== Métodos de comportamento =====================
 
-    /** 绑定用户（设备激活），同时指定默认角色 */
+    /** Vincula o usuário (ativação do dispositivo) e define o papel padrão */
     public void bindUser(Integer userId, Integer roleId) {
         if (this.userId != null && !this.userId.equals(userId)) {
-            throw new IllegalStateException("设备已被其他用户绑定");
+            throw new IllegalStateException("O dispositivo já está vinculado a outro usuário");
         }
         this.userId = userId;
         this.roleId = roleId;
         signals.add(DomainSignal.UPDATED);
     }
 
-    /** 切换关联角色 */
+    /** Troca o papel associado */
     public void bindRole(Integer roleId) {
         if (!Objects.equals(this.roleId, roleId)) {
             this.roleId = roleId;
@@ -103,7 +103,7 @@ public class Device {
         }
     }
 
-    /** 更新可编辑字段（来自 DeviceUpdateReq） */
+    /** Atualiza os campos editáveis (a partir de DeviceUpdateReq) */
     public void update(String deviceName, Integer roleId, String location) {
         if (deviceName != null && !deviceName.isBlank()) this.deviceName = deviceName;
         if (roleId != null && !Objects.equals(this.roleId, roleId)) {
@@ -116,7 +116,7 @@ public class Device {
         signals.add(DomainSignal.UPDATED);
     }
 
-    /** 设备上线时同步网络信息 */
+    /** Sincroniza informações de rede quando o dispositivo entra online */
     public void reportOnline(String ip, String version, String wifiName, String location) {
         if (ip != null && !ip.isBlank()) this.ip = ip;
         if (version != null && !version.isBlank()) this.version = version;
@@ -125,13 +125,13 @@ public class Device {
         signals.add(DomainSignal.ONLINE);
     }
 
-    /** 更新 MCP 工具列表（设备连接时上报） */
+    /** Atualiza a lista de ferramentas MCP (reportada na conexão do dispositivo) */
     public void updateMcpList(String mcpList) {
         this.mcpList = mcpList;
         signals.add(DomainSignal.UPDATED);
     }
 
-    /** OTA 上报时的部分字段同步 */
+    /** Sincronização parcial de campos durante o relatório OTA */
     public void sync(String deviceName, String wifiName, String chipModelName,
                      String type, String version, String ip, String location) {
         if (deviceName != null && !deviceName.isBlank()) this.deviceName = deviceName;
@@ -145,8 +145,8 @@ public class Device {
     }
 
     /**
-     * 提取并清空已收集的领域信号。
-     * <p>由 Repository.save() 在持久化完成后调用，转译为 Spring ApplicationEvent。
+     * Extrai e limpa os sinais de domínio coletados.
+     * <p>Chamado por Repository.save() após a conclusão da persistência, traduzido em Spring ApplicationEvent.
      */
     public List<DomainSignal> pullSignals() {
         List<DomainSignal> result = List.copyOf(signals);

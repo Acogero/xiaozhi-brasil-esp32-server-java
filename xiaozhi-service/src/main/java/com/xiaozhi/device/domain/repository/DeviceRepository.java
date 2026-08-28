@@ -7,33 +7,33 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Device 聚合根仓储接口（领域层定义，基础设施层实现）。
+ * Interface de repositório da raiz de agregação Device (definida na camada de domínio, implementada na infraestrutura).
  */
 public interface DeviceRepository {
 
-    /** 按设备 ID 加载聚合根 */
+    /** Carrega a raiz de agregação pelo ID do dispositivo */
     Optional<Device> findById(String deviceId);
 
-    /** 按验证码查询（设备激活场景） */
+    /** Consulta pelo código de verificação (cenário de ativação do dispositivo) */
     Optional<VerifyCode> findVerifyCode(String code, String deviceId, String sessionId);
 
     /**
-     * 持久化聚合根（新建或更新）。
-     * <p>实现类需在保存完成后调用 {@link Device#pullSignals()} 并发布对应 ApplicationEvent。
+     * Persiste a raiz de agregação (criação ou atualização).
+     * <p>A implementação deve chamar {@link Device#pullSignals()} após salvar e publicar o ApplicationEvent correspondente.
      */
     void save(Device device);
 
-    /** 删除设备并清除缓存 */
+    /** Remove o dispositivo e limpa o cache */
     void delete(String deviceId);
 
     /**
-     * 直接更新设备状态（热路径）。
-     * <p>不加载完整聚合根，直接执行 UPDATE + 缓存失效，无领域事件。
+     * Atualiza diretamente o estado do dispositivo (caminho crítico).
+     * <p>Não carrega a raiz de agregação completa; executa diretamente UPDATE + invalidação de cache, sem eventos de domínio.
      */
     void updateState(String deviceId, String state);
 
     /**
-     * 批量重置设备状态（热路径，如实例重启时批量离线）。
+     * Redefine o estado de dispositivos em lote (caminho crítico, ex.: colocar em lote como offline ao reiniciar a instância).
      */
     int batchUpdateState(Set<String> deviceIds, String state);
 }
