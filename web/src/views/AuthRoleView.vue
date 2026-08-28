@@ -166,7 +166,7 @@ async function loadAuthRoles() {
       await selectAuthRole(nextAuthRoleId)
     }
   } catch (error) {
-    console.error('加载权限角色失败:', error)
+    console.error('Falha ao carregar papéis de permissão:', error)
     message.error(t('authRole.loadRolesFailed'))
   } finally {
     roleLoading.value = false
@@ -192,7 +192,7 @@ async function selectAuthRole(authRoleId: number) {
     permissionConfig.value = res.data
     checkedPermissionIds.value = Array.from(new Set(res.data.checkedPermissionIds ?? [])).sort((a, b) => a - b)
   } catch (error) {
-    console.error('加载权限配置失败:', error)
+    console.error('Falha ao carregar configuração de permissões:', error)
     message.error(t('authRole.loadConfigFailed'))
   } finally {
     configLoading.value = false
@@ -217,7 +217,7 @@ async function handleSavePermissions() {
     checkedPermissionIds.value = Array.from(new Set(res.data.checkedPermissionIds ?? [])).sort((a, b) => a - b)
     message.success(t('authRole.saveSuccess'))
   } catch (error) {
-    console.error('保存权限配置失败:', error)
+    console.error('Falha ao salvar configuração de permissões:', error)
     message.error(t('authRole.saveFailed'))
   } finally {
     saveLoading.value = false

@@ -17,7 +17,7 @@ const { t } = useI18n()
 const loadingStore = useLoadingStore()
 const { navigateToMemory } = useMemoryView()
 
-// 表格和分页
+// Tabela e paginação
 const {
   loading,
   data,
@@ -28,7 +28,7 @@ const {
 } = useTable<Device>()
 
 
-// 查询表单
+// Formulário de consulta
 const queryForm = reactive({
   deviceId: '',
   deviceName: '',
@@ -36,14 +36,14 @@ const queryForm = reactive({
   state: '',
 })
 
-// 查询过滤器配置
+// Configuração dos filtros de consulta
 const queryFilters = [
   { label: t('device.deviceId'), key: 'deviceId' as const, placeholder: t('device.deviceId') },
   { label: t('device.deviceName'), key: 'deviceName' as const, placeholder: t('device.deviceName') },
   { label: t('role.roleName'), key: 'roleName' as const, placeholder: t('role.roleName') },
 ]
 
-// 设备状态选项
+// Opções de status do dispositivo
 const stateOptions = [
   { label: t('common.all'), value: '' },
   { label: t('device.onlineStatus'), value: '1' },
@@ -51,10 +51,10 @@ const stateOptions = [
   { label: t('device.offlineStatus'), value: '0' },
 ]
 
-// 角色列表
+// Lista de personagens
 const roleItems = ref<Role[]>([])
 
-// 使用行内编辑 composable
+// Usa o composable de edição inline
 const {
   editingKey,
   startEdit,
@@ -76,7 +76,7 @@ const {
         return false
       }
     } catch (error) {
-      console.error('更新设备失败:', error)
+      console.error('Falha ao atualizar dispositivo:', error)
       message.error(t('common.serverMaintenance'))
       return false
     } finally {
@@ -85,16 +85,16 @@ const {
   }
 })
 
-// 弹窗相关
+// Relacionado ao modal
 const editVisible = ref(false)
 const currentDevice = ref<Device | null>(null)
 const clearMemoryLoading = ref(false)
 
-// 添加设备输入框
+// Campo de entrada para adicionar dispositivo
 const addDeviceCode = ref('')
 const addDeviceLoading = ref(false)
 
-// 表格列配置
+// Configuração das colunas da tabela
 const columns = computed(() => [
   {
     title: t('device.deviceId'),
@@ -172,9 +172,9 @@ const columns = computed(() => [
   },
 ])
 
-// 获取设备数据
+// Obtém os dados do dispositivo
 async function fetchData() {
-  // 重置编辑状态
+  // Reseta o estado de edição
   editingKey.value = ''
   
   await loadData((params) => {
@@ -192,10 +192,10 @@ async function fetchData() {
   })
 }
 
-// 防抖搜索
+// Busca com debounce
 const debouncedSearch = createDebouncedSearch(fetchData, 500)
 
-// 获取角色列表
+// Obtém a lista de personagens
 async function getRoles() {
   try {
     const res = await queryRoles({})
@@ -203,12 +203,12 @@ async function getRoles() {
       roleItems.value = res.data.list
     }
   } catch (error) {
-    console.error('获取角色列表失败:', error)
+    console.error('Falha ao obter a lista de personagens:', error)
   }
 }
 
 /**
- * 添加设备（保留全局 loading）
+ * Adiciona dispositivo (mantém o loading global)
  */
 async function handleAddDevice(code: string) {
   if (!code) {
@@ -221,7 +221,7 @@ async function handleAddDevice(code: string) {
     return
   }
 
-  // 防抖处理：如果正在添加中，直接返回
+  // Debounce: se já está adicionando, retorna diretamente
   if (addDeviceLoading.value) {
     return
   }
@@ -238,7 +238,7 @@ async function handleAddDevice(code: string) {
       message.error(res.message || t('common.addFailed'))
     }
   } catch (error) {
-    console.error('添加设备失败:', error)
+    console.error('Falha ao adicionar dispositivo:', error)
     message.error(t('common.serverMaintenance'))
   } finally {
     addDeviceLoading.value = false
@@ -247,7 +247,7 @@ async function handleAddDevice(code: string) {
 }
 
 /**
- * 删除设备（快速操作，只用 table loading）
+ * Remove dispositivo (ação rápida, usa apenas o loading da tabela)
  */
 async function handleDeleteDevice(record: Device) {
   loading.value = true
@@ -260,7 +260,7 @@ async function handleDeleteDevice(record: Device) {
       message.error(res.message || t('common.deleteFailed'))
     }
   } catch (error) {
-    console.error('删除设备失败:', error)
+    console.error('Falha ao remover dispositivo:', error)
     message.error(t('common.serverMaintenance'))
   } finally {
     loading.value = false
@@ -268,7 +268,7 @@ async function handleDeleteDevice(record: Device) {
 }
 
 /**
- * 更新设备（弹窗编辑后的更新，只用 table loading）
+ * Atualiza dispositivo (após edição no modal, usa apenas o loading da tabela)
  */
 async function handleUpdate(device: Device) {
   loading.value = true
@@ -282,7 +282,7 @@ async function handleUpdate(device: Device) {
       message.error(res.message || t('common.updateFailed'))
     }
   } catch (error) {
-    console.error('更新设备失败:', error)
+    console.error('Falha ao atualizar dispositivo:', error)
     message.error(t('common.serverMaintenance'))
   } finally {
     loading.value = false
@@ -290,7 +290,7 @@ async function handleUpdate(device: Device) {
 }
 
 /**
- * 清除设备记忆（保留全局 loading）
+ * Limpa a memória do dispositivo (mantém o loading global)
  */
 async function handleClearMemory(device: Device) {
   clearMemoryLoading.value = true
@@ -305,7 +305,7 @@ async function handleClearMemory(device: Device) {
       message.error(res.message || t('common.deleteFailed'))
     }
   } catch (error) {
-    console.error('清除记忆失败:', error)
+    console.error('Falha ao limpar memória:', error)
     message.error(t('common.serverMaintenance'))
   } finally {
     clearMemoryLoading.value = false
@@ -314,27 +314,27 @@ async function handleClearMemory(device: Device) {
 }
 
 /**
- * 在弹窗中编辑
+ * Edita no modal
  */
 function handleEditWithDialog(record: Device) {
   currentDevice.value = { ...record }
   editVisible.value = true
 }
 
-// 直接导出 composable 的方法，无需额外包装
+// Exporta diretamente os métodos do composable, sem wrapper adicional
 const handleEdit = startEdit
 const handleCancel = cancelEditInline
 const handleSave = saveEdit
 
 /**
- * 输入编辑 - 使用 composable
+ * Edição de entrada - usa composable
  */
 function handleInputEdit(value: string, key: string, field: 'deviceName') {
   updateField(key, field, value)
 }
 
 /**
- * 角色选择变更 - 使用 composable
+ * Alteração da seleção de personagem - usa composable
  */
 function handleRoleChange(value: number, key: string) {
   const role = roleItems.value.find((item) => item.roleId === value)
@@ -346,28 +346,28 @@ function handleRoleChange(value: number, key: string) {
 }
 
 /**
- * 获取角色名称
+ * Obtém o nome do personagem
  */
 function getRoleName(roleId?: number) {
   if (!roleId) return ''
   const role = roleItems.value.find((r) => r.roleId === roleId)
-  return role ? role.roleName : `角色ID:${roleId}`
+  return role ? role.roleName : `ID do Personagem:${roleId}`
 }
 
-// 处理分页变化
+// Lida com a mudança de paginação
 const onTableChange = (pag: TablePaginationConfig) => {
   handleTableChange(pag)
   fetchData()
 }
 
-// 初始化（非阻塞式加载）
+// Inicialização (carregamento não bloqueante)
 getRoles()
 fetchData()
 </script>
 
 <template>
   <div class="device-view">
-    <!-- 查询表单 -->
+    <!-- Formulário de consulta -->
     <a-card :bordered="false" style="margin-bottom: 16px" class="search-card">
       <a-form layout="horizontal" :colon="false">
         <a-row :gutter="16">
@@ -410,7 +410,7 @@ fetchData()
       </a-form>
     </a-card>
 
-    <!-- 数据表格 -->
+    <!-- Tabela de dados -->
     <a-card :bordered="false">
       <template #title>
         <span>{{ t('menu.device') }}</span>
@@ -439,14 +439,14 @@ fetchData()
         @change="onTableChange"
       >
         <template #bodyCell="{ column, record }">
-          <!-- 设备编号列 -->
+          <!-- Coluna de ID do dispositivo -->
           <template v-if="column.dataIndex === 'deviceId'">
             <a-tooltip :title="record.deviceId" placement="topLeft">
               <span class="ellipsis-text">{{ record.deviceId }}</span>
             </a-tooltip>
           </template>
 
-          <!-- 设备名称列 -->
+          <!-- Coluna de nome do dispositivo -->
           <template v-else-if="column.dataIndex === 'deviceName'">
             <div>
               <a-input
@@ -460,7 +460,7 @@ fetchData()
               <span
                 v-else-if="editingKey === ''"
               >
-                <a-tooltip :title="record.deviceName || '未命名'" :mouse-enter-delay="0.5">
+                <a-tooltip :title="record.deviceName || 'Sem nome'" :mouse-enter-delay="0.5">
                   <span v-if="record.deviceName" class="ellipsis-text">{{ record.deviceName }}</span>
                   <span v-else>-</span>
                 </a-tooltip>
@@ -469,7 +469,7 @@ fetchData()
             </div>
           </template>
 
-          <!-- 角色列 -->
+          <!-- Coluna de personagem -->
           <template v-else-if="column.dataIndex === 'roleName'">
             <a-select
               v-if="record.editable"
@@ -500,47 +500,47 @@ fetchData()
             <span v-else class="ellipsis-text">{{ record.roleName }}</span>
           </template>
 
-          <!-- WIFI名称列 -->
+          <!-- Coluna de nome do WiFi -->
           <template v-else-if="column.dataIndex === 'wifiName'">
             <a-tooltip :title="record.wifiName" placement="top">
               <span class="ellipsis-text">{{ record.wifiName || '-' }}</span>
             </a-tooltip>
           </template>
 
-          <!-- 地理位置列 -->
+          <!-- Coluna de localização -->
           <template v-else-if="column.dataIndex === 'location'">
             <a-tooltip :title="record.location" placement="top">
               <span class="ellipsis-text">{{ record.location || '-' }}</span>
             </a-tooltip>
           </template>
 
-          <!-- 产品类型列 -->
+          <!-- Coluna de tipo de produto -->
           <template v-else-if="column.dataIndex === 'chipModelName'">
             <a-tooltip :title="record.chipModelName" placement="top">
               <span class="ellipsis-text">{{ record.chipModelName || '-' }}</span>
             </a-tooltip>
           </template>
 
-          <!-- 设备类型列 -->
+          <!-- Coluna de tipo de dispositivo -->
           <template v-else-if="column.dataIndex === 'type'">
             <a-tooltip :title="record.type" placement="top">
               <span class="ellipsis-text">{{ record.type || '-' }}</span>
             </a-tooltip>
           </template>
 
-          <!-- 状态列 -->
+          <!-- Coluna de status -->
           <template v-else-if="column.dataIndex === 'state'">
             <a-tag :color="record.state == 1 ? 'green' : record.state == 2 ? 'blue' : 'red'">
               {{ record.state == 1 ? t('device.onlineStatus') : record.state == 2 ? t('device.standbyStatus') : t('device.offlineStatus') }}
             </a-tag>
           </template>
 
-          <!-- 时间列 -->
+          <!-- Coluna de data/hora -->
           <template v-else-if="column.dataIndex === 'updateTime' || column.dataIndex === 'createTime'">
             {{ record[column.dataIndex] || '-' }}
           </template>
 
-          <!-- 操作列 -->
+          <!-- Coluna de ações -->
           <template v-else-if="column.dataIndex === 'operation'">
             <a-space v-if="record.editable">
               <a-popconfirm :title="t('common.confirmSave')" @confirm="() => handleUpdate(record)">
@@ -574,7 +574,7 @@ fetchData()
       </a-table>
     </a-card>
 
-    <!-- 设备详情弹窗 -->
+    <!-- Modal de detalhes do dispositivo -->
     <DeviceEditDialog
       :visible="editVisible"
       :current="currentDevice"
@@ -585,7 +585,7 @@ fetchData()
       @clear-memory="handleClearMemory"
     />
 
-    <!-- 回到顶部 -->
+    <!-- Voltar ao topo -->
     <a-back-top />
   </div>
 </template>
@@ -599,12 +599,12 @@ fetchData()
   margin-bottom: 0;
 }
 
-// 表格中的下拉框居中
+// Centraliza o dropdown na tabela
 :deep(.ant-select-selection-item) {
   text-align: center;
 }
 
-// 表格文字省略样式
+// Estilo de reticências para texto na tabela
 .ellipsis-text {
   display: inline-block;
   width: 100%;
@@ -613,7 +613,7 @@ fetchData()
   text-overflow: ellipsis;
 }
 
-// 表格单元格样式
+// Estilo das células da tabela
 :deep(.ant-table) {
   .ant-table-tbody > tr > td {
     max-width: 0;

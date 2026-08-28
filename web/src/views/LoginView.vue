@@ -36,17 +36,17 @@ const rules: Record<string, Rule[]> = {
   password: passwordRules,
 }
 
-// 切换登录方式
+// Alternar método de login
 const switchLoginType = (type: 'account' | 'mobile') => {
   loginType.value = type
 }
 
-// 发送验证码
+// Enviar código de verificação
 const handleSendCode = () => {
   sendVerificationCode(mobileFormState.tel)
 }
 
-// 提交表单
+// Enviar formulário
 const handleSubmit = async () => {
   if (loginType.value === 'account') {
     await login(formState)
@@ -78,7 +78,7 @@ onMounted(() => {
             @finish="handleSubmit"
             :hideRequiredMark="true"
           >
-            <!-- 账号密码登录 -->
+            <!-- Login por conta e senha -->
             <template v-if="loginType === 'account'">
               <a-form-item :label="t('user.username')" name="username">
                 <a-input
@@ -116,7 +116,7 @@ onMounted(() => {
               </a-row>
             </template>
 
-            <!-- 手机号验证码登录 -->
+            <!-- Login por celular e código de verificação -->
             <template v-else>
               <a-form-item :label="t('auth.mobilePhone')" name="tel">
                 <a-input
@@ -186,9 +186,9 @@ onMounted(() => {
 
             <div class="privacy-terms">
               <span class="terms-text">{{ t('auth.loginAgreement') }}</span>
-              <a href="#" class="terms-link">《隐私协议》</a>
-              <span class="terms-text">和</span>
-              <a href="#" class="terms-link">《服务条款》</a>
+              <a href="#" class="terms-link">《Acordo de Privacidade》</a>
+              <span class="terms-text">e</span>
+              <a href="#" class="terms-link">《Termos de Serviço》</a>
             </div>
 
             <a-divider>
@@ -438,7 +438,7 @@ onMounted(() => {
   border-top-color: rgba(255, 255, 255, 0.2) !important;
 }
 
-// 发送验证码按钮
+// Botão de enviar código de verificação
 .send-code-btn {
   color: #4285f4;
   cursor: pointer;
@@ -461,7 +461,7 @@ onMounted(() => {
   }
 }
 
-// 切换登录方式链接
+// Link de alternar método de login
 .switch-login-type {
   color: #4285f4;
   cursor: pointer;

@@ -33,11 +33,11 @@ const { copy } = useClipboard()
 const router = useRouter()
 const { navigateToMemory } = useMemoryView()
 
-// 表格和分页
+// Tabela e paginação
 const { loading, data: roleList, pagination, handleTableChange, loadData, createDebouncedSearch } = useTable<Role>()
 
 
-// 角色管理器
+// Gerenciador de personagens
 const {
   modelLoading,
   voiceLoading,
@@ -52,15 +52,15 @@ const {
   formatProviderName,
 } = useRoleManager()
 
-// 查询表单
+// Formulário de busca
 const searchForm = reactive({
   roleName: ''
 })
 
-// Tab相关
+// Relacionado às abas
 const activeTabKey = ref('1')
 
-// 表单相关
+// Relacionado ao formulário
 const formRef = ref<FormInstance>()
 const formData = reactive<RoleFormData>({
   roleName: '',
@@ -84,20 +84,20 @@ const formData = reactive<RoleFormData>({
   memoryType: 'window'
 })
 
-// 编辑状态
+// Estado de edição
 const editingRoleId = ref<number>()
 const submitLoading = ref(false)
 
-// 头像上传
+// Upload de avatar
 const avatarUrl = ref('')
 const avatarLoading = ref(false)
 
-// 音色播放状态
+// Estado de reprodução da voz
 const playingVoiceId = ref<string>('')
-const loadingVoiceId = ref<string>('') // loading状态（API请求期间）
+const loadingVoiceId = ref<string>('') // estado de carregamento (durante a requisição à API)
 const voiceAudioCache = new Map<string, HTMLAudioElement>()
 
-// 提示词模板
+// Modelo de prompt
 const promptEditorMode = ref<'custom' | 'template'>('custom')
 const selectedTemplateId = ref<number>()
 const promptTemplates = ref<PromptTemplate[]>([])
@@ -105,23 +105,23 @@ const templatesLoading = ref(false)
 
 const selectedProvider = ref<string>('')
 
-// 折叠面板展开状态
+// Estado de expansão do painel recolhível
 const modelAdvancedVisible = ref<string[]>([])
 const vadAdvancedVisible = ref<string[]>([])
 const ttsAdvancedVisible = ref<string[]>([])
 
-// 待设置的折叠面板值
+// Valor do painel recolhível pendente de definição
 const pendingVadValues = ref<Record<string, number> | null>(null)
 const pendingModelValues = ref<Record<string, number> | null>(null)
 const pendingTtsValues = ref<Record<string, number> | null>(null)
 
-// MCP 工具相关
+// Relacionado às ferramentas MCP
 const mcpToolsLoading = ref(false)
 const allMcpTools = ref<McpToolItem[]>([])
 const selectedToolNames = ref<string[]>([])
 const globalDisabledTools = ref<string[]>([])
 
-// 表格列定义
+// Definição das colunas da tabela
 const columns = computed<TableColumnsType>(() => [
   {
     title: t('common.avatar'),
@@ -187,7 +187,7 @@ const columns = computed<TableColumnsType>(() => [
 ])
 
 
-// 加载角色列表
+// Carrega a lista de personagens
 const fetchData = async () => {
   await loadData((params) => queryRoles({
     ...params,
@@ -195,49 +195,49 @@ const fetchData = async () => {
   }))
 }
 
-// 防抖搜索
+// Busca com debounce
 const debouncedSearch = createDebouncedSearch(fetchData, 500)
 
-// 处理表格分页变化
+// Trata a mudança de paginação da tabela
 const onTableChange = (pag: TablePaginationConfig) => {
   handleTableChange(pag)
   fetchData()
 }
 
-// 标签页切换
+// Troca de aba
 const handleTabChange = (key: string) => {
   activeTabKey.value = key
   if (key === '1') {
     fetchData()
   } else if (key === '2') {
     resetForm()
-    // 切换到创建角色时，加载 MCP 工具列表
+    // Ao mudar para a criação de personagem, carrega a lista de ferramentas MCP
     loadAllMcpTools()
   }
 }
 
-// 编辑角色
+// Editar personagem
 const handleEdit = (record: Role) => {
   editingRoleId.value = record.roleId
   avatarUrl.value = record.avatar || ''
   activeTabKey.value = '2'
   
-  // 编辑时默认使用自定义模式
+  // Ao editar, usa o modo personalizado por padrão
   promptEditorMode.value = 'custom'
 
   nextTick(() => {
-    // 获取模型信息
+    // Obtém informações do modelo
     const modelInfo = getModelInfo(record.modelId || undefined)
 
-    // 获取语音信息
+    // Obtém informações de voz
     const voiceInfo = allVoices.value.find(v => v.value === (record.voiceName || ''))
 
-    // 清空pending值（编辑时不使用pending机制）
+    // Limpa os valores pendentes (o mecanismo pendente não é usado durante a edição)
     pendingVadValues.value = null
     pendingModelValues.value = null
     pendingTtsValues.value = null
 
-    // 设置表单所有值（包括高级设置的值）
+    // Define todos os valores do formulário (incluindo os das configurações avançadas)
     Object.assign(formData, {
       roleName: record.roleName,
       roleDesc: record.roleDesc || '',
@@ -260,12 +260,12 @@ const handleEdit = (record: Role) => {
       memoryType: record.memoryType || 'window'
     })
 
-    // 加载 MCP 工具列表
+    // Carrega a lista de ferramentas MCP
     loadAllMcpTools()
   })
 }
 
-// 删除角色
+// Excluir personagem
 const handleDelete = async (roleId: number) => {
   loading.value = true
   try {
@@ -277,14 +277,14 @@ const handleDelete = async (roleId: number) => {
       message.error(res.message || t('role.deleteRoleFailed'))
     }
   } catch (error) {
-    console.error('删除角色失败:', error)
+    console.error('Falha ao excluir a personagem:', error)
     message.error(t('role.deleteRoleFailed'))
   } finally {
     loading.value = false
   }
 }
 
-// 设为默认角色
+// Definir como personagem padrão
 const handleSetDefault = async (roleId: number) => {
   loading.value = true
   try {
@@ -299,27 +299,27 @@ const handleSetDefault = async (roleId: number) => {
       message.error(res.message || t('role.setAsDefaultFailed'))
     }
   } catch (error) {
-    console.error('设置默认角色失败:', error)
+    console.error('Falha ao definir a personagem padrão:', error)
     message.error(t('role.setAsDefaultFailed'))
   } finally {
     loading.value = false
   }
 }
 
-// 提交表单
+// Enviar formulário
 const handleSubmit = async () => {
   try {
     await formRef.value?.validate()
     submitLoading.value = true
 
-    // 统一处理：从所有可用音色中查找
+    // Tratamento unificado: busca entre todas as vozes disponíveis
     const voiceInfo = allVoices.value.find(v => v.value === formData.voiceName)
     const ttsId = voiceInfo?.ttsId || -1
     
     const submitData: Partial<RoleFormData> & { avatar?: string } = {
       ...formData,
       avatar: avatarUrl.value || '',
-      // 将 isDefault 布尔值转换为字符串 '1' 或 '0'
+      // Converte o valor booleano isDefault em string '1' ou '0'
       isDefault: formData.isDefault ? '1' : '0',
       ttsId: ttsId,
     }
@@ -328,7 +328,7 @@ const handleSubmit = async () => {
       submitData.roleId = editingRoleId.value
     }
 
-    // 1. 保存角色信息
+    // 1. Salvar informações da personagem
     const res = editingRoleId.value 
       ? await updateRole(submitData)
       : await addRole(submitData)
@@ -336,7 +336,7 @@ const handleSubmit = async () => {
     if (res.code === 200) {
       const savedRoleId = editingRoleId.value ?? res.data?.roleId
 
-      // 2. 保存工具选择（使用 exclude 方式）
+      // 2. Salvar seleção de ferramentas (usando abordagem de exclusão)
       if (savedRoleId && allMcpTools.value.length > 0) {
         try {
           const excludeTools = allMcpTools.value
@@ -345,7 +345,7 @@ const handleSubmit = async () => {
           
           await updateToolsStatus(savedRoleId, excludeTools)
         } catch (error) {
-          console.error('保存工具选择失败:', error)
+          console.error('Falha ao salvar a seleção de ferramentas:', error)
           message.warning(t('role.mcpSaveFailed'))
         }
       }
@@ -358,7 +358,7 @@ const handleSubmit = async () => {
       message.error(res.message || t('common.operationFailed'))
     }
   } catch (error: unknown) {
-    console.error('提交表单失败:', error)
+    console.error('Falha ao enviar o formulário:', error)
     if (error && typeof error === 'object' && 'errorFields' in error) {
       message.error(t('role.checkForm'))
     }
@@ -367,31 +367,31 @@ const handleSubmit = async () => {
   }
 }
 
-// 取消编辑
+// Cancelar edição
 const handleCancel = () => {
   resetForm()
   activeTabKey.value = '1'
 }
 
-// 重置表单
+// Redefinir formulário
 const resetForm = () => {
   formRef.value?.resetFields()
   editingRoleId.value = undefined
   avatarUrl.value = ''
 
-  // 清空待设置的折叠面板值
+  // Limpa o valor pendente do painel recolhível
   pendingVadValues.value = null
   pendingModelValues.value = null
   pendingTtsValues.value = null
 
-  // 停止所有音频播放
+  // Para toda a reprodução de áudio
   playingVoiceId.value = ''
   voiceAudioCache.forEach(audio => {
     audio.pause()
     audio.currentTime = 0
   })
 
-  // 新建时使用模板模式并应用默认模板
+  // Ao criar, usa o modo de modelo e aplica o modelo padrão
   promptEditorMode.value = 'template'
   const defaultTemplate = promptTemplates.value.find(t => t.isDefault == 1)
   if (defaultTemplate) {
@@ -402,7 +402,7 @@ const resetForm = () => {
     formData.roleDesc = ''
   }
 
-  // 重置为默认值
+  // Redefine para os valores padrão
   Object.assign(formData, {
     roleName: '',
     avatar: '',
@@ -425,7 +425,7 @@ const resetForm = () => {
   })
 }
 
-// 模型类型变化
+// Mudança do tipo de modelo
 const handleModelTypeChange = () => {
   formData.modelId = undefined
   if (formData.modelType === 'agent') {
@@ -433,7 +433,7 @@ const handleModelTypeChange = () => {
   }
 }
 
-// 模型选择变化
+// Mudança na seleção do modelo
 const handleModelChange = (modelId: number | undefined) => {
   if (!modelId) return
   const modelInfo = getModelInfo(modelId)
@@ -442,11 +442,11 @@ const handleModelChange = (modelId: number | undefined) => {
   }
 }
 
-// 播放音色示例
+// Reproduzir exemplo de voz
 const handlePlayVoice = async (voiceName?: string) => {
   if (!voiceName) return
   try {
-    // 如果正在播放同一个音色，则停止
+    // Se a mesma voz já estiver sendo reproduzida, para a reprodução
     if (playingVoiceId.value === voiceName) {
       const audio = voiceAudioCache.get(voiceName)
       if (audio) {
@@ -457,7 +457,7 @@ const handlePlayVoice = async (voiceName?: string) => {
       return
     }
 
-    // 停止之前的播放
+    // Para a reprodução anterior
     if (playingVoiceId.value) {
       const prevAudio = voiceAudioCache.get(playingVoiceId.value)
       if (prevAudio) {
@@ -466,14 +466,14 @@ const handlePlayVoice = async (voiceName?: string) => {
       }
     }
 
-    // 设置loading状态（API请求期间）
+    // Define o estado de carregamento (durante a requisição à API)
     loadingVoiceId.value = voiceName
 
-    // 检查缓存
+    // Verifica o cache
     let audio = voiceAudioCache.get(voiceName)
     
     if (!audio) {
-      // 统一处理：从所有可用音色中查找
+      // Tratamento unificado: busca entre todas as vozes disponíveis
       const voiceInfo = allVoices.value.find(v => v.value === voiceName)
       if (!voiceInfo) {
         message.error(t('role.voiceNotFound'))
@@ -490,17 +490,17 @@ const handlePlayVoice = async (voiceName?: string) => {
         ttsSpeed: formData.ttsSpeed || 1.0
       }
 
-      // 调用测试接口获取音频URL
+      // Chama a API de teste para obter a URL do áudio
       const result: any = await testVoice(testParams)
       
-      // 清除loading状态
+      // Limpa o estado de carregamento
       loadingVoiceId.value = ''
 
       if (result.code === 200 && result.data) {
-        // 使用 getResourceUrl 处理音频路径
+        // Usa getResourceUrl para tratar o caminho do áudio
         const audioUrl = getResourceUrl(result.data)
         if (audioUrl) {
-          // 创建音频对象
+          // Cria o objeto de áudio
           audio = new Audio(audioUrl)
           voiceAudioCache.set(voiceName, audio)
         } else {
@@ -508,14 +508,14 @@ const handlePlayVoice = async (voiceName?: string) => {
           return
         }
         
-        // 监听播放结束
+        // Escuta o término da reprodução
         audio.onended = () => {
           if (playingVoiceId.value === voiceName) {
             playingVoiceId.value = ''
           }
         }
         
-        // 监听错误
+        // Escuta erros
         audio.onerror = () => {
           message.error(t('common.audioPlayFailed'))
           playingVoiceId.value = ''
@@ -526,18 +526,18 @@ const handlePlayVoice = async (voiceName?: string) => {
         return
       }
     } else {
-      // 清除loading状态
+      // Limpa o estado de carregamento
       loadingVoiceId.value = ''
     }
 
-    // 播放音频
+    // Reproduz o áudio
     if (audio) {
       await audio.play()
-      // 播放成功后设置playing状态
+      // Define o estado playing após o início da reprodução
       playingVoiceId.value = voiceName
     }
   } catch (error: unknown) {
-    console.error('播放音色失败:', error)
+    console.error('Falha ao reproduzir a voz:', error)
     const errorMessage = error instanceof Error ? error.message : t('role.playVoiceFailed')
     message.error(errorMessage)
     loadingVoiceId.value = ''
@@ -545,10 +545,10 @@ const handlePlayVoice = async (voiceName?: string) => {
   }
 }
 
-// 提示词模式变化
+// Mudança no modo de prompt
 const handlePromptModeChange = () => {
   if (promptEditorMode.value === 'template') {
-    // 切换到模板模式时，如果没有选中模板，则选择默认模板
+    // Ao mudar para o modo de modelo, se nenhum modelo estiver selecionado, seleciona o modelo padrão
     if (!selectedTemplateId.value) {
       const defaultTemplate = promptTemplates.value.find(t => t.isDefault == 1)
       if (defaultTemplate) {
@@ -556,7 +556,7 @@ const handlePromptModeChange = () => {
         formData.roleDesc = defaultTemplate.templateContent
       }
     } else {
-      // 如果已选中模板，应用该模板
+      // Se um modelo já estiver selecionado, aplica esse modelo
       const template = promptTemplates.value.find(t => t.templateId === selectedTemplateId.value)
       if (template) {
         formData.roleDesc = template.templateContent
@@ -565,7 +565,7 @@ const handlePromptModeChange = () => {
   }
 }
 
-// 模板选择变化
+// Mudança na seleção do modelo
 const handleTemplateChange = (templateId: number) => {
   const template = promptTemplates.value.find(t => t.templateId === templateId)
   if (template) {
@@ -573,12 +573,12 @@ const handleTemplateChange = (templateId: number) => {
   }
 }
 
-// 跳转到模板管理
+// Ir para o gerenciamento de modelos
 const goToTemplateManager = () => {
   router.push(ROUTES.TEMPLATE)
 }
 
-// 处理VAD折叠面板变化
+// Trata a mudança do painel recolhível de VAD
 const handleVadCollapseChange = (activeKeys: string | string[]) => {
   const keys = Array.isArray(activeKeys) ? activeKeys : [activeKeys]
   if (keys.includes('vad') && pendingVadValues.value) {
@@ -589,7 +589,7 @@ const handleVadCollapseChange = (activeKeys: string | string[]) => {
   }
 }
 
-// 处理模型折叠面板变化
+// Trata a mudança do painel recolhível de modelo
 const handleModelCollapseChange = (activeKeys: string | string[]) => {
   const keys = Array.isArray(activeKeys) ? activeKeys : [activeKeys]
   if (keys.includes('advanced') && pendingModelValues.value) {
@@ -600,7 +600,7 @@ const handleModelCollapseChange = (activeKeys: string | string[]) => {
   }
 }
 
-// 处理TTS折叠面板变化
+// Trata a mudança do painel recolhível de TTS
 const handleTtsCollapseChange = (activeKeys: string | string[]) => {
   const keys = Array.isArray(activeKeys) ? activeKeys : [activeKeys]
   if (keys.includes('tts') && pendingTtsValues.value) {
@@ -611,7 +611,7 @@ const handleTtsCollapseChange = (activeKeys: string | string[]) => {
   }
 }
 
-// 加载所有 MCP 工具
+// Carrega todas as ferramentas MCP
 const loadAllMcpTools = async () => {
   try {
     mcpToolsLoading.value = true
@@ -625,7 +625,7 @@ const loadAllMcpTools = async () => {
 
     const tools: McpToolItem[] = []
 
-    // 处理系统全局工具
+    // Trata as ferramentas globais do sistema
     if (systemRes.code === 200 && systemRes.data && Array.isArray(systemRes.data)) {
       systemRes.data.forEach((tool: { name: string; description: string }) => {
         tools.push({
@@ -641,7 +641,7 @@ const loadAllMcpTools = async () => {
 
     allMcpTools.value = tools
 
-    // 处理禁用状态
+    // Trata o estado desabilitado
     if (disabledRes.code === 200 && disabledRes.data) {
       const data = disabledRes.data as { globalDisabled?: string[]; roleDisabled?: string[] }
       globalDisabledTools.value = data.globalDisabled || []
@@ -655,32 +655,32 @@ const loadAllMcpTools = async () => {
     }
 
   } catch (error) {
-    console.error('加载 MCP 工具失败:', error)
+    console.error('Falha ao carregar as ferramentas MCP:', error)
     message.error(t('role.mcpLoadToolsFailed'))
   } finally {
     mcpToolsLoading.value = false
   }
 }
 
-// 获取所有可用工具
+// Obtém todas as ferramentas disponíveis
 const availableTools = computed(() => {
   return allMcpTools.value.filter(tool => !globalDisabledTools.value.includes(tool.name))
 })
 
-// 工具搜索过滤
+// Filtro de busca de ferramentas
 const filterToolOption = (input: string, option: any) => {
   const toolName = option.value || ''
   return toolName.toLowerCase().includes(input.toLowerCase())
 }
 
-// 格式化工具名称显示（去掉前缀）
+// Formata a exibição do nome da ferramenta (remove o prefixo)
 const formatToolName = (toolName: string): string => {
   return toolName
-    .replace(/^func_/, '')  // 去掉 "func_" 前缀
-    .replace(/^XiaoZhi_MCP_Client_/, '')  // 去掉 "XiaoZhi_MCP_Client_" 前缀
+    .replace(/^func_/, '')  // remove o prefixo "func_"
+    .replace(/^XiaoZhi_MCP_Client_/, '')  // remove o prefixo "XiaoZhi_MCP_Client_"
 }
 
-// 头像上传前检查
+// Verificação antes do upload do avatar
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (file) => {
   const isImage = file.type.startsWith('image/')
   const isLt2M = file.size / 1024 / 1024 < 2
@@ -708,32 +708,32 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (file) => {
   return false
 }
 
-// 上传头像文件
+// Upload do arquivo de avatar
 const uploadAvatarFile = async (file: File): Promise<string> => {
   return await uploadFile(file, 'avatar') as string
 }
 
-// 移除头像
+// Remover avatar
 const removeAvatar = () => {
   avatarUrl.value = ''
 }
 
-// 获取头像URL
+// Obtém a URL do avatar
 const getAvatar = (avatar?: string) => {
   return getAvatarUrl(avatar)
 }
 
 
-// 获取音色显示名称
+// Obtém o nome de exibição da voz
 const getVoiceDisplayName = (record: any) => {
   if (!record.voiceName) return ''
 
-  // 统一处理：从所有可用音色中查找
+  // Tratamento unificado: busca entre todas as vozes disponíveis
   const voiceInfo = allVoices.value.find(v => v.value === record.voiceName)
   return voiceInfo?.label || record.voiceName
 }
 
-// 获取记忆类型显示信息
+// Obtém as informações de exibição do tipo de memória
 const getMemoryTypeInfo = (memoryType?: string) => {
   switch (memoryType) {
     case 'window':
@@ -745,7 +745,7 @@ const getMemoryTypeInfo = (memoryType?: string) => {
   }
 }
 
-// 加载提示词模板
+// Carrega os modelos de prompt
 const loadTemplates = async () => {
   try {
     templatesLoading.value = true
@@ -754,14 +754,14 @@ const loadTemplates = async () => {
       promptTemplates.value = (res.data.list || []) as PromptTemplate[]
     }
   } catch (error) {
-    console.error('加载模板列表失败:', error)
+    console.error('Falha ao carregar a lista de modelos:', error)
     message.error(t('role.loadTemplateFailed'))
   } finally {
     templatesLoading.value = false
   }
 }
 
-// 提供商选项
+// Opções de provedor
 const providerOptions = computed(() => {
   const providers = new Set<string>()
   allVoices.value.forEach(v => {
@@ -772,18 +772,18 @@ const providerOptions = computed(() => {
   return [{ label: t('common.all'), value: '' }, ...items]
 })
 
-// 根据提供商过滤音色选项
+// Filtra as opções de voz de acordo com o provedor
 const filteredVoices = computed(() => {
   const list = allVoices.value
   return selectedProvider.value ? list.filter(v => v.provider === selectedProvider.value) : list
 })
 
-// 提供商切换：切换后清空已选音色
+// Troca de provedor: limpa a voz selecionada após a troca
 const handleProviderChange = () => {
   formData.voiceName = undefined
 }
 
-// 初始化：并行加载所有数据（非阻塞式）
+// Inicialização: carrega todos os dados em paralelo (modo não bloqueante)
 Promise.all([
   loadAllModels(),
   loadAllVoices(),
@@ -792,7 +792,7 @@ Promise.all([
   fetchData()
 ])
 
-// 加载模板后，应用默认模板（新建时）
+// Após carregar os modelos, aplica o modelo padrão (ao criar)
 if (!editingRoleId.value) {
   const defaultTemplate = promptTemplates.value.find(t => t.isDefault == 1)
   if (defaultTemplate) {
@@ -805,7 +805,7 @@ if (!editingRoleId.value) {
 
 <template>
   <div class="role-view">
-    <!-- 查询表单 -->
+    <!-- Formulário de busca -->
     <a-card :bordered="false" style="margin-bottom: 16px" class="search-card">
       <a-form layout="horizontal" :colon="false">
         <a-row :gutter="16">
@@ -823,13 +823,13 @@ if (!editingRoleId.value) {
       </a-form>
     </a-card>
 
-    <!-- 主内容 -->
+    <!-- Conteúdo principal -->
     <a-card :bordered="false" :body-style="{ padding: '0 24px 24px 24px' }">
       <a-tabs
         v-model:active-key="activeTabKey"
         @change="handleTabChange"
       >
-        <!-- 角色列表 -->
+        <!-- Lista de personagens -->
         <a-tab-pane key="1" :tab="t('role.roleList')">
           <a-table
             row-key="roleId"
@@ -841,20 +841,20 @@ if (!editingRoleId.value) {
             size="middle"
             @change="onTableChange"
           >
-            <!-- 头像 -->
+            <!-- Avatar -->
             <template #bodyCell="{ column, record }">
               <template v-if="column.dataIndex === 'avatar'">
                 <a-avatar :src="getAvatar(record.avatar)" icon="user" :size="40" />
               </template>
 
-              <!-- 角色名称 -->
+              <!-- Nome da personagem -->
               <template v-else-if="column.dataIndex === 'roleName'">
                 <a-tooltip :title="record.roleName" placement="top">
                   <span class="ellipsis-text">{{ record.roleName }}</span>
                 </a-tooltip>
               </template>
 
-              <!-- 角色描述 -->
+              <!-- Descrição da personagem -->
               <template v-else-if="column.dataIndex === 'roleDesc'">
                 <a-tooltip :title="record.roleDesc" :mouse-enter-delay="0.5" placement="topLeft">
                   <span v-if="record.roleDesc" class="ellipsis-text">{{ record.roleDesc }}</span>
@@ -862,7 +862,7 @@ if (!editingRoleId.value) {
                 </a-tooltip>
               </template>
 
-              <!-- 音色 -->
+              <!-- Voz -->
               <template v-else-if="column.dataIndex === 'voiceName'">
                 <a-tooltip 
                   :title="getVoiceDisplayName(record)"
@@ -875,7 +875,7 @@ if (!editingRoleId.value) {
                 </a-tooltip>
               </template>
 
-              <!-- 模型 -->
+              <!-- Modelo -->
               <template v-else-if="column.dataIndex === 'modelName'">
                 <a-tooltip 
                   :title="getModelInfo(record.modelId)?.desc || (getModelInfo(record.modelId)?.label || record.modelName || t('role.unknownModel'))"
@@ -889,7 +889,7 @@ if (!editingRoleId.value) {
                 </a-tooltip>
               </template>
 
-              <!-- 语音识别 -->
+              <!-- Reconhecimento de voz -->
               <template v-else-if="column.dataIndex === 'sttName'">
                 <a-tooltip
                   :title="record.sttId === -1 || record.sttId === null ? t('role.voskLocalRecognition') : (sttOptions.find(s => s.value === record.sttId)?.label || t('common.unknown'))"
@@ -904,20 +904,20 @@ if (!editingRoleId.value) {
                 </a-tooltip>
               </template>
 
-              <!-- 记忆类型 -->
+              <!-- Tipo de memória -->
               <template v-else-if="column.dataIndex === 'memoryType'">
                 <a-tag :color="getMemoryTypeInfo(record.memoryType).color">
                   {{ getMemoryTypeInfo(record.memoryType).label }}
                 </a-tag>
               </template>
 
-              <!-- 默认状态 -->
+              <!-- Estado padrão -->
               <template v-else-if="column.dataIndex === 'isDefault'">
                 <a-tag v-if="record.isDefault == 1" color="green">{{ t('common.default') }}</a-tag>
                 <span v-else>-</span>
               </template>
 
-              <!-- 操作 -->
+              <!-- Ações -->
               <template v-else-if="column.dataIndex === 'operation'">
                 <TableActionButtons
                   :record="record"
@@ -945,7 +945,7 @@ if (!editingRoleId.value) {
           </a-table>
         </a-tab-pane>
 
-        <!-- 创建/编辑角色 -->
+        <!-- Criar/Editar personagem -->
         <a-tab-pane
           key="2"
           :tab="editingRoleId ? t('role.updateRole') : t('role.createRole')"
@@ -959,7 +959,7 @@ if (!editingRoleId.value) {
             @finish="handleSubmit"
             :hideRequiredMark="true"
           >
-            <!-- 基本信息 -->
+            <!-- Informações básicas -->
             <a-row :gutter="20">
               <a-col :xl="8" :lg="12" :xs="24">
                 <a-form-item :label="t('common.avatar')">
@@ -1033,7 +1033,7 @@ if (!editingRoleId.value) {
               </a-col>
             </a-row>
 
-            <!-- 对话模型设置 -->
+            <!-- Configurações do modelo de conversa -->
             <a-divider orientation="left">{{ t('role.conversationModelSettings') }}</a-divider>
 
             <a-row :gutter="20">
@@ -1079,7 +1079,7 @@ if (!editingRoleId.value) {
               </a-col>
             </a-row>
 
-            <!-- 对话模型高级设置 -->
+            <!-- Configurações avançadas do modelo de conversa -->
             <a-collapse
               v-model:active-key="modelAdvancedVisible"
               :bordered="false"
@@ -1135,7 +1135,7 @@ if (!editingRoleId.value) {
               </a-collapse-panel>
             </a-collapse>
 
-            <!-- 语音识别设置 -->
+            <!-- Configurações de reconhecimento de voz -->
             <a-divider orientation="left">{{ t('role.speechRecognitionSettings') }}</a-divider>
 
             <a-row :gutter="20">
@@ -1162,7 +1162,7 @@ if (!editingRoleId.value) {
               </a-col>
             </a-row>
 
-            <!-- VAD高级设置 -->
+            <!-- Configurações avançadas de VAD -->
             <a-collapse
               v-model:active-key="vadAdvancedVisible"
               :bordered="false"
@@ -1242,10 +1242,10 @@ if (!editingRoleId.value) {
               </a-collapse-panel>
             </a-collapse>
 
-            <!-- 语音合成设置 -->
+            <!-- Configurações de síntese de voz -->
             <a-divider orientation="left">{{ t('role.voiceSynthesisSettings') }}</a-divider>
 
-            <!-- 音色选择 -->
+            <!-- Seleção de voz -->
             <a-row :gutter="20">
               <a-col :xl="6" :lg="8" :xs="24">
                 <a-form-item>
@@ -1311,7 +1311,7 @@ if (!editingRoleId.value) {
               </a-col>
             </a-row>
 
-            <!-- 语音合成高级设置 -->
+            <!-- Configurações avançadas de síntese de voz -->
             <a-collapse
               v-model:active-key="ttsAdvancedVisible"
               :bordered="false"
@@ -1368,7 +1368,7 @@ if (!editingRoleId.value) {
             </a-collapse>
 
             <div v-permission="'system:role:mcp-tools'">
-              <!-- MCP 工具设置 -->
+              <!-- Configurações de ferramentas MCP -->
               <a-divider orientation="left">{{ t('role.mcpTools') }}</a-divider>
               <a-row :gutter="20">
                 <a-col :xl="8" :lg="12" :xs="24">
@@ -1399,7 +1399,7 @@ if (!editingRoleId.value) {
                 </a-col>
               </a-row>
             </div>
-            <!-- 记忆类型配置 -->
+            <!-- Configuração do tipo de memória -->
             <a-divider orientation="left">{{ t('role.memoryTypeSettings') }}</a-divider>
 
             <a-row :gutter="20">
@@ -1423,10 +1423,10 @@ if (!editingRoleId.value) {
               </a-col>
             </a-row>
 
-            <!-- 角色提示词 -->
+            <!-- Prompt da personagem -->
             <a-divider orientation="left">{{ t('role.rolePrompt') }}</a-divider>
 
-            <!-- 智能体提示 -->
+            <!-- Dica do agente -->
             <a-alert
               v-if="formData.modelType === 'agent'"
               :message="t('role.agentPrompt')"
@@ -1436,7 +1436,7 @@ if (!editingRoleId.value) {
               style="margin-bottom: 16px"
             />
 
-            <!-- 提示词编辑 -->
+            <!-- Edição do prompt -->
             <template v-else>
               <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center">
                 <a-space>
@@ -1477,7 +1477,7 @@ if (!editingRoleId.value) {
               </div>
             </template>
 
-            <!-- 提示词输入 -->
+            <!-- Entrada do prompt -->
             <a-form-item name="roleDesc">
               <a-textarea
                 v-model:value="formData.roleDesc"
@@ -1487,7 +1487,7 @@ if (!editingRoleId.value) {
               />
             </a-form-item>
 
-            <!-- 表单操作按钮 -->
+            <!-- Botões de ação do formulário -->
             <a-form-item>
               <a-button
                 v-permission="editingRoleId ? 'system:role:update' : 'system:role:create'"
@@ -1506,7 +1506,7 @@ if (!editingRoleId.value) {
       </a-tabs>
     </a-card>
 
-    <!-- 回到顶部 -->
+    <!-- Voltar ao topo -->
     <a-back-top />
   </div>
 </template>
@@ -1520,7 +1520,7 @@ if (!editingRoleId.value) {
   margin-bottom: 0;
 }
 
-// 头像上传样式
+// Estilo de upload do avatar
 .avatar-uploader-wrapper {
   display: flex;
   flex-direction: column;
@@ -1603,7 +1603,7 @@ if (!editingRoleId.value) {
   font-size: 12px;
 }
 
-// 折叠面板样式
+// Estilo do painel recolhível
 :deep(.ant-collapse) {
   background: transparent;
 }
@@ -1616,14 +1616,14 @@ if (!editingRoleId.value) {
   border-bottom: none;
 }
 
-// 折叠面板标题颜色（适配深色模式）
+// Cor do título do painel recolhível (adaptado ao modo escuro)
 :deep(.ant-collapse-header) {
   color: var(--ant-color-text) !important;
 }
 
-// 使用 Ant Design 变量，无需特殊处理
+// Usa variáveis do Ant Design, sem necessidade de tratamento especial
 
-// 表格文字省略样式
+// Estilo de truncamento de texto da tabela
 .ellipsis-text {
   display: inline-block;
   width: 100%;
@@ -1632,7 +1632,7 @@ if (!editingRoleId.value) {
   text-overflow: ellipsis;
 }
 
-// 表格单元格样式
+// Estilo das células da tabela
 :deep(.ant-table) {
   .ant-table-tbody > tr > td {
     max-width: 0;
@@ -1640,7 +1640,7 @@ if (!editingRoleId.value) {
 }
 
 :deep(.ant-select-selection-item-content) {
-  max-width: 100px; // 设置最大宽度
+  max-width: 100px; // Define a largura máxima
 }
 
 </style>

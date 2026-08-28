@@ -37,7 +37,7 @@ const {
 const formRef = ref<FormInstance>()
 const showVerificationInput = ref(false)
 
-// 表单数据
+// Dados do formulário
 const formData = reactive({
   name: '',
   username: '',
@@ -87,17 +87,17 @@ const handleSubmit = async () => {
 
 <template>
   <div class="register-container">
-    <!-- 地球背景 -->
+    <!-- Fundo com globo terrestre -->
     <div class="earth-background"></div>
 
-    <!-- 注册区域 -->
+    <!-- Área de cadastro -->
     <a-row type="flex" justify="center" align="middle" style="min-height: 100vh">
       <a-col :xs="22" :sm="14" :md="12" :lg="10" :xl="8">
         <a-card class="register-card" :bordered="false">
-          <!-- 标题 -->
+          <!-- Título -->
           <div class="welcome-title">{{ t('auth.register') }}</div>
 
-          <!-- 注册表单 -->
+          <!-- Formulário de cadastro -->
           <a-form
             ref="formRef"
             :model="formData"
@@ -106,7 +106,7 @@ const handleSubmit = async () => {
             :hideRequiredMark="true"
             layout="vertical"
           >
-            <!-- 姓名输入 -->
+            <!-- Campo de nome -->
             <a-form-item :label="t('auth.name')" name="name">
               <a-input
                 v-model:value="formData.name"
@@ -120,7 +120,7 @@ const handleSubmit = async () => {
               </a-input>
             </a-form-item>
 
-            <!-- 账号输入 -->
+            <!-- Campo de conta -->
             <a-form-item :label="t('user.username')" name="username">
               <a-input
                 v-model:value="formData.username"
@@ -134,7 +134,7 @@ const handleSubmit = async () => {
               </a-input>
             </a-form-item>
 
-            <!-- 邮箱输入 -->
+            <!-- Campo de e-mail -->
             <a-form-item :label="t('user.email')" name="email">
               <a-input
                 v-model:value="formData.email"
@@ -161,7 +161,7 @@ const handleSubmit = async () => {
               </a-input>
             </a-form-item>
 
-            <!-- 电话输入 -->
+            <!-- Campo de telefone -->
             <a-form-item :label="t('user.phone')" name="tel">
               <a-input
                 v-model:value="formData.tel"
@@ -175,7 +175,7 @@ const handleSubmit = async () => {
               </a-input>
             </a-form-item>
 
-            <!-- 验证码输入 - 发送成功后才显示 -->
+            <!-- Campo de código de verificação - exibido após envio bem-sucedido -->
             <a-form-item :label="t('auth.emailVerificationCode')" name="verifyCode" v-if="showVerificationInput">
               <a-input
                 v-model:value="formData.verifyCode"
@@ -189,7 +189,7 @@ const handleSubmit = async () => {
               </a-input>
             </a-form-item>
 
-            <!-- 密码输入 -->
+            <!-- Campo de senha -->
             <a-form-item :label="t('account.password')" name="password">
               <a-input-password
                 v-model:value="formData.password"
@@ -203,7 +203,7 @@ const handleSubmit = async () => {
               </a-input-password>
             </a-form-item>
 
-            <!-- 确认密码输入 -->
+            <!-- Campo de confirmação de senha -->
             <a-form-item :label="t('account.confirmPassword')" name="confirmPassword">
               <a-input-password
                 v-model:value="formData.confirmPassword"
@@ -217,17 +217,17 @@ const handleSubmit = async () => {
               </a-input-password>
             </a-form-item>
 
-            <!-- 用户协议 -->
+            <!-- Termos de uso -->
             <a-form-item name="agreeTerms" :rules="[{ required: true, message: t('auth.agreeTermsRequired') }]">
               <a-checkbox v-model:checked="formData.agreeTerms">
                 {{ t('auth.agreeTerms') }}
-                <a href="#" class="terms-link">《用户协议》</a>
-                和
-                <a href="#" class="terms-link">《隐私政策》</a>
+                <a href="#" class="terms-link">《Termos de Uso》</a>
+                e
+                <a href="#" class="terms-link">《Política de Privacidade》</a>
               </a-checkbox>
             </a-form-item>
 
-            <!-- 注册按钮 -->
+            <!-- Botão de cadastro -->
             <a-form-item style="margin-top: 24px">
               <a-button
                 type="primary"
@@ -241,7 +241,7 @@ const handleSubmit = async () => {
               </a-button>
             </a-form-item>
 
-            <!-- 登录链接 -->
+            <!-- Link de login -->
             <div class="login-wrapper">
               <span class="login-text">{{ t('auth.haveAccount') }}</span>
               <router-link to="/login" class="login-link"> {{ t('auth.loginNow') }} </router-link>
@@ -254,7 +254,7 @@ const handleSubmit = async () => {
 </template>
 
 <style lang="scss" scoped>
-// 主容器
+// Container principal
 .register-container {
   position: relative;
   min-height: 100vh;
@@ -263,7 +263,7 @@ const handleSubmit = async () => {
   font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
 }
 
-// 背景图片
+// Imagem de fundo
 .earth-background {
   position: fixed;
   top: 0;
@@ -287,7 +287,7 @@ const handleSubmit = async () => {
   }
 }
 
-// 注册卡片
+// Card de cadastro
 .register-card {
   background: rgba(42, 42, 42, 0.35) !important;
   backdrop-filter: blur(10px);
@@ -301,7 +301,7 @@ const handleSubmit = async () => {
   }
 }
 
-// 标题样式
+// Estilo do título
 .welcome-title {
   text-align: center;
   color: #ffffff;
@@ -313,7 +313,7 @@ const handleSubmit = async () => {
   display: block;
 }
 
-// 输入框样式
+// Estilo dos campos de entrada
 .input-field {
   background: rgba(255, 255, 255, 0.1) !important;
   border: none !important;
@@ -370,13 +370,13 @@ const handleSubmit = async () => {
   }
 }
 
-// 表单标签
+// Rótulo do formulário
 :deep(.ant-form-item-label > label) {
   color: #cccccc !important;
   font-weight: 500;
 }
 
-// 发送验证码按钮
+// Botão de enviar código de verificação
 .send-code-btn {
   color: #4285f4;
   font-size: 12px;
@@ -404,7 +404,7 @@ const handleSubmit = async () => {
   }
 }
 
-// 用户协议
+// Termos de uso
 :deep(.ant-checkbox-wrapper) {
   color: rgba(255, 255, 255, 0.8);
   font-size: 12px;
@@ -431,7 +431,7 @@ const handleSubmit = async () => {
   }
 }
 
-// 注册按钮
+// Botão de cadastro
 .register-button {
   height: 36px !important;
   transition: all 0.3s ease !important;
@@ -442,7 +442,7 @@ const handleSubmit = async () => {
   }
 }
 
-// 登录链接
+// Link de login
 .login-wrapper {
   text-align: center;
   font-size: 14px;

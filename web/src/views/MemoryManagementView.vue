@@ -27,17 +27,17 @@ const { t } = useI18n()
 const route = useRoute()
 const loadingStore = useLoadingStore()
 
-// 从路由路径推导记忆类型
+// Deriva o tipo de memória a partir do caminho da rota
 const memoryType = computed<'chat' | 'summary'>(() => {
   if (route.path.endsWith('/summary')) return 'summary'
   return 'chat'
 })
 
-// 获取路由参数
+// Obtém os parâmetros da rota
 const roleId = computed(() => parseInt(route.query.roleId as string) || 0)
 const routeDeviceId = computed(() => route.query.deviceId as string || '')
 
-// 表格和分页
+// Tabela e paginação
 const {
   loading,
   data,
@@ -46,13 +46,13 @@ const {
   loadData,
 } = useTable<SummaryMemory | ChatMemory>()
 
-// 使用导出 composable
+// Usa o composable de exportação
 const { exporting, exportToExcel } = useExport()
 
-// 事件总线
+// Barramento de eventos
 const stopAllAudioBus = useEventBus<void>('stop-all-audio')
 
-// 角色下拉（滚动加载）
+// Dropdown de perfis (carregamento por rolagem)
 const {
   list: roles,
   loading: rolesLoading,
@@ -61,7 +61,7 @@ const {
 } = useSelectLoadMore<Role>(queryRoles)
 const selectedRoleId = ref<number>(0)
 
-// 设备下拉（滚动加载）
+// Dropdown de dispositivos (carregamento por rolagem)
 const {
   list: devices,
   loading: devicesLoading,
@@ -70,22 +70,22 @@ const {
 } = useSelectLoadMore<Device>(queryDevices)
 const selectedDeviceId = ref<string>('')
 
-// 时间范围
+// Intervalo de tempo
 const timeRange = ref<[Dayjs, Dayjs]>([dayjs().startOf('month'), dayjs().endOf('month')])
 
-// 日期快捷选项
+// Opções rápidas de data
 const rangePresets = computed(() => [
   { label: t('message.today'), value: [dayjs().startOf('day'), dayjs().endOf('day')] },
   { label: t('message.thisMonth'), value: [dayjs().startOf('month'), dayjs().endOf('month')] },
 ])
 
-// 当前选中的设备名称（long 类型后端不返回 deviceName，前端直接取）
+// Nome do dispositivo selecionado atualmente (o backend não retorna deviceName para o tipo long, então o frontend obtém diretamente)
 const selectedDeviceName = computed(() => {
   if (!selectedDeviceId.value) return ''
   return devices.value.find((d: Device) => d.deviceId === selectedDeviceId.value)?.deviceName || selectedDeviceId.value
 })
 
-// 表格列配置
+// Configuração das colunas da tabela
 const columns = computed(() => {
 
   const baseColumns = [
@@ -160,14 +160,14 @@ const columns = computed(() => {
 })
 
 /**
- * 初始化下拉数据并加载表格
+ * Inicializa os dados dos dropdowns e carrega a tabela
  */
 async function initSelects() {
   await Promise.all([loadRoles(), loadDevices()])
 
   const needDefault = memoryType.value === 'summary'
 
-  // 优先使用路由传参，否则 summary/long 自动选第一个
+  // Prioriza o parâmetro da rota; caso contrário, seleciona automaticamente o primeiro summary/long
   if (roleId.value) {
     selectedRoleId.value = roleId.value
   } else if (needDefault && roles.value.length > 0) {
@@ -184,14 +184,14 @@ async function initSelects() {
 }
 
 /**
- * 角色筛选函数
+ * Função de filtro de perfil
  */
 function filterRoleOption(input: string, option: any) {
   return option.children?.[0]?.children?.toLowerCase().includes(input.toLowerCase())
 }
 
 /**
- * 处理角色切换
+ * Trata a mudança de perfil
  */
 async function handleRoleChange(roleIdValue: number) {
   selectedRoleId.value = roleIdValue
@@ -200,7 +200,7 @@ async function handleRoleChange(roleIdValue: number) {
 }
 
 /**
- * 获取记忆数据
+ * Obtém os dados de memória
  */
 async function fetchMemoryData() {
   const params: any = {
@@ -208,12 +208,12 @@ async function fetchMemoryData() {
     pageSize: pagination.pageSize || 10,
   }
 
-  // 只有当选择了角色时才添加 roleId
+  // Só adiciona roleId se um perfil foi selecionado
   if (selectedRoleId.value) {
     params.roleId = selectedRoleId.value
   }
 
-  // 只有当选择了设备时才添加 deviceId
+  // Só adiciona deviceId se um dispositivo foi selecionado
   if (selectedDeviceId.value) {
     params.deviceId = selectedDeviceId.value
   }
@@ -229,20 +229,20 @@ async function fetchMemoryData() {
       await loadData(() => querySummaryMemory(params))
     }
   } catch (error) {
-    console.error('加载记忆数据失败:', error)
+    console.error('Falha ao carregar dados de memória:', error)
     antMessage.error(t('common.loadFailed'))
   }
 }
 
 /**
- * 处理删除记忆
+ * Trata a exclusão de memória
  */
 async function handleDeleteMemory(record: any) {
   loading.value = true
   try {
     let res
     if (memoryType.value === 'summary') {
-      // 对于summary，使用id（createTime的毫秒数）删除指定条
+      // Para summary, usa o id (milissegundos do createTime) para excluir o registro específico
       res = await deleteSummaryMemory(selectedRoleId.value, selectedDeviceId.value, record.id)
     }
 
@@ -253,7 +253,7 @@ async function handleDeleteMemory(record: any) {
       antMessage.error(res?.message || t('common.deleteFailed'))
     }
   } catch (error) {
-    console.error('删除记忆失败:', error)
+    console.error('Falha ao excluir memória:', error)
     antMessage.error(t('common.deleteFailed'))
   } finally {
     loading.value = false
@@ -261,7 +261,7 @@ async function handleDeleteMemory(record: any) {
 }
 
 /**
- * 处理设备切换
+ * Trata a mudança de dispositivo
  */
 async function handleDeviceChange(deviceId: string) {
   selectedDeviceId.value = deviceId
@@ -269,7 +269,7 @@ async function handleDeviceChange(deviceId: string) {
 }
 
 /**
- * 处理分页变化
+ * Trata a mudança de paginação
  */
 const onTableChange = (pag: TablePaginationConfig) => {
   handleTableChange(pag)
@@ -277,14 +277,14 @@ const onTableChange = (pag: TablePaginationConfig) => {
 }
 
 /**
- * 获取发送方显示文本
+ * Obtém o texto de exibição do remetente
  */
 function getSenderText(sender: string) {
   return sender === 'user' ? t('message.user') : t('message.assistant')
 }
 
 /**
- * 解析 toolCalls JSON 字符串为数组
+ * Converte a string JSON de toolCalls em um array
  */
 function parseToolCalls(toolCalls: string | undefined | null): { name: string; arguments: string; result: string }[] {
   if (!toolCalls) return []
@@ -297,7 +297,7 @@ function parseToolCalls(toolCalls: string | undefined | null): { name: string; a
 }
 
 /**
- * 检查音频路径是否有效
+ * Verifica se o caminho de áudio é válido
  */
 function hasValidAudio(audioPath: string | undefined | null): boolean {
   if (!audioPath || !audioPath.trim()) return false
@@ -305,7 +305,7 @@ function hasValidAudio(audioPath: string | undefined | null): boolean {
 }
 
 /**
- * 删除聊天消息
+ * Exclui mensagem de chat
  */
 async function handleDeleteMessage(record: any) {
   loading.value = true
@@ -316,7 +316,7 @@ async function handleDeleteMessage(record: any) {
       await fetchMemoryData()
     }
   } catch (error) {
-    console.error('删除消息失败:', error)
+    console.error('Falha ao excluir mensagem:', error)
     antMessage.error(t('common.deleteFailed'))
   } finally {
     loading.value = false
@@ -324,7 +324,7 @@ async function handleDeleteMessage(record: any) {
 }
 
 /**
- * 导出当前数据
+ * Exporta os dados atuais
  */
 async function handleExport() {
   if (!data.value || data.value.length === 0) {
@@ -365,24 +365,24 @@ async function handleExport() {
     })
     antMessage.success(t('common.exportSuccess'))
   } catch (error) {
-    console.error('导出失败:', error)
+    console.error('Falha ao exportar:', error)
     antMessage.error(t('common.exportFailed'))
   } finally {
     loadingStore.hideLoading()
   }
 }
 
-// 路由离开前停止所有音频
+// Para todos os áudios antes de sair da rota
 onBeforeRouteLeave(() => {
   stopAllAudioBus.emit()
 })
 
-// 组件销毁前停止所有音频
+// Para todos os áudios antes de destruir o componente
 onBeforeUnmount(() => {
   stopAllAudioBus.emit()
 })
 
-// 初始化
+// Inicialização
 onMounted(async () => {
   await initSelects()
 })
@@ -390,7 +390,7 @@ onMounted(async () => {
 
 <template>
   <div class="memory-management-view">
-    <!-- 筛选栏 -->
+    <!-- Barra de filtros -->
     <a-card :bordered="false" style="margin-bottom: 16px" class="search-card">
       <a-row :gutter="16">
         <a-col :span="8">
@@ -452,7 +452,7 @@ onMounted(async () => {
       </a-row>
     </a-card>
 
-    <!-- 记忆数据表格 -->
+    <!-- Tabela de dados de memória -->
     <a-card :bordered="false">
       <template #title>
         <a-space>
@@ -465,7 +465,7 @@ onMounted(async () => {
         </a-button>
       </template>
 
-      <!-- 短期记忆表格 -->
+      <!-- Tabela de memória de curto prazo -->
       <a-table
         v-if="memoryType === 'chat'"
         row-key="messageId"
@@ -504,12 +504,12 @@ onMounted(async () => {
         </template>
 
         <template #bodyCell="{ column, record }">
-          <!-- 发送方列 -->
+          <!-- Coluna do remetente -->
           <template v-if="column.dataIndex === 'sender'">
             {{ getSenderText(record.sender) }}
           </template>
 
-          <!-- 消息类型列 -->
+          <!-- Coluna do tipo de mensagem -->
           <template v-else-if="column.dataIndex === 'messageType'">
             <template v-if="!!record.toolCalls">
               <a-tooltip placement="topLeft" :mouse-enter-delay="0.5" :overlay-style="{ maxWidth: '400px' }">
@@ -522,7 +522,7 @@ onMounted(async () => {
             <span v-else>-</span>
           </template>
 
-          <!-- 消息内容列 -->
+          <!-- Coluna de conteúdo da mensagem -->
           <template v-else-if="column.dataIndex === 'message'">
             <a-tooltip :title="record.message" :mouse-enter-delay="0.5" placement="topLeft">
               <span v-if="record.message" class="ellipsis-text">{{ record.message }}</span>
@@ -530,7 +530,7 @@ onMounted(async () => {
             </a-tooltip>
           </template>
 
-          <!-- 音频列 -->
+          <!-- Coluna de áudio -->
           <template v-else-if="column.dataIndex === 'audioPath'">
             <div v-if="hasValidAudio(record.audioPath)" class="audio-player-container">
               <AudioPlayer :audio-url="record.audioPath" />
@@ -538,7 +538,7 @@ onMounted(async () => {
             <span v-else>{{ t('message.noAudio') }}</span>
           </template>
 
-          <!-- 操作列 -->
+          <!-- Coluna de ações -->
           <template v-else-if="column.dataIndex === 'operation'">
             <a-space>
               <TableActionButtons
@@ -553,7 +553,7 @@ onMounted(async () => {
         </template>
       </a-table>
 
-      <!-- 摘要记忆表格 -->
+      <!-- Tabela de memória resumida -->
       <a-table
         v-else-if="memoryType === 'summary'"
         row-key="createTime"
@@ -567,11 +567,11 @@ onMounted(async () => {
       >
         <template #bodyCell="{ column, record }">
 
-          <!-- 设备名列（后端不返回，直接用当前选中设备名） -->
+          <!-- Coluna do nome do dispositivo (backend não retorna, usa o dispositivo selecionado atualmente) -->
           <template v-if="column.dataIndex === 'deviceName'">
             {{ selectedDeviceName }}
           </template>
-          <!-- 摘要内容列 -->
+          <!-- Coluna de conteúdo do resumo -->
           <template v-if="column.dataIndex === 'summary'">
             <a-tooltip :title="record.summary" :mouse-enter-delay="0.5" placement="topLeft">
               <span v-if="record.summary" class="ellipsis-text">{{ record.summary }}</span>
@@ -579,7 +579,7 @@ onMounted(async () => {
             </a-tooltip>
           </template>
 
-          <!-- 操作列 -->
+          <!-- Coluna de ações -->
           <template v-else-if="column.dataIndex === 'operation'">
             <TableActionButtons
               :record="record"
@@ -594,7 +594,7 @@ onMounted(async () => {
 
     </a-card>
 
-    <!-- 回到顶部 -->
+    <!-- Voltar ao topo -->
     <a-back-top />
   </div>
 </template>
@@ -615,7 +615,7 @@ onMounted(async () => {
   z-index: 1;
 }
 
-// 表格文字省略样式
+// Estilo de reticências no texto da tabela
 .ellipsis-text {
   display: inline-block;
   width: 100%;
@@ -624,14 +624,14 @@ onMounted(async () => {
   text-overflow: ellipsis;
 }
 
-// 表格单元格样式
+// Estilo das células da tabela
 :deep(.ant-table) {
   .ant-table-tbody > tr > td {
     max-width: 0;
   }
 }
 
-// 工具调用 JSON 展示
+// Exibição do JSON de chamadas de ferramenta
 .tool-json {
   margin: 0;
   white-space: pre-wrap;
