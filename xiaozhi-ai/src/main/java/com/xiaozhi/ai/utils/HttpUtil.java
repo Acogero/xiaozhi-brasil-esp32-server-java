@@ -5,12 +5,12 @@ import okhttp3.OkHttpClient;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Http工具类
- * 用于创建OkHttpClient实例
+ * Classe utilitária HTTP
+ * Usada para criar instâncias de OkHttpClient
  */
 public class HttpUtil {
     /**
-     * OkHttpClient实例
+     * Instância de OkHttpClient
      */
     public static final OkHttpClient client;
 
