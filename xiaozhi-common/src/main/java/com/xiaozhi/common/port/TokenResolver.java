@@ -3,7 +3,7 @@ package com.xiaozhi.common.port;
 import com.xiaozhi.common.model.bo.ConfigBO;
 
 /**
- * 提供第三方平台 token 解析能力的窄接口。
+ * Interface enxuta que fornece a capacidade de resolução de token de plataformas de terceiros.
  */
 public interface TokenResolver {
 

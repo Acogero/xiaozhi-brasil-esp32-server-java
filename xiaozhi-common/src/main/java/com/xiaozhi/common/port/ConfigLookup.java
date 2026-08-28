@@ -5,7 +5,7 @@ import com.xiaozhi.common.model.bo.ConfigBO;
 import java.util.List;
 
 /**
- * AI/runtime 场景使用的最小配置查询端口，避免直接依赖完整配置服务。
+ * Porta mínima de consulta de configuração usada em cenários de AI/runtime, evitando dependência direta do serviço completo de configuração.
  */
 public interface ConfigLookup {
 
