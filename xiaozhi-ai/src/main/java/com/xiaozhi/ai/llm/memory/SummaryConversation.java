@@ -20,23 +20,23 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 实现对话摘要
+ * Implementa o resumo (summary) da conversa
  * @see org.springframework.ai.chat.memory.MessageWindowChatMemory
  * @see # org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor
  *
- * 设计的基本假设：
- * 1. 对聊天记录的成本因素考虑权重远远大于可靠性的考虑权重；
- * 2. 满足上述成本要求的前提下，尽量保证聊天的质量效果。
+ * Premissas básicas do design:
+ * 1. O peso dado ao fator custo do histórico de chat é muito maior do que o peso dado à confiabilidade;
+ * 2. Desde que o requisito de custo acima seja atendido, procura-se ao máximo garantir a qualidade do chat.
  *
- * 未来可考虑通过自定义一个Advisor向Prompt注入SystemMessage。
- * 这里约定 messages里不存放SystemMessage，它的模板，是作为单独一个变量记录。
+ * No futuro, pode-se considerar a criação de um Advisor customizado para injetar um SystemMessage no Prompt.
+ * Aqui fica definido que a SystemMessage não é armazenada em messages; seu template é registrado como uma variável separada.
  *
- * Conversation是从哪里来的？
- * 1. 用户与大模型的新对话，创建一个未入库的对话。这是最初的Conversation.
- * 2. 从库里初始化出来。这是一个已入库的Conversation。
+ * De onde vem a Conversation?
+ * 1. Uma nova conversa entre o usuário e o modelo cria uma conversa ainda não persistida no banco. Esta é a Conversation inicial.
+ * 2. Inicializada a partir do banco de dados. Esta é uma Conversation já persistida.
  *
- * 从成本来看，大模型显卡算力成本 >> 存储IO成本 > 内存占用成本 > 存储空间成本 > CPU成本。
- * 为了对话的意思连贯，所有不在Prompt里的消息，都应该进行摘要处理。而摘要需要大模型调用，所以不能每条消息一次摘要，需要批量消息摘要。
+ * Em termos de custo: poder computacional de GPU do modelo >> IO de armazenamento > uso de memória > espaço de armazenamento > CPU.
+ * Para manter a coerência de sentido da conversa, todas as mensagens que não estão no Prompt devem passar por resumo. Como o resumo exige uma chamada ao modelo, não é viável resumir mensagem por mensagem — é necessário resumir em lote.
  * @author Able
  */
 
@@ -48,13 +48,13 @@ public class SummaryConversation extends Conversation {
     private final ChatMemory chatMemory;
     private final ChatClient chatClient;
     private final Object summaryLock = new Object();
-    // 运行时不应该发生变化，避免计算错误
+    // Não deve mudar em tempo de execução, para evitar erros de cálculo
 
     private final int maxMessages ;
-    // 运行时不应该发生变化，避免计算错误
+    // Não deve mudar em tempo de execução, para evitar erros de cálculo
     private final int batchSize;
 
-    // 消息摘要
+    // Resumo das mensagens
     private SummaryBO lastSummary = null;
     private boolean summarizing = false;
 
@@ -83,39 +83,39 @@ public class SummaryConversation extends Conversation {
                 .defaultAdvisors()
                 .build();
 
-        // 在新建Conversation时，可以加载以前的已有的Summary。
+        // Ao criar uma nova Conversation, é possível carregar um Summary já existente.
         this.lastSummary = chatMemory.findLastSummary(getOwnerId(), getRoleId());
         if(lastSummary == null){
             List<Message> history = chatMemory.find(getOwnerId(), getRoleId(), maxMessages);
-            log.info("当前{}还没有历史summary,加载{}条普通消息进入对话上下文", getOwnerId(), history.size());
+            log.info("{} ainda não possui summary no histórico; carregando {} mensagens comuns no contexto da conversa", getOwnerId(), history.size());
             synchronized (summaryLock) {
                 super.messages.addAll(history);
             }
-            // 如果最后一条消息距今超过1小时且消息数足够，则生成summary以压缩上下文
+            // Se a última mensagem tiver mais de 1 hora e houver mensagens suficientes, gera um summary para compactar o contexto
             if (history.size() >= 2) {
                 Instant lastMessageTime = MessageTimeMetadata.getTimeMillis(history.getLast());
                 if (Duration.between(lastMessageTime, Instant.now()).toHours() >= CONVERSATION_INTERVAL_HOURS) {
-                    log.info("{}的最后一条消息已超过{}小时，生成summary压缩上下文", getOwnerId(), CONVERSATION_INTERVAL_HOURS);
+                    log.info("A última mensagem de {} já passou de {} horas; gerando summary para compactar o contexto", getOwnerId(), CONVERSATION_INTERVAL_HOURS);
                     summarize(true);
                 }
             }
         }else {
             List<Message> history = chatMemory.find(getOwnerId(), getRoleId(), lastSummary.getLastMessageTimestamp());
-            log.info("加载{}的{}条未被摘要的消息作为对话历史", getOwnerId(), history.size());
+            log.info("Carregando as mensagens não resumidas de {} ({} mensagens) como histórico da conversa", getOwnerId(), history.size());
             synchronized (summaryLock) {
                 super.messages.addAll(history);
             }
             if (Duration.between(lastSummary.getLastMessageTimestamp(), Instant.now()).toHours() >= CONVERSATION_INTERVAL_HOURS
                     && history.size() >= 2) {
-                log.info("{}的last summary已超过1小时，但还有一些剩余消息没有summarize,重新生成summary", getOwnerId());
+                log.info("O último summary de {} já passou de 1 hora, mas ainda há mensagens restantes não resumidas; gerando um novo summary", getOwnerId());
                 summarize(true);
             }
         }
     }
 
     /**
-     * 添加消息
-     * 后续考虑：继承封装UserMessage和AssistantMessage,UserMessageWithTime,AssistantMessageWithTime
+     * Adiciona mensagem
+     * Consideração futura: herdar e encapsular UserMessage e AssistantMessage como UserMessageWithTime, AssistantMessageWithTime
      * @param message
      */
     @Override
@@ -123,7 +123,7 @@ public class SummaryConversation extends Conversation {
         synchronized (summaryLock) {
             super.add(message);
         }
-        // 达到阈值则触发大模型进行摘要。只在添加 AssistantMessage 时触发（避免重复触发）
+        // Ao atingir o limite, aciona o modelo para gerar o resumo. Só é acionado ao adicionar uma AssistantMessage (para evitar disparos duplicados)
         if (message instanceof AssistantMessage) {
             summarize();
         }
@@ -160,7 +160,7 @@ public class SummaryConversation extends Conversation {
         // 1. Process memory messages as a string.
         String memory = MessageHistoryFormatter.format(needSummaryMessages);
 
-        // 2. 拼接提示词
+        // 2. Monta o prompt
         String lastSummaryText;
         synchronized (summaryLock) {
             lastSummaryText = lastSummary == null ? null : lastSummary.getSummary();
@@ -180,15 +180,15 @@ public class SummaryConversation extends Conversation {
 
         try {
             // 3. Call the model.
-            log.info("调用大模型进行摘要：{}", factExtractPrompt);
+            log.info("Chamando o modelo para gerar o resumo: {}", factExtractPrompt);
 
             String factExtract = chatClient.prompt()
                     .user(factExtractPrompt)
                     .call()
                     .content();
-            log.info("大模型从对话里提取用户重要备忘: {}", factExtract);
+            log.info("O modelo extraiu da conversa anotações importantes do usuário: {}", factExtract);
 
-            // 4. 入库存储。
+            // 4. Persiste no banco de dados.
             SummaryBO newSummary = new SummaryBO()
                     .setDeviceId(getOwnerId())
                     .setRoleId(getRoleId())
@@ -198,14 +198,14 @@ public class SummaryConversation extends Conversation {
             chatMemory.save(newSummary);
 
             synchronized (summaryLock) {
-                // 5. 移除已处理的消息
+                // 5. Remove as mensagens já processadas
                 messages.removeAll(needSummaryMessages);
                 this.lastSummary = newSummary;
                 summarizing = false;
             }
             summarize();
         } catch (Exception e) {
-            log.error("{}对话摘要失败", getOwnerId(), e);
+            log.error("Falha ao resumir a conversa de {}", getOwnerId(), e);
             synchronized (summaryLock) {
                 summarizing = false;
             }
@@ -219,18 +219,18 @@ public class SummaryConversation extends Conversation {
             messageSnapshot = new ArrayList<>(messages);
             summarySnapshot = lastSummary;
         }
-        // 新消息列表对象，避免使用过程中污染原始列表对象
+        // Novo objeto de lista de mensagens, para evitar poluir o objeto de lista original durante o uso
         List<Message> historyMessages = new ArrayList<>();
         var roleSystemMessage = roleSystemMessage(context);
         if(roleSystemMessage.isPresent()){
             historyMessages.add(roleSystemMessage.get());
         }
         if(summarySnapshot != null && StringUtils.hasText(summarySnapshot.getSummary())){
-            // 多条SystemMessage在主流模型（OpenAI、Qwen、DeepSeek）中均已验证可用
-            historyMessages.add(new SystemMessage("下面是你与用户最近聊天内容的摘要：\n" + summarySnapshot.getSummary()));
+            // Múltiplas SystemMessage já foram validadas como funcionais nos principais modelos (OpenAI, Qwen, DeepSeek)
+            historyMessages.add(new SystemMessage("A seguir está um resumo do conteúdo recente da sua conversa com o usuário:\n" + summarySnapshot.getSummary()));
         }
         historyMessages.addAll(messageSnapshot);
-        // UserMessage 按 metadata 装配带前缀的副本供 LLM 使用
+        // UserMessage é montada com uma cópia prefixada, de acordo com a metadata, para uso pelo LLM
         return historyMessages.stream().map(UserMessageAssembler::assemble).toList();
     }
 

@@ -13,28 +13,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 装配带元数据前缀的 UserMessage。
+ * Monta a UserMessage com prefixo de metadados.
  *
- * <p>输出格式（F1 约定）：
+ * <p>Formato de saída (convenção F1):
  * <pre>
- * [2026-04-18T12:35:42][说话人:张三][neutral] 西游记主角是谁?
+ * [2026-04-18T12:35:42][interlocutor:João][neutral] Quem é o protagonista de Jornada ao Oeste?
  * </pre>
  *
- * <p>设计原则：
+ * <p>Princípios de design:
  * <ul>
- *   <li>元数据以 UserMessage 前缀形式送 LLM（非 System Prompt、非 Tool Call），
- *       System Prompt 保持稳定利于前缀 KV cache；每条历史消息自带时空属性。</li>
- *   <li>字段顺序固定：时间戳 → 说话人 → 情绪；任一缺省跳过对应方括号。</li>
- *   <li>时间戳无 key；说话人带 <code>说话人:</code>；情绪无 key（沿用 <code>[neutral]</code> 约定）。</li>
+ *   <li>Os metadados são enviados ao LLM como prefixo da UserMessage (não como System Prompt, nem como Tool Call),
+ *       System Prompt permanece estável, o que favorece o cache KV do prefixo; cada mensagem do histórico carrega seus próprios atributos de tempo/espaço.</li>
+ *   <li>Ordem fixa dos campos: timestamp → interlocutor → emoção; quando ausente, o colchete correspondente é omitido.</li>
+ *   <li>Timestamp sem key; interlocutor com <code>interlocutor:</code>; emoção sem key (mantendo a convenção <code>[neutral]</code>).</li>
  * </ul>
  *
- * <p>System Prompt 里需有解读规则，见
+ * <p>As regras de interpretação precisam estar no System Prompt, veja
  * {@link Conversation#roleSystemMessage(ConversationContext)}。
  */
 public final class UserMessageAssembler {
 
     /**
-     * 严格到秒的 ISO_LOCAL_DATE_TIME，确保秒位始终输出，便于模型解析。
+     * ISO_LOCAL_DATE_TIME com precisão de segundos, garantindo que os segundos sejam sempre exibidos, facilitando o parsing pelo modelo.
      */
     public static final DateTimeFormatter TIMESTAMP_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
@@ -42,10 +42,10 @@ public final class UserMessageAssembler {
     private UserMessageAssembler() {}
 
     /**
-     * 高阶：根据 UserMessage.metadata 里的时间戳 / {@link MessageMetadataBO} 装配带前缀的新 UserMessage。
+     * Alto nível: monta uma nova UserMessage com prefixo, com base no timestamp em UserMessage.metadata / {@link MessageMetadataBO}.
      * <ul>
-     *   <li>非 UserMessage：原样返回。</li>
-     *   <li>三项元数据全缺：原样返回（兼容无 metadata 的历史老消息）。</li>
+     *   <li>Não é UserMessage: retornada sem alteração.</li>
+     *   <li>Os três metadados estão ausentes: retornada sem alteração (compatível com mensagens antigas sem metadata).</li>
      * </ul>
      */
     public static Message assemble(Message m) {
@@ -67,7 +67,7 @@ public final class UserMessageAssembler {
     }
 
     /**
-     * 低阶：纯字符串拼接，外部一般不直接用。
+     * Baixo nível: concatenação simples de strings; normalmente não é usado diretamente por fora.
      */
     public static String assemble(String text, Instant timestamp, String emotion) {
         StringBuilder sb = new StringBuilder();

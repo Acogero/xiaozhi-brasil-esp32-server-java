@@ -8,14 +8,14 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 
 /**
- * Conversation 是一个 对应于 sys_message 表的，但高于 sys_message 的一个抽象实体。
- * deviceID, roleID, sessionID, 实质构成了一次Conversation的全局唯一ID。这个ID必须final 的。
- * 在关系型数据库里，可以将deviceID, roleID, sessionID 建一个组合索引，注意顺序sessionID放在最后。
- * 在图数据库里， conversation label的节点，连接 device节点、role节点。
- * deviceID与roleID本质上不是Conversation的真正属性，而是外键，代表连接的2个对象。
- * 只有sessionID是真正挂在Conversation的属性。
+ * Conversation é uma entidade abstrata correspondente à tabela sys_message, porém em um nível acima dela.
+ * deviceID, roleID e sessionID formam, em essência, o ID globalmente único de uma Conversation. Esse ID deve ser final.
+ * Em um banco de dados relacional, é possível criar um índice composto com deviceID, roleID e sessionID; atenção à ordem — sessionID deve ficar por último.
+ * Em um banco de dados de grafos, o nó com o label conversation se conecta aos nós device e role.
+ * deviceID e roleID não são, em essência, atributos reais da Conversation, e sim chaves estrangeiras que representam os 2 objetos conectados.
+ * Apenas sessionID é, de fato, um atributo pertencente à Conversation.
  *
- * Conversation 也不再负责消息的存储持久化。
+ * A Conversation também não é mais responsável pela persistência de armazenamento das mensagens.
  *
  */
 public class Conversation extends ConversationIdentifier {
@@ -29,11 +29,11 @@ public class Conversation extends ConversationIdentifier {
     protected List<Message> messages = new ArrayList<>();
 
     /**
-     * @param ownerId   聊天参与者标识（设备场景: deviceId, Web 场景: userId）
-     * @param roleId    角色ID
-     * @param sessionId 会话ID
-     * @param roleDesc  角色描述（静态，构造时确定）
-     * @param userId    用户ID（消息持久化需要）
+     * @param ownerId   Identificador do participante do chat (cenário de dispositivo: deviceId; cenário Web: userId)
+     * @param roleId    ID do papel/role
+     * @param sessionId ID da sessão
+     * @param roleDesc  Descrição do papel/role (estática, definida na construção)
+     * @param userId    ID do usuário (necessário para a persistência das mensagens)
      */
     public Conversation(String ownerId, Integer roleId, String sessionId, String roleDesc, Integer userId) {
         super(ownerId, roleId, sessionId);
@@ -52,24 +52,24 @@ public class Conversation extends ConversationIdentifier {
     public Optional<SystemMessage> roleSystemMessage(ConversationContext context) {
         StringBuilder msgBuilder = new StringBuilder();
         if(StringUtils.hasText(roleDesc)) {
-            msgBuilder.append( "角色描述：" ).append(roleDesc).append(System.lineSeparator());
+            msgBuilder.append( "Descrição do papel: " ).append(roleDesc).append(System.lineSeparator());
         }
         String location = context != null ? context.location() : null;
         if (StringUtils.hasText(location)) {
-            msgBuilder.append("当前位置：").append(location)
-                    .append("。如果用户提及现在在哪里，则以新地方为准。")
+            msgBuilder.append("Localização atual: ").append(location)
+                    .append(". Se o usuário mencionar onde está agora, considere o novo local como referência.")
                     .append(System.lineSeparator());
         }
-        // 逐条消息的元数据（时间戳、说话人、情绪）由 UserMessageAssembler 拼接在每条 UserMessage 前缀里，
-        // 不在此处动态渲染，避免 System Prompt 每轮变化导致前缀 KV cache 失效。
+        // Os metadados de cada mensagem (timestamp, interlocutor, emoção) são anexados pelo UserMessageAssembler como prefixo em cada UserMessage,
+        // sem serem renderizados dinamicamente aqui, para evitar que o System Prompt mude a cada rodada e invalide o cache KV do prefixo.
         msgBuilder.append(System.lineSeparator())
-            .append("用户消息可能以方括号元数据标签开头，顺序固定为：")
+            .append("A mensagem do usuário pode começar com tags de metadados entre colchetes, em ordem fixa:")
             .append(System.lineSeparator())
-            .append("  1. [yyyy-MM-ddTHH:mm:ss] 本次消息发送时间（秒级精度，可用于定时任务、时间相对计算）；")
+            .append("  1. [yyyy-MM-ddTHH:mm:ss] Horário de envio desta mensagem (precisão de segundos, útil para tarefas agendadas e cálculos de tempo relativo);")
             .append(System.lineSeparator())
-            .append("  2. [情绪标签]（如 [neutral]、[happy]）语音识别出的用户情绪，据此调整回应语气。")
+            .append("  2. [tag de emoção] (ex.: [neutral], [happy]) emoção do usuário identificada pelo reconhecimento de voz; ajuste o tom da resposta com base nela.")
             .append(System.lineSeparator())
-            .append("请据此调整回应方式和语气，但无需在回复中提及或解释这些标签。任一标签可能缺省。")
+            .append("Ajuste sua forma de responder e o tom com base nisso, mas sem mencionar ou explicar essas tags na resposta. Qualquer uma das tags pode estar ausente.")
             .append(System.lineSeparator());
         if(StringUtils.hasText(roleDesc)) {
             var roleMessage = new SystemMessage(msgBuilder.toString());
@@ -80,34 +80,34 @@ public class Conversation extends ConversationIdentifier {
     }
 
     /**
-     * 带运行时上下文的消息列表（子类覆写此方法以注入系统提示词）。
+     * Lista de mensagens com contexto de execução (subclasses sobrescrevem este método para injetar o System Prompt).
      * <p>
-     * 对每条消息走一次 {@link UserMessageAssembler#assemble(Message)}：
-     * UserMessage 按其 metadata 装配带前缀的副本送给 LLM，非 UserMessage 原样透传。
-     * in-memory 的消息始终是"裸文本 + 结构化 metadata"。
+     * Cada mensagem passa por {@link UserMessageAssembler#assemble(Message)}:
+     * UserMessage é montada com uma cópia prefixada de acordo com seus metadata e enviada ao LLM; mensagens que não são UserMessage passam sem alteração.
+     * As mensagens em memória são sempre "texto puro + metadata estruturada".
      */
     public synchronized List<Message> messages(ConversationContext context) {
         return messages.stream().map(UserMessageAssembler::assemble).toList();
     }
 
     /**
-     * 当前Conversation的多轮消息列表。
+     * Lista de mensagens de múltiplas rodadas da Conversation atual.
      */
     public synchronized List<Message> messages() {
         return messages(ConversationContext.EMPTY);
     }
 
     /**
-     * 返回原始消息列表（不触发任何投影副作用，文本保持"裸文本"，metadata 未拼前缀）。
-     * 用于工具路由的 FC 上下文检测。
+     * Retorna a lista de mensagens original (sem disparar nenhum efeito colateral de projeção; o texto permanece "puro", sem prefixo de metadata).
+     * Usado para a detecção de contexto de FC (function calling) no roteamento de ferramentas.
      */
     public synchronized List<Message> rawMessages() {
         return messages;
     }
 
     /**
-     * 清理当前Conversation涉及的相关资源，包括缓存的消息列表。
-     * 对于某些具体的子类实现，清理也可能是指删除当前Covnersation的消息。
+     * Limpa os recursos relacionados envolvidos na Conversation atual, incluindo a lista de mensagens em cache.
+     * Para algumas implementações concretas de subclasses, a limpeza também pode significar excluir as mensagens da Conversation atual.
      */
     public synchronized void clear(){
         messages.clear();
@@ -131,7 +131,7 @@ public class Conversation extends ConversationIdentifier {
     }
 
     /**
-     * 将工具调用链（模型的 tool_call 请求 + 工具执行结果）作为原子操作添加到消息列表
+     * Adiciona a cadeia de chamadas de ferramenta (requisição tool_call do modelo + resultado da execução) à lista de mensagens como uma operação atômica
      */
     public synchronized void addToolCallChain(AssistantMessage toolCallMsg, ToolResponseMessage toolResponse) {
         messages.add(toolCallMsg);

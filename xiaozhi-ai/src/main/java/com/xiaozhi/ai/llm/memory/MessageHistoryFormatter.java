@@ -8,23 +8,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 将 Spring AI 的消息列表序列化为单一文本块，专供"二次喂给大模型做摘要"场景。
+ * Serializa a lista de mensagens do Spring AI em um único bloco de texto, destinado exclusivamente ao cenário de "reenviar ao modelo para gerar um resumo".
  * <p>
- * 渲染约定：
+ * Convenção de renderização:
  * <ul>
- *   <li>TOOL 消息 → {@code TOOL:<text>}</li>
- *   <li>ASSISTANT 携带 tool_calls → {@code ASSISTANT:[tool_call:<name1>,<name2>...]}
- *       （不落文本内容，避免把未解析的 JSON 喂回摘要模型）</li>
- *   <li>其它 → {@code <TYPE>:<text>}</li>
+ *   <li>Mensagem TOOL → {@code TOOL:<text>}</li>
+ *   <li>ASSISTANT com tool_calls → {@code ASSISTANT:[tool_call:<name1>,<name2>...]}
+ *       (sem incluir o conteúdo de texto, para evitar enviar JSON não interpretado de volta ao modelo de resumo)</li>
+ *   <li>Demais casos → {@code <TYPE>:<text>}</li>
  * </ul>
- * 原本此逻辑在 {@code SummaryConversation#summaryMessages}
+ * Originalmente esta lógica estava em {@code SummaryConversation#summaryMessages}
  */
 public final class MessageHistoryFormatter {
 
     private MessageHistoryFormatter() {}
 
     /**
-     * 按上述约定把消息列表渲染成单一字符串，消息间用 {@link System#lineSeparator()} 分隔。
+     * Renderiza a lista de mensagens em uma única string seguindo a convenção acima, separando as mensagens com {@link System#lineSeparator()}.
      */
     public static String format(List<Message> messages) {
         return messages.stream()

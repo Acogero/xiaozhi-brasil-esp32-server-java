@@ -13,19 +13,19 @@ import com.xiaozhi.common.model.bo.RoleBO;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 当前的10秒断链只是为了省电，而一般的我们日常自然人之间的对话Conversation 不会是以10秒那么短的时间间隔作为感知的一段对话。
- * SessionID是一个技术名词，不是一个用户关心的概念，即使开机与关机与不是用户关心的。
- * 既然用户不是真的关心session id , 那就可以batch为单位给到用户家长去看。
- * 考虑到云端API越来越多的支持Cache，这个Batch做得更大些才有更好的收益。
+ * A desconexão atual de 10 segundos serve apenas para economizar energia; no cotidiano, uma conversa natural entre pessoas normalmente não é percebida como "uma conversa" com base em um intervalo tão curto quanto 10 segundos.
+ * SessionID é um termo técnico, não um conceito que interessa ao usuário, assim como ligar e desligar o dispositivo também não são.
+ * Já que o usuário não se importa de fato com o session id, é possível agrupar em lotes (batch) para exibir aos pais/responsáveis pelo usuário.
+ * Considerando que cada vez mais APIs na nuvem suportam Cache, tornar esse Batch maior traz melhores benefícios.
  *
- * - 可能发生情形
+ * - Cenários que podem ocorrer
  *
- * 1. Conversation对话轮数太长了，需要切成几个Batch进行Summarize.
- * 2. Conversation对话轮数太短了，都不值得进行一次Summarize。
- * 3. 在进行了一轮summarize后没有太长时间对话轮数还比较短，就结束了 Conversation 了。
- * 4. 在结束了Conversation后，没有多长时间又登录进来继续聊天了。
+ * 1. A Conversation tem rodadas de diálogo longas demais, sendo necessário dividi-la em vários Batches para fazer o Summarize.
+ * 2. A Conversation tem rodadas de diálogo curtas demais, não valendo sequer a pena fazer um Summarize.
+ * 3. Após realizar um summarize, pouco tempo depois, ainda com poucas rodadas de diálogo, a Conversation é encerrada.
+ * 4. Pouco tempo depois de a Conversation ser encerrada, o usuário faz login novamente e continua a conversa.
  *
- * 引入 CONVERSATION_INTERVAL_HOURS 是为了支持业务感知上的一段对话的概念（脱离技术意义上的关于连接会话session_id）。
+ * A introdução de CONVERSATION_INTERVAL_HOURS visa suportar o conceito de "uma conversa" do ponto de vista de negócio (independente do session_id de conexão em sentido técnico).
  */
 @Slf4j
 @Service
@@ -35,7 +35,7 @@ public class SummaryConversationFactory implements ConversationFactory{
     private final PromptTemplate initSummarizerPromptTemplate ;
     private final PromptTemplate againSummarizerPromptTemplate ;
 
-    // Summary场景仅使用 chatModel.call(String)，不传入ToolCallbacks，不会触发工具调用。
+    // No cenário de Summary é usado apenas chatModel.call(String), sem passar ToolCallbacks; nenhuma chamada de ferramenta é acionada.
     @Autowired
     private  ChatModelFactory chatModelFactory;
 
@@ -60,10 +60,10 @@ public class SummaryConversationFactory implements ConversationFactory{
 
     @Override
     public Conversation initConversation(String ownerId, Integer userId, RoleBO role, String sessionId) {
-        log.debug("初始化SummaryConversation基础配置参数，maxMessages：{}，batchSize：{}",maxMessages,batchSize);
+        log.debug("Inicializando os parâmetros básicos de configuração do SummaryConversation, maxMessages: {}, batchSize: {}",maxMessages,batchSize);
 
         ChatModel chatModel = chatModelFactory.getChatModel(role);
-        // 测试时，可将batchSeconds调小。实际生产的默认值可以先考虑：20,16,60。
+        // Durante testes, batchSeconds pode ser reduzido. Para produção, considerar inicialmente os valores padrão: 20, 16, 60.
         return SummaryConversation.builder()
                 .ownerId(ownerId)
                 .roleId(role.getRoleId())

@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 基于数据库的聊天记忆实现。
- * 全局单例类，负责 Conversation 里消息的获取、保存、清理。
+ * Implementação de memória de chat baseada em banco de dados.
+ * Classe singleton global, responsável por obter, salvar e limpar as mensagens dentro da Conversation.
  */
 @Slf4j
 @Service
@@ -56,7 +56,7 @@ public class DatabaseChatMemory implements ChatMemory {
         try {
             return toSpringMessages(messageService.listHistory(ownerId, roleId, limit));
         } catch (Exception e) {
-            log.error("获取历史消息时出错(按 ownerId+roleId): {}", e.getMessage(), e);
+            log.error("Erro ao obter mensagens do histórico (por ownerId+roleId): {}", e.getMessage(), e);
             return new ArrayList<>();
         }
     }
@@ -66,7 +66,7 @@ public class DatabaseChatMemory implements ChatMemory {
         try {
             return toSpringMessages(messageService.listHistory(sessionId, limit));
         } catch (Exception e) {
-            log.error("获取历史消息时出错(按 sessionId): {}", e.getMessage(), e);
+            log.error("Erro ao obter mensagens do histórico (por sessionId): {}", e.getMessage(), e);
             return new ArrayList<>();
         }
     }
@@ -78,18 +78,18 @@ public class DatabaseChatMemory implements ChatMemory {
 
         Message springMessage;
         if (MessageBO.SENDER_TOOL.equals(role)) {
-            // ToolResponseMessage: 从 toolCalls 字段恢复 toolCallId 和 toolName
+            // ToolResponseMessage: restaura toolCallId e toolName a partir do campo toolCalls
             springMessage = buildToolResponseMessage(message);
         } else if (MessageBO.SENDER_ASSISTANT.equals(role)) {
-            // TOOL_CALL 类型的 AssistantMessage 需要恢复 toolCalls
+            // AssistantMessage do tipo TOOL_CALL precisa ter os toolCalls restaurados
             if (MessageBO.MESSAGE_TYPE_TOOL_CALL.equals(message.getMessageType())) {
                 springMessage = buildToolCallAssistantMessage(message, metadata);
             } else {
                 springMessage = AssistantMessage.builder().content(message.getMessage()).properties(metadata).build();
             }
         } else if (MessageBO.SENDER_USER.equals(role)) {
-            // 把持久化的结构化元数据（speaker/emotion 等）回灌到 UserMessage.metadata，
-            // 供 Conversation 层投影拼成文本前缀送 LLM
+            // Reinjeta a metadata estruturada persistida (speaker/emotion etc.) em UserMessage.metadata,
+            // para que a camada Conversation a projete como prefixo de texto enviado ao LLM
             MessageMetadataBO userMetadata = message.getMetadata();
             if (userMetadata != null) {
                 metadata.put(MessageMetadataBO.METADATA_KEY, userMetadata);
@@ -109,14 +109,14 @@ public class DatabaseChatMemory implements ChatMemory {
     }
 
     /**
-     * 从 DB 记录重建带 toolCalls 的 AssistantMessage
+     * Reconstrói, a partir do registro do banco, um AssistantMessage com toolCalls
      */
     private static AssistantMessage buildToolCallAssistantMessage(MessageBO message, Map<String, Object> metadata) {
         List<AssistantMessage.ToolCall> toolCalls = List.of();
         try {
             toolCalls = ToolCallMessageCodec.decodeToolCalls(message.getToolCalls());
         } catch (Exception e) {
-            log.warn("反序列化 toolCalls 失败: {}", e.getMessage());
+            log.warn("Falha ao desserializar toolCalls: {}", e.getMessage());
         }
         return AssistantMessage.builder()
                 .content(message.getMessage())
@@ -126,14 +126,14 @@ public class DatabaseChatMemory implements ChatMemory {
     }
 
     /**
-     * 从 DB 记录重建 ToolResponseMessage
+     * Reconstrói, a partir do registro do banco, um ToolResponseMessage
      */
     private static ToolResponseMessage buildToolResponseMessage(MessageBO message) {
         List<ToolResponseMessage.ToolResponse> responses;
         try {
             responses = ToolCallMessageCodec.decodeToolResponses(message.getToolCalls(), message.getMessage());
         } catch (Exception e) {
-            log.warn("反序列化 tool response 信息失败: {}", e.getMessage());
+            log.warn("Falha ao desserializar informações de tool response: {}", e.getMessage());
             responses = new ArrayList<>();
             responses.add(new ToolResponseMessage.ToolResponse("", "", message.getMessage()));
         }
@@ -160,9 +160,9 @@ public class DatabaseChatMemory implements ChatMemory {
     @Override
     public void delete(String ownerId, int roleId) {
         try {
-            throw new IllegalAccessException("暂不支持删除历史记录");
+            throw new IllegalAccessException("A exclusão do histórico ainda não é suportada");
         } catch (Exception e) {
-            log.error("清除历史记录时出错: {}", e.getMessage(), e);
+            log.error("Erro ao limpar o histórico: {}", e.getMessage(), e);
         }
     }
 }
