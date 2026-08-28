@@ -89,6 +89,6 @@ class McpToolExcludeServiceImplTest {
 
         assertThatThrownBy(() -> mcpToolExcludeService.toggleGlobalToolStatus("tool-a", null, false))
             .isInstanceOf(OperationFailedException.class)
-            .hasMessage("保存MCP工具排除配置失败");
+            .hasMessage("Falha ao salvar configuração de exclusão de ferramentas MCP");
     }
 }

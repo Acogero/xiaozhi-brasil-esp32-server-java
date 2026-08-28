@@ -51,7 +51,7 @@ class WxLoginServiceImplTest {
 
         assertThatThrownBy(() -> wxLoginService.getWxLoginInfo("code-1"))
             .isInstanceOf(RuntimeException.class)
-            .hasMessage("解析微信登录响应失败");
+            .hasMessage("Falha ao analisar a resposta de login do WeChat");
 
         server.verify();
     }

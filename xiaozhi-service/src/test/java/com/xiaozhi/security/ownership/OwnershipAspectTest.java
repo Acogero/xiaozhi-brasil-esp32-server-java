@@ -79,7 +79,7 @@ class OwnershipAspectTest {
 
             assertThatThrownBy(() -> aspect.checkOwner(joinPoint))
                 .isInstanceOf(UnauthorizedException.class)
-                .hasMessage("无法获取当前登录用户");
+                .hasMessage("Não foi possível obter o usuário atualmente logado");
         }
     }
 

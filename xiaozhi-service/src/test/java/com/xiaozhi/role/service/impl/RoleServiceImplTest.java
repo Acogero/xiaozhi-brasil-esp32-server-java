@@ -159,7 +159,7 @@ class RoleServiceImplTest {
 
         assertThatThrownBy(() -> roleService.copyDefaultRole(10, 20))
             .isInstanceOf(IllegalStateException.class)
-            .hasMessage("复制默认角色失败");
+            .hasMessage("Falha ao copiar o papel padrão");
     }
 
     @Test
@@ -168,7 +168,7 @@ class RoleServiceImplTest {
 
         assertThatThrownBy(() -> roleService.copyDefaultRole(10, 20))
             .isInstanceOf(IllegalStateException.class)
-            .hasMessage("默认角色模板不存在");
+            .hasMessage("Modelo de papel padrão não encontrado");
     }
 
     @Test
@@ -186,7 +186,7 @@ class RoleServiceImplTest {
 
         assertThatThrownBy(() -> roleService.copyDefaultRole(10, 20))
             .isInstanceOf(IllegalStateException.class)
-            .hasMessage("复制默认角色失败");
+            .hasMessage("Falha ao copiar o papel padrão");
     }
 
 }
