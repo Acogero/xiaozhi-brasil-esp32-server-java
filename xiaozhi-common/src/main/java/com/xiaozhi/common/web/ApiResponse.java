@@ -3,20 +3,20 @@ package com.xiaozhi.common.web;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
- * 统一响应结果
+ * Resultado de resposta unificado
  *
  * @author Joey
  */
-@Schema(description = "统一响应结果")
+@Schema(description = "Resultado de resposta unificado")
 public class ApiResponse<T> {
 
-    @Schema(description = "状态码：200-成功，500-失败", example = "200")
+    @Schema(description = "Código de status: 200-sucesso, 500-falha", example = "200")
     private int code;
 
-    @Schema(description = "返回消息", example = "操作成功")
+    @Schema(description = "Mensagem de retorno", example = "Operação realizada com sucesso")
     private String message;
 
-    @Schema(description = "返回数据")
+    @Schema(description = "Dados de retorno")
     private T data;
 
     private ApiResponse(int code, String message, T data) {
@@ -28,7 +28,7 @@ public class ApiResponse<T> {
     // -------------------- success --------------------
 
     public static <T> ApiResponse<T> success() {
-        return new ApiResponse<>(ResultStatus.SUCCESS, "操作成功", null);
+        return new ApiResponse<>(ResultStatus.SUCCESS, "Operação realizada com sucesso", null);
     }
 
     public static <T> ApiResponse<T> success(String msg) {
@@ -36,7 +36,7 @@ public class ApiResponse<T> {
     }
 
     public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(ResultStatus.SUCCESS, "操作成功", data);
+        return new ApiResponse<>(ResultStatus.SUCCESS, "Operação realizada com sucesso", data);
     }
 
     public static <T> ApiResponse<T> success(String msg, T data) {
@@ -72,7 +72,7 @@ public class ApiResponse<T> {
     // -------------------- error --------------------
 
     public static <T> ApiResponse<T> error() {
-        return new ApiResponse<>(ResultStatus.ERROR, "操作失败", null);
+        return new ApiResponse<>(ResultStatus.ERROR, "Falha na operação", null);
     }
 
     public static <T> ApiResponse<T> error(String msg) {

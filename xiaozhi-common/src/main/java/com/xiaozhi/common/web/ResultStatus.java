@@ -1,88 +1,88 @@
 package com.xiaozhi.common.web;
 
 /**
- * 返回状态码
+ * Código de status de retorno
  * 
  * @author Joey
  */
 public class ResultStatus {
     /**
-     * 操作成功
+     * Operação realizada com sucesso
      */
     public static final int SUCCESS = 200;
 
     /**
-     * 对象创建成功
+     * Objeto criado com sucesso
      */
     public static final int CREATED = 201;
 
     /**
-     * 请求已经被接受
+     * Requisição já foi aceita
      */
     public static final int ACCEPTED = 202;
 
     /**
-     * 操作已经执行成功，但是没有返回数据
+     * Operação executada com sucesso, mas sem dados de retorno
      */
     public static final int NO_CONTENT = 204;
 
     /**
-     * 资源已被移除
+     * Recurso foi removido
      */
     public static final int MOVED_PERM = 301;
 
     /**
-     * 重定向
+     * Redirecionamento
      */
     public static final int SEE_OTHER = 303;
 
     /**
-     * 资源没有被修改
+     * Recurso não foi modificado
      */
     public static final int NOT_MODIFIED = 304;
 
     /**
-     * 参数列表错误（缺少，格式不匹配）
+     * Lista de parâmetros incorreta (ausente, formato incompatível)
      */
     public static final int BAD_REQUEST = 400;
 
     /**
-     * 未授权
+     * Não autorizado
      */
     public static final int UNAUTHORIZED = 401;
 
     /**
-     * 访问受限，授权过期
+     * Acesso restrito, autorização expirada
      */
     public static final int FORBIDDEN = 403;
 
     /**
-     * 资源，服务未找到
+     * Recurso ou serviço não encontrado
      */
     public static final int NOT_FOUND = 404;
 
     /**
-     * 不允许的http方法
+     * Método http não permitido
      */
     public static final int BAD_METHOD = 405;
 
     /**
-     * 资源冲突，或者资源被锁
+     * Conflito de recurso, ou recurso bloqueado
      */
     public static final int CONFLICT = 409;
 
     /**
-     * 不支持的数据，媒体类型
+     * Dados ou tipo de mídia não suportado
      */
     public static final int UNSUPPORTED_TYPE = 415;
 
     /**
-     * 系统内部错误
+     * Erro interno do sistema
      */
     public static final int ERROR = 500;
 
     /**
-     * 接口未实现
+     * Interface não implementada
      */
     public static final int NOT_IMPLEMENTED = 501;
 }
