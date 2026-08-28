@@ -1,38 +1,38 @@
 package com.xiaozhi.enums;
 
 /**
- * 设备服务端状态机
- * 用于超时保护和整体状态感知，替代原有分散的 playing / musicPlaying / streamingState / inWakeupResponse 布尔字段。
+ * Máquina de estados do dispositivo no lado do servidor
+ * Usada para proteção contra timeout e percepção geral do estado, substituindo os antigos campos booleanos dispersos playing / musicPlaying / streamingState / inWakeupResponse.
  *
- * 状态流转：
+ * Fluxo de estados:
  * IDLE ──(wake/listen)──→ LISTENING ──(speech_end/STT done)──→ THINKING ──(TTS start)──→ SPEAKING ──(TTS stop)──→ IDLE
  *
- * 超时保护规则：只有 IDLE 状态下才允许触发超时断连。
+ * Regra de proteção contra timeout: a desconexão por timeout só pode ser disparada no estado IDLE.
  */
 public enum DeviceState {
 
     /**
-     * 待机：设备连接中但无活跃音频交互。
-     * 允许触发不活跃超时。
+     * Ocioso: dispositivo conectado, mas sem interação de áudio ativa.
+     * Permite disparar timeout por inatividade.
      */
     IDLE,
 
     /**
-     * 聆听：设备正在录音并进行 STT 流式识别。
-     * 包含原 streamingState=true 和唤醒词收到后的等待阶段。
-     * 不触发超时。
+     * Ouvindo: o dispositivo está gravando e realizando reconhecimento STT em streaming.
+     * Inclui o antigo streamingState=true e a fase de espera após o recebimento da palavra de ativação.
+     * Não dispara timeout.
      */
     LISTENING,
 
     /**
-     * 思考：STT 已完成，LLM 正在推理，TTS 尚未开始。
-     * 不触发超时。
+     * Pensando: STT concluído, LLM em inferência, TTS ainda não iniciado.
+     * Não dispara timeout.
      */
     THINKING,
 
     /**
-     * 说话：TTS 音频帧正在下发至设备（含唤醒响应阶段）。
-     * 不触发超时。
+     * Falando: frames de áudio TTS estão sendo enviados ao dispositivo (incluindo a fase de resposta de ativação).
+     * Não dispara timeout.
      */
     SPEAKING
 }
