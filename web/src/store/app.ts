@@ -3,27 +3,27 @@ import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 
 /**
- * 语言类型
+ * Tipo de idioma
  */
 export type Locale = 'zh-CN' | 'en-US'
 
 /**
- * 应用全局状态 Store
- * 管理语言、布局等全局配置
+ * Store de estado global da aplicação
+ * Gerencia idioma, layout e outras configurações globais
  */
 export const useAppStore = defineStore('app', () => {
 
-  // ========== 布局管理 ==========
-  // 侧边栏折叠状态
+  // ========== Gerenciamento de layout ==========
+  // Estado de recolhimento da barra lateral
   const sidebarCollapsed = ref(false)
   
-  // 是否移动端
+  // Se é dispositivo móvel
   const isMobile = ref(false)
 
-  // 导航风格
+  // Estilo de navegação
   const navigationStyle = useStorage<'tabs' | 'sidebar'>('navigation-style', 'sidebar')
 
-  // 屏幕尺寸
+  // Tamanho da tela
   const screenWidth = ref(window.innerWidth)
   const screenHeight = ref(window.innerHeight)
 
@@ -49,7 +49,7 @@ export const useAppStore = defineStore('app', () => {
     isMobile.value = window.innerWidth < 768
   }
 
-  // ========== 页面设置 ==========
+  // ========== Configurações de página ==========
   const pageTitle = ref<string>('')
 
   const setPageTitle = (title: string) => {
@@ -59,7 +59,7 @@ export const useAppStore = defineStore('app', () => {
   }
 
   return {
-    // 布局
+    // Layout
     sidebarCollapsed,
     isMobile,
     navigationStyle,
@@ -71,7 +71,7 @@ export const useAppStore = defineStore('app', () => {
     setNavigationStyle,
     updateScreenSize,
     
-    // 页面
+    // Página
     pageTitle,
     setPageTitle,
   }
