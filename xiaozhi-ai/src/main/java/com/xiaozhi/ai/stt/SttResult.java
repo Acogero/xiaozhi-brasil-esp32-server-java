@@ -1,16 +1,16 @@
 package com.xiaozhi.ai.stt;
 
 /**
- * STT 识别结果。
- * 情感字段仅在支持情感识别的模型下有值，其余为 null。
+ * Resultado do reconhecimento STT.
+ * O campo de emoção só tem valor em modelos que suportam reconhecimento de emoção; nos demais, é null.
  *
- * <p>各字段说明：
+ * <p>Descrição dos campos:
  * <ul>
- *   <li>text - 识别文本</li>
- *   <li>emotion - 情感标签，如 happy / neutral / angry / sad 等</li>
- *   <li>emotionScore - 情感置信度（0~1）</li>
- *   <li>emotionDegree - 情感强度标签，如 weak / moderate / strong（火山引擎）</li>
- *   <li>emotionDegreeScore - 情感强度置信度（0~1）（火山引擎）</li>
+ *   <li>text - texto reconhecido</li>
+ *   <li>emotion - tag de emoção, como happy / neutral / angry / sad, etc.</li>
+ *   <li>emotionScore - confiança da emoção (0~1)</li>
+ *   <li>emotionDegree - tag de intensidade da emoção, como weak / moderate / strong (Volcengine)</li>
+ *   <li>emotionDegreeScore - confiança da intensidade da emoção (0~1) (Volcengine)</li>
  * </ul>
  */
 public record SttResult(
@@ -22,21 +22,21 @@ public record SttResult(
 ) {
 
     /**
-     * 仅含文本，无情感信息。
+     * Contém apenas o texto, sem informações de emoção.
      */
     public static SttResult textOnly(String text) {
         return new SttResult(text, null, null, null, null);
     }
 
     /**
-     * 含文本和情感信息（阿里云 paraformer 使用）。
+     * Contém texto e informações de emoção (usado pelo Alibaba Cloud paraformer).
      */
     public static SttResult withEmotion(String text, String emotion, Double emotionScore) {
         return new SttResult(text, emotion, emotionScore, null, null);
     }
 
     /**
-     * 含文本和完整情感信息（火山引擎使用）。
+     * Contém texto e informações completas de emoção (usado pelo Volcengine).
      */
     public static SttResult withFullEmotion(String text, String emotion, Double emotionScore,
                                             String emotionDegree, Double emotionDegreeScore) {

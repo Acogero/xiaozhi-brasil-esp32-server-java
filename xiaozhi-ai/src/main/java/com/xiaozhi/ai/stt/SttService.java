@@ -3,20 +3,20 @@ package com.xiaozhi.ai.stt;
 import reactor.core.publisher.Flux;
 
 /**
- * STT服务接口
+ * Interface de serviço STT
  */
 public interface SttService {
 
   /**
-   * 获取服务提供商名称
+   * Obtém o nome do provedor do serviço
    */
   String getProviderName();
 
   /**
-   * 流式处理音频数据
+   * Processa dados de áudio em streaming
    *
-   * @param audioSink 音频数据流
-   * @return 识别结果，包含文本及可选的情感信息
+   * @param audioSink Fluxo de dados de áudio
+   * @return Resultado do reconhecimento, contendo o texto e informações opcionais de emoção
    */
   SttResult stream(Flux<byte[]> audioSink);
 

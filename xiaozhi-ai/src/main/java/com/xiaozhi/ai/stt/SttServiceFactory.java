@@ -27,34 +27,34 @@ public class SttServiceFactory {
     @Resource
     private RuntimePathConfig runtimePathConfig;
 
-    // 缓存已初始化的服务：key format: "provider:configId"
+    // Cache dos serviços já inicializados: key format: "provider:configId"
     private final Map<String, SttService> serviceCache = new ConcurrentHashMap<>();
 
-    // 默认服务提供商名称
+    // Nome do provedor de serviço padrão
     private static final String DEFAULT_PROVIDER = "vosk";
 
-    // 标记Vosk是否初始化成功
+    // Marca se o Vosk foi inicializado com sucesso
     private boolean voskInitialized = false;
 
-    // 备选默认提供商（当Vosk初始化失败时使用）
+    // Provedor padrão alternativo (usado quando a inicialização do Vosk falha)
     private String fallbackProvider = null;
 
     /**
-     * 应用启动时自动初始化Vosk服务
+     * Inicializa automaticamente o serviço Vosk na inicialização da aplicação
      */
     @PostConstruct
     public void initializeDefaultSttService() {
-        log.info("正在初始化默认语音识别服务(Vosk)...");
+        log.info("Inicializando o serviço de reconhecimento de voz padrão (Vosk)...");
         initializeVosk();
         if (voskInitialized) {
-            log.info("默认语音识别服务(Vosk)初始化成功，可直接使用");
+            log.info("Serviço de reconhecimento de voz padrão (Vosk) inicializado com sucesso; pronto para uso");
         } else {
-            log.warn("默认语音识别服务(Vosk)初始化失败，将在需要时尝试使用备选服务");
+            log.warn("Falha ao inicializar o serviço de reconhecimento de voz padrão (Vosk); um serviço alternativo será tentado quando necessário");
         }
     }
 
     /**
-     * 初始化Vosk服务
+     * Inicializa o serviço Vosk
      */
     private synchronized SttService initializeVosk() {
         if (serviceCache.containsKey(DEFAULT_PROVIDER)) {
@@ -68,50 +68,50 @@ public class SttServiceFactory {
             );
             voskService.initialize();
             
-            // 检查模型是否真正加载成功
+            // Verifica se o modelo foi realmente carregado com sucesso
             if (voskService instanceof VoskSttService && !((VoskSttService)voskService).isModelLoaded()) {
                 throw new Exception("Vosk model was not properly loaded");
             }
             
             serviceCache.put(DEFAULT_PROVIDER, voskService);
             voskInitialized = true;
-            log.info("Vosk STT服务初始化成功");
+            log.info("Serviço STT do Vosk inicializado com sucesso");
             return voskService;
         } catch (Throwable e) {
             voskInitialized = false;
-            log.warn("Vosk STT服务初始化失败: {}", e.getMessage());
+            log.warn("Falha ao inicializar o serviço STT do Vosk: {}", e.getMessage());
         }
         return null;
     }
 
     /**
-     * 获取默认STT服务
+     * Obtém o serviço STT padrão
      */
     public SttService getDefaultSttService() {
         return getSttService(null);
     }
 
     /**
-     * 根据配置获取STT服务
+     * Obtém o serviço STT com base na configuração
      */
     public SttService getSttService(ConfigBO config) {
         if (config == null) {
             config = new ConfigBO().setProvider(DEFAULT_PROVIDER).setConfigId(-1);
         }
 
-        // 对于API服务，使用"provider:configId"作为缓存键，确保每个配置使用独立的服务实例
+        // Para serviços de API, usa "provider:configId" como chave de cache, garantindo que cada configuração use uma instância de serviço independente
         var cacheKey = config.getProvider() + ":" + config.getConfigId();
 
-        // 检查是否已有该配置的服务实例
+        // Verifica se já existe uma instância de serviço para esta configuração
         if (serviceCache.containsKey(cacheKey)) {
             return serviceCache.get(cacheKey);
         }
 
-        // 创建新的API服务实例
+        // Cria uma nova instância de serviço de API
         var service = createApiService(config);
         serviceCache.put(cacheKey, service);
 
-        // 如果没有备选默认服务，将此服务设为备选
+        // Se não houver serviço padrão alternativo, define este serviço como alternativo
         if (fallbackProvider == null) {
             fallbackProvider = cacheKey;
         }
@@ -120,14 +120,14 @@ public class SttServiceFactory {
     }
 
     /**
-     * 根据配置创建API类型的STT服务
+     * Cria um serviço STT do tipo API com base na configuração
      */
     private SttService createApiService(@Nonnull ConfigBO config) {
         return switch (config.getProvider()) {
             case "tencent" -> new TencentSttService(config);
             case "aliyun" -> new AliyunSttService(config);
             case "aliyun-nls" -> {
-                // 为NLS创建阿里云Token服务
+                // Cria o serviço de Token da Alibaba Cloud para o NLS
                 yield new AliyunNlsSttService(config, tokenResolver);
             }
             case "funasr" -> new FunASRSttService(config);
@@ -148,7 +148,7 @@ public class SttServiceFactory {
     }
 
     public void removeCache(ConfigBO config) {
-        // 对于API服务，使用"provider:configId"作为缓存键，确保每个配置使用独立的服务实例
+        // Para serviços de API, usa "provider:configId" como chave de cache, garantindo que cada configuração use uma instância de serviço independente
         Integer configId = config.getConfigId();
         String provider = config.getProvider();
         String cacheKey = provider + ":" + (configId != null ? configId : "default");
