@@ -1,9 +1,9 @@
-对下面"user"与"assistant"两人之间日常对话内容的旧摘要与新对话内容，进行综合摘要，提取主要讨论内容、关键信息和重要结论，去除冗余细节和无关闲聊，确保摘要客观中立、语言简洁，字数控制在150字以内。
+Faça um resumo consolidado do resumo anterior e do novo conteúdo da conversa cotidiana entre "user" e "assistant" abaixo, extraindo os principais tópicos discutidos, informações-chave e conclusões importantes, removendo detalhes redundantes e conversa fiada irrelevante. Garanta que o resumo seja objetivo, imparcial e conciso, com no máximo 150 caracteres.
 ---
-旧摘要：
+Resumo anterior:
 $last_summary$
 ---
-用户和助手之间的对话内容:
+Conteúdo da conversa entre o usuário e o assistente:
 $conversation$
 ---
-综合摘要：
+Resumo consolidado:

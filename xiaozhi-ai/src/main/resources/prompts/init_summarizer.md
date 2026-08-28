@@ -1,7 +1,7 @@
-请对以下两人之间的日常对话进行摘要，提取主要讨论内容、关键信息和重要结论，去除冗余细节和无关闲聊，确保摘要客观中立、语言简洁，字数控制在150字以内。
+Por favor, resuma a conversa cotidiana abaixo entre as duas pessoas, extraindo os principais tópicos discutidos, informações-chave e conclusões importantes, removendo detalhes redundantes e conversa fiada irrelevante. Garanta que o resumo seja objetivo, imparcial e conciso, com no máximo 150 caracteres.
 
 ---
-用户和助手之间的对话内容:
+Conteúdo da conversa entre o usuário e o assistente:
 $conversation$
 ---
-摘要:
+Resumo:
