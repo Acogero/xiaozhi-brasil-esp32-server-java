@@ -16,17 +16,17 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 /**
- * 表示一次 Conversation 中已完成的一轮交互：
- * 一个 UserMessage，对应一个最终 AssistantMessage，以及这一轮产生的时序与工具调用信息。
+ * Representa uma rodada de interação já concluída em um Conversation:
+ * um UserMessage, correspondendo a um AssistantMessage final, além das informações de sequência temporal e de chamadas de ferramentas geradas nessa rodada.
  * <p>
- * 一轮内可能有多个工具调用链（顺序排列），由 {@code toolChains} 表达，例如：
+ * Uma rodada pode ter múltiplas cadeias de chamadas de ferramentas (em ordem), representadas por {@code toolChains}, por exemplo:
  * <ol>
- *   <li>模型生成中途主动调用的真实工具（MCP/内置 Function）</li>
+ *   <li>Ferramentas reais chamadas proativamente pelo modelo durante a geração (MCP/Function interna)</li>
  * </ol>
- * 持久化时按顺序写入 sys_message，回放时按顺序还原。
+ * Ao persistir, são gravadas em sys_message na ordem; ao reproduzir, são restauradas na mesma ordem.
  * <p>
- * 仅作为 Conversation 里的单轮结果对象；持久化转换由
- * {@link com.xiaozhi.dialogue.runtime.convert.DialogueTurnConverter} 负责。
+ * Serve apenas como o objeto de resultado de uma única rodada dentro do Conversation; a conversão para persistência é responsabilidade de
+ * {@link com.xiaozhi.dialogue.runtime.convert.DialogueTurnConverter}.
  */
 @Value
 public class DialogueTurn {
@@ -40,7 +40,7 @@ public class DialogueTurn {
     private Path userSpeechPath;
 
     /**
-     * 一轮内按时间顺序排列的工具调用链（可能为空）
+     * Cadeia de chamadas de ferramentas em ordem cronológica dentro da rodada (pode estar vazia)
      */
     private List<ToolChainPair> toolChains;
 
@@ -57,11 +57,11 @@ public class DialogueTurn {
             Instant assistantMessageCreatedAt,
             List<DialogueContext.ToolCallInfo> toolCallDetails,
             List<ToolChainPair> toolChains) {
-        Assert.notNull(userMessage, "用户消息对象不应该为NULL！");
-        Assert.notNull(chatResponse, "大语言模型的响应对象不应该为NULL！");
-        Assert.notNull(conversation, "会话对象不应该为NULL！");
-        Assert.notNull(userMessageCreatedAt, "用户消息创建时间对象不应该为NULL！");
-        Assert.notNull(assistantMessageCreatedAt, "模型响应创建时间对象不应该为NULL！");
+        Assert.notNull(userMessage, "O objeto de mensagem do usuário não deve ser NULL!");
+        Assert.notNull(chatResponse, "O objeto de resposta do modelo de linguagem não deve ser NULL!");
+        Assert.notNull(conversation, "O objeto de sessão não deve ser NULL!");
+        Assert.notNull(userMessageCreatedAt, "O objeto de horário de criação da mensagem do usuário não deve ser NULL!");
+        Assert.notNull(assistantMessageCreatedAt, "O objeto de horário de criação da resposta do modelo não deve ser NULL!");
         this.userMessage = userMessage;
         this.chatResponse = chatResponse;
         this.conversation = conversation;

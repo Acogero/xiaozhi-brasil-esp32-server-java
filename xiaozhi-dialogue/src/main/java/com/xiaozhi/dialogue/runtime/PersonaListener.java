@@ -1,33 +1,33 @@
 package com.xiaozhi.dialogue.runtime;
 
 /**
- * Persona 生命周期回调接口（领域层，无框架依赖）。
+ * Interface de callback do ciclo de vida do Persona (camada de domínio, sem dependência de framework).
  * <p>
- * 将 Persona 与基础设施（消息持久化、监控统计）解耦：
- * Persona 只通过此接口通知外部"发生了什么"，由 Spring 管理的实现类决定"做什么"。
+ * Desacopla o Persona da infraestrutura (persistência de mensagens, estatísticas de monitoramento):
+ * O Persona apenas notifica externamente "o que aconteceu" por meio desta interface; a implementação gerenciada pelo Spring decide "o que fazer".
  * <p>
- * 分布式友好：将来需要集群广播时，只需让实现类内部桥接到 Redis/Kafka，Persona 完全不用改。
+ * Amigável a ambientes distribuídos: quando for necessário fazer broadcast em cluster no futuro, basta a implementação fazer a ponte internamente com Redis/Kafka, sem nenhuma alteração no Persona.
  * <p>
- * 注：STT 语音识别和工具调用发生在 Persona 外部（分别在 DialogueService 和 Spring AI 框架内），
- * 因此通过 Spring Event（SpeechRecognizedEvent、ToolCallCompletedEvent）而非此接口通知。
+ * Nota: o reconhecimento de voz STT e as chamadas de ferramentas ocorrem fora do Persona (respectivamente no DialogueService e no framework Spring AI),
+ * por isso são notificados via Spring Event (SpeechRecognizedEvent, ToolCallCompletedEvent) e não por esta interface.
  *
  * @see com.xiaozhi.dialogue.llm.handler.DialogueListener
  */
 public interface PersonaListener {
 
     /**
-     * 一轮 Conversation 完成后回调。
-     * 实现类负责持久化消息、记录 LLM 调用成功等。
+     * Callback chamado após a conclusão de uma rodada de Conversation.
+     * A implementação é responsável por persistir a mensagem, registrar o sucesso da chamada ao LLM etc.
      *
-     * @param turn 本轮对话的完整信息
+     * @param turn informações completas desta rodada do diálogo
      */
     void onDialogueTurn(DialogueTurn turn);
 
     /**
-     * LLM 调用出错时回调。
-     * 实现类负责记录 LLM 调用失败、日志等。
+     * Callback chamado quando a chamada ao LLM falha.
+     * A implementação é responsável por registrar a falha da chamada ao LLM, logs etc.
      *
-     * @param error 错误信息
+     * @param error informações do erro
      */
     void onError(Throwable error);
 }

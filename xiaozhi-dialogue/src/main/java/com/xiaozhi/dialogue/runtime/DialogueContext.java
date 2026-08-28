@@ -15,8 +15,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * 对话上下文，承载一次对话会话中与对话逻辑直接相关的状态。
- * 从 ChatSession（通信层）中拆分出来，使通信层不再承载对话业务逻辑。
+ * Contexto do diálogo, carrega o estado diretamente relacionado à lógica do diálogo em uma sessão de conversa.
+ * Extraído do ChatSession (camada de comunicação), para que a camada de comunicação não carregue mais a lógica de negócio do diálogo.
  */
 @Getter
 @Setter
@@ -29,28 +29,28 @@ public class DialogueContext {
     private ToolsSessionHolder toolsSessionHolder;
 
     /**
-     * 当前对话轮次的用户音频保存路径，供 Function 复用
+     * Caminho de salvamento do áudio do usuário da rodada atual do diálogo, reutilizável pelas Functions
      */
     private volatile Path userAudioPath;
 
     /**
-     * 当前对话轮次中的工具调用详情列表（包括内置Function和MCP工具）
-     * 由 XiaoZhiToolCallingManager 在执行工具时追加，由 Persona 在消息保存后清空。
+     * Lista de detalhes das chamadas de ferramentas na rodada atual do diálogo (incluindo Functions internas e ferramentas MCP)
+     * Anexada pelo XiaoZhiToolCallingManager ao executar ferramentas, e limpa pelo Persona após o salvamento da mensagem.
      */
     private final List<ToolCallInfo> toolCallDetails = new CopyOnWriteArrayList<>();
 
     /**
-     * 工具调用的中间消息：模型请求调用工具的 AssistantMessage（包含 toolCalls）
+     * Mensagem intermediária da chamada de ferramenta: o AssistantMessage em que o modelo solicita a chamada da ferramenta (contém toolCalls)
      */
     private volatile AssistantMessage toolCallAssistantMessage;
 
     /**
-     * 工具调用的中间消息：工具执行结果
+     * Mensagem intermediária da chamada de ferramenta: resultado da execução da ferramenta
      */
     private volatile ToolResponseMessage toolResponseMessage;
 
     /**
-     * 工具调用详情
+     * Detalhes da chamada de ferramenta
      */
     public record ToolCallInfo(String name, String arguments, String result) {}
 

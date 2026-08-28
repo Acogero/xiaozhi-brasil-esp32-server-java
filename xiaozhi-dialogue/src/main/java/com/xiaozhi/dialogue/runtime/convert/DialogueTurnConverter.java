@@ -27,10 +27,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * DialogueTurn 到持久化层 {@link MessageBO} 列表的转换器。
+ * Conversor de DialogueTurn para uma lista de {@link MessageBO} da camada de persistência.
  * <p>
- * 将一轮对话（user + 可选 tool-call / tool-response + assistant）拆分为 2 到 4 条 MessageBO。
- * 职责上与 {@code RoleConverter} / {@code ConfigConverter} 一致：把领域对象转成持久化 / 传输用的 BO。
+ * Divide uma rodada de diálogo (user + tool-call/tool-response opcional + assistant) em 2 a 4 MessageBO.
+ * Sua responsabilidade é consistente com {@code RoleConverter} / {@code ConfigConverter}: converter objetos de domínio em BOs para persistência/transporte.
  */
 @Slf4j
 @Component
@@ -38,7 +38,7 @@ public class DialogueTurnConverter {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    /** 将 DialogueTurn 拆分为 MessageBO 列表（供 MessageService 批量持久化） */
+    /** Divide o DialogueTurn em uma lista de MessageBO (para persistência em lote pelo MessageService) */
     public List<MessageBO> toMessages(DialogueTurn turn) {
         ChatResponse chatResponse = turn.getChatResponse();
         Generation generation = chatResponse.getResult();
@@ -51,7 +51,7 @@ public class DialogueTurnConverter {
         // 1. UserMessage
         messages.add(toMessageBO(turn, turn.getUserMessage()));
 
-        // 2. 按顺序插入所有工具调用链：每个 pair 拆成 Assistant(toolCall) + Tool(response) 两条
+        // 2. Insere em ordem todas as cadeias de chamadas de ferramentas: cada pair é dividido em Assistant(toolCall) + Tool(response)
         for (ToolChainPair chain : turn.getToolChains()) {
             if (chain == null || chain.toolCallMessage() == null || chain.toolResponseMessage() == null) {
                 continue;
@@ -60,7 +60,7 @@ public class DialogueTurnConverter {
             messages.add(toToolResponseMessageBO(turn, chain.toolResponseMessage()));
         }
 
-        // 3. 最终 AssistantMessage
+        // 3. AssistantMessage final
         messages.add(toMessageBO(turn, finalAssistantMessage));
 
         return messages;
@@ -87,7 +87,7 @@ public class DialogueTurnConverter {
                     messageBO.setAudioPath(userSpeechPath.toString());
                 }
                 messageBO.setCreateTime(LocalDateTime.ofInstant(turn.getUserMessageCreatedAt(), ZoneId.systemDefault()));
-                // 从 UserMessage.metadata 抽取结构化元数据（speaker/emotion 等）写入 MessageBO.metadata
+                // Extrai os metadados estruturados de UserMessage.metadata (speaker/emotion etc.) e grava em MessageBO.metadata
                 if (message instanceof UserMessage userMessage
                         && userMessage.getMetadata() != null
                         && userMessage.getMetadata().get(MessageMetadataBO.METADATA_KEY) instanceof MessageMetadataBO metadata) {
@@ -100,7 +100,7 @@ public class DialogueTurnConverter {
                     try {
                         messageBO.setToolCalls(OBJECT_MAPPER.writeValueAsString(toolCallDetails));
                     } catch (JsonProcessingException e) {
-                        log.warn("序列化工具调用详情失败", e);
+                        log.warn("Falha ao serializar os detalhes da chamada de ferramenta", e);
                     }
                 }
                 break;
@@ -111,7 +111,7 @@ public class DialogueTurnConverter {
         return messageBO;
     }
 
-    /** 构建工具调用请求的 MessageBO（sender=assistant, messageType=TOOL_CALL） */
+    /** Constrói o MessageBO da requisição de chamada de ferramenta (sender=assistant, messageType=TOOL_CALL) */
     private MessageBO toToolCallAssistantMessageBO(DialogueTurn turn, AssistantMessage toolCallAssistantMessage) {
         Conversation conversation = turn.getConversation();
 
@@ -128,12 +128,12 @@ public class DialogueTurnConverter {
         try {
             messageBO.setToolCalls(ToolCallMessageCodec.encodeToolCalls(toolCallAssistantMessage.getToolCalls()));
         } catch (JsonProcessingException e) {
-            log.warn("序列化 tool call 请求失败", e);
+            log.warn("Falha ao serializar a requisição de tool call", e);
         }
         return messageBO;
     }
 
-    /** 构建工具执行结果的 MessageBO（sender=tool, messageType=TOOL_RESPONSE） */
+    /** Constrói o MessageBO do resultado da execução da ferramenta (sender=tool, messageType=TOOL_RESPONSE) */
     private MessageBO toToolResponseMessageBO(DialogueTurn turn, ToolResponseMessage toolResponseMessage) {
         Conversation conversation = turn.getConversation();
 
@@ -153,7 +153,7 @@ public class DialogueTurnConverter {
         try {
             messageBO.setToolCalls(ToolCallMessageCodec.encodeToolResponses(toolResponseMessage.getResponses()));
         } catch (JsonProcessingException e) {
-            log.warn("序列化 tool response 信息失败", e);
+            log.warn("Falha ao serializar as informações de tool response", e);
         }
         return messageBO;
     }
