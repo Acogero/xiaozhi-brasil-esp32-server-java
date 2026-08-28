@@ -1,33 +1,33 @@
 import { ref, computed, onBeforeUnmount } from 'vue'
 
 /**
- * 倒计时 Composable
- * 用于验证码倒计时、限时活动等场景
+ * Composable de contagem regressiva
+ * Usado em cenários como contagem regressiva de código de verificação, promoções por tempo limitado etc.
  */
 
 export interface UseCountdownOptions {
   /**
-   * 初始倒计时秒数
+   * Segundos iniciais da contagem regressiva
    */
   initialCount?: number
   
   /**
-   * 倒计时结束回调
+   * Callback de término da contagem regressiva
    */
   onFinish?: () => void
   
   /**
-   * 每秒回调
+   * Callback a cada segundo
    */
   onTick?: (count: number) => void
   
   /**
-   * 是否自动开始
+   * Se deve iniciar automaticamente
    */
   autoStart?: boolean
   
   /**
-   * 间隔时间（毫秒）
+   * Intervalo de tempo (em milissegundos)
    */
   interval?: number
 }
@@ -36,35 +36,35 @@ export function useCountdown(options: UseCountdownOptions = {}) {
   const initialCount = options.initialCount || 60
   const interval = options.interval || 1000
   
-  // 当前倒计时值
+  // Valor atual da contagem regressiva
   const count = ref(0)
   
-  // 是否正在倒计时
+  // Se a contagem regressiva está em andamento
   const counting = ref(false)
   
-  // 定时器
+  // Temporizador
   let timer: ReturnType<typeof setInterval> | null = null
   
-  // 是否已完成
+  // Se já foi concluída
   const isFinished = computed(() => count.value === 0 && !counting.value)
   
-  // 格式化时间显示（MM:SS）
+  // Exibição de tempo formatada (MM:SS)
   const formattedTime = computed(() => {
     const minutes = Math.floor(count.value / 60)
     const seconds = count.value % 60
     return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
   })
   
-  // 倒计时文本（常用于按钮）
+  // Texto da contagem regressiva (comumente usado em botões)
   const countdownText = computed(() => {
     return counting.value ? `${count.value}s` : ''
   })
   
   /**
-   * 开始倒计时
+   * Inicia a contagem regressiva
    */
   const start = (seconds: number = initialCount): boolean => {
-    // 如果正在倒计时，不重复启动
+    // Se já estiver em contagem regressiva, não inicia novamente
     if (counting.value) {
       return false
     }
@@ -75,10 +75,10 @@ export function useCountdown(options: UseCountdownOptions = {}) {
     timer = setInterval(() => {
       count.value--
       
-      // 触发每秒回调
+      // Dispara o callback a cada segundo
       options.onTick?.(count.value)
       
-      // 倒计时结束
+      // Contagem regressiva encerrada
       if (count.value <= 0) {
         stop()
         options.onFinish?.()
@@ -89,7 +89,7 @@ export function useCountdown(options: UseCountdownOptions = {}) {
   }
   
   /**
-   * 停止倒计时
+   * Interrompe a contagem regressiva
    */
   const stop = () => {
     if (timer) {
@@ -100,7 +100,7 @@ export function useCountdown(options: UseCountdownOptions = {}) {
   }
   
   /**
-   * 暂停倒计时
+   * Pausa a contagem regressiva
    */
   const pause = () => {
     if (timer) {
@@ -111,7 +111,7 @@ export function useCountdown(options: UseCountdownOptions = {}) {
   }
   
   /**
-   * 恢复倒计时
+   * Retoma a contagem regressiva
    */
   const resume = () => {
     if (count.value > 0 && !counting.value) {
@@ -131,7 +131,7 @@ export function useCountdown(options: UseCountdownOptions = {}) {
   }
   
   /**
-   * 重置倒计时
+   * Reseta a contagem regressiva
    */
   const reset = (seconds: number = initialCount) => {
     stop()
@@ -139,7 +139,7 @@ export function useCountdown(options: UseCountdownOptions = {}) {
   }
   
   /**
-   * 重新开始倒计时
+   * Reinicia a contagem regressiva
    */
   const restart = (seconds: number = initialCount) => {
     stop()
@@ -147,21 +147,21 @@ export function useCountdown(options: UseCountdownOptions = {}) {
   }
   
   /**
-   * 设置倒计时值
+   * Define o valor da contagem regressiva
    */
   const setCount = (seconds: number) => {
     count.value = seconds
   }
   
   /**
-   * 增加倒计时（延长时间）
+   * Aumenta a contagem regressiva (prolonga o tempo)
    */
   const addTime = (seconds: number) => {
     count.value += seconds
   }
   
   /**
-   * 减少倒计时（减少时间）
+   * Reduz a contagem regressiva (diminui o tempo)
    */
   const reduceTime = (seconds: number) => {
     count.value = Math.max(0, count.value - seconds)
@@ -172,25 +172,25 @@ export function useCountdown(options: UseCountdownOptions = {}) {
     }
   }
   
-  // 自动开始
+  // Início automático
   if (options.autoStart) {
     start()
   }
   
-  // 组件卸载时清理定时器
+  // Limpa o temporizador ao desmontar o componente
   onBeforeUnmount(() => {
     stop()
   })
   
   return {
-    // 状态
+    // Estado
     count,
     counting,
     isFinished,
     formattedTime,
     countdownText,
     
-    // 方法
+    // Métodos
     start,
     stop,
     pause,

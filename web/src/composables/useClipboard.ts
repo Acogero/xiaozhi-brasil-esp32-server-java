@@ -3,33 +3,33 @@ import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 
 /**
- * 剪贴板操作 Composable
- * 用于复制、粘贴等剪贴板操作
+ * Composable de operações da área de transferência
+ * Usado para operações de copiar, colar etc. na área de transferência
  */
 
 export interface UseClipboardOptions {
   /**
-   * 复制成功的消息
+   * Mensagem de cópia bem-sucedida
    */
   successMessage?: string
   
   /**
-   * 复制失败的消息
+   * Mensagem de falha na cópia
    */
   errorMessage?: string
   
   /**
-   * 是否显示消息提示
+   * Se deve exibir a mensagem de notificação
    */
   showMessage?: boolean
   
   /**
-   * 复制成功回调
+   * Callback de cópia bem-sucedida
    */
   onSuccess?: (text: string) => void
   
   /**
-   * 复制失败回调
+   * Callback de falha na cópia
    */
   onError?: (error: any) => void
 }
@@ -37,19 +37,19 @@ export interface UseClipboardOptions {
 export function useClipboard(options: UseClipboardOptions = {}) {
   const { t } = useI18n()
   
-  // 复制状态
+  // Estado de cópia
   const copying = ref(false)
   
-  // 已复制的文本
+  // Texto copiado
   const copiedText = ref<string>('')
   
-  // 是否支持剪贴板 API
+  // Se a API de área de transferência é suportada
   const isSupported = ref(
     typeof navigator !== 'undefined' && 'clipboard' in navigator
   )
   
   /**
-   * 复制文本到剪贴板
+   * Copia o texto para a área de transferência
    */
   const copy = async (
     text: string,
@@ -59,7 +59,7 @@ export function useClipboard(options: UseClipboardOptions = {}) {
     const showMessage = mergedOptions.showMessage !== false
     
     if (!isSupported.value) {
-      // 降级处理：使用 document.execCommand
+      // Fallback: usa document.execCommand
       return copyFallback(text, mergedOptions, showMessage)
     }
     
@@ -77,7 +77,7 @@ export function useClipboard(options: UseClipboardOptions = {}) {
       mergedOptions.onSuccess?.(text)
       return true
     } catch (error: any) {
-      console.error('复制失败:', error)
+      console.error('Falha ao copiar:', error)
       
       if (showMessage) {
         const errorMsg = mergedOptions.errorMessage || t('clipboard.copyFailed')
@@ -92,7 +92,7 @@ export function useClipboard(options: UseClipboardOptions = {}) {
   }
   
   /**
-   * 降级方案：使用 execCommand
+   * Solução de fallback: usa execCommand
    */
   const copyFallback = (
     text: string,
@@ -102,7 +102,7 @@ export function useClipboard(options: UseClipboardOptions = {}) {
     copying.value = true
     
     try {
-      // 创建临时 textarea
+      // Cria um textarea temporário
       const textarea = document.createElement('textarea')
       textarea.value = text
       textarea.style.position = 'fixed'
@@ -130,7 +130,7 @@ export function useClipboard(options: UseClipboardOptions = {}) {
         throw new Error('execCommand failed')
       }
     } catch (error: any) {
-      console.error('复制失败（降级方案）:', error)
+      console.error('Falha ao copiar (solução de fallback):', error)
       
       if (showMessage) {
         const errorMsg = mergedOptions.errorMessage || t('clipboard.copyFailed')
@@ -145,7 +145,7 @@ export function useClipboard(options: UseClipboardOptions = {}) {
   }
   
   /**
-   * 读取剪贴板内容
+   * Lê o conteúdo da área de transferência
    */
   const paste = async (): Promise<string | null> => {
     if (!isSupported.value) {
@@ -157,14 +157,14 @@ export function useClipboard(options: UseClipboardOptions = {}) {
       const text = await navigator.clipboard.readText()
       return text
     } catch (error: any) {
-      console.error('读取剪贴板失败:', error)
+      console.error('Falha ao ler a área de transferência:', error)
       message.error(t('clipboard.pasteFailed'))
       return null
     }
   }
   
   /**
-   * 清空剪贴板
+   * Limpa a área de transferência
    */
   const clear = async (): Promise<boolean> => {
     if (!isSupported.value) {
@@ -176,13 +176,13 @@ export function useClipboard(options: UseClipboardOptions = {}) {
       copiedText.value = ''
       return true
     } catch (error: any) {
-      console.error('清空剪贴板失败:', error)
+      console.error('Falha ao limpar a área de transferência:', error)
       return false
     }
   }
   
   /**
-   * 复制对象为 JSON 字符串
+   * Copia um objeto como string JSON
    */
   const copyJSON = async (
     obj: any,
@@ -193,21 +193,21 @@ export function useClipboard(options: UseClipboardOptions = {}) {
       const json = pretty ? JSON.stringify(obj, null, 2) : JSON.stringify(obj)
       return await copy(json, customOptions)
     } catch (error: any) {
-      console.error('JSON 序列化失败:', error)
+      console.error('Falha na serialização JSON:', error)
       message.error(t('clipboard.jsonError'))
       return false
     }
   }
   
   /**
-   * 复制 HTML
+   * Copia HTML
    */
   const copyHTML = async (
     html: string,
     plainText?: string
   ): Promise<boolean> => {
     if (!isSupported.value) {
-      // 降级：复制纯文本
+      // Fallback: copia texto simples
       return copy(plainText || html.replace(/<[^>]*>/g, ''))
     }
     
@@ -230,9 +230,9 @@ export function useClipboard(options: UseClipboardOptions = {}) {
       
       return true
     } catch (error: any) {
-      console.error('复制 HTML 失败:', error)
+      console.error('Falha ao copiar HTML:', error)
       
-      // 降级：复制纯文本
+      // Fallback: copia texto simples
       return copy(plainText || html.replace(/<[^>]*>/g, ''))
     } finally {
       copying.value = false
@@ -240,7 +240,7 @@ export function useClipboard(options: UseClipboardOptions = {}) {
   }
   
   /**
-   * 复制图片
+   * Copia imagem
    */
   const copyImage = async (blob: Blob): Promise<boolean> => {
     if (!isSupported.value) {
@@ -263,7 +263,7 @@ export function useClipboard(options: UseClipboardOptions = {}) {
       
       return true
     } catch (error: any) {
-      console.error('复制图片失败:', error)
+      console.error('Falha ao copiar imagem:', error)
       
       if (options.showMessage !== false) {
         message.error(options.errorMessage || t('clipboard.copyFailed'))
@@ -276,12 +276,12 @@ export function useClipboard(options: UseClipboardOptions = {}) {
   }
   
   return {
-    // 状态
+    // Estado
     copying,
     copiedText,
     isSupported,
     
-    // 方法
+    // Métodos
     copy,
     paste,
     clear,

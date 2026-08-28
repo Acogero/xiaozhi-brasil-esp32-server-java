@@ -35,7 +35,7 @@ export function useVerificationCode() {
     resume()
   }
 
-  // 验证邮箱格式
+  // Valida o formato do e-mail
   const validateEmail = (email: string): boolean => {
     if (!email) {
       message.error(t('auth.enterEmailFirst'))
@@ -51,7 +51,7 @@ export function useVerificationCode() {
     return true
   }
 
-  // 发送验证码（注册场景 - 需要先检查用户名和邮箱）
+  // Envia o código de verificação (cenário de registro - requer verificar antes o nome de usuário e o e-mail)
   const sendRegisterCode = async (email: string, username?: string) => {
     if (!validateEmail(email)) return false
     if (!canSendCode.value) return false
@@ -59,7 +59,7 @@ export function useVerificationCode() {
     sendCodeLoading.value = true
 
     try {
-      // 先检查用户名和邮箱是否已存在
+      // Verifica primeiro se o nome de usuário e o e-mail já existem
       if (username) {
         const checkRes = await checkUser({
           username,
@@ -72,7 +72,7 @@ export function useVerificationCode() {
         }
       }
 
-      // 发送验证码
+      // Envia o código de verificação
       const res = await sendEmailCaptcha({
         email,
         type: 'register',
@@ -94,7 +94,7 @@ export function useVerificationCode() {
     }
   }
 
-  // 发送验证码（忘记密码场景）
+  // Envia o código de verificação (cenário de senha esquecida)
   const sendForgetCode = async (email: string) => {
     if (!validateEmail(email)) return false
     if (!canSendCode.value) return false
@@ -123,7 +123,7 @@ export function useVerificationCode() {
     }
   }
 
-  // 验证验证码
+  // Valida o código de verificação
   const verifyCode = async (email: string, code: string, type: VerificationType) => {
     try {
       const res = await checkCaptcha({
@@ -140,7 +140,7 @@ export function useVerificationCode() {
         return false
       }
     } catch (error) {
-      message.error('验证失败，请稍后重试')
+      message.error('Falha na verificação, tente novamente mais tarde')
       return false
     }
   }

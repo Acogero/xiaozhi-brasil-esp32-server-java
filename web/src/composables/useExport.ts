@@ -3,40 +3,40 @@ import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 
 /**
- * 数据导出 Composable
- * 支持 CSV、JSON、Excel 等格式导出
+ * Composable de exportação de dados
+ * Suporta exportação nos formatos CSV, JSON, Excel etc.
  */
 
 export interface ExportColumn<T = unknown> {
   /**
-   * 列键名
+   * Nome da chave da coluna
    */
   key: string
   
   /**
-   * 列标题
+   * Título da coluna
    */
   title: string
   
   /**
-   * 自定义格式化函数
+   * Função de formatação personalizada
    */
   format?: (value: any, record: T) => string | number
 }
 
 export interface ExportOptions<T = unknown> {
   /**
-   * 文件名（不含扩展名）
+   * Nome do arquivo (sem extensão)
    */
   filename?: string
   
   /**
-   * 列配置（如果不指定，则导出所有字段）
+   * Configuração das colunas (se não especificado, exporta todos os campos)
    */
   columns?: ExportColumn<T>[]
   
   /**
-   * 是否显示加载提示
+   * Se deve exibir a mensagem de carregamento
    */
   showLoading?: boolean
 }
@@ -44,42 +44,42 @@ export interface ExportOptions<T = unknown> {
 export function useExport() {
   const { t } = useI18n()
   
-  // 导出状态
+  // Estado de exportação
   const exporting = ref(false)
   
   /**
-   * 转换为 CSV 格式
+   * Converte para o formato CSV
    */
   const convertToCSV = <T>(data: T[], columns?: ExportColumn<T>[]): string => {
     if (data.length === 0) return ''
     
-    // 如果没有指定列，使用第一行的所有键
+    // Se as colunas não forem especificadas, usa todas as chaves da primeira linha
     const firstItem = data[0] as object
     const cols: ExportColumn<T>[] = columns || Object.keys(firstItem).map(key => ({
       key,
       title: key,
     }))
     
-    // CSV 头部
+    // Cabeçalho do CSV
     const headers = cols.map(col => `"${col.title}"`).join(',')
     
-    // CSV 数据行
+    // Linhas de dados do CSV
     const rows = data.map(record => {
       const recordObj = record as { [key: string]: unknown }
       return cols.map(col => {
         let value: unknown = recordObj[col.key]
         
-        // 使用自定义格式化
+        // Usa a formatação personalizada
         if (col.format) {
           value = col.format(value, record)
         }
         
-        // 处理特殊字符
+        // Trata caracteres especiais
         if (value === null || value === undefined) {
           return '""'
         }
         
-        // 转为字符串并转义引号
+        // Converte para string e escapa as aspas
         const strValue = String(value).replace(/"/g, '""')
         return `"${strValue}"`
       }).join(',')
@@ -89,10 +89,10 @@ export function useExport() {
   }
   
   /**
-   * 下载文件
+   * Faz o download do arquivo
    */
   const downloadFile = (content: string, filename: string, mimeType: string) => {
-    // 添加 BOM 使 Excel 正确识别 UTF-8
+    // Adiciona o BOM para que o Excel reconheça corretamente o UTF-8
     const BOM = '\uFEFF'
     const blob = new Blob([BOM + content], { type: `${mimeType};charset=utf-8;` })
     const url = URL.createObjectURL(blob)
@@ -106,12 +106,12 @@ export function useExport() {
     link.click()
     document.body.removeChild(link)
     
-    // 释放 URL 对象
+    // Libera o objeto URL
     setTimeout(() => URL.revokeObjectURL(url), 100)
   }
   
   /**
-   * 导出为 CSV
+   * Exporta como CSV
    */
   const exportToCSV = async <T>(
     data: T[],
@@ -134,14 +134,14 @@ export function useExport() {
       
       downloadFile(csv, filename, 'text/csv')
       
-      // 只在启用内部提示时显示成功消息
+      // Exibe a mensagem de sucesso apenas se a notificação interna estiver habilitada
       if (options.showLoading !== false) {
         message.success(t('export.success'))
       }
       return true
     } catch (error) {
-      console.error('CSV 导出失败:', error)
-      // 只在启用内部提示时显示错误消息
+      console.error('Falha na exportação do CSV:', error)
+      // Exibe a mensagem de erro apenas se a notificação interna estiver habilitada
       if (options.showLoading !== false) {
         message.error(t('export.failed'))
       }
@@ -152,7 +152,7 @@ export function useExport() {
   }
   
   /**
-   * 导出为 JSON
+   * Exporta como JSON
    */
   const exportToJSON = async <T>(
     data: T[],
@@ -170,7 +170,7 @@ export function useExport() {
         message.loading(t('export.exporting'))
       }
       
-      // 如果指定了列，只导出指定的字段
+      // Se as colunas forem especificadas, exporta apenas os campos indicados
       let exportData = data
       if (options.columns && options.columns.length > 0) {
         exportData = data.map(record => {
@@ -192,14 +192,14 @@ export function useExport() {
       
       downloadFile(json, filename, 'application/json')
       
-      // 只在启用内部提示时显示成功消息
+      // Exibe a mensagem de sucesso apenas se a notificação interna estiver habilitada
       if (options.showLoading !== false) {
         message.success(t('export.success'))
       }
       return true
     } catch (error) {
-      console.error('JSON 导出失败:', error)
-      // 只在启用内部提示时显示错误消息
+      console.error('Falha na exportação do JSON:', error)
+      // Exibe a mensagem de erro apenas se a notificação interna estiver habilitada
       if (options.showLoading !== false) {
         message.error(t('export.failed'))
       }
@@ -210,7 +210,7 @@ export function useExport() {
   }
   
   /**
-   * 导出为 Excel（使用 CSV 格式，Excel 可以打开）
+   * Exporta como Excel (usa o formato CSV, que o Excel consegue abrir)
    */
   const exportToExcel = async <T>(
     data: T[],
@@ -231,11 +231,11 @@ export function useExport() {
       const csv = convertToCSV(data, options.columns)
       const filename = `${options.filename || 'export'}.xlsx`
       
-      // 使用 UTF-16LE 编码和特殊格式让 Excel 识别
+      // Usa a codificação UTF-16LE e um formato especial para que o Excel reconheça
       const BOM = '\ufeff'
       const csvWithBOM = BOM + csv
       
-      // 创建 Excel 兼容的 CSV
+      // Cria um CSV compatível com o Excel
       const blob = new Blob([csvWithBOM], { 
         type: 'application/vnd.ms-excel;charset=utf-8;' 
       })
@@ -252,14 +252,14 @@ export function useExport() {
       
       setTimeout(() => URL.revokeObjectURL(url), 100)
       
-      // 只在启用内部提示时显示成功消息
+      // Exibe a mensagem de sucesso apenas se a notificação interna estiver habilitada
       if (options.showLoading !== false) {
         message.success(t('export.success'))
       }
       return true
     } catch (error) {
-      console.error('Excel 导出失败:', error)
-      // 只在启用内部提示时显示错误消息
+      console.error('Falha na exportação do Excel:', error)
+      // Exibe a mensagem de erro apenas se a notificação interna estiver habilitada
       if (options.showLoading !== false) {
         message.error(t('export.failed'))
       }
@@ -270,7 +270,7 @@ export function useExport() {
   }
   
   /**
-   * 自动选择导出格式
+   * Seleciona automaticamente o formato de exportação
    */
   const exportData = async <T>(
     data: T[],
@@ -291,7 +291,7 @@ export function useExport() {
   }
   
   /**
-   * 从 CSV 文本解析为 HTML 表格（用于预览）
+   * Converte texto CSV em tabela HTML (usado para pré-visualização)
    */
   const parseCSVToTable = (csvText: string): string => {
     if (!csvText.trim()) {
@@ -306,7 +306,7 @@ export function useExport() {
     const headerRow = lines[0]
     const dataRows = lines.slice(1)
     
-    // 简单的 CSV 解析（处理引号）
+    // Análise simples de CSV (trata aspas)
     const parseCSVRow = (row: string): string[] => {
       const values: string[] = []
       let current = ''
@@ -347,7 +347,7 @@ export function useExport() {
   }
   
   /**
-   * 从剪贴板导入 CSV 数据
+   * Importa dados CSV da área de transferência
    */
   const importFromClipboard = async <T = { [key: string]: string }>(): Promise<T[]> => {
     try {
@@ -358,7 +358,7 @@ export function useExport() {
         return []
       }
       
-      // 简单解析 CSV（假设以 tab 或逗号分隔）
+      // Análise simples de CSV (assume separação por tabulação ou vírgula)
       const lines = text.split(/\r?\n/).filter(line => line.trim())
       const headers = lines[0]?.split(/\t|,/).map(h => h.trim()) || []
       
@@ -375,17 +375,17 @@ export function useExport() {
       message.success(t('export.importSuccess'))
       return data
     } catch (error) {
-      console.error('导入失败:', error)
+      console.error('Falha na importação:', error)
       message.error(t('export.importFailed'))
       return []
     }
   }
   
   return {
-    // 状态
+    // Estado
     exporting,
     
-    // 方法
+    // Métodos
     exportToCSV,
     exportToJSON,
     exportToExcel,

@@ -1,52 +1,52 @@
 import { reactive, computed } from 'vue'
 
 /**
- * Loading 状态管理 Composable
- * 用于管理多个加载状态，避免 loading 状态混乱
+ * Composable de gerenciamento de estado de loading
+ * Usado para gerenciar múltiplos estados de carregamento, evitando confusão entre eles
  */
 
 export interface UseLoadingStateOptions {
   /**
-   * 初始加载状态
+   * Estado de carregamento inicial
    */
   initialStates?: Record<string, boolean>
   
   /**
-   * 全局加载回调
+   * Callback de carregamento global
    */
   onLoadingChange?: (key: string, loading: boolean) => void
 }
 
 export function useLoadingState(options: UseLoadingStateOptions = {}) {
-  // 加载状态集合
+  // Conjunto de estados de carregamento
   const loadingStates = reactive<Record<string, boolean>>(
     options.initialStates || {}
   )
   
-  // 是否有任何加载中的状态
+  // Indica se há algum estado em carregamento
   const isAnyLoading = computed(() => {
     return Object.values(loadingStates).some(loading => loading)
   })
   
-  // 是否全部加载中
+  // Indica se todos estão em carregamento
   const isAllLoading = computed(() => {
     const keys = Object.keys(loadingStates)
     if (keys.length === 0) return false
     return keys.every(key => loadingStates[key])
   })
   
-  // 加载中的数量
+  // Quantidade de itens em carregamento
   const loadingCount = computed(() => {
     return Object.values(loadingStates).filter(loading => loading).length
   })
   
-  // 加载中的 key 列表
+  // Lista de keys em carregamento
   const loadingKeys = computed(() => {
     return Object.keys(loadingStates).filter(key => loadingStates[key])
   })
   
   /**
-   * 设置加载状态
+   * Define o estado de carregamento
    */
   const setLoading = (key: string, loading: boolean) => {
     loadingStates[key] = loading
@@ -54,35 +54,35 @@ export function useLoadingState(options: UseLoadingStateOptions = {}) {
   }
   
   /**
-   * 开始加载
+   * Inicia o carregamento
    */
   const startLoading = (key: string) => {
     setLoading(key, true)
   }
   
   /**
-   * 结束加载
+   * Finaliza o carregamento
    */
   const stopLoading = (key: string) => {
     setLoading(key, false)
   }
   
   /**
-   * 切换加载状态
+   * Alterna o estado de carregamento
    */
   const toggleLoading = (key: string) => {
     setLoading(key, !loadingStates[key])
   }
   
   /**
-   * 判断是否正在加载
+   * Verifica se está carregando
    */
   const isLoading = (key: string): boolean => {
     return loadingStates[key] || false
   }
   
   /**
-   * 包装异步函数，自动管理加载状态
+   * Encapsula uma função assíncrona, gerenciando automaticamente o estado de carregamento
    */
   const withLoading = async <T>(
     key: string,
@@ -97,7 +97,7 @@ export function useLoadingState(options: UseLoadingStateOptions = {}) {
   }
   
   /**
-   * 批量设置加载状态
+   * Define estados de carregamento em lote
    */
   const setLoadingBatch = (states: Record<string, boolean>) => {
     Object.entries(states).forEach(([key, loading]) => {
@@ -106,7 +106,7 @@ export function useLoadingState(options: UseLoadingStateOptions = {}) {
   }
   
   /**
-   * 重置所有加载状态
+   * Redefine todos os estados de carregamento
    */
   const resetAll = () => {
     Object.keys(loadingStates).forEach(key => {
@@ -115,14 +115,14 @@ export function useLoadingState(options: UseLoadingStateOptions = {}) {
   }
   
   /**
-   * 清除指定的加载状态
+   * Remove o estado de carregamento especificado
    */
   const clear = (key: string) => {
     delete loadingStates[key]
   }
   
   /**
-   * 清除所有加载状态
+   * Remove todos os estados de carregamento
    */
   const clearAll = () => {
     Object.keys(loadingStates).forEach(key => {
@@ -131,7 +131,7 @@ export function useLoadingState(options: UseLoadingStateOptions = {}) {
   }
   
   /**
-   * 创建命名空间的加载管理器（用于组件内部多个加载状态）
+   * Cria um gerenciador de carregamento com namespace (para múltiplos estados dentro do componente)
    */
   const createNamespace = (namespace: string) => {
     const getKey = (key: string) => `${namespace}:${key}`
@@ -157,14 +157,14 @@ export function useLoadingState(options: UseLoadingStateOptions = {}) {
   }
   
   /**
-   * 创建加载状态的 computed（用于组合使用）
+   * Cria um computed de estado de carregamento (para uso combinado)
    */
   const createLoadingComputed = (...keys: string[]) => {
     return computed(() => keys.some(key => isLoading(key)))
   }
   
   /**
-   * 等待所有指定的加载完成
+   * Aguarda a conclusão de todos os carregamentos especificados
    */
   const waitForAll = async (...keys: string[]): Promise<void> => {
     return new Promise((resolve) => {
@@ -178,14 +178,14 @@ export function useLoadingState(options: UseLoadingStateOptions = {}) {
   }
   
   return {
-    // 状态
+    // Estado
     loadingStates,
     isAnyLoading,
     isAllLoading,
     loadingCount,
     loadingKeys,
     
-    // 方法
+    // Métodos
     setLoading,
     startLoading,
     stopLoading,

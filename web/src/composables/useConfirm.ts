@@ -3,38 +3,38 @@ import { useI18n } from 'vue-i18n'
 import type { ModalFuncProps } from 'ant-design-vue'
 
 /**
- * 确认对话框 Composable
- * 统一管理各种确认操作
+ * Composable de diálogo de confirmação
+ * Gerencia de forma unificada diversas operações de confirmação
  */
 
 export interface ConfirmOptions {
   /**
-   * 标题
+   * Título
    */
   title?: string
   
   /**
-   * 内容
+   * Conteúdo
    */
   content?: string
   
   /**
-   * 确定按钮文本
+   * Texto do botão de confirmação
    */
   okText?: string
   
   /**
-   * 取消按钮文本
+   * Texto do botão de cancelamento
    */
   cancelText?: string
   
   /**
-   * 确定按钮类型
+   * Tipo do botão de confirmação
    */
   okType?: 'primary' | 'danger' | 'default' | 'dashed' | 'link' | 'text'
   
   /**
-   * 确定按钮加载状态
+   * Estado de carregamento do botão de confirmação
    */
   okButtonProps?: {
     loading?: boolean
@@ -42,17 +42,17 @@ export interface ConfirmOptions {
   }
   
   /**
-   * 图标
+   * Ícone
    */
   icon?: any
   
   /**
-   * 宽度
+   * Largura
    */
   width?: string | number
   
   /**
-   * 是否显示取消按钮
+   * Se deve exibir o botão de cancelar
    */
   showCancel?: boolean
 }
@@ -61,7 +61,7 @@ export function useConfirm() {
   const { t } = useI18n()
   
   /**
-   * 通用确认对话框
+   * Diálogo de confirmação genérico
    */
   const confirm = (
     onOk: () => void | Promise<void>,
@@ -84,7 +84,7 @@ export function useConfirm() {
   }
   
   /**
-   * 删除确认
+   * Confirmação de exclusão
    */
   const confirmDelete = (
     onConfirm: () => void | Promise<void>,
@@ -105,7 +105,7 @@ export function useConfirm() {
   }
   
   /**
-   * 警告确认
+   * Confirmação de aviso
    */
   const confirmWarning = (
     onConfirm: () => void | Promise<void>,
@@ -125,7 +125,7 @@ export function useConfirm() {
   }
   
   /**
-   * 信息确认
+   * Confirmação informativa
    */
   const confirmInfo = (
     onConfirm: () => void | Promise<void>,
@@ -144,7 +144,7 @@ export function useConfirm() {
   }
   
   /**
-   * 成功确认
+   * Confirmação de sucesso
    */
   const confirmSuccess = (
     onConfirm: () => void | Promise<void>,
@@ -163,7 +163,7 @@ export function useConfirm() {
   }
   
   /**
-   * 错误确认
+   * Confirmação de erro
    */
   const confirmError = (
     onConfirm: () => void | Promise<void>,
@@ -182,7 +182,7 @@ export function useConfirm() {
   }
   
   /**
-   * 保存确认
+   * Confirmação de salvamento
    */
   const confirmSave = (
     onConfirm: () => void | Promise<void>,
@@ -203,7 +203,7 @@ export function useConfirm() {
   }
   
   /**
-   * 取消确认
+   * Confirmação de cancelamento
    */
   const confirmCancel = (
     onConfirm: () => void | Promise<void>,
@@ -224,7 +224,7 @@ export function useConfirm() {
   }
   
   /**
-   * 提交确认
+   * Confirmação de envio
    */
   const confirmSubmit = (
     onConfirm: () => void | Promise<void>,

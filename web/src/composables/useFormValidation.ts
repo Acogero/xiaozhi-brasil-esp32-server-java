@@ -2,18 +2,18 @@ import type { Rule } from 'ant-design-vue/es/form'
 import type { Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-// 创建验证规则的工厂函数
+// Função de fábrica para criar regras de validação
 export function createValidationRules() {
   const { t } = useI18n()
 
   return {
-    // 邮箱验证规则
+    // Regra de validação de e-mail
     emailRules: [
       { required: true, message: t('validation.enterEmail'), trigger: 'blur' },
       { type: 'email', message: t('validation.enterValidEmail'), trigger: 'blur' },
     ] as Rule[],
 
-    // 用户名验证规则
+    // Regra de validação de nome de usuário
     usernameRules: [
       { required: true, message: t('validation.enterUsername'), trigger: 'blur' },
       { min: 3, max: 20, message: t('validation.usernameLength', { min: 3, max: 20 }), trigger: 'blur' },
@@ -24,13 +24,13 @@ export function createValidationRules() {
       },
     ] as Rule[],
 
-    // 密码验证规则
+    // Regra de validação de senha
     passwordRules: [
       { required: true, message: t('validation.enterPassword'), trigger: 'blur' },
       { min: 6, max: 20, message: t('validation.passwordLength', { min: 6, max: 20 }), trigger: 'blur' },
     ] as Rule[],
 
-    // 确认密码验证规则（响应式版本）
+    // Regra de validação de confirmação de senha (versão reativa)
     confirmPasswordRules: (passwordRef: Ref<string>): Rule[] => [
       {
         validator: (_rule: Rule, value: string) => {
@@ -46,13 +46,13 @@ export function createValidationRules() {
       },
     ],
 
-    // 验证码规则
+    // Regra do código de verificação
     verificationCodeRules: [
       { required: true, message: t('validation.enterVerificationCode'), trigger: 'blur' },
       { len: 6, message: t('validation.verificationCodeLength', { length: 6 }), trigger: 'blur' },
     ] as Rule[],
 
-    // 手机号规则（可选）
+    // Regra de número de telefone (opcional)
     telRules: [
       {
         pattern: /^1[3-9]\d{9}$/,
@@ -61,7 +61,7 @@ export function createValidationRules() {
       },
     ] as Rule[],
 
-    // 姓名规则
+    // Regra de nome
     nameRules: [
       { required: true, message: t('validation.enterName'), trigger: 'blur' },
       { min: 2, max: 20, message: t('validation.nameLength', { min: 2, max: 20 }), trigger: 'blur' },
@@ -69,13 +69,13 @@ export function createValidationRules() {
   }
 }
 
-// 主要的 composable 函数
+// Função composable principal
 export function useFormValidation() {
   return createValidationRules()
 }
 
-// 为了向后兼容，提供延迟初始化的规则
-// 这些函数需要在 setup 上下文中调用
+// Para compatibilidade retroativa, fornece regras de inicialização tardia
+// Essas funções precisam ser chamadas no contexto do setup
 export function useEmailRules() {
   return createValidationRules().emailRules
 }

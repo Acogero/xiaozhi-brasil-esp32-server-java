@@ -5,7 +5,7 @@ import type { ThemeConfig } from 'ant-design-vue/es/config-provider/context'
 
 export type ThemeMode = 'light' | 'dark' | 'auto'
 
-// Ant Design Vue 暗色主题配置
+// Configuração de tema escuro do Ant Design Vue
 const darkTheme: ThemeConfig = {
   algorithm: theme.darkAlgorithm,
   token: {
@@ -27,7 +27,7 @@ const darkTheme: ThemeConfig = {
   },
 }
 
-// Ant Design Vue 亮色主题配置
+// Configuração de tema claro do Ant Design Vue
 const lightTheme: ThemeConfig = {
   algorithm: theme.defaultAlgorithm,
   token: {
@@ -50,9 +50,9 @@ const lightTheme: ThemeConfig = {
 }
 
 /**
- * 将主题 token 注入到 CSS 变量中
- * 这是为了兼容项目中使用的 var(--ant-xxx) 样式
- * 注意：Ant Design Vue 不像 React 版本会自动生成 CSS 变量，需要手动注入
+ * Injeta os tokens do tema nas variáveis CSS
+ * Isso é para manter compatibilidade com o estilo var(--ant-xxx) usado no projeto
+ * Observação: diferente da versão React, o Ant Design Vue não gera variáveis CSS automaticamente, sendo necessário injetá-las manualmente
  */
 function injectCssVariables(isDark: boolean) {
   const root = document.documentElement
@@ -60,14 +60,14 @@ function injectCssVariables(isDark: boolean) {
   
   if (!tokens) return
   
-  // 注入所有 token 作为 CSS 变量
+  // Injeta todos os tokens como variáveis CSS
   Object.entries(tokens).forEach(([key, value]) => {
-    // 将 camelCase 转换为 kebab-case
+    // Converte camelCase para kebab-case
     const cssVarName = key.replace(/([A-Z])/g, '-$1').toLowerCase()
     root.style.setProperty(`--ant-${cssVarName}`, String(value))
   })
   
-  // 额外添加一些常用的派生变量
+  // Adiciona algumas variáveis derivadas comumente usadas
   root.style.setProperty('--ant-color-primary-hover', isDark ? '#40a9ff' : '#40a9ff')
   root.style.setProperty('--ant-color-primary-bg', isDark ? '#111d2c' : '#e6f7ff')
   root.style.setProperty('--ant-color-success-bg', isDark ? '#162312' : '#f6ffed')
@@ -87,7 +87,7 @@ export function useAntdTheme() {
   const themeMode = useStorage<ThemeMode>('theme-mode', 'auto')
   const prefersDark = usePreferredDark()
 
-  // 计算实际应用的主题
+  // Calcula o tema efetivamente aplicado
   const actualTheme = computed<'light' | 'dark'>(() => {
     if (themeMode.value === 'auto') {
       return prefersDark.value ? 'dark' : 'light'
@@ -95,17 +95,17 @@ export function useAntdTheme() {
     return themeMode.value
   })
 
-  // 获取 Ant Design Vue 的主题配置
+  // Obtém a configuração de tema do Ant Design Vue
   const antdTheme = computed<ThemeConfig>(() => {
     return actualTheme.value === 'dark' ? darkTheme : lightTheme
   })
 
-  // 监听主题变化，注入 CSS 变量
+  // Observa mudanças de tema e injeta as variáveis CSS
   watch(actualTheme, (theme) => {
     injectCssVariables(theme === 'dark')
   }, { immediate: true })
 
-  // 切换主题（循环切换：light -> dark -> auto）
+  // Alterna o tema (ciclo: light -> dark -> auto)
   const toggleTheme = () => {
     if (themeMode.value === 'light') {
       themeMode.value = 'dark'
@@ -116,12 +116,12 @@ export function useAntdTheme() {
     }
   }
 
-  // 设置特定主题
+  // Define um tema específico
   const setTheme = (theme: ThemeMode) => {
     themeMode.value = theme
   }
 
-  // 获取主题图标
+  // Obtém o ícone do tema
   const themeIcon = computed(() => {
     switch (themeMode.value) {
       case 'light':
@@ -135,17 +135,17 @@ export function useAntdTheme() {
     }
   })
 
-  // 获取主题显示名称
+  // Obtém o nome de exibição do tema
   const themeName = computed(() => {
     switch (themeMode.value) {
       case 'light':
-        return '亮色模式'
+        return 'Modo claro'
       case 'dark':
-        return '暗色模式'
+        return 'Modo escuro'
       case 'auto':
-        return '跟随系统'
+        return 'Seguir sistema'
       default:
-        return '亮色模式'
+        return 'Modo claro'
     }
   })
 
@@ -160,7 +160,7 @@ export function useAntdTheme() {
   }
 }
 
-// 使用示例：
+// Exemplo de uso:
 // const { themeMode, actualTheme, antdTheme, toggleTheme } = useAntdTheme()
 // 
 // <a-config-provider :theme="antdTheme">

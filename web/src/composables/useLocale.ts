@@ -2,47 +2,52 @@ import { useStorage } from '@vueuse/core'
 import { computed, watch } from 'vue'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import enUS from 'ant-design-vue/es/locale/en_US'
+import ptBR from 'ant-design-vue/es/locale/pt_BR'
 import type { Locale } from 'ant-design-vue/es/locale'
 import { i18n } from '@/locales'
 
-export type LocaleType = 'zh-CN' | 'en-US'
+export type LocaleType = 'zh-CN' | 'en-US' | 'pt-BR'
 
-// 语言配置映射
+// Mapeamento de configuração de idiomas
 const localeMap: Record<LocaleType, Locale> = {
   'zh-CN': zhCN,
   'en-US': enUS,
+  'pt-BR': ptBR,
 }
 
-// 语言显示名称
+// Nomes de exibição dos idiomas (cada um em seu próprio idioma)
 const localeNames: Record<LocaleType, string> = {
   'zh-CN': '简体中文',
   'en-US': 'English',
+  'pt-BR': 'Português (Brasil)',
 }
 
 export function useLocale() {
-  const currentLocale = useStorage<LocaleType>('locale', 'zh-CN')
+  const currentLocale = useStorage<LocaleType>('locale', 'pt-BR')
 
-  // 获取 Ant Design Vue 的 locale 对象
+  // Obtém o objeto locale do Ant Design Vue
   const antdLocale = computed(() => localeMap[currentLocale.value])
 
-  // 获取当前语言的显示名称
+  // Obtém o nome de exibição do idioma atual
   const localeName = computed(() => localeNames[currentLocale.value])
 
-  // 切换语言
+  // Alterna entre os idiomas disponíveis, em sequência
   const toggleLocale = () => {
-    currentLocale.value = currentLocale.value === 'zh-CN' ? 'en-US' : 'zh-CN'
+    const locales = Object.keys(localeMap) as LocaleType[]
+    const currentIndex = locales.indexOf(currentLocale.value)
+    currentLocale.value = locales[(currentIndex + 1) % locales.length]
   }
 
-  // 设置特定语言
+  // Define um idioma específico
   const setLocale = (locale: LocaleType) => {
     currentLocale.value = locale
   }
 
-  // 监听语言变化，同步到 i18n
+  // Observa mudanças no idioma e sincroniza com a instância do i18n
   watch(
     currentLocale,
     (newLocale) => {
-      // 同步更新 i18n 实例
+      // Sincroniza a instância do i18n
       if (i18n && i18n.global) {
         i18n.global.locale.value = newLocale
       }
@@ -50,7 +55,7 @@ export function useLocale() {
     { immediate: true }
   )
 
-  // 获取所有可用语言
+  // Obtém todos os idiomas disponíveis
   const availableLocales = Object.keys(localeMap) as LocaleType[]
 
   return {

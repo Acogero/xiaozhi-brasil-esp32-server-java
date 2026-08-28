@@ -48,7 +48,7 @@ export function useAuth() {
   const rememberedUsername = useStorage('username', '', localStorage)
   const rememberedPassword = useStorage('rememberMe', '', localStorage)
 
-  // 使用倒计时 composable
+  // Usa o composable de contagem regressiva
   const {
     count: countdown,
     counting,
@@ -58,7 +58,7 @@ export function useAuth() {
     initialCount: 60
   })
 
-  // 登录
+  // Login
   const login = async (form: LoginForm) => {
     loading.value = true
     try {
@@ -68,13 +68,13 @@ export function useAuth() {
       })
 
       if (res.code === 200) {
-        // 设置用户信息
+        // Define as informações do usuário
         userStore.setUserInfo(res.data.user)
-        // 设置权限信息
+        // Define as informações de permissões
         userStore.setPermissions(res.data.permissions)
-        // 设置后台权限角色信息
+        // Define as informações de papéis/permissões do backend
         userStore.setAuthRole(res.data.authRole)
-        // 设置token
+        // Define o token
         userStore.setToken(res.data.token)
         userStore.setRefreshToken(res.data.refreshToken)
 
@@ -91,30 +91,30 @@ export function useAuth() {
 
         message.success(t('auth.loginSuccess'))
         
-        // 根据用户类型跳转到不同页面
-        // 管理员跳转到 dashboard，普通用户跳转到 agents
+        // Redireciona para páginas diferentes conforme o tipo de usuário
+        // Administradores vão para o dashboard, usuários comuns vão para agents
         const isAdmin = res.data.user && res.data.user.isAdmin === '1'
         const defaultRoute = isAdmin ? ROUTES.DASHBOARD : ROUTES.DEVICE
         
-        // 获取重定向路径
+        // Obtém o caminho de redirecionamento
         let redirect = router.currentRoute.value.query.redirect as string || defaultRoute
         
-        // 检查用户是否有权限访问redirect路径
+        // Verifica se o usuário tem permissão para acessar o caminho de redirecionamento
         if (redirect && redirect !== defaultRoute) {
           const targetRoute = router.resolve(redirect)
           if (targetRoute && targetRoute.meta) {
-            // 检查是否需要管理员权限
+            // Verifica se é necessária permissão de administrador
             if (targetRoute.meta.isAdmin && !isAdmin) {
               redirect = defaultRoute
             }
-            // 检查特定权限
+            // Verifica uma permissão específica
             else if (targetRoute.meta.permission) {
               const hasPermission = userStore.hasPermission(targetRoute.meta.permission as string)
               if (!hasPermission) {
                 redirect = defaultRoute
               }
             }
-            // 检查多个权限（任一即可）
+            // Verifica múltiplas permissões (basta uma)
             else if (targetRoute.meta.permissions && Array.isArray(targetRoute.meta.permissions)) {
               const hasAnyPermission = userStore.hasAnyPermission(targetRoute.meta.permissions as string[])
               if (!hasAnyPermission) {
@@ -124,7 +124,7 @@ export function useAuth() {
           }
         }
         
-        // 跳转到指定页面
+        // Redireciona para a página especificada
         router.push(redirect)
         return true
       } else {
@@ -139,7 +139,7 @@ export function useAuth() {
     }
   }
 
-  // 注册
+  // Registro
   const register = async (form: RegisterForm) => {
     loading.value = true
     try {
@@ -170,7 +170,7 @@ export function useAuth() {
     }
   }
 
-  // 重置密码
+  // Redefinir senha
   const resetPassword = async (form: ForgetPasswordForm) => {
     loading.value = true
     try {
@@ -210,7 +210,7 @@ export function useAuth() {
     }
   }
 
-  // 手机号验证码登录
+  // Login por código de verificação via celular
   const telLogin = async (form: MobileLoginForm) => {
     loading.value = true
     try {
@@ -220,41 +220,41 @@ export function useAuth() {
       })
 
       if (res.code === 200) {
-        // 设置用户信息
+        // Define as informações do usuário
         userStore.setUserInfo(res.data.user)
-        // 设置权限信息
+        // Define as informações de permissões
         userStore.setPermissions(res.data.permissions)
-        // 设置后台权限角色信息
+        // Define as informações de papéis/permissões do backend
         userStore.setAuthRole(res.data.authRole)
-        // 设置token
+        // Define o token
         userStore.setToken(res.data.token)
         userStore.setRefreshToken(res.data.refreshToken)
 
         message.success(t('auth.loginSuccess'))
         
-        // 根据用户类型跳转到不同页面
+        // Redireciona para páginas diferentes conforme o tipo de usuário
         const isAdmin = res.data.user && res.data.user.isAdmin === '1'
         const defaultRoute = isAdmin ? ROUTES.DASHBOARD : ROUTES.DEVICE
         
-        // 获取重定向路径
+        // Obtém o caminho de redirecionamento
         let redirect = router.currentRoute.value.query.redirect as string || defaultRoute
         
-        // 检查用户是否有权限访问redirect路径
+        // Verifica se o usuário tem permissão para acessar o caminho de redirecionamento
         if (redirect && redirect !== defaultRoute) {
           const targetRoute = router.resolve(redirect)
           if (targetRoute && targetRoute.meta) {
-            // 检查是否需要管理员权限
+            // Verifica se é necessária permissão de administrador
             if (targetRoute.meta.isAdmin && !isAdmin) {
               redirect = defaultRoute
             }
-            // 检查特定权限
+            // Verifica uma permissão específica
             else if (targetRoute.meta.permission) {
               const hasPermission = userStore.hasPermission(targetRoute.meta.permission as string)
               if (!hasPermission) {
                 redirect = defaultRoute
               }
             }
-            // 检查多个权限（任一即可）
+            // Verifica múltiplas permissões (basta uma)
             else if (targetRoute.meta.permissions && Array.isArray(targetRoute.meta.permissions)) {
               const hasAnyPermission = userStore.hasAnyPermission(targetRoute.meta.permissions as string[])
               if (!hasAnyPermission) {
@@ -267,7 +267,7 @@ export function useAuth() {
         router.push(redirect)
         return true
       } else if (res.code === 201) {
-        // 未注册的手机号
+        // Número de celular não cadastrado
         message.warning(res.message)
         router.push(ROUTES.REGISTER)
         return false
@@ -288,7 +288,7 @@ export function useAuth() {
     }
   }
 
-  // 发送短信验证码
+  // Enviar código de verificação por SMS
   const sendVerificationCode = async (tel: string) => {
     if (!tel) {
       message.error(t('auth.enterMobilePhone'))
@@ -308,7 +308,7 @@ export function useAuth() {
 
       if (res.code === 200) {
         message.success(t('auth.verificationCodeSent'))
-        // 开始倒计时（60秒）
+        // Inicia a contagem regressiva (60 segundos)
         startCountdown(60)
         return true
       } else {

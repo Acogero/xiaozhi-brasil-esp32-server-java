@@ -5,27 +5,27 @@ import { testVoice } from '@/services/role'
 import { getResourceUrl } from '@/utils/resource'
 
 /**
- * 音频播放 Composable
- * 统一封装音频播放逻辑，支持两种模式：
- * 1. 直接播放音频路径
- * 2. 通过API获取音频再播放
+ * Composable de reprodução de áudio
+ * Encapsula de forma unificada a lógica de reprodução de áudio, com suporte a dois modos:
+ * 1. Reprodução direta a partir do caminho do áudio
+ * 2. Obtenção do áudio via API antes de reproduzir
  */
 export function useAudioPlayer() {
   const { t } = useI18n()
 
-  // 播放状态
+  // Estado de reprodução
   const playingAudioId = ref<string>('')
-  const loadingAudioId = ref<string>('') // loading状态（API请求期间）
+  const loadingAudioId = ref<string>('') // estado de carregamento (durante a requisição da API)
   const audioCache = new Map<string, HTMLAudioElement>()
 
   /**
-   * 直接播放音频文件（用于剧本脚本播放）
-   * @param audioPath 音频路径
-   * @param audioId 音频唯一标识
+   * Reproduz diretamente um arquivo de áudio (usado na reprodução de roteiros)
+   * @param audioPath Caminho do áudio
+   * @param audioId Identificador único do áudio
    */
   const playAudioDirect = async (audioPath: string, audioId: string): Promise<boolean> => {
     try {
-      // 如果正在播放同一个音频，则停止
+      // Se o mesmo áudio já estiver tocando, interrompe
       if (playingAudioId.value === audioId) {
         const audio = audioCache.get(audioId)
         if (audio) {
@@ -36,23 +36,23 @@ export function useAudioPlayer() {
         return true
       }
 
-      // 停止其他正在播放的音频
+      // Interrompe outros áudios em reprodução
       stopAllAudio()
 
-      // 创建或获取音频元素
+      // Cria ou obtém o elemento de áudio
       let audio = audioCache.get(audioId)
       if (!audio) {
         audio = new Audio()
         audioCache.set(audioId, audio)
 
-        // 设置音频结束回调
+        // Define o callback de término do áudio
         audio.onended = () => {
           if (playingAudioId.value === audioId) {
             playingAudioId.value = ''
           }
         }
 
-        // 设置错误回调
+        // Define o callback de erro
         audio.onerror = () => {
           message.error(t('common.audioPlayFailed'))
           if (playingAudioId.value === audioId) {
@@ -61,7 +61,7 @@ export function useAudioPlayer() {
         }
       }
 
-      // 设置音频源并播放
+      // Define a fonte do áudio e inicia a reprodução
       const audioUrl = getResourceUrl(audioPath)
       if (!audioUrl) {
         message.error(t('common.audioPathInvalid'))
@@ -75,20 +75,20 @@ export function useAudioPlayer() {
 
       return true
     } catch (error) {
-      // 播放失败，清除播放状态
-      // 注意：不在这里显示错误提示，因为 audio.onerror 会处理错误提示
+      // Falha na reprodução, limpa o estado de reprodução
+      // Observação: não exibe mensagem de erro aqui, pois audio.onerror já trata isso
       playingAudioId.value = ''
       return false
     }
   }
 
   /**
-   * 通过API测试音色并播放（用于音色测试）
-   * @param voiceName 音色名称
-   * @param ttsId TTS配置ID
-   * @param provider TTS提供商
-   * @param audioId 音频唯一标识
-   * @param testMessage 测试文本
+   * Testa a voz via API e reproduz o resultado (usado no teste de voz)
+   * @param voiceName Nome da voz
+   * @param ttsId ID da configuração de TTS
+   * @param provider Provedor de TTS
+   * @param audioId Identificador único do áudio
+   * @param testMessage Texto de teste
    */
   const playAudioFromApi = async (
     voiceName: string,
@@ -98,7 +98,7 @@ export function useAudioPlayer() {
     testMessage?: string
   ): Promise<boolean> => {
     try {
-      // 如果正在播放同一个音频，则停止
+      // Se o mesmo áudio já estiver tocando, interrompe
       if (playingAudioId.value === audioId) {
         const audio = audioCache.get(audioId)
         if (audio) {
@@ -109,10 +109,10 @@ export function useAudioPlayer() {
         return true
       }
 
-      // 停止其他正在播放的音频
+      // Interrompe outros áudios em reprodução
       stopAllAudio()
 
-      // 设置loading状态（API请求期间）
+      // Define o estado de carregamento (durante a requisição da API)
       loadingAudioId.value = audioId
       
       const res = await testVoice({
@@ -122,7 +122,7 @@ export function useAudioPlayer() {
         message: testMessage || t('role.voiceTestMessage')
       })
 
-      // 清除loading状态
+      // Limpa o estado de carregamento
       loadingAudioId.value = ''
 
       if (res.code !== 200 || !res.data) {
@@ -130,20 +130,20 @@ export function useAudioPlayer() {
         return false
       }
 
-      // 创建或获取音频元素
+      // Cria ou obtém o elemento de áudio
       let audio = audioCache.get(audioId)
       if (!audio) {
         audio = new Audio()
         audioCache.set(audioId, audio)
 
-        // 设置音频结束回调
+        // Define o callback de término do áudio
         audio.onended = () => {
           if (playingAudioId.value === audioId) {
             playingAudioId.value = ''
           }
         }
 
-        // 设置错误回调
+        // Define o callback de erro
         audio.onerror = () => {
           message.error(t('common.audioPlayFailed'))
           if (playingAudioId.value === audioId) {
@@ -152,7 +152,7 @@ export function useAudioPlayer() {
         }
       }
 
-      // 设置音频源并播放
+      // Define a fonte do áudio e inicia a reprodução
       const audioUrl = getResourceUrl(res.data)
       if (!audioUrl) {
         message.error(t('common.audioPathInvalid'))
@@ -163,12 +163,12 @@ export function useAudioPlayer() {
       
       await audio.play()
       
-      // 播放成功后设置playing状态
+      // Define o estado de reprodução após o sucesso
       playingAudioId.value = audioId
 
       return true
     } catch (error) {
-      console.error('测试音色失败:', error)
+      console.error('Falha ao testar a voz:', error)
       message.error(t('common.audioTestFailed'))
       loadingAudioId.value = ''
       if (playingAudioId.value === audioId) {
@@ -179,7 +179,7 @@ export function useAudioPlayer() {
   }
 
   /**
-   * 停止所有音频播放
+   * Interrompe toda a reprodução de áudio
    */
   const stopAllAudio = () => {
     audioCache.forEach((audio) => {
@@ -190,7 +190,7 @@ export function useAudioPlayer() {
   }
 
   /**
-   * 停止指定音频播放
+   * Interrompe a reprodução de um áudio específico
    */
   const stopAudio = (audioId: string) => {
     const audio = audioCache.get(audioId)
@@ -204,14 +204,14 @@ export function useAudioPlayer() {
   }
 
   /**
-   * 检查指定音频是否正在播放
+   * Verifica se um áudio específico está em reprodução
    */
   const isPlaying = (audioId: string): boolean => {
     return playingAudioId.value === audioId
   }
 
   /**
-   * 清理音频缓存
+   * Limpa o cache de áudio
    */
   const clearAudioCache = () => {
     stopAllAudio()

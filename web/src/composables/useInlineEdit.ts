@@ -1,28 +1,28 @@
 import { ref, type Ref } from 'vue'
 
 /**
- * 行内编辑 Composable
- * 用于表格行内编辑功能
+ * Composable de edição em linha
+ * Usado para funcionalidade de edição em linha em tabelas
  */
 
 export interface UseInlineEditOptions<T> {
   /**
-   * 获取项的唯一标识
-   * @param item 数据项
-   * @returns 唯一标识（通常是 ID）
+   * Obtém o identificador único do item
+   * @param item Item de dados
+   * @returns Identificador único (geralmente o ID)
    */
   getKey: (item: T) => string | number
   
   /**
-   * 保存回调函数
-   * @param item 编辑后的数据项
-   * @returns 是否成功，返回 false 时不退出编辑模式
+   * Função de callback de salvamento
+   * @param item Item de dados após edição
+   * @returns Indica sucesso; se retornar false, não sai do modo de edição
    */
   onSave?: (item: T) => Promise<boolean | void>
   
   /**
-   * 取消编辑回调
-   * @param item 取消编辑的数据项
+   * Callback de cancelamento de edição
+   * @param item Item de dados com edição cancelada
    */
   onCancel?: (item: T) => void
 }
@@ -36,68 +36,68 @@ export function useInlineEdit<T extends EditableItem>(
   dataSource: Ref<T[]>,
   options: UseInlineEditOptions<T>
 ) {
-  // 当前编辑的 key
+  // Key do item atualmente em edição
   const editingKey = ref<string | number>('')
   
-  // 缓存数据（用于取消编辑时恢复）
+  // Dados em cache (usados para restaurar ao cancelar a edição)
   const cacheData = ref<T[]>([])
   
   /**
-   * 判断是否正在编辑某项
+   * Verifica se um item está sendo editado
    */
   const isEditing = (key: string | number): boolean => {
     return editingKey.value === key
   }
   
   /**
-   * 开始编辑
-   * @param key 要编辑项的 key
+   * Inicia a edição
+   * @param key Key do item a ser editado
    */
   const startEdit = (key: string | number) => {
-    // 取消其他行的编辑状态
+    // Cancela o estado de edição de outras linhas
     dataSource.value.forEach(item => {
       if (item.editable) {
         item.editable = false
       }
     })
     
-    // 开始编辑目标行
+    // Inicia a edição da linha alvo
     const target = dataSource.value.find(item => options.getKey(item) === key)
     if (target) {
-      // 备份当前数据
+      // Faz backup dos dados atuais
       cacheData.value = dataSource.value.map(item => ({ ...item }))
       
-      // 设置编辑状态
+      // Define o estado de edição
       target.editable = true
       editingKey.value = key
     }
   }
   
   /**
-   * 取消编辑
-   * @param key 要取消编辑项的 key
+   * Cancela a edição
+   * @param key Key do item a ter a edição cancelada
    */
   const cancelEdit = (key: string | number) => {
     const target = dataSource.value.find(item => options.getKey(item) === key)
     const cache = cacheData.value.find(item => options.getKey(item as T) === key)
     
     if (target && cache) {
-      // 恢复缓存数据
+      // Restaura os dados em cache
       Object.assign(target, cache)
       target.editable = false
     }
     
     editingKey.value = ''
     
-    // 触发取消回调
+    // Dispara o callback de cancelamento
     if (target) {
       options.onCancel?.(target)
     }
   }
   
   /**
-   * 保存编辑
-   * @param item 编辑后的数据项
+   * Salva a edição
+   * @param item Item de dados após edição
    */
   const saveEdit = async (item: T): Promise<boolean> => {
     if (!options.onSave) {
@@ -109,7 +109,7 @@ export function useInlineEdit<T extends EditableItem>(
     try {
       const result = await options.onSave(item)
       
-      // 如果返回 false，不退出编辑模式
+      // Se retornar false, não sai do modo de edição
       if (result === false) {
         return false
       }
@@ -118,16 +118,16 @@ export function useInlineEdit<T extends EditableItem>(
       editingKey.value = ''
       return true
     } catch (error) {
-      console.error('保存失败:', error)
+      console.error('Falha ao salvar:', error)
       return false
     }
   }
   
   /**
-   * 更新字段值
-   * @param key 项的 key
-   * @param field 字段名
-   * @param value 新值
+   * Atualiza o valor do campo
+   * @param key Key do item
+   * @param field Nome do campo
+   * @param value Novo valor
    */
   const updateField = <K extends keyof T>(
     key: string | number,
@@ -141,11 +141,11 @@ export function useInlineEdit<T extends EditableItem>(
   }
   
   return {
-    // 状态
+    // Estado
     editingKey,
     cacheData,
     
-    // 方法
+    // Métodos
     isEditing,
     startEdit,
     cancelEdit,

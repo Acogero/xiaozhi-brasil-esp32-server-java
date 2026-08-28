@@ -1,43 +1,43 @@
 import { ref, computed, nextTick, onMounted, onBeforeUnmount, type Ref } from 'vue'
 
 /**
- * 滚动管理 Composable
- * 用于管理容器的滚动行为
+ * Composable de gerenciamento de rolagem
+ * Usado para gerenciar o comportamento de rolagem do contêiner
  */
 
 export interface UseScrollOptions {
   /**
-   * 滚动容器引用
+   * Referência do contêiner de rolagem
    */
   container?: Ref<HTMLElement | undefined>
   
   /**
-   * 滚动到底部的阈值（像素），小于此值认为在底部
+   * Limite (em pixels) para considerar que chegou ao final; valores abaixo disso são considerados no final
    */
   bottomThreshold?: number
   
   /**
-   * 滚动到顶部的阈值（像素），小于此值认为在顶部
+   * Limite (em pixels) para considerar que chegou ao topo; valores abaixo disso são considerados no topo
    */
   topThreshold?: number
   
   /**
-   * 是否启用滚动监听
+   * Indica se o monitoramento de rolagem está habilitado
    */
   enableScrollListener?: boolean
   
   /**
-   * 滚动事件回调
+   * Callback do evento de rolagem
    */
   onScroll?: (scrollInfo: ScrollInfo) => void
   
   /**
-   * 到达底部回调
+   * Callback ao chegar ao final
    */
   onReachBottom?: () => void
   
   /**
-   * 到达顶部回调
+   * Callback ao chegar ao topo
    */
   onReachTop?: () => void
 }
@@ -56,7 +56,7 @@ export function useScroll(options: UseScrollOptions = {}) {
   const bottomThreshold = options.bottomThreshold || 50
   const topThreshold = options.topThreshold || 10
   
-  // 滚动信息
+  // Informações de rolagem
   const scrollTop = ref(0)
   const scrollLeft = ref(0)
   const scrollHeight = ref(0)
@@ -64,30 +64,30 @@ export function useScroll(options: UseScrollOptions = {}) {
   const clientHeight = ref(0)
   const clientWidth = ref(0)
   
-  // 是否在底部
+  // Indica se está no final
   const isAtBottom = computed(() => {
     if (!containerRef.value) return false
     return scrollHeight.value - scrollTop.value - clientHeight.value <= bottomThreshold
   })
   
-  // 是否在顶部
+  // Indica se está no topo
   const isAtTop = computed(() => {
     return scrollTop.value <= topThreshold
   })
   
-  // 是否可以滚动
+  // Indica se é possível rolar
   const isScrollable = computed(() => {
     return scrollHeight.value > clientHeight.value
   })
   
-  // 滚动百分比
+  // Percentual de rolagem
   const scrollPercentage = computed(() => {
     if (!isScrollable.value) return 0
     return Math.round((scrollTop.value / (scrollHeight.value - clientHeight.value)) * 100)
   })
   
   /**
-   * 更新滚动信息
+   * Atualiza as informações de rolagem
    */
   const updateScrollInfo = () => {
     if (!containerRef.value) return
@@ -100,7 +100,7 @@ export function useScroll(options: UseScrollOptions = {}) {
     clientHeight.value = el.clientHeight
     clientWidth.value = el.clientWidth
     
-    // 触发回调
+    // Dispara o callback
     if (options.onScroll) {
       options.onScroll({
         scrollTop: scrollTop.value,
@@ -112,19 +112,19 @@ export function useScroll(options: UseScrollOptions = {}) {
       })
     }
     
-    // 触发到达底部回调
+    // Dispara o callback de chegada ao final
     if (isAtBottom.value && options.onReachBottom) {
       options.onReachBottom()
     }
     
-    // 触发到达顶部回调
+    // Dispara o callback de chegada ao topo
     if (isAtTop.value && options.onReachTop) {
       options.onReachTop()
     }
   }
   
   /**
-   * 滚动到底部
+   * Rola até o final
    */
   const scrollToBottom = (smooth = true) => {
     nextTick(() => {
@@ -140,7 +140,7 @@ export function useScroll(options: UseScrollOptions = {}) {
   }
   
   /**
-   * 滚动到顶部
+   * Rola até o topo
    */
   const scrollToTop = (smooth = true) => {
     nextTick(() => {
@@ -156,7 +156,7 @@ export function useScroll(options: UseScrollOptions = {}) {
   }
   
   /**
-   * 滚动到指定位置
+   * Rola até a posição especificada
    */
   const scrollTo = (options: { top?: number; left?: number; smooth?: boolean }) => {
     nextTick(() => {
@@ -173,7 +173,7 @@ export function useScroll(options: UseScrollOptions = {}) {
   }
   
   /**
-   * 滚动到指定元素
+   * Rola até o elemento especificado
    */
   const scrollToElement = (
     selector: string | HTMLElement,
@@ -191,7 +191,7 @@ export function useScroll(options: UseScrollOptions = {}) {
       }
       
       if (!element) {
-        console.warn('找不到目标元素:', selector)
+        console.warn('Elemento alvo não encontrado:', selector)
         return
       }
       
@@ -206,7 +206,7 @@ export function useScroll(options: UseScrollOptions = {}) {
   }
   
   /**
-   * 滚动指定距离
+   * Rola a distância especificada
    */
   const scrollBy = (options: { top?: number; left?: number; smooth?: boolean }) => {
     nextTick(() => {
@@ -222,12 +222,12 @@ export function useScroll(options: UseScrollOptions = {}) {
     })
   }
   
-  // 滚动事件处理
+  // Tratamento do evento de rolagem
   const handleScroll = () => {
     updateScrollInfo()
   }
   
-  // 挂载时初始化
+  // Inicializa na montagem
   onMounted(() => {
     if (options.enableScrollListener !== false && containerRef.value) {
       containerRef.value.addEventListener('scroll', handleScroll)
@@ -235,7 +235,7 @@ export function useScroll(options: UseScrollOptions = {}) {
     }
   })
   
-  // 卸载时清理
+  // Limpa na desmontagem
   onBeforeUnmount(() => {
     if (containerRef.value) {
       containerRef.value.removeEventListener('scroll', handleScroll)
@@ -243,10 +243,10 @@ export function useScroll(options: UseScrollOptions = {}) {
   })
   
   return {
-    // 容器引用
+    // Referência do contêiner
     containerRef,
     
-    // 滚动信息
+    // Informações de rolagem
     scrollTop,
     scrollLeft,
     scrollHeight,
@@ -254,13 +254,13 @@ export function useScroll(options: UseScrollOptions = {}) {
     clientHeight,
     clientWidth,
     
-    // 计算属性
+    // Propriedades computadas
     isAtBottom,
     isAtTop,
     isScrollable,
     scrollPercentage,
     
-    // 方法
+    // Métodos
     scrollToBottom,
     scrollToTop,
     scrollTo,

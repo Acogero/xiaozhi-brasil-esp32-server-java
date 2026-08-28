@@ -1,6 +1,6 @@
 /**
- * Web 聊天会话 Composable
- * 统一管理会话状态、消息流、历史记录
+ * Composable de sessão de chat Web
+ * Gerencia de forma unificada o estado da sessão, o fluxo de mensagens e o histórico
  */
 
 import { ref, onBeforeUnmount } from 'vue'
@@ -11,24 +11,24 @@ import type { ChatMessage } from '@/types/chat'
 import type { Conversation, Message } from '@/types/message'
 
 export function useChatSession() {
-  // 会话状态
+  // Estado da sessão
   const sessionId = ref<string>('')
-  const activeSessionId = ref<string>('') // 通过 openChatSession 打开的活跃会话
+  const activeSessionId = ref<string>('') // sessão ativa aberta via openChatSession
   const connecting = ref(false)
 
-  // 历史会话列表
+  // Lista de sessões do histórico
   const conversations = ref<Conversation[]>([])
   const loadingConversations = ref(false)
 
-  // 聊天消息
+  // Mensagens do chat
   const messages = ref<ChatMessage[]>([])
   const sending = ref(false)
   const messageIdCounter = ref(0)
 
-  // 思考区域展开/收起状态
+  // Estado de expansão/recolhimento da área de raciocínio
   const thinkingExpanded = ref<Record<number, boolean>>({})
 
-  // 当前流式请求的 AbortController
+  // AbortController da requisição de streaming atual
   let currentAbort: AbortController | null = null
 
   function toggleThinking(msgId: number) {
@@ -38,39 +38,39 @@ export function useChatSession() {
   async function loadConversations() {
     loadingConversations.value = true
     try {
-      // 仅加载 Web 来源的会话，避免混入设备对话（每次连接都会产生新 sessionId）
+      // Carrega apenas sessões originadas da Web, evitando misturar com conversas do dispositivo (cada conexão gera um novo sessionId)
       const res = await queryConversations({ pageNo: 1, pageSize: 50, source: 'web' })
       conversations.value = res.data.list
     } catch (e: unknown) {
-      antMessage.error('加载历史会话失败: ' + (e instanceof Error ? e.message : String(e)))
+      antMessage.error('Falha ao carregar o histórico de sessões: ' + (e instanceof Error ? e.message : String(e)))
     } finally {
       loadingConversations.value = false
     }
   }
 
   /**
-   * 选择一个历史会话，加载其消息记录
-   * @returns 是否成功切换（sending 中或相同会话返回 false）
+   * Seleciona uma sessão do histórico e carrega o registro de mensagens
+   * @returns Se a troca foi bem-sucedida (retorna false se estiver enviando ou for a mesma sessão)
    */
   async function selectConversation(
     conv: Conversation,
     onAfterLoad?: () => void
   ): Promise<boolean> {
     if (sending.value) {
-      antMessage.warning('当前对话正在进行中，请稍后再试')
+      antMessage.warning('A conversa atual está em andamento, tente novamente mais tarde')
       return false
     }
 
     if (sessionId.value === conv.sessionId) return false
 
-    // 关闭当前可能活跃的会话
+    // Encerra a sessão atualmente ativa, se houver
     abortCurrentStream()
     await closeActiveSessionQuietly()
 
     sessionId.value = conv.sessionId
     messages.value = []
 
-    // 加载该会话的历史消息
+    // Carrega as mensagens do histórico dessa sessão
     try {
       const res = await queryMessages({
         pageNo: 1,
@@ -78,7 +78,7 @@ export function useChatSession() {
         sessionId: conv.sessionId,
       })
 
-      // 接口返回是倒序的(ORDER BY createTime DESC)，我们需要正序显示
+      // A API retorna em ordem decrescente (ORDER BY createTime DESC), precisamos exibir em ordem crescente
       const historyMsgs: ChatMessage[] = res.data.list.reverse().map((m: Message) => ({
         id: ++messageIdCounter.value,
         role: m.sender === 'user' ? 'user' : 'assistant',
@@ -90,7 +90,7 @@ export function useChatSession() {
       onAfterLoad?.()
       return true
     } catch (e: unknown) {
-      antMessage.error('加载消息记录失败: ' + (e instanceof Error ? e.message : String(e)))
+      antMessage.error('Falha ao carregar o registro de mensagens: ' + (e instanceof Error ? e.message : String(e)))
       return false
     }
   }
@@ -115,18 +115,18 @@ export function useChatSession() {
       try {
         await closeChatSession(activeSessionId.value)
       } catch {
-        // 忽略关闭错误
+        // Ignora erros ao encerrar
       }
       activeSessionId.value = ''
     }
   }
 
   /**
-   * 发送消息并处理流式响应
-   * @param text 用户输入文本
-   * @param roleId 当前选中的角色
-   * @param onScroll 每收到新内容时的回调（通常用于滚动到底部）
-   * @returns 本轮是否新开/续接了会话（若是，调用者可刷新历史列表）
+   * Envia a mensagem e trata a resposta em streaming
+   * @param text Texto inserido pelo usuário
+   * @param roleId ID do personagem atualmente selecionado
+   * @param onScroll Callback disparado a cada novo conteúdo recebido (geralmente usado para rolar até o final)
+   * @returns Se esta rodada abriu uma nova sessão ou deu continuidade a uma existente (em caso positivo, o chamador pode atualizar a lista de histórico)
    */
   async function sendMessage(
     text: string,
@@ -135,7 +135,7 @@ export function useChatSession() {
   ): Promise<{ openedNow: boolean; success: boolean }> {
     if (!text || sending.value) return { openedNow: false, success: false }
 
-    // 若无活跃会话，则打开一次：sessionId 已有值（浏览历史后续聊）→ 传给后端续接；否则创建新会话
+    // Se não houver sessão ativa, abre uma: se sessionId já tiver valor (continuação após navegar pelo histórico) → é enviado ao backend para dar continuidade; caso contrário, cria uma nova sessão
     let openedNow = false
     if (!activeSessionId.value) {
       connecting.value = true
@@ -146,14 +146,14 @@ export function useChatSession() {
         activeSessionId.value = data.sessionId
         openedNow = true
       } catch (e: unknown) {
-        antMessage.error('建立会话失败: ' + (e instanceof Error ? e.message : String(e)))
+        antMessage.error('Falha ao estabelecer a sessão: ' + (e instanceof Error ? e.message : String(e)))
         connecting.value = false
         return { openedNow: false, success: false }
       }
       connecting.value = false
     }
 
-    // 添加用户消息
+    // Adiciona a mensagem do usuário
     messages.value.push({
       id: ++messageIdCounter.value,
       role: 'user',
@@ -162,7 +162,7 @@ export function useChatSession() {
     })
     onScroll?.()
 
-    // 添加 AI 占位消息
+    // Adiciona a mensagem de placeholder da IA
     messages.value.push({
       id: ++messageIdCounter.value,
       role: 'assistant',
@@ -170,7 +170,7 @@ export function useChatSession() {
       timestamp: new Date(),
       streaming: true,
     })
-    // 从响应式数组中获取代理对象，确保后续修改能触发视图更新
+    // Obtém o objeto proxy a partir do array reativo, garantindo que alterações subsequentes disparem a atualização da view
     const assistantMsg = messages.value[messages.value.length - 1]!
     onScroll?.()
 
@@ -182,7 +182,7 @@ export function useChatSession() {
         if (token.type === 'thinking') {
           assistantMsg.thinking = (assistantMsg.thinking || '') + token.text
         } else {
-          // 思考阶段结束，标记为已完成
+          // Etapa de raciocínio concluída, marca como finalizada
           if (assistantMsg.thinking && !assistantMsg.thinkingDone) {
             assistantMsg.thinkingDone = true
           }
@@ -190,15 +190,15 @@ export function useChatSession() {
         }
         onScroll?.()
       }
-      // 流结束后确保 thinking 标记为 done
+      // Garante que thinking seja marcado como done após o fim do streaming
       if (assistantMsg.thinking && !assistantMsg.thinkingDone) {
         assistantMsg.thinkingDone = true
       }
     } catch (e: unknown) {
       if (e instanceof DOMException && e.name === 'AbortError') {
-        // 用户主动取消
+        // Cancelado pelo usuário
       } else {
-        assistantMsg.content += '\n\n⚠️ 回复中断: ' + (e instanceof Error ? e.message : String(e))
+        assistantMsg.content += '\n\n⚠️ Resposta interrompida: ' + (e instanceof Error ? e.message : String(e))
       }
     } finally {
       assistantMsg.streaming = false
@@ -210,7 +210,7 @@ export function useChatSession() {
     return { openedNow, success: true }
   }
 
-  // 组件卸载时清理
+  // Limpeza ao desmontar o componente
   onBeforeUnmount(() => {
     abortCurrentStream()
     if (activeSessionId.value) {
@@ -219,7 +219,7 @@ export function useChatSession() {
   })
 
   return {
-    // 状态
+    // Estado
     sessionId,
     activeSessionId,
     connecting,
@@ -228,7 +228,7 @@ export function useChatSession() {
     conversations,
     loadingConversations,
     thinkingExpanded,
-    // 操作
+    // Ações
     loadConversations,
     selectConversation,
     startNewChat,

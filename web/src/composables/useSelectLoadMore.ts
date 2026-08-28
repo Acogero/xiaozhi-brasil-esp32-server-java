@@ -4,8 +4,8 @@ import type { PageResponse } from '@/types/api'
 const PAGE_SIZE = 50
 
 /**
- * 下拉框滚动加载更多 Composable
- * 支持初始加载 + 滚动到底部自动加载下一页
+ * Composable de carregamento incremental por rolagem no dropdown
+ * Suporta carregamento inicial + carregamento automático da próxima página ao rolar até o final
  */
 export function useSelectLoadMore<T extends object>(
   fetchFn: (params: { pageNo: number; pageSize: number }) => Promise<PageResponse<T>>
