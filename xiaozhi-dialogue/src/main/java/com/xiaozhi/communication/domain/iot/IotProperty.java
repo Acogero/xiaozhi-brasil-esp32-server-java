@@ -4,20 +4,20 @@ import com.xiaozhi.utils.JsonUtil;
 import lombok.Data;
 
 /**
- * function_call的参数定义
+ * Definição de parâmetro de function_call
  */
 @Data
 public class IotProperty {
     /**
-     * 参数描述
+     * Descrição do parâmetro
      */
     private String description;
     /**
-     * 参数类型
+     * Tipo do parâmetro
      */
     private String type;
     /**
-     * 参数值
+     * Valor do parâmetro
      */
     private Object value;
 
