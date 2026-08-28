@@ -10,8 +10,8 @@ import java.util.function.Supplier;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 缓存助手类
- * 提供带分布式锁的缓存查询,防止缓存击穿
+ * Classe auxiliar de cache
+ * Fornece consulta de cache com lock distribuído, evitando o esgotamento de cache (cache breakdown)
  *
  * @author Joey
  */
@@ -23,71 +23,71 @@ public class CacheHelper {
     private RedissonClient redissonClient;
 
     /**
-     * 带分布式锁的缓存查询
-     * 防止缓存击穿 - 当缓存失效时,只有一个请求去查询数据库
+     * Consulta de cache com lock distribuído
+     * Evita o esgotamento de cache - quando o cache expira, apenas uma requisição consulta o banco de dados
      *
-     * @param lockKey 锁的key
-     * @param cacheGetter 从缓存获取数据的函数
-     * @param dbGetter 从数据库获取数据的函数
-     * @param <T> 数据类型
-     * @return 数据
+     * @param lockKey chave do lock
+     * @param cacheGetter função que obtém os dados do cache
+     * @param dbGetter função que obtém os dados do banco de dados
+     * @param <T> tipo de dado
+     * @return dados
      */
     public <T> T getWithLock(String lockKey, Supplier<T> cacheGetter, Supplier<T> dbGetter) {
-        // 1. 先尝试从缓存获取
+        // 1. Tenta obter do cache primeiro
         T cached = cacheGetter.get();
         if (cached != null) {
             return cached;
         }
 
-        // 2. 缓存未命中,使用分布式锁
+        // 2. Cache não encontrado, usa lock distribuído
         RLock lock = redissonClient.getLock("lock:" + lockKey);
 
         try {
-            // 尝试获取锁,最多等待3秒,锁10秒后自动释放
+            // Tenta obter o lock, aguardando no máximo 3 segundos; o lock é liberado automaticamente após 10 segundos
             if (lock.tryLock(3, 10, TimeUnit.SECONDS)) {
                 try {
-                    // 3. 双重检查,避免重复查询数据库
+                    // 3. Verificação dupla, evita consultar o banco de dados novamente
                     cached = cacheGetter.get();
                     if (cached != null) {
-                        log.debug("获取锁后从缓存命中: {}", lockKey);
+                        log.debug("Cache encontrado após obter o lock: {}", lockKey);
                         return cached;
                     }
 
-                    // 4. 查询数据库
-                    log.debug("从数据库查询: {}", lockKey);
+                    // 4. Consulta o banco de dados
+                    log.debug("Consultando o banco de dados: {}", lockKey);
                     T result = dbGetter.get();
 
-                    // 5. 结果会通过@Cacheable自动写入缓存
+                    // 5. O resultado será gravado no cache automaticamente via @Cacheable
                     return result;
 
                 } finally {
                     lock.unlock();
                 }
             } else {
-                // 获取锁失败,直接查询数据库(降级策略)
-                log.warn("获取锁超时,直接查询数据库: {}", lockKey);
+                // Falha ao obter o lock, consulta o banco de dados diretamente (estratégia de fallback)
+                log.warn("Timeout ao obter o lock, consultando o banco de dados diretamente: {}", lockKey);
                 return dbGetter.get();
             }
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.error("获取锁被中断: {}", lockKey, e);
-            // 降级: 直接查询数据库
+            log.error("Obtenção do lock interrompida: {}", lockKey, e);
+            // Fallback: consulta o banco de dados diretamente
             return dbGetter.get();
         } catch (Exception e) {
-            log.error("分布式锁异常: {}", lockKey, e);
-            // 降级: 直接查询数据库
+            log.error("Exceção no lock distribuído: {}", lockKey, e);
+            // Fallback: consulta o banco de dados diretamente
             return dbGetter.get();
         }
     }
 
     /**
-     * 简化版 - 带分布式锁的操作
+     * Versão simplificada - operação com lock distribuído
      *
-     * @param lockKey 锁的key
-     * @param supplier 需要执行的操作
-     * @param <T> 返回类型
-     * @return 操作结果
+     * @param lockKey chave do lock
+     * @param supplier operação a ser executada
+     * @param <T> tipo de retorno
+     * @return resultado da operação
      */
     public <T> T executeWithLock(String lockKey, Supplier<T> supplier) {
         RLock lock = redissonClient.getLock("lock:" + lockKey);
@@ -100,15 +100,15 @@ public class CacheHelper {
                     lock.unlock();
                 }
             } else {
-                log.warn("获取锁超时: {}", lockKey);
+                log.warn("Timeout ao obter o lock: {}", lockKey);
                 return null;
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.error("获取锁被中断: {}", lockKey, e);
+            log.error("Obtenção do lock interrompida: {}", lockKey, e);
             return null;
         } catch (Exception e) {
-            log.error("执行带锁操作异常: {}", lockKey, e);
+            log.error("Exceção ao executar operação com lock: {}", lockKey, e);
             return null;
         }
     }

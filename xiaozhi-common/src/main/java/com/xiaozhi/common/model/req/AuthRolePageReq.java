@@ -6,15 +6,15 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "后台权限角色分页查询")
+@Schema(description = "Consulta paginada de papéis de permissão do backend")
 public class AuthRolePageReq extends BasePageReq {
 
-    @Schema(description = "角色名称")
+    @Schema(description = "Nome do papel")
     private String authRoleName;
 
-    @Schema(description = "角色标识")
+    @Schema(description = "Identificador do papel")
     private String roleKey;
 
-    @Schema(description = "状态")
+    @Schema(description = "Status")
     private String status;
 }

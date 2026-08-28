@@ -5,26 +5,26 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-@Schema(description = "测试语音合成请求")
+@Schema(description = "Requisição de teste de síntese de voz")
 public class TestVoiceReq {
 
-    @Schema(description = "消息文本", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "消息文本不能为空")
+    @Schema(description = "Texto da mensagem", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "O texto da mensagem não pode ser vazio")
     private String message;
 
-    @Schema(description = "语音合成提供方", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "提供方不能为空")
+    @Schema(description = "Provedor de síntese de voz", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "O provedor não pode ser vazio")
     private String provider;
 
-    @Schema(description = "TTS配置ID")
+    @Schema(description = "ID da configuração TTS")
     private Integer ttsId;
 
-    @Schema(description = "音色名称")
+    @Schema(description = "Nome do timbre de voz")
     private String voiceName;
 
-    @Schema(description = "语音音调(0.5-2.0)")
+    @Schema(description = "Tom de voz (0.5-2.0)")
     private Double ttsPitch;
 
-    @Schema(description = "语音语速(0.5-2.0)")
+    @Schema(description = "Velocidade da fala (0.5-2.0)")
     private Double ttsSpeed;
 }

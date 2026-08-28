@@ -11,18 +11,18 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "分页响应")
+@Schema(description = "Resposta paginada")
 public class PageResp<T> implements Serializable {
 
-    @Schema(description = "数据列表")
+    @Schema(description = "Lista de dados")
     private List<T> list;
 
-    @Schema(description = "总记录数")
+    @Schema(description = "Total de registros")
     private Long total;
 
-    @Schema(description = "页码")
+    @Schema(description = "Número da página")
     private Integer pageNo;
 
-    @Schema(description = "每页数量")
+    @Schema(description = "Itens por página")
     private Integer pageSize;
 }

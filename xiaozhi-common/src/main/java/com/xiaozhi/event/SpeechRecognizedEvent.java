@@ -4,15 +4,15 @@ import com.xiaozhi.common.domain.AbstractDomainEvent;
 import lombok.Getter;
 
 /**
- * STT 语音识别完成事件。
- * 在 DialogueService.startStt() 中，STT 识别出用户文本后同步发布。
+ * Evento de conclusão do reconhecimento de voz STT.
+ * Publicado de forma síncrona em DialogueService.startStt() assim que o STT reconhece o texto do usuário.
  *
- * <p><b>注意：此事件在虚拟线程中同步处理，监听器不应引入阻塞操作或延迟。</b>
+ * <p><b>Atenção: este evento é processado de forma síncrona em uma virtual thread; os listeners não devem introduzir operações bloqueantes ou atrasos.</b>
  *
- * <p>扩展点（当前无监听器）：
+ * <p>Pontos de extensão (atualmente sem listeners):
  * <ul>
- *   <li>情感分析日志：记录用户情感标签用于对话质量分析</li>
- *   <li>敏感词过滤：在 LLM 调用前对用户文本进行安全过滤</li>
+ *   <li>Log de análise de sentimento: registra o rótulo de emoção do usuário para análise de qualidade da conversa</li>
+ *   <li>Filtro de palavras sensíveis: aplica filtragem de segurança no texto do usuário antes de chamar o LLM</li>
  * </ul>
  */
 @Getter
@@ -21,7 +21,7 @@ public class SpeechRecognizedEvent extends AbstractDomainEvent {
     private final String sessionId;
     private final String text;
     /**
-     * 用户语音中检测到的情感标签，可能为 null。
+     * Rótulo de emoção detectado na voz do usuário, pode ser null.
      */
     private final String emotion;
 

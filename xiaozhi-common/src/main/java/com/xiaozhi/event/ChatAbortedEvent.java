@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.springframework.util.StringUtils;
 
 /**
- * 设备端（客户端）发起打断的事件
+ * Evento de interrupção iniciado pelo lado do dispositivo (cliente)
  */
 @Getter
 public class ChatAbortedEvent extends AbstractDomainEvent {
@@ -18,6 +18,6 @@ public class ChatAbortedEvent extends AbstractDomainEvent {
         super(source);
         this.sessionId = sessionId;
         this.deviceId = deviceId;
-        this.reason = StringUtils.hasText(reason) ? reason : "设备端打断";
+        this.reason = StringUtils.hasText(reason) ? reason : "Interrompido pelo dispositivo";
     }
 }

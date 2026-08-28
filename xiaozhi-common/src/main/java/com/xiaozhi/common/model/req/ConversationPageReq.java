@@ -6,12 +6,12 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "会话分页查询")
+@Schema(description = "Consulta paginada de sessões")
 public class ConversationPageReq extends BasePageReq {
 
-    @Schema(description = "角色ID")
+    @Schema(description = "ID do papel")
     private Integer roleId;
 
-    @Schema(description = "消息来源: web|device")
+    @Schema(description = "Origem da mensagem: web|device")
     private String source;
 }

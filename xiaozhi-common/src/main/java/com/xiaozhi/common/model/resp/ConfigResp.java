@@ -7,50 +7,50 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@Schema(description = "配置信息")
+@Schema(description = "Informações da configuração")
 public class ConfigResp {
 
-    @Schema(description = "配置ID")
+    @Schema(description = "ID da configuração")
     private Integer configId;
 
-    @Schema(description = "用户ID")
+    @Schema(description = "ID do usuário")
     private Integer userId;
 
-    @Schema(description = "配置名称")
+    @Schema(description = "Nome da configuração")
     private String configName;
 
-    @Schema(description = "配置描述")
+    @Schema(description = "Descrição da configuração")
     private String configDesc;
 
-    @Schema(description = "配置类型")
+    @Schema(description = "Tipo de configuração")
     private String configType;
 
-    @Schema(description = "模型类型")
+    @Schema(description = "Tipo de modelo")
     private String modelType;
 
-    @Schema(description = "服务提供商")
+    @Schema(description = "Provedor de serviço")
     private String provider;
 
-    @Schema(description = "服务提供商分配的AppId")
+    @Schema(description = "AppId atribuído pelo provedor de serviço")
     private String appId;
 
-    @Schema(description = "服务提供商的API地址")
+    @Schema(description = "Endereço da API do provedor de serviço")
     private String apiUrl;
 
-    @Schema(description = "状态(1启用 0禁用)")
+    @Schema(description = "Status (1 habilitado, 0 desabilitado)")
     private String state;
 
-    @Schema(description = "是否默认配置(1是 0否)")
+    @Schema(description = "Se é a configuração padrão (1 sim, 0 não)")
     private String isDefault;
 
-    @Schema(description = "是否启用思考模式")
+    @Schema(description = "Se o modo de pensamento está habilitado")
     private Boolean enableThinking;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Schema(description = "创建时间")
+    @Schema(description = "Data de criação")
     private LocalDateTime createTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Schema(description = "更新时间")
+    @Schema(description = "Data de atualização")
     private LocalDateTime updateTime;
 }

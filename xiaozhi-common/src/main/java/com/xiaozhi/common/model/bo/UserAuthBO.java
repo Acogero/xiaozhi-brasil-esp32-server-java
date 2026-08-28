@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 用户第三方授权信息 BO（对应 sys_user_auth 表）。
+ * BO de informações de autorização de terceiros do usuário (correspondente à tabela sys_user_auth).
  */
 @Data
 public class UserAuthBO {

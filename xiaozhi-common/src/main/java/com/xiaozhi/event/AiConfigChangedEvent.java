@@ -4,8 +4,8 @@ import com.xiaozhi.common.domain.AbstractDomainEvent;
 import lombok.Getter;
 
 /**
- * AI 模型配置变更事件（更新或删除）。
- * 由 ConfigRepositoryImpl.save() / delete() 发布，触发 STT/TTS/Token 缓存失效广播。
+ * Evento de alteração de configuração do modelo de IA (atualização ou exclusão).
+ * Publicado por ConfigRepositoryImpl.save() / delete(), dispara o broadcast de invalidação de cache de STT/TTS/Token.
  */
 @Getter
 public class AiConfigChangedEvent extends AbstractDomainEvent {

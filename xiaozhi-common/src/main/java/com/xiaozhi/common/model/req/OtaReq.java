@@ -3,29 +3,29 @@ package com.xiaozhi.common.model.req;
 import lombok.Data;
 
 /**
- * OTA 请求数据，由 Controller 从 HTTP 请求解析后传入 AppService。
+ * Dados da requisição OTA, extraídos pelo Controller a partir da requisição HTTP e repassados ao AppService.
  */
 @Data
 public class OtaReq {
 
-    /** 设备ID（MAC 地址） */
+    /** ID do dispositivo (endereço MAC) */
     private String deviceId;
 
-    /** 芯片型号 */
+    /** Modelo do chip */
     private String chipModelName;
 
-    /** 固件版本 */
+    /** Versão do firmware */
     private String version;
 
-    /** WiFi 名称 */
+    /** Nome do WiFi */
     private String wifiName;
 
-    /** 设备类型 */
+    /** Tipo de dispositivo */
     private String type;
 
-    /** 客户端 IP */
+    /** IP do cliente */
     private String ip;
 
-    /** 地理位置（由 AppService 通过 IP 解析填充） */
+    /** Localização geográfica (preenchida pelo AppService a partir da resolução do IP) */
     private String location;
 }

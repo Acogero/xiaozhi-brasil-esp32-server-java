@@ -4,15 +4,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@Schema(description = "更新设备请求")
+@Schema(description = "Requisição de atualização de dispositivo")
 public class DeviceUpdateReq {
 
-    @Schema(description = "设备名称")
+    @Schema(description = "Nome do dispositivo")
     private String deviceName;
 
-    @Schema(description = "角色ID")
+    @Schema(description = "ID do papel")
     private Integer roleId;
 
-    @Schema(description = "地理位置")
+    @Schema(description = "Localização geográfica")
     private String location;
 }

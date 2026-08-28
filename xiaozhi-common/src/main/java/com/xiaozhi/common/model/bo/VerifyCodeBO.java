@@ -5,12 +5,12 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 验证码 BO（对应 sys_code 表）。
+ * BO de código de verificação (correspondente à tabela sys_code).
  * <p>
- * sys_code 表为多用途验证码表，不同场景使用不同字段：
+ * A tabela sys_code é uma tabela de código de verificação multiuso, usando campos diferentes conforme o cenário:
  * <ul>
- *   <li>设备激活：deviceId、sessionId、type、code、audioPath</li>
- *   <li>用户注册：email、code</li>
+ *   <li>Ativação de dispositivo: deviceId, sessionId, type, code, audioPath</li>
+ *   <li>Registro de usuário: email, code</li>
  * </ul>
  */
 @Data

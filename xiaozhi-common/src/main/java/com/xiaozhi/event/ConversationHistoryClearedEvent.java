@@ -4,7 +4,7 @@ import com.xiaozhi.common.domain.AbstractDomainEvent;
 import lombok.Getter;
 
 /**
- * 对话历史清除事件，通知会话层通过 Redis 广播清除跨实例对话历史
+ * Evento de limpeza do histórico de conversa, notifica a camada de sessão para limpar o histórico de conversa entre instâncias via broadcast Redis
  */
 @Getter
 public class ConversationHistoryClearedEvent extends AbstractDomainEvent {

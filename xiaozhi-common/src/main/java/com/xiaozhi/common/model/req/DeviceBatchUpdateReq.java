@@ -5,13 +5,13 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-@Schema(description = "批量更新设备请求")
+@Schema(description = "Requisição de atualização em lote de dispositivos")
 public class DeviceBatchUpdateReq {
 
-    @NotBlank(message = "设备ID不能为空")
-    @Schema(description = "设备ID列表，以逗号分隔", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "O ID do dispositivo não pode ser vazio")
+    @Schema(description = "Lista de IDs de dispositivos, separados por vírgula", requiredMode = Schema.RequiredMode.REQUIRED)
     private String deviceIds;
 
-    @Schema(description = "角色ID")
+    @Schema(description = "ID do papel")
     private Integer roleId;
 }

@@ -1,7 +1,7 @@
 package com.xiaozhi.common.exception;
 
 /**
- * 用于表达已知的业务操作失败，但不属于参数错误或资源不存在。
+ * Usada para representar uma falha conhecida em operação de negócio, que não é erro de parâmetro nem recurso inexistente.
  */
 public class OperationFailedException extends RuntimeException {
 

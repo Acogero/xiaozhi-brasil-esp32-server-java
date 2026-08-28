@@ -5,27 +5,27 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-@Schema(description = "提示词模板创建请求")
+@Schema(description = "Requisição de criação de modelo de prompt")
 public class TemplateCreateReq {
 
-    @Schema(description = "模板名称", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "模板名称不能为空")
+    @Schema(description = "Nome do template", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "O nome do template não pode ser vazio")
     private String templateName;
 
-    @Schema(description = "模板描述")
+    @Schema(description = "Descrição do template")
     private String templateDesc;
 
-    @Schema(description = "模板内容", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "模板内容不能为空")
+    @Schema(description = "Conteúdo do template", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "O conteúdo do template não pode ser vazio")
     private String templateContent;
 
-    @Schema(description = "模板分类", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "模板分类不能为空")
+    @Schema(description = "Categoria do template", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "A categoria do template não pode ser vazia")
     private String category;
 
-    @Schema(description = "是否默认模板(1是 0否)")
+    @Schema(description = "Se é o modelo padrão (1 sim, 0 não)")
     private String isDefault;
 
-    @Schema(description = "状态(1启用 0禁用)")
+    @Schema(description = "Status (1 habilitado, 0 desabilitado)")
     private String state;
 }

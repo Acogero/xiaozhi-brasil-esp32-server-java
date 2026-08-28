@@ -3,21 +3,21 @@ package com.xiaozhi.common.domain;
 import java.time.Instant;
 
 /**
- * 领域事件标记接口。
- * 所有领域事件均应实现此接口，提供事件 ID 和发生时间。
+ * Interface marcadora de evento de domínio.
+ * Todos os eventos de domínio devem implementar esta interface, fornecendo o ID do evento e o momento em que ocorreu.
  * <p>
- * 现有事件同时继承 {@link org.springframework.context.ApplicationEvent}（Spring 事件分发）
- * 和实现本接口（领域语义标识），两者职责互补。
+ * Os eventos existentes herdam ao mesmo tempo de {@link org.springframework.context.ApplicationEvent} (despacho de eventos do Spring)
+ * e implementam esta interface (identificação semântica de domínio); as duas responsabilidades se complementam.
  */
 public interface DomainEvent {
 
     /**
-     * 事件唯一标识，用于幂等和审计追踪。
+     * Identificador único do evento, usado para idempotência e rastreamento de auditoria.
      */
     String eventId();
 
     /**
-     * 事件发生的时间点。
+     * Momento em que o evento ocorreu.
      */
     Instant occurredOn();
 }

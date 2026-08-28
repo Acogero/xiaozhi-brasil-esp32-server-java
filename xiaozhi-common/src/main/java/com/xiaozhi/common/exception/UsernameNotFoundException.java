@@ -1,7 +1,7 @@
 package com.xiaozhi.common.exception;
 
 /**
- * 用户名没有找到异常
+ * Exceção de nome de usuário não encontrado
  * 
  * @author Joey
  */

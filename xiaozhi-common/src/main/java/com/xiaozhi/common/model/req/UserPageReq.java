@@ -6,21 +6,21 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "用户分页查询")
+@Schema(description = "Consulta paginada de usuários")
 public class UserPageReq extends BasePageReq {
 
-    @Schema(description = "姓名/昵称")
+    @Schema(description = "Nome/Apelido")
     private String name;
 
-    @Schema(description = "邮箱")
+    @Schema(description = "E-mail")
     private String email;
 
-    @Schema(description = "手机号")
+    @Schema(description = "Número de telefone")
     private String tel;
 
-    @Schema(description = "是否管理员")
+    @Schema(description = "Se é administrador")
     private String isAdmin;
 
-    @Schema(description = "后台权限角色ID")
+    @Schema(description = "ID do papel de permissão do backend")
     private Integer authRoleId;
 }

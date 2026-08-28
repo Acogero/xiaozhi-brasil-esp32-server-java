@@ -12,30 +12,30 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "登录响应")
+@Schema(description = "Resposta de login")
 public class LoginResp {
 
-    @Schema(description = "访问令牌")
+    @Schema(description = "Token de acesso")
     private String token;
 
-    @Schema(description = "刷新令牌")
+    @Schema(description = "Token de atualização")
     private String refreshToken;
 
-    @Schema(description = "过期时间（秒）")
+    @Schema(description = "Tempo de expiração (segundos)")
     private Integer expiresIn;
 
-    @Schema(description = "用户ID")
+    @Schema(description = "ID do usuário")
     private Integer userId;
 
-    @Schema(description = "是否新用户")
+    @Schema(description = "Se é um novo usuário")
     private Boolean isNewUser;
 
-    @Schema(description = "用户信息")
+    @Schema(description = "Informações do usuário")
     private UserResp user;
 
-    @Schema(description = "后台权限角色")
+    @Schema(description = "Papel de permissão do backend")
     private AuthRoleResp authRole;
 
-    @Schema(description = "权限树")
+    @Schema(description = "Árvore de permissões")
     private List<PermissionTreeResp> permissions;
 }

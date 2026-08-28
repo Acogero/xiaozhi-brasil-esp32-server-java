@@ -5,7 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * Dialogue服务器信息 — 用于服务注册/发现
+ * Informações do servidor Dialogue — usado para registro/descoberta de serviço
  */
 @Data
 public class DialogueServerInfo implements Serializable {

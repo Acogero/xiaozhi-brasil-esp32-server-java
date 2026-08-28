@@ -7,38 +7,38 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@Schema(description = "提示词模板信息")
+@Schema(description = "Informações do modelo de prompt")
 public class TemplateResp {
 
-    @Schema(description = "模板ID")
+    @Schema(description = "ID do template")
     private Integer templateId;
 
-    @Schema(description = "用户ID")
+    @Schema(description = "ID do usuário")
     private Integer userId;
 
-    @Schema(description = "模板名称")
+    @Schema(description = "Nome do template")
     private String templateName;
 
-    @Schema(description = "模板描述")
+    @Schema(description = "Descrição do template")
     private String templateDesc;
 
-    @Schema(description = "模板内容")
+    @Schema(description = "Conteúdo do template")
     private String templateContent;
 
-    @Schema(description = "模板分类")
+    @Schema(description = "Categoria do template")
     private String category;
 
-    @Schema(description = "是否默认模板(1是 0否)")
+    @Schema(description = "Se é o modelo padrão (1 sim, 0 não)")
     private String isDefault;
 
-    @Schema(description = "状态(1启用 0禁用)")
+    @Schema(description = "Status (1 habilitado, 0 desabilitado)")
     private String state;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Schema(description = "创建时间")
+    @Schema(description = "Data de criação")
     private LocalDateTime createTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Schema(description = "更新时间")
+    @Schema(description = "Data de atualização")
     private LocalDateTime updateTime;
 }

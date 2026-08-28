@@ -3,32 +3,32 @@ package com.xiaozhi.communication.registry;
 import java.util.List;
 
 /**
- * Dialogue服务器注册中心 — 用于横向扩展时的服务发现和负载均衡
+ * Centro de registro do servidor Dialogue — usado para descoberta de serviço e balanceamento de carga em escalonamento horizontal
  */
 public interface DialogueServerRegistry {
 
     /**
-     * 注册dialogue服务器实例
+     * Registra a instância do servidor dialogue
      */
     void register(DialogueServerInfo serverInfo);
 
     /**
-     * 注销dialogue服务器实例
+     * Remove o registro da instância do servidor dialogue
      */
     void unregister(String instanceId);
 
     /**
-     * 心跳更新，延长TTL
+     * Atualização de heartbeat, estende o TTL
      */
     void heartbeat(DialogueServerInfo serverInfo);
 
     /**
-     * 获取所有可用的dialogue服务器
+     * Obtém todos os servidores dialogue disponíveis
      */
     List<DialogueServerInfo> getAvailableServers();
 
     /**
-     * 负载均衡选择一个dialogue服务器
+     * Seleciona um servidor dialogue por balanceamento de carga
      */
     DialogueServerInfo selectServer();
 }

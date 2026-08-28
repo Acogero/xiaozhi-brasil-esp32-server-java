@@ -6,12 +6,12 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * 领域事件基类，同时兼容 Spring {@link ApplicationEvent} 事件分发机制。
+ * Classe base de evento de domínio, compatível também com o mecanismo de despacho de eventos {@link ApplicationEvent} do Spring.
  * <p>
- * 所有领域事件继承此类即可同时获得：
+ * Todos os eventos de domínio que herdam desta classe obtêm ao mesmo tempo:
  * <ul>
- *   <li>DomainEvent 语义（eventId + occurredOn）</li>
- *   <li>Spring ApplicationEvent 分发能力</li>
+ *   <li>Semântica de DomainEvent (eventId + occurredOn)</li>
+ *   <li>Capacidade de despacho do Spring ApplicationEvent</li>
  * </ul>
  */
 public abstract class AbstractDomainEvent extends ApplicationEvent implements DomainEvent {

@@ -16,12 +16,12 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 跨实例消息广播。
- * 通过 Redis Pub/Sub 通知所有实例执行对应操作，支持：
+ * Broadcast de mensagens entre instâncias.
+ * Notifica todas as instâncias via Redis Pub/Sub para executar a operação correspondente, suportando:
  * <ul>
- *   <li>clearConversation：清除指定设备的对话历史</li>
- *   <li>roleChanged：设备角色变更，重新加载 Persona</li>
- *   <li>configChanged：配置变更，清除对应工厂缓存</li>
+ *   <li>clearConversation: limpa o histórico de conversa do dispositivo informado</li>
+ *   <li>roleChanged: papel do dispositivo alterado, recarrega a Persona</li>
+ *   <li>configChanged: configuração alterada, limpa o cache da factory correspondente</li>
  * </ul>
  */
 @Slf4j
@@ -39,7 +39,7 @@ public class RedisBroadcast {
     private StringRedisTemplate stringRedisTemplate;
 
     /**
-     * 事件驱动：收到对话清除事件后通过 Redis 广播
+     * Orientado a eventos: transmite via Redis ao receber o evento de limpeza de conversa
      */
     @EventListener
     public void onConversationClear(ConversationHistoryClearedEvent event) {
@@ -101,9 +101,9 @@ public class RedisBroadcast {
     private void publish(String channel, String message) {
         try {
             stringRedisTemplate.convertAndSend(channel, message);
-            log.debug("已广播消息 - channel: {}, message: {}", channel, message);
+            log.debug("Mensagem transmitida - channel: {}, message: {}", channel, message);
         } catch (Exception e) {
-            log.error("广播消息失败 - channel: {}, message: {}", channel, message, e);
+            log.error("Falha ao transmitir mensagem - channel: {}, message: {}", channel, message, e);
         }
     }
 }

@@ -5,13 +5,13 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-@Schema(description = "微信登录请求")
+@Schema(description = "Requisição de login do WeChat")
 public class UserWechatLoginReq {
 
-    @Schema(description = "微信登录 code", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "微信登录code不能为空")
+    @Schema(description = "Código de login do WeChat", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "O código de login do WeChat não pode ser vazio")
     private String code;
 
-    @Schema(description = "邀请人ID")
+    @Schema(description = "ID do convidante")
     private Integer inviterId;
 }

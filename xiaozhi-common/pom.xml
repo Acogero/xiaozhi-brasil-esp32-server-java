@@ -8,7 +8,7 @@
     </parent>
     <artifactId>xiaozhi-common</artifactId>
     <name>xiaozhi-common</name>
-    <description>公共层：entity, dto, event, enums, utils, common</description>
+    <description>Camada comum: entity, dto, event, enums, utils, common</description>
 
     <dependencies>
         <!-- Spring Boot -->
@@ -32,7 +32,7 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
         </dependency>
-        <!-- Spring AI model (Speech 父类等) -->
+        <!-- Spring AI model (superclasse de Speech, etc.) -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-model</artifactId>
@@ -47,7 +47,7 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
-        <!-- 文件 -->
+        <!-- Arquivo -->
         <dependency>
             <groupId>net.coobird</groupId>
             <artifactId>thumbnailator</artifactId>
@@ -85,7 +85,7 @@
             <artifactId>mybatis-plus-annotation</artifactId>
             <version>${mybatis-plus.version}</version>
         </dependency>
-        <!-- 音频基础（Opus 编解码 + MP3 解码） -->
+        <!-- Base de áudio (codec Opus + decodificação MP3) -->
         <dependency>
             <groupId>io.github.jaredmdobson</groupId>
             <artifactId>concentus</artifactId>

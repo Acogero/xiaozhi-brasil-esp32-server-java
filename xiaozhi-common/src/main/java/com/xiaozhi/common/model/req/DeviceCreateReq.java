@@ -5,10 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-@Schema(description = "添加设备请求")
+@Schema(description = "Requisição de adição de dispositivo")
 public class DeviceCreateReq {
 
-    @NotBlank(message = "设备验证码不能为空")
-    @Schema(description = "设备验证码", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "O código de verificação do dispositivo não pode ser vazio")
+    @Schema(description = "Código de verificação do dispositivo", requiredMode = Schema.RequiredMode.REQUIRED)
     private String code;
 }

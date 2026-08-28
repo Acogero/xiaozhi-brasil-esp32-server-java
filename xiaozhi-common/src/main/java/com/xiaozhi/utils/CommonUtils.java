@@ -18,7 +18,7 @@ public class CommonUtils {
             Pattern.compile("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$");
 
     /**
-     * 判断 MAC 地址是否合法（格式正确且为单播地址）
+     * Verifica se o endereço MAC é válido (formato correto e endereço unicast)
      */
     public static boolean isMacAddressValid(String mac) {
         if (!MAC_PATTERN.matcher(mac).matches()) {
@@ -62,7 +62,7 @@ public class CommonUtils {
     }
 
     /**
-     * 使用 HMAC-SHA256 对内容签名，返回 Base64 编码结果，失败时返回 null
+     * Assina o conteúdo usando HMAC-SHA256, retornando o resultado em Base64; retorna null em caso de falha
      */
     public static String hmacSha256(String content, String secretKey) {
         try {
@@ -78,7 +78,7 @@ public class CommonUtils {
     }
 
     /**
-     * 对给定的字符串进行MD5加密
+     * Aplica criptografia MD5 na string informada
      * @param str
      * @return
      */

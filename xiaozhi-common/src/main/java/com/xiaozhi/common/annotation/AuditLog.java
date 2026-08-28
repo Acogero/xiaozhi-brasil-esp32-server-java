@@ -6,15 +6,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 操作审计日志注解，标记需要记录操作日志的敏感接口。
+ * Anotação de log de auditoria de operação, marca interfaces sensíveis que precisam registrar log de operação.
  * <p>
- * AOP 切面会在方法执行后异步将操作记录写入 sys_operation_log 表。
- * 查询接口不需要添加此注解。
+ * O aspecto AOP grava o registro de operação de forma assíncrona na tabela sys_operation_log após a execução do método.
+ * Interfaces de consulta não precisam adicionar esta anotação.
  * <p>
- * 使用示例：
+ * Exemplo de uso:
  * <pre>
  * {@code
- * @AuditLog(module = "设备管理", operation = "创建设备")
+ * @AuditLog(module = "Gerenciamento de Dispositivos", operation = "Criar Dispositivo")
  * @PostMapping("/")
  * public ApiResponse<?> create(...) { ... }
  * }
@@ -25,12 +25,12 @@ import java.lang.annotation.Target;
 public @interface AuditLog {
 
     /**
-     * 操作模块，例如"设备管理"、"用户管理"。
+     * Módulo da operação, por exemplo "Gerenciamento de Dispositivos", "Gerenciamento de Usuários".
      */
     String module();
 
     /**
-     * 操作描述，例如"创建设备"、"删除角色"。
+     * Descrição da operação, por exemplo "Criar Dispositivo", "Excluir Papel".
      */
     String operation();
 }

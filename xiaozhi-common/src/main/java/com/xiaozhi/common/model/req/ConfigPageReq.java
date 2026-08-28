@@ -6,24 +6,24 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "配置分页查询")
+@Schema(description = "Consulta paginada de configurações")
 public class ConfigPageReq extends BasePageReq {
 
-    @Schema(description = "配置类型")
+    @Schema(description = "Tipo de configuração")
     private String configType;
 
-    @Schema(description = "配置名称")
+    @Schema(description = "Nome da configuração")
     private String configName;
 
-    @Schema(description = "模型类型")
+    @Schema(description = "Tipo de modelo")
     private String modelType;
 
-    @Schema(description = "服务提供商")
+    @Schema(description = "Provedor de serviço")
     private String provider;
 
-    @Schema(description = "是否默认配置(1是 0否)")
+    @Schema(description = "Se é a configuração padrão (1 sim, 0 não)")
     private String isDefault;
 
-    @Schema(description = "状态(1启用 0禁用)")
+    @Schema(description = "Status (1 habilitado, 0 desabilitado)")
     private String state;
 }

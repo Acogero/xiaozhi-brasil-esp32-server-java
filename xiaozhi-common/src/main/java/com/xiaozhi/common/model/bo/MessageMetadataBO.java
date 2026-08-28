@@ -7,16 +7,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * UserMessage 附加元数据，结构化存储于 sys_message.metadata (JSON 列)。
+ * Metadados adicionais do UserMessage, armazenados de forma estruturada em sys_message.metadata (coluna JSON).
  *
- * <p>设计：与 message 文本列分离，保证：
+ * <p>Design: separado da coluna de texto message, garantindo que:
  * <ul>
- *   <li>message 列仅存用户裸文本，前端直接展示无需剥离</li>
- *   <li>LLM 读取时由 Conversation 层做"裸文本 + metadata → 带前缀文本"投影，前缀 KV cache 友好</li>
- *   <li>未来扩展附加字段（如 asrConfidence、speakerDirection 等）只需加本类字段，不改 DB</li>
+ *   <li>a coluna message armazena apenas o texto puro do usuário, exibido diretamente pelo frontend sem necessidade de tratamento</li>
+ *   <li>ao ler para o LLM, a camada Conversation faz a projeção "texto puro + metadata → texto com prefixo", amigável ao KV cache de prefixo</li>
+ *   <li>futuras extensões de campos (como asrConfidence, speakerDirection, etc.) só precisam adicionar campos nesta classe, sem alterar o banco de dados</li>
  * </ul>
  *
- * <p>为空字段不序列化，JSON 更紧凑；反序列化时缺省字段默认 null。
+ * <p>Campos vazios não são serializados, deixando o JSON mais compacto; na desserialização, campos ausentes assumem null por padrão.
  */
 @Data
 @Builder
@@ -26,8 +26,8 @@ import lombok.NoArgsConstructor;
 public class MessageMetadataBO {
 
     /**
-     * Spring AI {@code UserMessage.metadata} Map 里存放本对象用的 key。
-     * Write/Read 路径统一通过该 key 在 UserMessage 上附带元数据：
+     * Chave usada para armazenar este objeto no Map {@code UserMessage.metadata} do Spring AI.
+     * Os caminhos de escrita/leitura usam essa chave de forma unificada para anexar metadados ao UserMessage:
      * <pre>
      *   userMessage.getMetadata().put(METADATA_KEY, metadataBO);
      *   MessageMetadataBO m = (MessageMetadataBO) userMessage.getMetadata().get(METADATA_KEY);
@@ -36,17 +36,17 @@ public class MessageMetadataBO {
     public static final String METADATA_KEY = "userMessageMetadata";
 
     /**
-     * 语音情感识别标签（neutral/happy/sad/angry/...），仅支持情感识别的 STT 有值。
+     * Rótulo de reconhecimento de emoção na voz (neutral/happy/sad/angry/...), com valor apenas quando o STT suporta reconhecimento de emoção.
      */
     private String emotion;
 
     /**
-     * 情绪置信度 [0,1]，仅情感识别时有值。
+     * Confiança da emoção [0,1], com valor apenas quando há reconhecimento de emoção.
      */
     private Double emotionScore;
 
     /**
-     * 情绪强度（弱/中/强 等），仅情感识别时有值。
+     * Intensidade da emoção (fraca/média/forte, etc.), com valor apenas quando há reconhecimento de emoção.
      */
     private String emotionDegree;
 }

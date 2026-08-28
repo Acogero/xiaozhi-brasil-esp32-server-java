@@ -6,18 +6,18 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-@Schema(description = "切换角色 MCP 工具状态请求")
+@Schema(description = "Requisição para alternar o status da ferramenta MCP do papel")
 public class McpRoleToolStatusReq {
 
-    @Schema(description = "工具名称", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "工具名称不能为空")
+    @Schema(description = "Nome da ferramenta", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "O nome da ferramenta não pode ser vazio")
     private String toolName;
 
-    @Schema(description = "服务器名称", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "服务器名称不能为空")
+    @Schema(description = "Nome do servidor", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "O nome do servidor não pode ser vazio")
     private String serverName;
 
-    @Schema(description = "是否启用", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "启用状态不能为空")
+    @Schema(description = "Se está habilitado", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "O status de habilitação não pode ser vazio")
     private Boolean enabled;
 }

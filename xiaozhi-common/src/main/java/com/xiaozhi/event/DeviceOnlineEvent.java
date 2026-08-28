@@ -4,8 +4,8 @@ import com.xiaozhi.common.domain.AbstractDomainEvent;
 import lombok.Getter;
 
 /**
- * 设备重新上线/变为待机状态事件
- * 用于触发OTA升级结果的即时检查
+ * Evento de dispositivo voltando a ficar online / passando para o estado ocioso
+ * Usado para disparar a verificação imediata do resultado da atualização OTA
  */
 @Getter
 public class DeviceOnlineEvent extends AbstractDomainEvent {

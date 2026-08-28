@@ -8,53 +8,53 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-@Schema(description = "消息信息")
+@Schema(description = "Informações da mensagem")
 public class MessageResp {
 
-    @Schema(description = "消息ID")
+    @Schema(description = "ID da mensagem")
     private Integer messageId;
 
-    @Schema(description = "设备ID")
+    @Schema(description = "ID do dispositivo")
     private String deviceId;
 
-    @Schema(description = "设备名称")
+    @Schema(description = "Nome do dispositivo")
     private String deviceName;
 
-    @Schema(description = "发送方")
+    @Schema(description = "Remetente")
     private String sender;
 
-    @Schema(description = "消息内容")
+    @Schema(description = "Conteúdo da mensagem")
     private String message;
 
-    @Schema(description = "语音文件路径")
+    @Schema(description = "Caminho do arquivo de áudio")
     private String audioPath;
 
-    @Schema(description = "消息状态")
+    @Schema(description = "Status da mensagem")
     private String state;
 
-    @Schema(description = "消息类型")
+    @Schema(description = "Tipo de mensagem")
     private String messageType;
 
-    @Schema(description = "工具调用详情")
+    @Schema(description = "Detalhes da chamada da ferramenta")
     private String toolCalls;
 
-    @Schema(description = "会话ID")
+    @Schema(description = "ID da sessão")
     private String sessionId;
 
-    @Schema(description = "消息来源: web|device")
+    @Schema(description = "Origem da mensagem: web|device")
     private String source;
 
-    @Schema(description = "角色ID")
+    @Schema(description = "ID do papel")
     private Integer roleId;
 
-    @Schema(description = "角色名称")
+    @Schema(description = "Nome do papel")
     private String roleName;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Schema(description = "创建时间")
+    @Schema(description = "Data de criação")
     private LocalDateTime createTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Schema(description = "更新时间")
+    @Schema(description = "Data de atualização")
     private LocalDateTime updateTime;
 }
