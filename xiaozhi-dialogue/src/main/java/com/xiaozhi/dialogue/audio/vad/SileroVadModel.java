@@ -17,7 +17,7 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * Silero VAD模型实现
+ * Implementação do modelo Silero VAD
  */
 @Slf4j
 @Component
@@ -46,14 +46,14 @@ public class SileroVadModel implements VadModel {
                 session = env.createSession(modelPath, opts);
             }
 
-            log.info("Silero VAD模型初始化成功, windowSize={}, contextSize={}, effectiveWindowSize={}", windowSize, CONTEXT_SIZE, effectiveWindowSize);
+            log.info("Modelo Silero VAD inicializado com sucesso, windowSize={}, contextSize={}, effectiveWindowSize={}", windowSize, CONTEXT_SIZE, effectiveWindowSize);
         } catch (UnsatisfiedLinkError e) {
-            log.error("ONNX Runtime native libraries加载失败，请安装Visual C++ Redistributable: {}", e.getMessage());
-            log.error("下载地址: https://aka.ms/vs/17/release/vc_redist.x64.exe");
-            throw new RuntimeException("ONNX Runtime native libraries加载失败，请安装Visual C++ Redistributable", e);
+            log.error("Falha ao carregar as bibliotecas nativas do ONNX Runtime; instale o Visual C++ Redistributable: {}", e.getMessage());
+            log.error("Link para download: https://aka.ms/vs/17/release/vc_redist.x64.exe");
+            throw new RuntimeException("Falha ao carregar as bibliotecas nativas do ONNX Runtime; instale o Visual C++ Redistributable", e);
         } catch (OrtException e) {
-            log.error("Silero VAD模型初始化失败", e);
-            throw new RuntimeException("VAD模型初始化失败", e);
+            log.error("Falha ao inicializar o modelo Silero VAD", e);
+            throw new RuntimeException("Falha ao inicializar o modelo de VAD", e);
         }
     }
 
@@ -65,7 +65,7 @@ public class SileroVadModel implements VadModel {
     public InferenceResult infer(float[] samples, float[] context, float[][][] prevState) {
         try {
             if (samples.length != windowSize) {
-                throw new IllegalArgumentException("样本数量必须是" + windowSize);
+                throw new IllegalArgumentException("A quantidade de amostras deve ser " + windowSize);
             }
 
             float[][] x = new float[][] { buildInput(samples, context) };
@@ -93,7 +93,7 @@ public class SileroVadModel implements VadModel {
                 srTensor.close();
             }
         } catch (OrtException e) {
-            log.error("VAD模型推理失败", e);
+            log.error("Falha na inferência do modelo de VAD", e);
             return new InferenceResult(0.0f, prevState);
         }
     }
@@ -115,9 +115,9 @@ public class SileroVadModel implements VadModel {
             if (session != null) {
                 session.close();
             }
-            log.info("Silero VAD模型资源已释放");
+            log.info("Recursos do modelo Silero VAD liberados");
         } catch (OrtException e) {
-            log.error("关闭VAD模型失败", e);
+            log.error("Falha ao fechar o modelo de VAD", e);
         }
     }
 }
