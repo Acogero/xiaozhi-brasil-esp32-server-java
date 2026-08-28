@@ -6,12 +6,12 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "提示词模板分页查询")
+@Schema(description = "Consulta paginada de modelos de prompt")
 public class TemplatePageReq extends BasePageReq {
 
-    @Schema(description = "模板名称")
+    @Schema(description = "Nome do template")
     private String templateName;
 
-    @Schema(description = "模板分类")
+    @Schema(description = "Categoria do template")
     private String category;
 }

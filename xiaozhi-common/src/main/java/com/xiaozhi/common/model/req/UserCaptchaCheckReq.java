@@ -7,21 +7,21 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
-@Schema(description = "验证码检查请求")
+@Schema(description = "Requisição de verificação de código")
 public class UserCaptchaCheckReq {
 
-    @Schema(description = "验证码", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "验证码不能为空")
+    @Schema(description = "Código de verificação", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "O código de verificação não pode ser vazio")
     private String code;
 
-    @Schema(description = "邮箱")
-    @Email(message = "邮箱格式不正确")
+    @Schema(description = "E-mail")
+    @Email(message = "Formato de e-mail inválido")
     private String email;
 
-    @Schema(description = "手机号")
-    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
+    @Schema(description = "Número de telefone")
+    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "Formato de número de telefone inválido")
     private String tel;
 
-    @Schema(description = "用途类型")
+    @Schema(description = "Tipo de uso")
     private String type;
 }

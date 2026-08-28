@@ -6,18 +6,18 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "角色分页查询")
+@Schema(description = "Consulta paginada de papéis")
 public class RolePageReq extends BasePageReq {
 
-    @Schema(description = "角色ID")
+    @Schema(description = "ID do papel")
     private Integer roleId;
 
-    @Schema(description = "角色名称")
+    @Schema(description = "Nome do papel")
     private String roleName;
 
-    @Schema(description = "是否默认角色(1是 0否)")
+    @Schema(description = "Se é o papel padrão (1 sim, 0 não)")
     private String isDefault;
 
-    @Schema(description = "状态(1启用 0禁用)")
+    @Schema(description = "Status (1 habilitado, 0 desabilitado)")
     private String state;
 }

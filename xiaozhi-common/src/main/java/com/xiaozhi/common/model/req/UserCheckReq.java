@@ -6,17 +6,17 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
-@Schema(description = "用户占用检查请求")
+@Schema(description = "Requisição de verificação de disponibilidade de usuário")
 public class UserCheckReq {
 
-    @Schema(description = "用户名")
+    @Schema(description = "Nome de usuário")
     private String username;
 
-    @Schema(description = "邮箱")
-    @Email(message = "邮箱格式不正确")
+    @Schema(description = "E-mail")
+    @Email(message = "Formato de e-mail inválido")
     private String email;
 
-    @Schema(description = "手机号")
-    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
+    @Schema(description = "Número de telefone")
+    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "Formato de número de telefone inválido")
     private String tel;
 }

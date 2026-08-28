@@ -7,25 +7,25 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-@Schema(description = "用户更新请求")
+@Schema(description = "Requisição de atualização de usuário")
 public class UserUpdateReq {
 
-    @Schema(description = "新邮箱")
-    @Email(message = "邮箱格式不正确")
+    @Schema(description = "Novo e-mail")
+    @Email(message = "Formato de e-mail inválido")
     private String email;
 
-    @Schema(description = "新手机号")
-    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
+    @Schema(description = "Novo número de telefone")
+    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "Formato de número de telefone inválido")
     private String tel;
 
-    @Schema(description = "新密码")
-    @Size(min = 6, max = 20, message = "密码长度必须在6-20个字符之间")
+    @Schema(description = "Nova senha")
+    @Size(min = 6, max = 20, message = "A senha deve ter entre 6 e 20 caracteres")
     private String password;
 
-    @Schema(description = "新姓名/昵称")
-    @Size(max = 50, message = "姓名长度不能超过50个字符")
+    @Schema(description = "Novo nome/apelido")
+    @Size(max = 50, message = "O nome não pode ter mais de 50 caracteres")
     private String name;
 
-    @Schema(description = "新头像")
+    @Schema(description = "Novo avatar")
     private String avatar;
 }

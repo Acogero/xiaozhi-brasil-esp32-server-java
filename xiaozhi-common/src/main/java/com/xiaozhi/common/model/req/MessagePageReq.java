@@ -10,37 +10,37 @@ import java.util.Date;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "消息分页查询")
+@Schema(description = "Consulta paginada de mensagens")
 public class MessagePageReq extends BasePageReq {
 
-    @Schema(description = "设备ID")
+    @Schema(description = "ID do dispositivo")
     private String deviceId;
 
-    @Schema(description = "设备名称")
+    @Schema(description = "Nome do dispositivo")
     private String deviceName;
 
-    @Schema(description = "发送方")
+    @Schema(description = "Remetente")
     private String sender;
 
-    @Schema(description = "消息类型")
+    @Schema(description = "Tipo de mensagem")
     private String messageType;
 
-    @Schema(description = "角色ID")
+    @Schema(description = "ID do papel")
     private Integer roleId;
 
-    @Schema(description = "开始时间")
+    @Schema(description = "Data de início")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date startTime;
 
-    @Schema(description = "结束时间")
+    @Schema(description = "Data de término")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endTime;
 
-    @Schema(description = "会话ID")
+    @Schema(description = "ID da sessão")
     private String sessionId;
 
-    @Schema(description = "消息来源: web|device")
+    @Schema(description = "Origem da mensagem: web|device")
     private String source;
 }

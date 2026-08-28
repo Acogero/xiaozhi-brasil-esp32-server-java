@@ -4,30 +4,30 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@Schema(description = "设备同步请求")
+@Schema(description = "Requisição de sincronização de dispositivo")
 public class DeviceSyncReq {
 
-    @Schema(description = "设备ID")
+    @Schema(description = "ID do dispositivo")
     private String deviceId;
 
-    @Schema(description = "设备名称")
+    @Schema(description = "Nome do dispositivo")
     private String deviceName;
 
-    @Schema(description = "WiFi 名称")
+    @Schema(description = "Nome do WiFi")
     private String wifiName;
 
     @Schema(description = "IP")
     private String ip;
 
-    @Schema(description = "地理位置")
+    @Schema(description = "Localização geográfica")
     private String location;
 
-    @Schema(description = "芯片型号")
+    @Schema(description = "Modelo do chip")
     private String chipModelName;
 
-    @Schema(description = "设备类型")
+    @Schema(description = "Tipo de dispositivo")
     private String type;
 
-    @Schema(description = "固件版本")
+    @Schema(description = "Versão do firmware")
     private String version;
 }

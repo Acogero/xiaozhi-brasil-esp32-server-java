@@ -7,20 +7,20 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-@Schema(description = "重置密码请求")
+@Schema(description = "Requisição de redefinição de senha")
 public class UserResetPasswordReq {
 
-    @Schema(description = "邮箱", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "邮箱不能为空")
-    @Email(message = "邮箱格式不正确")
+    @Schema(description = "E-mail", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "O e-mail não pode ser vazio")
+    @Email(message = "Formato de e-mail inválido")
     private String email;
 
-    @Schema(description = "验证码", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "验证码不能为空")
+    @Schema(description = "Código de verificação", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "O código de verificação não pode ser vazio")
     private String code;
 
-    @Schema(description = "新密码", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "新密码不能为空")
-    @Size(min = 6, max = 20, message = "密码长度必须在6-20个字符之间")
+    @Schema(description = "Nova senha", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "A nova senha não pode ser vazia")
+    @Size(min = 6, max = 20, message = "A senha deve ter entre 6 e 20 caracteres")
     private String password;
 }

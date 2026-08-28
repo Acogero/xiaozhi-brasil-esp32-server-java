@@ -7,13 +7,13 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@Schema(description = "批量设置角色排除工具请求")
+@Schema(description = "Requisição de configuração em lote de ferramentas excluídas do papel")
 public class McpRoleExcludeToolsReq {
 
-    @Schema(description = "排除的工具列表", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "排除工具列表不能为空")
+    @Schema(description = "Lista de ferramentas excluídas", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(message = "A lista de ferramentas excluídas não pode ser vazia")
     private List<String> excludeTools;
 
-    @Schema(description = "服务器名称")
+    @Schema(description = "Nome do servidor")
     private String serverName;
 }

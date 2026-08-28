@@ -5,51 +5,51 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-@Schema(description = "配置创建请求")
+@Schema(description = "Requisição de criação de configuração")
 public class ConfigCreateReq {
 
-    @Schema(description = "配置名称", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "配置名称不能为空")
+    @Schema(description = "Nome da configuração", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "O nome da configuração não pode ser vazio")
     private String configName;
 
-    @Schema(description = "配置描述")
+    @Schema(description = "Descrição da configuração")
     private String configDesc;
 
-    @Schema(description = "配置类型", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "配置类型不能为空")
+    @Schema(description = "Tipo de configuração", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "O tipo de configuração não pode ser vazio")
     private String configType;
 
-    @Schema(description = "模型类型")
+    @Schema(description = "Tipo de modelo")
     private String modelType;
 
-    @Schema(description = "服务提供商", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank(message = "服务提供商不能为空")
+    @Schema(description = "Provedor de serviço", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(message = "O provedor de serviço não pode ser vazio")
     private String provider;
 
-    @Schema(description = "服务提供商分配的AppId")
+    @Schema(description = "AppId atribuído pelo provedor de serviço")
     private String appId;
 
-    @Schema(description = "服务提供商分配的ApiKey")
+    @Schema(description = "ApiKey atribuída pelo provedor de serviço")
     private String apiKey;
 
-    @Schema(description = "服务提供商分配的ApiSecret")
+    @Schema(description = "ApiSecret atribuído pelo provedor de serviço")
     private String apiSecret;
 
-    @Schema(description = "服务提供商分配的Access Key")
+    @Schema(description = "Access Key atribuída pelo provedor de serviço")
     private String ak;
 
-    @Schema(description = "服务提供商分配的Secret Key")
+    @Schema(description = "Secret Key atribuída pelo provedor de serviço")
     private String sk;
 
-    @Schema(description = "服务提供商的API地址")
+    @Schema(description = "Endereço da API do provedor de serviço")
     private String apiUrl;
 
-    @Schema(description = "状态(1启用 0禁用)")
+    @Schema(description = "Status (1 habilitado, 0 desabilitado)")
     private String state;
 
-    @Schema(description = "是否默认配置(1是 0否)")
+    @Schema(description = "Se é a configuração padrão (1 sim, 0 não)")
     private String isDefault;
 
-    @Schema(description = "是否启用思考模式(模型支持时生效)")
+    @Schema(description = "Se o modo de pensamento está habilitado (efetivo quando o modelo suportar)")
     private Boolean enableThinking;
 }
