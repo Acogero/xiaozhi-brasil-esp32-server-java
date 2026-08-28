@@ -30,9 +30,9 @@ public class OwnershipConfig {
             public void check(Object resourceId, Integer userId) {
                 RoleDO role = roleMapper.selectById(toIntId(resourceId, "roleId"));
                 if (role == null) {
-                    throw new ResourceNotFoundException("角色不存在");
+                    throw new ResourceNotFoundException("Papel não encontrado");
                 }
-                requireOwner(role.getUserId(), userId, "角色不归属当前用户");
+                requireOwner(role.getUserId(), userId, "O papel não pertence ao usuário atual");
             }
         };
     }
@@ -44,9 +44,9 @@ public class OwnershipConfig {
             public void check(Object resourceId, Integer userId) {
                 ConfigBO config = configService.getBO(toIntId(resourceId, "configId"));
                 if (config == null) {
-                    throw new ResourceNotFoundException("配置不存在");
+                    throw new ResourceNotFoundException("Configuração não encontrada");
                 }
-                requireOwner(config.getUserId(), userId, "配置不归属当前用户");
+                requireOwner(config.getUserId(), userId, "A configuração não pertence ao usuário atual");
             }
         };
     }
@@ -58,9 +58,9 @@ public class OwnershipConfig {
             public void check(Object resourceId, Integer userId) {
                 TemplateDO template = templateMapper.selectById(toIntId(resourceId, "templateId"));
                 if (template == null || !TemplateBO.STATE_ENABLED.equals(template.getState())) {
-                    throw new ResourceNotFoundException("模板不存在");
+                    throw new ResourceNotFoundException("Modelo não encontrado");
                 }
-                requireOwner(template.getUserId(), userId, "模板不归属当前用户");
+                requireOwner(template.getUserId(), userId, "O modelo não pertence ao usuário atual");
             }
         };
     }
@@ -72,9 +72,9 @@ public class OwnershipConfig {
             public void check(Object resourceId, Integer userId) {
                 DeviceBO device = deviceService.getBO(toStrId(resourceId, "deviceId"));
                 if (device == null) {
-                    throw new ResourceNotFoundException("设备不存在");
+                    throw new ResourceNotFoundException("Dispositivo não encontrado");
                 }
-                requireOwner(device.getUserId(), userId, "设备不归属当前用户");
+                requireOwner(device.getUserId(), userId, "O dispositivo não pertence ao usuário atual");
             }
         };
     }
@@ -86,9 +86,9 @@ public class OwnershipConfig {
             public void check(Object resourceId, Integer userId) {
                 MessageBO message = messageService.getBO(toIntId(resourceId, "messageId"));
                 if (message == null) {
-                    throw new ResourceNotFoundException("消息不存在");
+                    throw new ResourceNotFoundException("Mensagem não encontrada");
                 }
-                requireOwner(message.getUserId(), userId, "消息不归属当前用户");
+                requireOwner(message.getUserId(), userId, "A mensagem não pertence ao usuário atual");
             }
         };
     }
@@ -100,9 +100,9 @@ public class OwnershipConfig {
             public void check(Object resourceId, Integer userId) {
                 UserBO user = userService.getBO(toIntId(resourceId, "userId"));
                 if (user == null) {
-                    throw new ResourceNotFoundException("用户不存在");
+                    throw new ResourceNotFoundException("Usuário não encontrado");
                 }
-                requireOwner(user.getUserId(), userId, "用户不归属当前登录人");
+                requireOwner(user.getUserId(), userId, "O usuário não pertence à pessoa atualmente logada");
             }
         };
     }
@@ -136,7 +136,7 @@ public class OwnershipConfig {
             if (value instanceof String text && StringUtils.hasText(text)) {
                 return Integer.valueOf(text.trim());
             }
-            throw new IllegalArgumentException(fieldName + " 参数类型不合法");
+            throw new IllegalArgumentException(fieldName + " tipo de parâmetro inválido");
         }
 
         protected final Long toLongId(Object value, String fieldName) {
@@ -149,14 +149,14 @@ public class OwnershipConfig {
             if (value instanceof String text && StringUtils.hasText(text)) {
                 return Long.valueOf(text.trim());
             }
-            throw new IllegalArgumentException(fieldName + " 参数类型不合法");
+            throw new IllegalArgumentException(fieldName + " tipo de parâmetro inválido");
         }
 
         protected final String toStrId(Object value, String fieldName) {
             if (value instanceof String text && StringUtils.hasText(text)) {
                 return text.trim();
             }
-            throw new IllegalArgumentException(fieldName + " 参数类型不合法");
+            throw new IllegalArgumentException(fieldName + " tipo de parâmetro inválido");
         }
     }
 }

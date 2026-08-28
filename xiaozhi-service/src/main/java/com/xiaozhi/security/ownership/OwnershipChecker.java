@@ -1,20 +1,20 @@
 package com.xiaozhi.security.ownership;
 
 /**
- * 资源归属检查器。
+ * Verificador de propriedade de recurso.
  */
 public interface OwnershipChecker {
 
     /**
-     * 资源类型标识，例如 role/config/device。
+     * Identificador do tipo de recurso, por exemplo role/config/device.
      */
     String getResource();
 
     /**
-     * 校验资源是否归属当前用户，不通过时应抛出业务异常。
+     * Valida se o recurso pertence ao usuário atual; deve lançar uma exceção de negócio caso não pertença.
      *
-     * @param resourceId 资源 ID
-     * @param userId     当前登录用户 ID
+     * @param resourceId ID do recurso
+     * @param userId     ID do usuário atualmente logado
      */
     void check(Object resourceId, Integer userId);
 }

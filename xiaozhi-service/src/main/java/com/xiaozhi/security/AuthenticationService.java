@@ -1,7 +1,7 @@
 package com.xiaozhi.security;
 
 /**
- * 密码加密与验证
+ * Criptografia e verificação de senha
  * 
  * @author Joey
  * 
@@ -9,19 +9,19 @@ package com.xiaozhi.security;
 
 public interface AuthenticationService {
   /**
-   * 密码加密
+   * Criptografia de senha
    * 
    * @param rawPassword
-   * @return 加密后的密码
+   * @return Senha criptografada
    */
   public String encryptPassword(String rawPassword);
 
   /**
-   * 密码验证
+   * Verificação de senha
    * 
    * @param rawPassword
    * @param encryptPassword
-   * @return 是否相同
+   * @return Se são iguais
    */
   public Boolean isPasswordValid(String rawPassword, String encryptPassword);
 }
