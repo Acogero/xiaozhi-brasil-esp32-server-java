@@ -43,7 +43,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Resource
     private PermissionConvert permissionConvert;
 
-    // 自注入以解决Spring AOP自调用缓存失效问题
+    // Auto-injeção para resolver o problema de invalidação de cache em autochamadas do Spring AOP
     @Lazy
     @Autowired
     private PermissionService self;
