@@ -22,8 +22,8 @@ public class MessageDO extends BaseDO {
     private String sender;
     private String message;
     /**
-     * UserMessage 附加元数据的 JSON 序列化字符串（speaker/emotion 等）。
-     * 仅 sender=user 的行可能有值，其他为 null。
+     * String serializada em JSON com metadados adicionais da UserMessage (speaker/emotion etc.).
+     * Apenas linhas com sender=user podem ter valor; as demais são null.
      */
     private String metadata;
     private LocalDate statDate;

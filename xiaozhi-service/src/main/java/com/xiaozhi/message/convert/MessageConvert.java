@@ -18,8 +18,8 @@ public interface MessageConvert {
     MessageResp toResp(MessageBO messageBO);
 
     /**
-     * DO.metadata (JSON 字符串) → BO.metadata (值对象)。
-     * MapStruct 自动识别方法签名并用于 toBO 映射。
+     * DO.metadata (string JSON) → BO.metadata (objeto de valor).
+     * O MapStruct reconhece automaticamente a assinatura do método e o utiliza no mapeamento toBO.
      */
     default MessageMetadataBO jsonToMetadata(String json) {
         if (!StringUtils.hasText(json)) {
@@ -29,8 +29,8 @@ public interface MessageConvert {
     }
 
     /**
-     * BO.metadata (值对象) → DO.metadata (JSON 字符串)。
-     * MapStruct 自动识别方法签名并用于 toDO 映射。
+     * BO.metadata (objeto de valor) → DO.metadata (string JSON).
+     * O MapStruct reconhece automaticamente a assinatura do método e o utiliza no mapeamento toDO.
      */
     default String metadataToJson(MessageMetadataBO metadata) {
         if (metadata == null) {

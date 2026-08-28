@@ -13,15 +13,15 @@ import java.util.Objects;
 
 
 /**
- * Role 聚合根。
+ * Role Raiz de agregação.
  * <p>
- * 职责：持有角色配置（LLM / 语音 / VAD / 记忆策略），
- * 通过行为方法修改状态，收集领域信号供 Repository 发布事件。
+ * Responsabilidade: mantém a configuração do papel (LLM / voz / VAD / estratégia de memória),
+ * altera o estado por meio de métodos de comportamento e coleta sinais de domínio para o Repository publicar eventos.
  */
 @Getter
 public class Role {
 
-    /** 领域信号 */
+    /** Sinais de domínio */
     public enum DomainSignal { UPDATED }
 
     // --- Identity ---
@@ -47,7 +47,7 @@ public class Role {
 
     private final List<DomainSignal> signals = new ArrayList<>();
 
-    /** 从持久层重建聚合根（Repository 专用） */
+    /** Reconstrói a raiz de agregação a partir da camada de persistência (uso exclusivo do Repository) */
     public Role(Integer roleId, Integer userId, String avatar, String roleName, String roleDesc,
                 String state, boolean isDefault,
                 LlmConfig llmConfig, VoiceConfig voiceConfig,
@@ -68,7 +68,7 @@ public class Role {
         this.updateTime = updateTime;
     }
 
-    /** 工厂方法：创建新角色 */
+    /** Método de fábrica: cria um novo papel */
     public static Role newRole(Integer userId, String roleName, String roleDesc, String avatar,
                                LlmConfig llmConfig, VoiceConfig voiceConfig,
                                AudioConfig audioConfig, MemoryStrategy memoryStrategy,
@@ -80,20 +80,20 @@ public class Role {
         return role;
     }
 
-    // ===================== 行为方法 =====================
+    // ===================== Métodos de comportamento =====================
 
-    /** 将此角色设为默认角色（Repository 负责重置同用户其他角色） */
+    /** Define este papel como padrão (o Repository é responsável por redefinir os demais papéis do mesmo usuário) */
     public void setAsDefault() {
         this.isDefault = true;
         signals.add(DomainSignal.UPDATED);
     }
 
-    /** 清除默认标记 */
+    /** Remove a marcação de padrão */
     public void clearDefault() {
         this.isDefault = false;
     }
 
-    /** 更新可编辑字段及配置值对象 */
+    /** Atualiza os campos editáveis e os objetos de valor de configuração */
     public void update(String roleName, String roleDesc, String avatar,
                        LlmConfig llmConfig, VoiceConfig voiceConfig,
                        AudioConfig audioConfig, MemoryStrategy memoryStrategy,
@@ -109,13 +109,13 @@ public class Role {
         signals.add(DomainSignal.UPDATED);
     }
 
-    /** void setRoleId — 仅允许 Repository 在 insert 后回填自增 ID */
+    /** void setRoleId — permitido apenas ao Repository para preencher o ID autoincrementado após o insert */
     public void assignId(Integer roleId) {
-        if (this.roleId != null) throw new IllegalStateException("roleId 已设置，不允许覆盖");
+        if (this.roleId != null) throw new IllegalStateException("roleId já definido, não é permitido sobrescrever");
         this.roleId = roleId;
     }
 
-    /** 提取并清空领域信号，由 Repository.save() 调用 */
+    /** Extrai e limpa os sinais de domínio; chamado por Repository.save() */
     public List<DomainSignal> pullSignals() {
         List<DomainSignal> result = List.copyOf(signals);
         signals.clear();

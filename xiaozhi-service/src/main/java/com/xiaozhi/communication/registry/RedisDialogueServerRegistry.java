@@ -13,9 +13,9 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 基于 Redis 的 Dialogue 服务器注册中心实现
+ * Implementação do centro de registro de servidores Dialogue baseado em Redis
  * <p>
- * 使用 Redis Hash 存储所有实例信息，每个实例有独立的 TTL key 做健康检测。
+ * Usa Redis Hash para armazenar as informações de todas as instâncias; cada instância tem uma chave TTL própria para verificação de saúde.
  * </p>
  */
 @Slf4j
@@ -37,14 +37,14 @@ public class RedisDialogueServerRegistry implements DialogueServerRegistry {
         stringRedisTemplate.opsForValue().set(
                 HEARTBEAT_KEY_PREFIX + serverInfo.getInstanceId(), "1",
                 HEARTBEAT_TTL_SECONDS, TimeUnit.SECONDS);
-        log.info("Dialogue服务器已注册: {}", serverInfo.getInstanceId());
+        log.info("Servidor Dialogue registrado: {}", serverInfo.getInstanceId());
     }
 
     @Override
     public void unregister(String instanceId) {
         stringRedisTemplate.opsForHash().delete(REGISTRY_HASH_KEY, instanceId);
         stringRedisTemplate.delete(HEARTBEAT_KEY_PREFIX + instanceId);
-        log.info("Dialogue服务器已注销: {}", instanceId);
+        log.info("Servidor Dialogue removido: {}", instanceId);
     }
 
     @Override
@@ -85,12 +85,12 @@ public class RedisDialogueServerRegistry implements DialogueServerRegistry {
                     continue;
                 }
 
-                // 心跳过期，清理僵尸注册
+                // Heartbeat expirado, limpando registro órfão
                 stringRedisTemplate.opsForHash().delete(REGISTRY_HASH_KEY, instanceId);
-                log.info("清理过期的Dialogue服务器: {}", instanceId);
+                log.info("Limpando servidor Dialogue expirado: {}", instanceId);
             }
         } catch (Exception e) {
-            log.error("获取可用Dialogue服务器列表失败", e);
+            log.error("Falha ao obter lista de servidores Dialogue disponíveis", e);
         }
         return result;
     }
@@ -101,7 +101,7 @@ public class RedisDialogueServerRegistry implements DialogueServerRegistry {
         if (servers.isEmpty()) {
             return null;
         }
-        // 随机负载均衡
+        // Balanceamento de carga aleatório
         int index = ThreadLocalRandom.current().nextInt(servers.size());
         return servers.get(index);
     }

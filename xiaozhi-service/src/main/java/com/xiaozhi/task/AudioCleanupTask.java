@@ -14,9 +14,9 @@ import java.time.format.DateTimeParseException;
 import java.util.stream.Stream;
 
 /**
- * 音频文件定时清理任务
+ * Tarefa agendada de limpeza de arquivos de áudio
  *
- * 凌晨1点：清理超过 retentionDays 天的对话录音目录
+ * À 1h da manhã: limpa os diretórios de gravações de conversa com mais de retentionDays dias
  */
 @Slf4j
 @Component
@@ -30,7 +30,7 @@ public class AudioCleanupTask {
         }
 
         int retentionDays = AudioUtils.AUDIO_RETENTION_DAYS;
-        log.info("========== 开始执行音频文件清理任务（保留{}天）==========", retentionDays);
+        log.info("========== Iniciando tarefa de limpeza de arquivos de áudio (mantendo {} dias) ==========", retentionDays);
         LocalDate expireDate = LocalDate.now().minusDays(retentionDays);
         int deletedDirs = 0;
 
@@ -44,13 +44,13 @@ public class AudioCleanupTask {
                         deletedDirs++;
                     }
                 } catch (DateTimeParseException ignored) {
-                    // 非日期格式的目录跳过
+                    // Ignora diretórios que não estão no formato de data
                 }
             }
         } catch (IOException e) {
-            log.error("音频文件清理任务执行失败", e);
+            log.error("Falha na execução da tarefa de limpeza de arquivos de áudio", e);
         }
 
-        log.info("========== 音频文件清理完成，共清理{}个目录 ==========", deletedDirs);
+        log.info("========== Limpeza de arquivos de áudio concluída, {} diretório(s) limpo(s) ==========", deletedDirs);
     }
 }

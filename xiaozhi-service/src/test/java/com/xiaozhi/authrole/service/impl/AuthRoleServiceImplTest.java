@@ -60,7 +60,7 @@ class AuthRoleServiceImplTest {
     void getThrowsWhenAuthRoleIdMissing() {
         assertThatThrownBy(() -> authRoleService.get(null))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("权限角色ID不能为空");
+            .hasMessage("O ID do papel de permissão não pode estar vazio");
     }
 
     @Test
@@ -69,7 +69,7 @@ class AuthRoleServiceImplTest {
         authRoleDO.setAuthRoleId(1);
         AuthRoleResp authRoleResp = new AuthRoleResp();
         authRoleResp.setAuthRoleId(1);
-        authRoleResp.setAuthRoleName("管理员");
+        authRoleResp.setAuthRoleName("Administrador");
         authRoleResp.setRoleKey("admin");
         PermissionTreeResp tree = new PermissionTreeResp();
         tree.setPermissionId(10);

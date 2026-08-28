@@ -8,10 +8,10 @@ import java.util.List;
 
 public interface RoleService {
 
-    /** 角色缓存名称（RoleServiceImpl 读缓存、RoleRepositoryImpl 写后失效均使用此常量） */
+    /** Nome do cache de papéis (usado por RoleServiceImpl para leitura e por RoleRepositoryImpl para invalidação após escrita) */
     String CACHE_NAME = "XiaoZhi:Role";
 
-    // ===================== 查询操作 =====================
+    // ===================== Operações de consulta =====================
 
     PageResp<RoleResp> page(int pageNo, int pageSize, Integer roleId, String roleName,
                             String isDefault, String state, Integer userId);
@@ -22,7 +22,7 @@ public interface RoleService {
 
     RoleBO getDefaultOrFirstBO(Integer userId);
 
-    // ===================== 写操作（待迁移到 RoleAppService） =====================
+    // ===================== Operações de escrita (a migrar para RoleAppService) =====================
 
     Integer copyDefaultRole(Integer sourceUserId, Integer targetUserId);
 }

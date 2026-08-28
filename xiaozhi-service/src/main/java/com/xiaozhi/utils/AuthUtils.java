@@ -5,8 +5,8 @@ import com.xiaozhi.common.model.bo.UserBO;
 import com.xiaozhi.user.service.UserService;
 
 /**
- * 认证工具类
- * 提供统一的用户信息获取方法
+ * Classe utilitária de autenticação
+ * Fornece métodos unificados para obtenção de informações do usuário
  *
  * @author Joey
  */
@@ -15,16 +15,16 @@ public class AuthUtils {
     private static UserService userService;
 
     /**
-     * 注入UserService(通过Spring容器注入)
+     * Injeta o UserService (via container do Spring)
      */
     public static void setUserService(UserService userService) {
         AuthUtils.userService = userService;
     }
 
     /**
-     * 获取当前登录用户ID
+     * Obtém o ID do usuário atualmente logado
      *
-     * @return 用户ID
+     * @return ID do usuário
      */
     public static Integer getCurrentUserId() {
         try {
@@ -35,9 +35,9 @@ public class AuthUtils {
     }
 
     /**
-     * 获取当前登录用户信息
+     * Obtém as informações do usuário atualmente logado
      *
-     * @return 用户信息
+     * @return Informações do usuário
      */
     public static UserBO getCurrentUser() {
         Integer userId = getCurrentUserId();
@@ -53,19 +53,19 @@ public class AuthUtils {
     }
 
     /**
-     * 检查是否已登录
+     * Verifica se está logado
      *
-     * @return 是否已登录
+     * @return Se está logado
      */
     public static boolean isLogin() {
         return StpUtil.isLogin();
     }
 
     /**
-     * 检查当前用户是否有指定权限
+     * Verifica se o usuário atual tem a permissão especificada
      *
-     * @param permission 权限标识
-     * @return 是否有权限
+     * @param permission Identificador da permissão
+     * @return Se possui a permissão
      */
     public static boolean hasPermission(String permission) {
         try {
@@ -77,10 +77,10 @@ public class AuthUtils {
     }
 
     /**
-     * 检查当前用户是否有指定角色
+     * Verifica se o usuário atual tem o papel especificado
      *
-     * @param role 角色标识
-     * @return 是否有角色
+     * @param role Identificador do papel
+     * @return Se possui o papel
      */
     public static boolean hasRole(String role) {
         try {
@@ -92,14 +92,14 @@ public class AuthUtils {
     }
 
     /**
-     * 退出登录
+     * Encerra a sessão
      */
     public static void logout() {
         StpUtil.logout();
     }
 
     /**
-     * 获取当前Token
+     * Obtém o Token atual
      *
      * @return Token
      */

@@ -87,16 +87,16 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserBO create(UserBO user) {
         if (user == null || !StringUtils.hasText(user.getUsername()) || !StringUtils.hasText(user.getPassword())) {
-            throw new IllegalArgumentException("用户信息不完整");
+            throw new IllegalArgumentException("Informações do usuário incompletas");
         }
         if (getByUsername(user.getUsername()) != null) {
-            throw new IllegalArgumentException("用户名已存在");
+            throw new IllegalArgumentException("Nome de usuário já existe");
         }
         if (StringUtils.hasText(user.getEmail()) && getByEmail(user.getEmail()) != null) {
-            throw new IllegalArgumentException("邮箱已注册");
+            throw new IllegalArgumentException("E-mail já registrado");
         }
         if (StringUtils.hasText(user.getTel()) && getByTel(user.getTel()) != null) {
-            throw new IllegalArgumentException("手机号已注册");
+            throw new IllegalArgumentException("Número de telefone já registrado");
         }
 
         UserDO userDO = userConvert.toDO(user);
@@ -108,16 +108,16 @@ public class UserServiceImpl implements UserService {
             userDO.setIsAdmin(UserBO.ADMIN_NO);
         }
         if (userDO.getAuthRoleId() == null) {
-            // sys_user.authRoleId 存的是后台权限角色，不是对话 persona。
+            // sys_user.authRoleId armazena o papel de permissão do backoffice, não a persona de conversa.
             userDO.setAuthRoleId(DEFAULT_AUTH_ROLE_ID);
         }
         if (userMapper.insert(userDO) <= 0) {
-            throw new IllegalStateException("创建用户失败");
+            throw new IllegalStateException("Falha ao criar usuário");
         }
 
         UserBO result = userConvert.toBO(userMapper.selectById(userDO.getUserId()));
         if (result == null) {
-            throw new IllegalStateException("创建用户失败");
+            throw new IllegalStateException("Falha ao criar usuário");
         }
         return result;
     }
@@ -127,46 +127,46 @@ public class UserServiceImpl implements UserService {
     @CacheEvict(value = CACHE_NAME, key = "'bo:' + #user.userId", condition = "#user != null && #user.userId != null")
     public void update(UserBO user) {
         if (user == null || user.getUserId() == null) {
-            throw new IllegalArgumentException("用户信息不完整");
+            throw new IllegalArgumentException("Informações do usuário incompletas");
         }
 
         UserDO existing = userMapper.selectById(user.getUserId());
         if (existing == null) {
-            throw new ResourceNotFoundException("用户不存在");
+            throw new ResourceNotFoundException("Usuário não encontrado");
         }
         if (StringUtils.hasText(user.getUsername()) && !user.getUsername().equals(existing.getUsername())) {
             UserBO usernameOwner = getByUsername(user.getUsername());
             if (usernameOwner != null && !usernameOwner.getUserId().equals(user.getUserId())) {
-                throw new IllegalArgumentException("用户名已存在");
+                throw new IllegalArgumentException("Nome de usuário já existe");
             }
         }
         if (StringUtils.hasText(user.getEmail()) && !user.getEmail().equals(existing.getEmail())) {
             UserBO emailOwner = getByEmail(user.getEmail());
             if (emailOwner != null && !emailOwner.getUserId().equals(user.getUserId())) {
-                throw new IllegalArgumentException("邮箱已注册");
+                throw new IllegalArgumentException("E-mail já registrado");
             }
         }
         if (StringUtils.hasText(user.getTel()) && !user.getTel().equals(existing.getTel())) {
             UserBO telOwner = getByTel(user.getTel());
             if (telOwner != null && !telOwner.getUserId().equals(user.getUserId())) {
-                throw new IllegalArgumentException("手机号已注册");
+                throw new IllegalArgumentException("Número de telefone já registrado");
             }
         }
 
         userConvert.updateDO(user, existing);
         if (userMapper.updateById(existing) <= 0) {
-            throw new IllegalStateException("更新用户失败");
+            throw new IllegalStateException("Falha ao atualizar usuário");
         }
     }
 
     @Override
     public String generateCaptcha(String account) {
         if (!StringUtils.hasText(account)) {
-            throw new IllegalArgumentException("账号不能为空");
+            throw new IllegalArgumentException("A conta não pode estar vazia");
         }
         String code = String.format("%06d", ThreadLocalRandom.current().nextInt(1_000_000));
         if (userMapper.insertCode(account, code) <= 0) {
-            throw new IllegalStateException("生成验证码失败");
+            throw new IllegalStateException("Falha ao gerar código de verificação");
         }
         return code;
     }

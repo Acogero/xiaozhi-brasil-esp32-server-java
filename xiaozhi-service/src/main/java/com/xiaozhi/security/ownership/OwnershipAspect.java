@@ -62,7 +62,7 @@ public class OwnershipAspect {
 
             OwnershipChecker checker = checkerMap.get(annotation.resource());
             if (checker == null) {
-                throw new IllegalStateException("未注册资源归属检查器: " + annotation.resource());
+                throw new IllegalStateException("Verificador de propriedade de recurso não registrado: " + annotation.resource());
             }
 
             Object resourceId = expressionParser.parseExpression(annotation.id()).getValue(context);
@@ -83,10 +83,10 @@ public class OwnershipAspect {
         try {
             loginId = StpUtil.getLoginId();
         } catch (Exception e) {
-            throw new UnauthorizedException("无法获取当前登录用户");
+            throw new UnauthorizedException("Não foi possível obter o usuário atualmente logado");
         }
         if (loginId == null) {
-            throw new UnauthorizedException("无法获取当前登录用户");
+            throw new UnauthorizedException("Não foi possível obter o usuário atualmente logado");
         }
         try {
             if (loginId instanceof Number number) {
@@ -98,7 +98,7 @@ public class OwnershipAspect {
             }
             return Integer.valueOf(text);
         } catch (NumberFormatException | ArithmeticException e) {
-            throw new UnauthorizedException("无法获取当前登录用户");
+            throw new UnauthorizedException("Não foi possível obter o usuário atualmente logado");
         }
     }
 

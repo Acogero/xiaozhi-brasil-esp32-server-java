@@ -4,7 +4,7 @@ import com.xiaozhi.utils.CommonUtils;
 import org.springframework.stereotype.Service;
 
 /**
- * 密码加密与验证
+ * Criptografia e verificação de senha
  *
  * @author Joey
  *
@@ -16,7 +16,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     /**
      * @param rawPassword
-     * @return 加密后的密码
+     * @return Senha criptografada
      */
     public String encryptPassword(String rawPassword) {
         String saltPassword = rawPassword + salt;
@@ -24,11 +24,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     /**
-     * 密码验证
+     * Verificação de senha
      * 
      * @param rawPassword
      * @param encryptPassword
-     * @return 是否相同
+     * @return Se são iguais
      */
     public Boolean isPasswordValid(String rawPassword, String encryptPassword) {
         String encodePassword = encryptPassword(rawPassword);

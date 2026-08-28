@@ -5,7 +5,7 @@ import com.xiaozhi.common.model.bo.OperationLogBO;
 public interface OperationLogService {
 
     /**
-     * 异步保存操作日志，不影响主流程性能。
+     * Salva o log de operação de forma assíncrona, sem afetar o desempenho do fluxo principal.
      */
     void saveAsync(OperationLogBO log);
 }

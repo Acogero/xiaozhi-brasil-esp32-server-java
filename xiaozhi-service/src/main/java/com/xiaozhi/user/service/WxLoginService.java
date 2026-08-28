@@ -3,15 +3,15 @@ package com.xiaozhi.user.service;
 import java.util.Map;
 
 /**
- * 微信登录服务接口
+ * Interface do serviço de login do WeChat
  */
 public interface WxLoginService {
     
     /**
-     * 获取微信登录信息
+     * Obtém as informações de login do WeChat
      * 
-     * @param code 微信登录code
-     * @return 包含openid和session_key的Map
+     * @param code Code de login do WeChat
+     * @return Map contendo openid e session_key
      */
     Map<String, String> getWxLoginInfo(String code);
 }

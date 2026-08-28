@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * AiConfig 聚合根 —— 表示一条 AI 模型配置（LLM / TTS / STT / VAD / Embedding 等）。
+ * AiConfig Raiz de agregação — representa uma configuração de modelo de IA (LLM / TTS / STT / VAD / Embedding etc.).
  * <p>
- * 不变式：同一 userId + configType + modelType 组合下最多一条默认配置（由 ConfigRepository.save 维护）。
+ * Invariante: no máximo uma configuração padrão por combinação de userId + configType + modelType (mantido por ConfigRepository.save).
  */
 @Getter
 public class AiConfig {
@@ -20,18 +20,18 @@ public class AiConfig {
 
     public enum DomainSignal { DEFAULT_CHANGED, UPDATED, DISABLED }
 
-    // ── 标识 ─────────────────────────────────────────────────────────────────
+    // ── Identificação ───────────────────────────────────────────────────────
     private Integer       configId;
     private Integer       userId;
 
-    // ── 元数据 ────────────────────────────────────────────────────────────────
+    // ── Metadados ───────────────────────────────────────────────────────────
     private String configName;
     private String configDesc;
     private String configType;
     private String modelType;
     private String provider;
 
-    // ── 凭证 ──────────────────────────────────────────────────────────────────
+    // ── Credenciais ─────────────────────────────────────────────────────────
     private String appId;
     private String apiKey;
     private String apiSecret;
@@ -39,23 +39,23 @@ public class AiConfig {
     private String sk;
     private String apiUrl;
 
-    // ── 能力 ──────────────────────────────────────────────────────────────────
+    // ── Capacidades ─────────────────────────────────────────────────────────
     private Boolean enableThinking;
 
-    // ── 状态 ──────────────────────────────────────────────────────────────────
+    // ── Estado ──────────────────────────────────────────────────────────────
     private String  state;
     private boolean isDefault;
 
-    // ── 时间戳 ────────────────────────────────────────────────────────────────
+    // ── Timestamps ──────────────────────────────────────────────────────────
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
     private final List<DomainSignal> signals = new ArrayList<>();
 
-    /** 仅供 ConfigConverter 重建使用 */
+    /** Uso exclusivo do ConfigConverter para reconstrução */
     public AiConfig() {}
 
-    // ── 工厂方法 ──────────────────────────────────────────────────────────────
+    // ── Métodos de fábrica ──────────────────────────────────────────────────
 
     public static AiConfig newConfig(Integer userId, String configType, String provider,
                                      String configName, String configDesc, String modelType,
@@ -90,7 +90,7 @@ public class AiConfig {
                 bo.getEnableThinking(), "1".equals(bo.getIsDefault()));
     }
 
-    /** 从持久层重建聚合根（Repository 专用，不产生任何信号）。 */
+    /** Reconstrói a raiz de agregação a partir da camada de persistência (uso exclusivo do Repository, não gera sinais). */
     public static AiConfig reconstitute(Integer configId, Integer userId,
                                         String configType, String provider,
                                         String configName, String configDesc, String modelType,
@@ -121,9 +121,9 @@ public class AiConfig {
         return c;
     }
 
-    // ── 行为方法 ──────────────────────────────────────────────────────────────
+    // ── Métodos de comportamento ────────────────────────────────────────────
 
-    /** 将此配置设为默认（Repository.save 负责清除同类其他默认标记）。 */
+    /** Define esta configuração como padrão (Repository.save é responsável por limpar as outras marcações padrão do mesmo tipo). */
     public void setAsDefault() {
         if (!this.isDefault) {
             this.isDefault = true;
@@ -131,7 +131,7 @@ public class AiConfig {
         }
     }
 
-    /** 由 Repository 在 resetDefault 流程中调用，不产生信号。 */
+    /** Chamado pelo Repository no fluxo de resetDefault, não gera sinais. */
     public void clearDefault() {
         this.isDefault = false;
     }
@@ -168,19 +168,19 @@ public class AiConfig {
         signals.add(DomainSignal.UPDATED);
     }
 
-    /** 软删除：禁用并取消默认。 */
+    /** Exclusão lógica: desabilita e remove a marcação de padrão. */
     public void disable() {
         this.state     = STATE_DISABLED;
         this.isDefault = false;
         signals.add(DomainSignal.DISABLED);
     }
 
-    /** insert 后由 Repository 回填自增主键，不产生信号。 */
+    /** Preenchido pelo Repository após o insert com a chave primária autoincrementada, não gera sinais. */
     public void assignId(Integer configId) {
         this.configId = configId;
     }
 
-    /** 取出并清空信号队列，供 Repository 发布领域事件。 */
+    /** Extrai e limpa a fila de sinais, para o Repository publicar eventos de domínio. */
     public List<DomainSignal> pullSignals() {
         List<DomainSignal> s = List.copyOf(signals);
         signals.clear();

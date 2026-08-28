@@ -84,7 +84,7 @@ class UserServiceImplTest {
 
         assertThatThrownBy(() -> userService.create(draft))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("用户名已存在");
+            .hasMessage("Nome de usuário já existe");
     }
 
     @Test
@@ -96,13 +96,13 @@ class UserServiceImplTest {
 
         assertThatThrownBy(() -> userService.update(user))
             .isInstanceOf(ResourceNotFoundException.class)
-            .hasMessage("用户不存在");
+            .hasMessage("Usuário não encontrado");
     }
 
     @Test
     void generateCaptchaThrowsWhenAccountBlank() {
         assertThatThrownBy(() -> userService.generateCaptcha(" "))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("账号不能为空");
+            .hasMessage("A conta não pode estar vazia");
     }
 }

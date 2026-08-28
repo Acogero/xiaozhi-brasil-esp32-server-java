@@ -6,68 +6,68 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
- * 对象存储服务接口。
- * 通过 {@link StorageServiceFactory} 获取当前生效的实现。
+ * Interface do serviço de armazenamento de objetos.
+ * A implementação atualmente ativa é obtida via {@link StorageServiceFactory}.
  * <p>
- * 支持本地文件存储和多云 OSS（腾讯云 COS、阿里云 OSS）。
- * 配置通过 sys_config 表（configType="oss"）管理，前端管理员可在设置页面选择存储方式。
+ * Suporta armazenamento de arquivos local e múltiplos provedores de OSS na nuvem (Tencent Cloud COS, Alibaba Cloud OSS).
+ * A configuração é gerenciada pela tabela sys_config (configType="oss"); o administrador pode escolher o modo de armazenamento na página de configurações do frontend.
  */
 public interface StorageService {
 
-    /** 默认文件大小上限：50MB */
+    /** Limite padrão de tamanho de arquivo: 50MB */
     long DEFAULT_MAX_SIZE = 50 * 1024 * 1024;
 
     /**
-     * 上传文件（Web 端）
+     * Envia um arquivo (lado Web)
      *
-     * @param file         上传的文件
-     * @param relativePath 相对路径（如 "avatar/2026/02/28"）
-     * @param fileName     文件名（如 "xxxx.png"）
-     * @return 访问路径（本地返回相对路径，云端返回完整 URL）
-     * @throws IOException 上传失败
+     * @param file         Arquivo a ser enviado
+     * @param relativePath Caminho relativo (ex.: "avatar/2026/02/28")
+     * @param fileName     Nome do arquivo (ex.: "xxxx.png")
+     * @return Caminho de acesso (localmente retorna o caminho relativo, na nuvem retorna a URL completa)
+     * @throws IOException Falha no envio
      */
     String upload(MultipartFile file, String relativePath, String fileName) throws IOException;
 
     /**
-     * 上传本地文件（内部使用，如音频缓存）。
-     * 方法会接管 localFile 的生命周期，调用者不再需要关心源文件。
+     * Envia um arquivo local (uso interno, ex.: cache de áudio).
+     * O método assume o ciclo de vida do localFile; o chamador não precisa mais se preocupar com o arquivo de origem.
      *
-     * @param localFile 本地文件
-     * @param objectKey 存储键（本地作为相对路径，云端作为对象键）
-     * @return 存储路径（本地返回文件路径，云端返回完整 URL）
-     * @throws IOException 上传失败
+     * @param localFile Arquivo local
+     * @param objectKey Chave de armazenamento (localmente como caminho relativo, na nuvem como chave de objeto)
+     * @return Caminho de armazenamento (localmente retorna o caminho do arquivo, na nuvem retorna a URL completa)
+     * @throws IOException Falha no envio
      */
     String upload(Path localFile, String objectKey) throws IOException;
 
     /**
-     * 下载文件内容
+     * Baixa o conteúdo do arquivo
      *
-     * @param storedPath {@link #upload} 返回的路径
-     * @return 文件字节，不存在或失败返回 {@code null}
+     * @param storedPath Caminho retornado por {@link #upload}
+     * @return Bytes do arquivo; retorna {@code null} se não existir ou falhar
      */
     byte[] download(String storedPath);
 
     /**
-     * 删除文件（静默处理不存在的情况）
+     * Exclui o arquivo (trata silenciosamente o caso de não existir)
      */
     void remove(String storedPath);
 
     /**
-     * 检查文件是否存在
+     * Verifica se o arquivo existe
      */
     boolean exists(String storedPath);
 
     /**
-     * 获取 provider 名称，用于 Factory 路由
+     * Obtém o nome do provider, usado no roteamento da Factory
      */
     String getProvider();
 
     /**
-     * 检查文件大小
+     * Verifica o tamanho do arquivo
      */
     static void assertAllowed(MultipartFile file) {
         if (file.getSize() > DEFAULT_MAX_SIZE) {
-            throw new IllegalArgumentException("文件大小超过限制，最大允许：" + (DEFAULT_MAX_SIZE / 1024 / 1024) + "MB");
+            throw new IllegalArgumentException("O tamanho do arquivo excede o limite; máximo permitido: " + (DEFAULT_MAX_SIZE / 1024 / 1024) + "MB");
         }
     }
 }

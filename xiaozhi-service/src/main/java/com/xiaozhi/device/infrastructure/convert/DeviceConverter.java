@@ -8,15 +8,15 @@ import com.xiaozhi.device.domain.vo.VerifyCode;
 import org.springframework.stereotype.Component;
 
 /**
- * Device 聚合根 ↔ DO / BO 转换器（领域层与基础设施层之间）。
+ * Conversor Device raiz de agregação ↔ DO / BO (entre a camada de domínio e a de infraestrutura).
  * <p>
- * 注意：此类负责 DO ↔ {@link Device} 聚合根的转换，
- * 与 MapStruct {@code DeviceConvert}（DO ↔ BO）职责不同，请勿混用。
+ * Observação: esta classe é responsável pela conversão DO ↔ raiz de agregação {@link Device},
+ * responsabilidade diferente da MapStruct {@code DeviceConvert} (DO ↔ BO); não confundir.
  */
 @Component
 public class DeviceConverter {
 
-    /** DeviceDO → Device 聚合根（从持久层重建） */
+    /** DeviceDO → Device raiz de agregação (reconstrução a partir da camada de persistência) */
     public Device toDomain(DeviceDO d) {
         return new Device(
                 d.getDeviceId(),
@@ -36,7 +36,7 @@ public class DeviceConverter {
         );
     }
 
-    /** Device 聚合根 → DeviceDO（写入持久层） */
+    /** Device raiz de agregação → DeviceDO (gravação na camada de persistência) */
     public DeviceDO toDataObject(Device device) {
         DeviceDO d = new DeviceDO();
         d.setDeviceId(device.getDeviceId());
@@ -54,7 +54,7 @@ public class DeviceConverter {
         return d;
     }
 
-    /** Device 聚合根 → DeviceBO（用于事件发布，sessionId / roleName 不可用） */
+    /** Device raiz de agregação → DeviceBO (usado na publicação de eventos; sessionId / roleName não disponíveis) */
     public DeviceBO toBO(Device device) {
         DeviceBO bo = new DeviceBO();
         bo.setDeviceId(device.getDeviceId());
@@ -74,7 +74,7 @@ public class DeviceConverter {
         return bo;
     }
 
-    /** VerifyCodeBO → VerifyCode 值对象 */
+    /** VerifyCodeBO → objeto de valor VerifyCode */
     public VerifyCode toVerifyCode(VerifyCodeBO bo) {
         return new VerifyCode(
                 bo.getCode(),

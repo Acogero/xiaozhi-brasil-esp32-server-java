@@ -1,9 +1,9 @@
 package com.xiaozhi.role.domain.vo;
 
 /**
- * 对话记忆策略值对象。
+ * Objeto de valor da estratégia de memória de conversa.
  * <p>
- * type 对应数据库 memoryType 字段（如 "memory_window"、"memory_long_term"）。
+ * type corresponde ao campo memoryType do banco de dados (ex.: "memory_window", "memory_long_term").
  */
 public record MemoryStrategy(String type) {
 

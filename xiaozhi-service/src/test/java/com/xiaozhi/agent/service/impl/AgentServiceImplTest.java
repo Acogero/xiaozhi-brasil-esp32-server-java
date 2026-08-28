@@ -75,12 +75,12 @@ class AgentServiceImplTest {
         llmConfig.setConfigType("llm");
         llmConfig.setApiKey("k1");
         llmConfig.setProvider("dify");
-        llmConfig.setConfigName("现有智能体");
-        llmConfig.setConfigDesc("说明");
+        llmConfig.setConfigName("Agente existente");
+        llmConfig.setConfigDesc("Descrição");
         llmConfig.setCreateTime(LocalDateTime.now());
 
         AgentResp resp = new AgentResp();
-        resp.setAgentName("现有智能体");
+        resp.setAgentName("Agente existente");
         when(configService.listBO(1, null, "dify", null, null, ConfigBO.STATE_ENABLED))
             .thenReturn(List.of(agentConfig, llmConfig));
         when(agentConvert.toResp(org.mockito.ArgumentMatchers.any())).thenReturn(resp);

@@ -26,7 +26,7 @@ public class OperationLogServiceImpl implements OperationLogService {
         try {
             operationLogMapper.insert(operationLogConvert.toDO(operationLog));
         } catch (Exception e) {
-            log.error("保存操作日志失败: module={} operation={}", operationLog.getModule(), operationLog.getOperation(), e);
+            log.error("Falha ao salvar log de operação: module={} operation={}", operationLog.getModule(), operationLog.getOperation(), e);
         }
     }
 }

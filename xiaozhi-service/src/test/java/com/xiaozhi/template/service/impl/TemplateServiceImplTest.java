@@ -47,7 +47,7 @@ class TemplateServiceImplTest {
         when(templateMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(templateDO));
         when(templateConvert.toBO(templateDO)).thenReturn(templateBO);
 
-        List<TemplateBO> result = templateService.listBO(1, "默认", "chat");
+        List<TemplateBO> result = templateService.listBO(1, "Padrão", "chat");
 
         assertThat(result).containsExactly(templateBO);
         verify(templateMapper).selectList(any(LambdaQueryWrapper.class));

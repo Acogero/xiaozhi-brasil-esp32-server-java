@@ -15,7 +15,7 @@ import java.nio.file.StandardCopyOption;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 本地文件存储实现
+ * Implementação de armazenamento de arquivos local
  */
 @Slf4j
 @Component
@@ -36,7 +36,7 @@ public class LocalStorageService implements StorageService {
         if (!directory.exists()) {
             boolean created = directory.mkdirs();
             if (!created) {
-                throw new IOException("无法创建目录: " + fullPath);
+                throw new IOException("Não foi possível criar o diretório: " + fullPath);
             }
         }
 
@@ -46,7 +46,7 @@ public class LocalStorageService implements StorageService {
             inputStream.transferTo(fos);
         }
 
-        // 返回相对路径（统一使用正斜杠，便于 URL 访问）
+        // Retorna o caminho relativo (usando sempre barra normal, para facilitar o acesso via URL)
         String relativeFilePath = baseDir + File.separator + relativePath + File.separator + fileName;
         return relativeFilePath.replace(File.separator, "/");
     }
@@ -68,7 +68,7 @@ public class LocalStorageService implements StorageService {
             Path path = Path.of(storedPath);
             return Files.exists(path) ? Files.readAllBytes(path) : null;
         } catch (Exception e) {
-            log.warn("读取本地文件失败: {}", storedPath, e);
+            log.warn("Falha ao ler arquivo local: {}", storedPath, e);
             return null;
         }
     }
@@ -79,7 +79,7 @@ public class LocalStorageService implements StorageService {
         try {
             Files.deleteIfExists(Path.of(storedPath));
         } catch (Exception e) {
-            log.warn("删除本地文件失败: {}", storedPath, e);
+            log.warn("Falha ao excluir arquivo local: {}", storedPath, e);
         }
     }
 

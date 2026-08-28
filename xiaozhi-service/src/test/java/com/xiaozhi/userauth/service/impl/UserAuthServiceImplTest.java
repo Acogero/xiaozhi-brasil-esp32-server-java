@@ -40,7 +40,7 @@ class UserAuthServiceImplTest {
     void createThrowsWhenUserAuthIncomplete() {
         assertThatThrownBy(() -> userAuthService.create(new UserAuthBO()))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("用户授权信息不完整");
+            .hasMessage("Informações de autorização do usuário incompletas");
     }
 
     @Test
@@ -79,13 +79,13 @@ class UserAuthServiceImplTest {
 
         assertThatThrownBy(() -> userAuthService.update(userAuth))
             .isInstanceOf(ResourceNotFoundException.class)
-            .hasMessage("用户授权不存在");
+            .hasMessage("Autorização do usuário não encontrada");
     }
 
     @Test
     void deleteByIdThrowsWhenIdMissing() {
         assertThatThrownBy(() -> userAuthService.deleteById(null))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("授权ID不能为空");
+            .hasMessage("O ID da autorização não pode estar vazio");
     }
 }

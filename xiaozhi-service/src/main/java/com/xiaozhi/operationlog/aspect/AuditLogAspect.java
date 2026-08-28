@@ -56,7 +56,7 @@ public class AuditLogAspect {
                 log.setErrorMsg(msg != null && msg.length() > 500 ? msg.substring(0, 500) : msg);
             }
 
-            // 用户ID
+            // ID do usuário
             try {
                 if (StpUtil.isLogin()) {
                     Object loginId = StpUtil.getLoginId();
@@ -69,7 +69,7 @@ public class AuditLogAspect {
             } catch (Exception ignored) {
             }
 
-            // 请求信息
+            // Informações da requisição
             ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attrs != null) {
                 HttpServletRequest request = attrs.getRequest();
@@ -78,16 +78,16 @@ public class AuditLogAspect {
                 log.setIp(RequestContextUtils.getClientIp(request));
             }
 
-            // handler 名称
+            // Nome do handler
             MethodSignature sig = (MethodSignature) pjp.getSignature();
             log.setHandler(pjp.getTarget().getClass().getSimpleName() + "#" + sig.getMethod().getName());
 
-            // 请求参数（过滤文件、response 等不可序列化的参数）
+            // Parâmetros da requisição (filtrando arquivos, response e outros parâmetros não serializáveis)
             log.setParams(serializeArgs(pjp.getArgs()));
 
             operationLogService.saveAsync(log);
         } catch (Exception e) {
-            // 日志记录失败不影响主流程
+            // Falha ao registrar o log não afeta o fluxo principal
         }
     }
 

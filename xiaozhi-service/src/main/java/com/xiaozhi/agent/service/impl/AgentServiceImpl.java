@@ -151,9 +151,9 @@ public class AgentServiceImpl implements AgentService {
                         agent.setAgentDesc(description);
                         agent.setPublishTime(savedConfig.getCreateTime() == null
                             ? null : java.sql.Timestamp.valueOf(savedConfig.getCreateTime()));
-                        log.debug("添加DIFY LLM配置成功: {}", apiKey);
+                        log.debug("Configuração LLM DIFY adicionada com sucesso: {}", apiKey);
                     } catch (RuntimeException e) {
-                        log.warn("同步DIFY智能体配置失败，apiKey={}", apiKey, e);
+                        log.warn("Falha ao sincronizar configuração do agente DIFY, apiKey={}", apiKey, e);
                     }
 
                     fillDifyIcon(apiUrl, apiKey, agent);
@@ -162,9 +162,9 @@ public class AgentServiceImpl implements AgentService {
                 if (e instanceof InterruptedException) {
                     Thread.currentThread().interrupt();
                 }
-                log.error("查询DIFY智能体信息异常", e);
+                log.error("Exceção ao consultar informações do agente DIFY", e);
                 agent.setAgentName(StringUtils.hasText(agentConfig.getConfigName()) ? agentConfig.getConfigName() : "DIFY Agent");
-                agent.setAgentDesc("无法连接到DIFY API");
+                agent.setAgentDesc("Não foi possível conectar à API do DIFY");
             }
 
             if (!StringUtils.hasText(agentName)
@@ -232,9 +232,9 @@ public class AgentServiceImpl implements AgentService {
                 fillAgentConfig(agent, savedConfig);
                 agent.setPublishTime(savedConfig.getCreateTime() != null
                     ? java.sql.Timestamp.valueOf(savedConfig.getCreateTime()) : null);
-                log.debug("添加XingChen LLM配置成功: {}", apiKey);
+                log.debug("Configuração LLM XingChen adicionada com sucesso: {}", apiKey);
             } catch (RuntimeException e) {
-                log.warn("同步XingChen智能体配置失败，apiKey={}", apiKey, e);
+                log.warn("Falha ao sincronizar configuração do agente XingChen, apiKey={}", apiKey, e);
                 fillAgentConfig(agent, agentConfig);
             }
             agent.setAgentName(name);
@@ -279,8 +279,8 @@ public class AgentServiceImpl implements AgentService {
 
             JsonNode rootNode = objectMapper.readTree(response.body());
             if (!rootNode.has("code") || rootNode.get("code").asInt() != 0) {
-                String errorMsg = rootNode.has("msg") ? rootNode.get("msg").asText() : "未知错误";
-                log.error("查询Coze智能体列表失败：{}", errorMsg);
+                String errorMsg = rootNode.has("msg") ? rootNode.get("msg").asText() : "Erro desconhecido";
+                log.error("Falha ao consultar lista de agentes Coze: {}", errorMsg);
                 return result;
             }
 
@@ -316,12 +316,12 @@ public class AgentServiceImpl implements AgentService {
                     existingConfig.setConfigDesc(description);
                     try {
                         AiConfig aiConfig = configRepository.findById(existingConfig.getConfigId())
-                            .orElseThrow(() -> new RuntimeException("配置不存在: " + existingConfig.getConfigId()));
+                            .orElseThrow(() -> new RuntimeException("Configuração não encontrada: " + existingConfig.getConfigId()));
                         aiConfig.update(existingConfig);
                         configRepository.save(aiConfig);
                         fillAgentConfig(agent, configConverter.toBO(aiConfig));
                     } catch (RuntimeException e) {
-                        log.warn("同步Coze智能体配置失败，botId={}", botId, e);
+                        log.warn("Falha ao sincronizar configuração do agente Coze, botId={}", botId, e);
                         fillAgentConfig(agent, existingConfig);
                     }
                 } else {
@@ -334,7 +334,7 @@ public class AgentServiceImpl implements AgentService {
                         configRepository.save(aiConfig);
                         fillAgentConfig(agent, configConverter.toBO(aiConfig));
                     } catch (RuntimeException e) {
-                        log.warn("创建Coze智能体配置失败，botId={}", botId, e);
+                        log.warn("Falha ao criar configuração do agente Coze, botId={}", botId, e);
                     }
                 }
 
@@ -346,12 +346,12 @@ public class AgentServiceImpl implements AgentService {
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.error("查询Coze智能体列表异常", e);
+            log.error("Exceção ao consultar lista de agentes Coze", e);
         } catch (IOException e) {
-            log.error("查询Coze智能体列表异常", e);
+            log.error("Exceção ao consultar lista de agentes Coze", e);
         } catch (RuntimeException e) {
-            log.error("获取Coze Token失败", e);
-            throw new RuntimeException("无法获取Coze平台授权码，请检查您的平台配置是否正确", e);
+            log.error("Falha ao obter Token do Coze", e);
+            throw new RuntimeException("Não foi possível obter o código de autorização da plataforma Coze, verifique se a configuração da sua plataforma está correta", e);
         }
 
         return result;
@@ -400,7 +400,7 @@ public class AgentServiceImpl implements AgentService {
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
             }
-            log.error("获取DIFY meta信息异常", e);
+            log.error("Exceção ao obter informações meta do DIFY", e);
         }
     }
 }

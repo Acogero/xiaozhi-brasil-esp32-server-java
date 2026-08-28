@@ -26,13 +26,13 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Device 聚合根仓储实现。
+ * Implementação do repositório da raiz de agregação Device.
  * <p>
- * 封装 MyBatis-Plus Mapper，负责：
+ * Encapsula o Mapper do MyBatis-Plus, responsável por:
  * <ul>
- *   <li>DO ↔ 聚合根转换</li>
- *   <li>缓存失效</li>
- *   <li>聚合根信号 → Spring ApplicationEvent 发布</li>
+ *   <li>Conversão DO ↔ raiz de agregação</li>
+ *   <li>Invalidação de cache</li>
+ *   <li>Sinais da raiz de agregação → publicação de Spring ApplicationEvent</li>
  * </ul>
  */
 @Repository
@@ -134,7 +134,7 @@ public class DeviceRepositoryImpl implements DeviceRepository {
         }
     }
 
-    /** BO 快照 → DO（仅用于缓存命中路径的聚合根重建） */
+    /** Snapshot BO → DO (usado apenas na reconstrução da raiz de agregação no caminho de cache hit) */
     private DeviceDO toDeviceDO(DeviceBO bo) {
         DeviceDO d = new DeviceDO();
         d.setDeviceId(bo.getDeviceId());

@@ -6,7 +6,7 @@ import com.xiaozhi.template.domain.Template;
 import org.springframework.stereotype.Component;
 
 /**
- * TemplateDO / TemplateBO ↔ Template 聚合根转换器。
+ * Conversor entre TemplateDO / TemplateBO ↔ raiz de agregação Template.
  */
 @Component
 public class TemplateConverter {

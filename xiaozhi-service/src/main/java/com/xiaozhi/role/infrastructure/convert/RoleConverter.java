@@ -10,15 +10,15 @@ import com.xiaozhi.role.domain.vo.VoiceConfig;
 import org.springframework.stereotype.Component;
 
 /**
- * Role 聚合根 ↔ DO / BO 转换器。
+ * Conversor Role raiz de agregação ↔ DO / BO.
  * <p>
- * 负责将扁平化的 {@link RoleDO} 重建为含值对象的 {@link Role} 聚合根，
- * 与 MapStruct {@code RoleConvert}（DO ↔ BO）职责不同，请勿混用。
+ * Responsável por reconstruir o {@link RoleDO} "achatado" na raiz de agregação {@link Role} com objetos de valor,
+ * responsabilidade diferente da MapStruct {@code RoleConvert} (DO ↔ BO); não confundir.
  */
 @Component
 public class RoleConverter {
 
-    /** RoleDO → Role 聚合根（从持久层重建） */
+    /** RoleDO → Role raiz de agregação (reconstrução a partir da camada de persistência) */
     public Role toDomain(RoleDO d) {
         LlmConfig llm = new LlmConfig(d.getModelId(),
                 d.getTemperature() != null ? d.getTemperature() : 0.7d,
@@ -42,7 +42,7 @@ public class RoleConverter {
         );
     }
 
-    /** Role 聚合根 → RoleDO（写入持久层） */
+    /** Role raiz de agregação → RoleDO (gravação na camada de persistência) */
     public RoleDO toDataObject(Role r) {
         RoleDO d = new RoleDO();
         d.setRoleId(r.getRoleId());
@@ -85,7 +85,7 @@ public class RoleConverter {
         return d;
     }
 
-    /** Role 聚合根 → RoleBO（供已有 Service 接口和事件发布使用） */
+    /** Role raiz de agregação → RoleBO (usado pela interface Service existente e pela publicação de eventos) */
     public RoleBO toBO(Role r) {
         RoleBO bo = new RoleBO();
         bo.setRoleId(r.getRoleId());
@@ -128,7 +128,7 @@ public class RoleConverter {
         return bo;
     }
 
-    /** RoleBO → value objects（供 AppService 构造 update/create 行为参数） */
+    /** RoleBO → value objects (usado pelo AppService para construir os parâmetros de comportamento de update/create) */
     public LlmConfig toLlmConfig(RoleBO bo) {
         return new LlmConfig(bo.getModelId(), bo.getTemperature(), bo.getTopP());
     }

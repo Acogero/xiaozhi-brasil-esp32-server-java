@@ -1,7 +1,7 @@
 package com.xiaozhi.role.domain.vo;
 
 /**
- * 语音合成 / 识别配置值对象。
+ * Objeto de valor de configuração de síntese / reconhecimento de voz.
  */
 public record VoiceConfig(Integer ttsId, Integer sttId, String voiceName,
                            Double ttsPitch, Double ttsSpeed) {

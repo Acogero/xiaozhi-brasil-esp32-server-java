@@ -71,11 +71,11 @@ public class MessageServiceImpl implements MessageService {
     @Transactional
     public void delete(Integer messageId) {
         if (messageId == null) {
-            throw new IllegalArgumentException("消息ID不能为空");
+            throw new IllegalArgumentException("O ID da mensagem não pode estar vazio");
         }
         MessageBO existing = getBO(messageId);
         if (existing == null) {
-            throw new ResourceNotFoundException("消息不存在或已删除");
+            throw new ResourceNotFoundException("Mensagem não encontrada ou já excluída");
         }
 
         if (StringUtils.hasText(existing.getAudioPath())) {
@@ -86,7 +86,7 @@ public class MessageServiceImpl implements MessageService {
             .eq(MessageDO::getState, MessageBO.STATE_ENABLED)
             .set(MessageDO::getState, MessageBO.STATE_DELETED);
         if (messageMapper.update(null, updateWrapper) <= 0) {
-            throw new IllegalStateException("删除消息失败");
+            throw new IllegalStateException("Falha ao excluir mensagem");
         }
     }
 
@@ -223,7 +223,7 @@ public class MessageServiceImpl implements MessageService {
             return;
         }
 
-        // 1. 找到 assistant 消息的 messageId
+        // 1. Localiza o messageId da mensagem do assistant
         LambdaQueryWrapper<MessageDO> query = new LambdaQueryWrapper<MessageDO>()
             .eq(MessageDO::getDeviceId, deviceId)
             .eq(MessageDO::getRoleId, roleId)
@@ -236,7 +236,7 @@ public class MessageServiceImpl implements MessageService {
             return;
         }
 
-        // 2. 更新 audioPath
+        // 2. Atualiza o audioPath
         if (StringUtils.hasText(audioPath)) {
             LambdaUpdateWrapper<MessageDO> msgUpdate = new LambdaUpdateWrapper<MessageDO>()
                 .eq(MessageDO::getMessageId, messageDO.getMessageId())

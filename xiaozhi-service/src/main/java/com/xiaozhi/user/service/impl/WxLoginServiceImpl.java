@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 微信登录服务实现
+ * Implementação do serviço de login do WeChat
  */
 @Service
 public class WxLoginServiceImpl implements WxLoginService {
@@ -26,32 +26,32 @@ public class WxLoginServiceImpl implements WxLoginService {
     
     @Override
     public Map<String, String> getWxLoginInfo(String code) {
-        // 微信小程序登录API地址
+        // Endereço da API de login do miniaplicativo do WeChat
         String url = "https://api.weixin.qq.com/sns/jscode2session";
         
-        // 构建完整URL，包含查询参数
+        // Monta a URL completa, incluindo os parâmetros de consulta
         String fullUrl = String.format("%s?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code",
                 url, appid, secret, code);
         
-        // 发送请求
+        // Envia a requisição
         String response = restTemplate.getForObject(fullUrl, String.class);
         
-        // 解析响应
+        // Analisa a resposta
         Map<String, String> result = new HashMap<>();
         try {
-            // 使用Jackson解析JSON
+            // Usa o Jackson para analisar o JSON
             Map<String, Object> responseMap = objectMapper.readValue(response, Map.class);
             if (responseMap.containsKey("openid")) {
                 result.put("openid", (String) responseMap.get("openid"));
                 result.put("session_key", (String) responseMap.get("session_key"));
                 
-                // 如果有unionid，也保存下来
+                // Se houver unionid, também salva
                 if (responseMap.containsKey("unionid")) {
                     result.put("unionid", (String) responseMap.get("unionid"));
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("解析微信登录响应失败", e);
+            throw new RuntimeException("Falha ao analisar a resposta de login do WeChat", e);
         }
         
         return result;

@@ -47,7 +47,7 @@ class MessageServiceImplTest {
     void deleteThrowsWhenMessageIdMissing() {
         assertThatThrownBy(() -> messageService.delete(null))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("消息ID不能为空");
+            .hasMessage("O ID da mensagem não pode estar vazio");
     }
 
     @Test
@@ -56,7 +56,7 @@ class MessageServiceImplTest {
 
         assertThatThrownBy(() -> messageService.delete(1))
             .isInstanceOf(ResourceNotFoundException.class)
-            .hasMessage("消息不存在或已删除");
+            .hasMessage("Mensagem não encontrada ou já excluída");
 
         verify(messageMapper, never()).update(isNull(), any(LambdaUpdateWrapper.class));
     }

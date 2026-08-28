@@ -50,16 +50,16 @@ public class UserAuthServiceImpl implements UserAuthService {
     public UserAuthBO create(UserAuthBO userAuth) {
         if (userAuth == null || userAuth.getUserId() == null || !StringUtils.hasText(userAuth.getOpenId())
             || !StringUtils.hasText(userAuth.getPlatform())) {
-            throw new IllegalArgumentException("用户授权信息不完整");
+            throw new IllegalArgumentException("Informações de autorização do usuário incompletas");
         }
         UserAuthDO d = userAuthConvert.toDO(userAuth);
         d.setId(null);
         if (userAuthMapper.insert(d) <= 0) {
-            throw new IllegalStateException("创建用户授权失败");
+            throw new IllegalStateException("Falha ao criar autorização do usuário");
         }
         UserAuthDO result = userAuthMapper.selectById(d.getId());
         if (result == null) {
-            throw new IllegalStateException("创建用户授权失败");
+            throw new IllegalStateException("Falha ao criar autorização do usuário");
         }
         return userAuthConvert.toBO(result);
     }
@@ -68,13 +68,13 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Transactional
     public void update(UserAuthBO userAuth) {
         if (userAuth == null || userAuth.getId() == null) {
-            throw new IllegalArgumentException("用户授权信息不完整");
+            throw new IllegalArgumentException("Informações de autorização do usuário incompletas");
         }
         if (userAuthMapper.selectById(userAuth.getId()) == null) {
-            throw new ResourceNotFoundException("用户授权不存在");
+            throw new ResourceNotFoundException("Autorização do usuário não encontrada");
         }
         if (userAuthMapper.updateById(userAuthConvert.toDO(userAuth)) <= 0) {
-            throw new IllegalStateException("更新用户授权失败");
+            throw new IllegalStateException("Falha ao atualizar autorização do usuário");
         }
     }
 
@@ -82,13 +82,13 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Transactional
     public void deleteById(Long id) {
         if (id == null) {
-            throw new IllegalArgumentException("授权ID不能为空");
+            throw new IllegalArgumentException("O ID da autorização não pode estar vazio");
         }
         if (userAuthMapper.selectById(id) == null) {
-            throw new ResourceNotFoundException("用户授权不存在");
+            throw new ResourceNotFoundException("Autorização do usuário não encontrada");
         }
         if (userAuthMapper.deleteById(id) <= 0) {
-            throw new IllegalStateException("删除用户授权失败");
+            throw new IllegalStateException("Falha ao excluir autorização do usuário");
         }
     }
 

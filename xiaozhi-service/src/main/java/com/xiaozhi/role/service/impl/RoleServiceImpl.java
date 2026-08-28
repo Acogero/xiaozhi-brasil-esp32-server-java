@@ -24,7 +24,7 @@ import java.util.List;
 public class RoleServiceImpl implements RoleService {
 
     private static final String ENABLED = "1";
-    // 缓存名称统一定义在 RoleService 接口中
+    // Nome do cache definido de forma unificada na interface RoleService
 
     @Resource
     private RoleMapper roleMapper;
@@ -104,7 +104,7 @@ public class RoleServiceImpl implements RoleService {
 
         RoleDO sourceRole = findDefaultOrFirstDO(sourceUserId);
         if (sourceRole == null) {
-            throw new IllegalStateException("默认角色模板不存在");
+            throw new IllegalStateException("Modelo de papel padrão não encontrado");
         }
 
         resetDefault(targetUserId);
@@ -113,10 +113,10 @@ public class RoleServiceImpl implements RoleService {
         copiedRole.setUserId(targetUserId);
         copiedRole.setIsDefault("1");
         if (roleMapper.insert(copiedRole) <= 0) {
-            throw new IllegalStateException("复制默认角色失败");
+            throw new IllegalStateException("Falha ao copiar o papel padrão");
         }
         if (copiedRole.getRoleId() == null || getBO(copiedRole.getRoleId()) == null) {
-            throw new IllegalStateException("复制默认角色失败");
+            throw new IllegalStateException("Falha ao copiar o papel padrão");
         }
         return copiedRole.getRoleId();
     }
