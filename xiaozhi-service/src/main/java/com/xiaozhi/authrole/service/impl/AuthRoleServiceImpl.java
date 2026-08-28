@@ -64,11 +64,11 @@ public class AuthRoleServiceImpl implements AuthRoleService {
     @Override
     public AuthRoleResp get(Integer authRoleId) {
         if (authRoleId == null) {
-            throw new IllegalArgumentException("权限角色ID不能为空");
+            throw new IllegalArgumentException("O ID do papel de permissão não pode estar vazio");
         }
         AuthRoleResp result = authRoleConvert.toResp(authRoleMapper.selectById(authRoleId));
         if (result == null) {
-            throw new ResourceNotFoundException("权限角色不存在");
+            throw new ResourceNotFoundException("Papel de permissão não encontrado");
         }
         return result;
     }
