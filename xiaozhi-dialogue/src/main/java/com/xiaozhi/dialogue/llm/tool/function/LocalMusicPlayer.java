@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class LocalMusicPlayer implements ToolsGlobalRegistry.GlobalFunction {
     public static final String TOOL_NAME = "play_music";
 
-    // 使用虚拟线程执行器处理定时任务
+    // Usa um executor de virtual threads para tratar tarefas agendadas
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(
             Runtime.getRuntime().availableProcessors(),
             Thread.ofVirtual().name("music-scheduler-", 0).factory());
@@ -37,25 +37,25 @@ public class LocalMusicPlayer implements ToolsGlobalRegistry.GlobalFunction {
     @Resource
     private RuntimePathConfig runtimePathConfig;
 
-    @Tool(name = TOOL_NAME, description = "音乐播放器,播放指定名称的歌曲", returnDirect = true)
-    public String playMusic(@ToolParam(description = "要播放的歌曲名称") String songName, ToolContext toolContext) {
+    @Tool(name = TOOL_NAME, description = "Player de música, reproduz a música com o nome especificado", returnDirect = true)
+    public String playMusic(@ToolParam(description = "Nome da música a ser reproduzida") String songName, ToolContext toolContext) {
         String sessionId = (String) toolContext.getContext().get(Persona.TOOL_CONTEXT_SESSION_ID_KEY);
         ChatSession chatSession = sessionManager.getSession(sessionId);
 
         try {
             if (songName == null || songName.isEmpty()) {
-                return "你没有告诉我具体的歌曲名称，我播放不了！";
+                return "Você não me disse o nome específico da música, não consigo reproduzir!";
             } else {
                 scheduler.schedule(() -> {
-                    // 必须异步处理，也就是先返回一个回应用户的字符串，再开始播放。
+                    // Deve ser tratado de forma assíncrona: primeiro retorna uma string de resposta ao usuário, depois inicia a reprodução.
                     chatSession.getPlayer().play(songName, Path.of(runtimePathConfig.getMusicDir(), songName + ".mp3"));
                 }, 60, TimeUnit.MILLISECONDS);
-                return "尝试播放歌曲《" + songName + "》";
+                return "Tentando reproduzir a música \"" + songName + "\"";
             }
 
         } catch (Exception e) {
-            log.error("device 音乐播放异常，song name: {}", songName, e);
-            return "音乐播放失败";
+            log.error("Exceção na reprodução de música do device, song name: {}", songName, e);
+            return "Falha na reprodução da música";
         }
     }
 
@@ -72,6 +72,6 @@ public class LocalMusicPlayer implements ToolsGlobalRegistry.GlobalFunction {
 
     @Override
     public String getToolDescription() {
-        return "播放音乐";
+        return "Reproduzir música";
     }
 }

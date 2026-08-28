@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 // @Component
 public class PlayHuiBenFunction implements ToolsGlobalRegistry.GlobalFunction {
     private static final String TOOL_NAME = "play_huiben";
-    // 使用虚拟线程执行器处理定时任务
+    // Usa um executor de virtual threads para tratar tarefas agendadas
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(
             Runtime.getRuntime().availableProcessors(),
             Thread.ofVirtual().name("huiBen-scheduler-", 0).factory());
@@ -44,22 +44,22 @@ public class PlayHuiBenFunction implements ToolsGlobalRegistry.GlobalFunction {
                         huiBenPlayer.play();
                     }, AudioUtils.OPUS_FRAME_DURATION_MS, TimeUnit.MILLISECONDS);
 
-                    return "尝试播放绘本《" + num + "》";
+                    return "Tentando reproduzir o livro ilustrado \"" + num + "\"";
 
                 } catch (Exception e) {
-                    log.error("播放绘本异常，绘本编号: {}", num, e);
-                    return "绘本播放失败";
+                    log.error("Exceção ao reproduzir o livro ilustrado, número: {}", num, e);
+                    return "Falha ao reproduzir o livro ilustrado";
                 }
             })
             .toolMetadata(ToolMetadata.builder().returnDirect(true).build())
-            .description("绘本播放助手，需要用户提供绘本数字编号")
+            .description("Assistente de reprodução de livros ilustrados; requer que o usuário informe o número do livro")
             .inputSchema("""
                         {
                             "type": "object",
                             "properties": {
                                 "num": {
                                     "type": "integer",
-                                    "description": "要播放的绘本数字编号"
+                                    "description": "Número do livro ilustrado a ser reproduzido"
                                 }
                             },
                             "required": ["num"]
@@ -81,6 +81,6 @@ public class PlayHuiBenFunction implements ToolsGlobalRegistry.GlobalFunction {
 
     @Override
     public String getToolDescription() {
-        return "播放绘本";
+        return "Reproduzir livro ilustrado";
     }
 }

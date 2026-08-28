@@ -23,13 +23,13 @@ public class PlayListGetter implements ToolsGlobalRegistry.GlobalFunction {
     @Resource
     private RuntimePathConfig runtimePathConfig;
 
-    @Tool(name = TOOL_NAME, description = "获取可播放的歌曲列表",returnDirect = false)
+    @Tool(name = TOOL_NAME, description = "Obtém a lista de músicas disponíveis para reprodução",returnDirect = false)
     public String getPlayList() {
         try {
             Path playlistPath = Path.of(runtimePathConfig.getMusicDir(), "playlist.txt");
             return Files.readString(playlistPath);
         } catch (IOException e) {
-            return "目前没有可播放的歌曲列表";
+            return "No momento não há lista de músicas disponíveis";
         }
     }
 
@@ -46,6 +46,6 @@ public class PlayListGetter implements ToolsGlobalRegistry.GlobalFunction {
 
     @Override
     public String getToolDescription() {
-        return "获取歌曲列表";
+        return "Obter lista de músicas";
     }
 }

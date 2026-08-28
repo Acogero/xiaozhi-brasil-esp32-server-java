@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 /**
- * 创建一个新的对话
+ * Cria um novo diálogo
  */
 @Component
 public class NewChatFunction implements ToolsGlobalRegistry.GlobalFunction {
@@ -28,19 +28,19 @@ public class NewChatFunction implements ToolsGlobalRegistry.GlobalFunction {
                 conversation.clear();
                 String sayNewChat = params.get("sayNewChat");
                 if (sayNewChat == null) {
-                    sayNewChat = "让我们聊聊新的话题吧！";
+                    sayNewChat = "Vamos falar sobre um novo assunto!";
                 }
                 return sayNewChat;
             })
             .toolMetadata(ToolMetadata.builder().returnDirect(true).build())
-            .description("当用户想开启新的对话调用function：new_chat")
+            .description("Chamado quando o usuário deseja iniciar um novo diálogo: new_chat")
             .inputSchema("""
                         {
                             "type": "object",
                             "properties": {
                                 "sayNewChat": {
                                     "type": "string",
-                                    "description": "与用户友好开心新对话的开场语"
+                                    "description": "Frase de abertura amigável e animada para o novo diálogo com o usuário"
                                 }
                             },
                             "required": ["sayNewChat"]
@@ -62,6 +62,6 @@ public class NewChatFunction implements ToolsGlobalRegistry.GlobalFunction {
 
     @Override
     public String getToolDescription() {
-        return "新对话";
+        return "Novo diálogo";
     }
 }

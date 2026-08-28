@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 通过语音切换角色函数
+ * Função para trocar de papel por voz
  */
 @Slf4j
 // @Component
@@ -44,7 +44,7 @@ public class ChangeRoleFunction implements ToolsGlobalRegistry.GlobalFunction {
 
     @Override
     public ToolCallback getFunctionCallTool(ToolSession toolSession) {
-        // 通过 sessionManager 获取 ChatSession（ToolSession 是 Adapter，不能直接强转）
+        // Obtém o ChatSession via sessionManager (ToolSession é um Adapter, não pode ser convertido diretamente)
         ChatSession chatSession = sessionManager.getSession(toolSession.getSessionId());
         if (chatSession == null) {
             return null;
@@ -56,7 +56,7 @@ public class ChangeRoleFunction implements ToolsGlobalRegistry.GlobalFunction {
                     .builder(TOOL_NAME, (Map<String, String> params, ToolContext toolContext) -> {
                         String roleName = params.get("roleName");
                         try{
-                            // 获取参数
+                            // Obtém os parâmetros
                             Optional<RoleBO> changedRole = roleList.stream()
                                     .filter(role -> role.getRoleName().equals(roleName))
                                     .findFirst();
@@ -69,32 +69,32 @@ public class ChangeRoleFunction implements ToolsGlobalRegistry.GlobalFunction {
                                 });
                                 device.setRoleId(role.getRoleId());
                                 device.setRoleName(role.getRoleName());
-                                // 切换了角色，需要更换Conversation
+                                // Papel alterado, é necessário trocar o Conversation
                                 if(chatSession.getPersona().getConversation()!=null){
                                     chatSession.getPersona().getConversation().clear();
                                 }
 
                                 Persona persona = personaFactory.buildPersona(chatSession, device, role);
                                 chatSession.setPersona(persona);
-                                return "角色已切换至" + roleName;
+                                return "Papel alterado para " + roleName;
                             }else{
-                                return "角色切换失败, 没有对应角色哦";
+                                return "Falha ao trocar de papel, não há um papel correspondente";
                             }
                         }catch (Exception e){
-                            log.error("角色切换异常，role name: {}", roleName, e);
-                            return "角色切换异常";
+                            log.error("Exceção ao trocar de papel, role name: {}", roleName, e);
+                            return "Exceção ao trocar de papel";
                         }
                     })
                     .toolMetadata(new XiaozhiToolMetadata(true))
-                    .description("当用户想切换角色/助手名字时调用,可选的角色名称列表：" + getRoleList(roleList)
-                            + ". 调用前需要先把所有角色名称告知用户,用户告诉你角色名称进行切换.")
+                    .description("Chamado quando o usuário deseja trocar de papel/nome do assistente. Lista de papéis disponíveis: " + getRoleList(roleList)
+                            + ". Antes de chamar, informe ao usuário todos os nomes de papéis disponíveis; o usuário informará o nome do papel para a troca.")
                     .inputSchema("""
                         {
                             "type": "object",
                             "properties": {
                                 "roleName": {
                                     "type": "string",
-                                    "description": "要切换的角色名称"
+                                    "description": "Nome do papel para o qual trocar"
                                 }
                             },
                             "required": ["roleName"]
@@ -118,6 +118,6 @@ public class ChangeRoleFunction implements ToolsGlobalRegistry.GlobalFunction {
 
     @Override
     public String getToolDescription() {
-        return "切换角色";
+        return "Trocar de papel";
     }
 }
