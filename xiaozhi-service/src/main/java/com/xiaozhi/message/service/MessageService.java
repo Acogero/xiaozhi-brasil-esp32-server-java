@@ -28,21 +28,21 @@ public interface MessageService {
     int saveAll(List<MessageBO> messages);
 
     /**
-     * 按 ownerId（deviceId）+ roleId 查询最近 limit 条历史消息，按时间升序返回（即会话上下文顺序）。
-     * 适用于设备场景（跨 session 聚合）。
+     * Consulta as últimas "limit" mensagens do histórico por ownerId (deviceId) + roleId, retornadas em ordem crescente de tempo (ou seja, na ordem do contexto da conversa).
+     * Aplicável ao cenário de dispositivo (agregação entre sessions).
      */
     List<MessageBO> listHistory(String deviceId, Integer roleId, int limit);
 
     /**
-     * 按 sessionId 查询最近 limit 条历史消息，按时间升序返回（即会话上下文顺序）。
-     * 适用于 Web 场景（按会话隔离）。
+     * Consulta as últimas "limit" mensagens do histórico por sessionId, retornadas em ordem crescente de tempo (ou seja, na ordem do contexto da conversa).
+     * Aplicável ao cenário Web (isolado por sessão).
      */
     List<MessageBO> listHistory(String sessionId, int limit);
 
     List<MessageBO> listHistoryAfter(String deviceId, Integer roleId, Instant time);
 
     /**
-     * 更新 assistant 消息的音频路径，并更新关联的 metrics 记录中的 ttsDuration。
+     * Atualiza o caminho de áudio da mensagem do assistant e o ttsDuration no registro de metrics associado.
      */
     void updateAssistantAudio(String deviceId, Integer roleId,
                               LocalDateTime createTime, String audioPath,
