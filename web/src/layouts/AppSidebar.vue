@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useMenu } from '@/composables/useMenu'
-import type { MenuItem } from '@/types/menu'
+import {useI18n} from 'vue-i18n'
+import {useMenu} from '@/composables/useMenu'
 import * as Icons from '@ant-design/icons-vue'
 
 const { t } = useI18n()

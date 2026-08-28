@@ -3,24 +3,12 @@ SET NAMES utf8mb4;
 SET CHARACTER SET utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
--- Cria o usuário local e define a senha (usando o plugin mysql_native_password)
-CREATE USER IF NOT EXISTS 'xiaozhi'@'localhost' IDENTIFIED WITH mysql_native_password BY '123456';
-
--- Cria o usuário remoto e define a senha (usando o plugin mysql_native_password)
-CREATE USER IF NOT EXISTS 'xiaozhi'@'%' IDENTIFIED WITH mysql_native_password BY '123456';
-
--- Concede ao usuário local todas as permissões apenas sobre o banco xiaozhi
-GRANT ALL PRIVILEGES ON xiaozhi.* TO 'xiaozhi'@'localhost';
-
--- Concede ao usuário remoto todas as permissões apenas sobre o banco xiaozhi
-GRANT ALL PRIVILEGES ON xiaozhi.* TO 'xiaozhi'@'%';
-
--- Atualiza os privilégios para aplicar as alterações
-FLUSH PRIVILEGES;
-
--- Verifica os privilégios do usuário
-SHOW GRANTS FOR 'xiaozhi'@'localhost';
-SHOW GRANTS FOR 'xiaozhi'@'%';
+-- NOTA: a criação do usuário 'xiaozhi' e os GRANTs sao feitos manualmente
+-- pelo administrador (root), conforme docs/WINDOWS_DEVELOPMENT.md e
+-- docs/CENTOS_DEVELOPMENT.md, ANTES do primeiro start da aplicacao.
+-- Esta migration roda com o usuario 'xiaozhi' (sem privilegios globais),
+-- entao comandos CREATE USER / GRANT / SHOW GRANTS aqui sempre falhavam
+-- e deixavam o Flyway com uma migration marcada como falha.
 
 -- Cria o banco de dados (se não existir)
 CREATE DATABASE IF NOT EXISTS `xiaozhi` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

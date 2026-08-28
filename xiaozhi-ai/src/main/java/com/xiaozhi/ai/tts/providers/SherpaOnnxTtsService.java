@@ -28,6 +28,58 @@ public class SherpaOnnxTtsService implements TtsService {
     // Cache de instâncias OfflineTts, evitando o recarregamento do modelo (key = modelPath)
     private static final Map<String, OfflineTts> ttsCache = new ConcurrentHashMap<>();
 
+    // Garante que ensureNativeSearchPath() só rode uma vez por JVM
+    private static volatile boolean nativeSearchPathConfigured = false;
+
+    /**
+     * No Windows, ajusta a ordem de busca de DLLs nativas via SetDllDirectory, apontando para o
+     * mesmo diretório de "lib" nativas do java.library.path (ex.: lib/), ANTES de qualquer classe
+     * do sherpa-onnx ser carregada.
+     * <p>
+     * Isso evita que uma onnxruntime.dll de outra origem já presente no sistema (ex.:
+     * C:\Windows\System32\onnxruntime.dll, instalada por outro programa) seja encontrada
+     * primeiro pelo carregador de DLLs do Windows e usada no lugar da versão empacotada junto
+     * com o sherpa-onnx-jni.dll, o que causa erro de incompatibilidade de versão da API do ONNX
+     * Runtime (e pode até derrubar a JVM com EXCEPTION_ACCESS_VIOLATION).
+     * <p>
+     * Com SetDllDirectory, a ordem de busca passa a ser: (1) diretório do executável,
+     * (2) diretório informado aqui, (3) System32, (4) diretório do Windows, (5) PATH — ou seja,
+     * nosso diretório de libs nativas passa a ser buscado antes do System32.
+     */
+    private static void ensureNativeSearchPath() {
+        if (nativeSearchPathConfigured) {
+            return;
+        }
+        synchronized (SherpaOnnxTtsService.class) {
+            if (nativeSearchPathConfigured) {
+                return;
+            }
+            nativeSearchPathConfigured = true;
+
+            String osName = System.getProperty("os.name", "");
+            if (!osName.toLowerCase().contains("win")) {
+                return;
+            }
+
+            try {
+                String libraryPath = System.getProperty("java.library.path", "");
+                String firstDir = libraryPath.split(File.pathSeparator)[0];
+                if (firstDir == null || firstDir.isBlank()) {
+                    return;
+                }
+                String absoluteDir = Path.of(firstDir).toAbsolutePath().normalize().toString();
+                boolean ok = Kernel32Native.INSTANCE.SetDllDirectoryW(new com.sun.jna.WString(absoluteDir));
+                if (ok) {
+                    log.info("Diretório de busca de DLLs nativas ajustado (SetDllDirectory): {}", absoluteDir);
+                } else {
+                    log.warn("SetDllDirectory retornou falha para o diretório: {}", absoluteDir);
+                }
+            } catch (Throwable t) {
+                log.warn("Não foi possível ajustar o diretório de busca de DLLs nativas via SetDllDirectory: {}", t.getMessage());
+            }
+        }
+    }
+
     private final XiaozhiTtsOptions options;
     private final String outputPath;
 
@@ -129,6 +181,7 @@ public class SherpaOnnxTtsService implements TtsService {
      * Cria uma instância de OfflineTts com base no tipo de modelo
      */
     private OfflineTts createTts() {
+        ensureNativeSearchPath();
         log.info("Inicializando o modelo TTS do sherpa-onnx - tipo: {}, caminho: {}", modelType, modelPath);
 
         OfflineTtsModelConfig.Builder modelConfigBuilder = OfflineTtsModelConfig.builder()
@@ -142,7 +195,7 @@ public class SherpaOnnxTtsService implements TtsService {
         switch (modelType) {
             case "kokoro" -> {
                 OfflineTtsKokoroModelConfig kokoroConfig = OfflineTtsKokoroModelConfig.builder()
-                        .setModel(findFile(dir, "model.onnx"))
+                        .setModel(findOnnxModelFile(dir))
                         .setVoices(findFile(dir, "voices.bin"))
                         .setTokens(findFile(dir, "tokens.txt"))
                         .setDataDir(findDir(dir, "espeak-ng-data"))
@@ -152,7 +205,7 @@ public class SherpaOnnxTtsService implements TtsService {
             }
             case "vits" -> {
                 OfflineTtsVitsModelConfig vitsConfig = OfflineTtsVitsModelConfig.builder()
-                        .setModel(findFile(dir, "model.onnx"))
+                        .setModel(findOnnxModelFile(dir))
                         .setTokens(findFile(dir, "tokens.txt"))
                         .setLexicon(findFileOptional(dir, "lexicon.txt"))
                         .setDataDir(findDirOptional(dir, "espeak-ng-data"))
@@ -198,6 +251,41 @@ public class SherpaOnnxTtsService implements TtsService {
             throw new RuntimeException("Arquivo do modelo não existe: " + f.getAbsolutePath());
         }
         return f.getAbsolutePath();
+    }
+
+    /**
+     * Localiza o arquivo .onnx do modelo principal dentro do diretório.
+     * Prioriza o nome padrão "model.onnx"; se não existir, procura automaticamente
+     * por qualquer arquivo .onnx no diretório (comum em modelos Piper, cujo arquivo
+     * é nomeado como o próprio modelo, ex.: pt_BR-faber-medium.onnx).
+     */
+    private String findOnnxModelFile(File dir) {
+        File preferred = new File(dir, "model.onnx");
+        if (preferred.exists()) {
+            return preferred.getAbsolutePath();
+        }
+
+        File[] onnxFiles = dir.listFiles((d, n) -> n.toLowerCase().endsWith(".onnx"));
+        if (onnxFiles == null || onnxFiles.length == 0) {
+            throw new RuntimeException("Nenhum arquivo .onnx encontrado no diretório do modelo: " + dir.getAbsolutePath());
+        }
+
+        java.util.Arrays.sort(onnxFiles, java.util.Comparator.comparing(File::getName));
+        if (onnxFiles.length == 1) {
+            return onnxFiles[0].getAbsolutePath();
+        }
+
+        // Múltiplos .onnx: evita usar versões quantizadas (int8/quant) quando houver alternativa
+        for (File f : onnxFiles) {
+            String n = f.getName().toLowerCase();
+            if (!n.contains("int8") && !n.contains("quant")) {
+                log.warn("Múltiplos arquivos .onnx encontrados em {}, usando: {}", dir.getAbsolutePath(), f.getName());
+                return f.getAbsolutePath();
+            }
+        }
+
+        log.warn("Múltiplos arquivos .onnx encontrados em {} (todos parecem quantizados), usando: {}", dir.getAbsolutePath(), onnxFiles[0].getName());
+        return onnxFiles[0].getAbsolutePath();
     }
 
     private String findFileOptional(File dir, String name) {

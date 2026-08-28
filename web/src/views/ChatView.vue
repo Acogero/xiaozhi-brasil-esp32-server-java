@@ -470,6 +470,10 @@ function handleKeyDown(e: KeyboardEvent) {
   line-height: 1.6;
   word-break: break-word;
   white-space: pre-wrap;
+  /* Cor de texto fixa: os fundos do balão (abaixo) são sempre claros,
+     mesmo no tema escuro, então o texto não pode herdar a cor clara
+     do tema escuro (var(--ant-color-text)) sob risco de ficar invisível. */
+  color: #1f2329;
 }
 
 .message-bubble.user {

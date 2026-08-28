@@ -51,6 +51,7 @@
         <vosk.version>0.3.45</vosk.version>
         <webrtc.version>0.14.0</webrtc.version>
         <onnxruntime.version>1.23.2</onnxruntime.version>
+        <jna.version>5.14.0</jna.version>
         <tencent-speech.version>1.0.53</tencent-speech.version>
         <aliyun-nls.version>2.2.18</aliyun-nls.version>
         <dashscope.version>2.22.7</dashscope.version>
@@ -208,6 +209,11 @@
                 <groupId>com.microsoft.onnxruntime</groupId>
                 <artifactId>onnxruntime</artifactId>
                 <version>${onnxruntime.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna</artifactId>
+                <version>${jna.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
