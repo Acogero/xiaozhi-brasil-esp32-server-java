@@ -3,8 +3,8 @@ package com.xiaozhi.common;
 import lombok.Getter;
 
 /**
- * 音频播放对象，主要是封装语音字节数组（必须），并添加文本信息（非必须）。
- * 数据格式可以是 PCM（默认）或预编码的 Opus 帧（opusEncoded=true）。
+ * Objeto de reprodução de áudio, que basicamente encapsula o array de bytes da fala (obrigatório) e adiciona informações de texto (opcional).
+ * O formato dos dados pode ser PCM (padrão) ou um frame Opus pré-codificado (opusEncoded=true).
  */
 public class Speech extends org.springframework.ai.audio.tts.Speech {
 
@@ -15,9 +15,9 @@ public class Speech extends org.springframework.ai.audio.tts.Speech {
     private String mood;
 
     /**
-     * 标记数据是否已经是 Opus 编码帧。
-     * true: getOutput() 返回的是单个 Opus 帧，Player 无需再做 PCM→Opus 转换。
-     * false（默认）: getOutput() 返回的是 PCM 数据，需要经过 Opus 编码。
+     * Indica se os dados já são um frame codificado em Opus.
+     * true: getOutput() retorna um único frame Opus; o Player não precisa fazer a conversão PCM→Opus.
+     * false (padrão): getOutput() retorna dados PCM, que precisam ser codificados em Opus.
      */
     @Getter
     private boolean opusEncoded = false;
@@ -31,7 +31,7 @@ public class Speech extends org.springframework.ai.audio.tts.Speech {
     }
 
     /**
-     * 设置文本信息（用于缓存命中场景，在第一帧上附加文本）
+     * Define as informações de texto (usado em cenários de cache hit, anexando o texto ao primeiro frame)
      */
     public Speech withText(String text) {
         this.text = text;
@@ -39,7 +39,7 @@ public class Speech extends org.springframework.ai.audio.tts.Speech {
     }
 
     /**
-     * 设置情绪信息（从表情符号提取，用于设备表情展示）
+     * Define as informações de emoção (extraídas de emojis, usadas para exibir expressões no dispositivo)
      */
     public Speech withMood(String mood) {
         this.mood = mood;
@@ -47,7 +47,7 @@ public class Speech extends org.springframework.ai.audio.tts.Speech {
     }
 
     /**
-     * 创建预编码 Opus 帧的 Speech 对象
+     * Cria um objeto Speech com frame Opus pré-codificado
      */
     public static Speech ofOpus(byte[] opusFrame) {
         Speech s = new Speech(opusFrame);
@@ -56,7 +56,7 @@ public class Speech extends org.springframework.ai.audio.tts.Speech {
     }
 
     /**
-     * 创建预编码 Opus 帧的 Speech 对象（带文本）
+     * Cria um objeto Speech com frame Opus pré-codificado (com texto)
      */
     public static Speech ofOpus(byte[] opusFrame, String text) {
         Speech s = new Speech(opusFrame, text);
