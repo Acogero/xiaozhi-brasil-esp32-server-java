@@ -8,15 +8,15 @@
     </parent>
     <artifactId>xiaozhi-dialogue</artifactId>
     <name>xiaozhi-dialogue</name>
-    <description>对话层：communication + 音频前处理/管道 + 会话管理 + MCP + 工具调用</description>
+    <description>Camada de diálogo: communication + pré-processamento/pipeline de áudio + gerenciamento de sessão + MCP + chamada de ferramentas</description>
 
     <dependencies>
         <dependency>
             <groupId>com.xiaozhi</groupId>
             <artifactId>xiaozhi-ai</artifactId>
         </dependency>
-        <!-- xiaozhi-common 和 xiaozhi-service 通过 xiaozhi-ai 传递 -->
-        <!-- Netty (WebSocket 服务器) -->
+        <!-- xiaozhi-common e xiaozhi-service são propagados via xiaozhi-ai -->
+        <!-- Netty (servidor WebSocket) -->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
