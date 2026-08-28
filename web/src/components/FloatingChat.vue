@@ -16,7 +16,7 @@ const { t } = useI18n()
 const userStore = useUserStore()
 const { getAvatarUrl } = useAvatar()
 
-// WebSocket 连接
+// Conexão WebSocket
 const {
   isConnected,
   connectionStatus,
@@ -28,80 +28,80 @@ const {
   stopRecording: wsStopRecording
 } = useWebSocket()
 
-// 聊天窗口状态
+// Estado da janela de chat
 const chatVisible = ref(false)
 const inputMessage = ref('')
 const isVoiceMode = ref(false)
 const isRecording = ref(false)
 
-// 使用滚动管理 composable
+// Usa o composable de gerenciamento de rolagem
 const { containerRef: chatContentRef, scrollToBottom, isAtBottom } = useScroll({
   enableScrollListener: true
 })
 
-// 角色列表和当前选中的角色
+// Lista de personagens e o personagem atualmente selecionado
 const roleList = ref<Role[]>([])
 const selectedRoleId = ref<number | undefined>()
 
-// 头像
+// Avatar
 const userAvatar = computed(() => getAvatarUrl(userStore.userInfo?.avatar))
 
-// WebSocket 配置（从 store 获取）
+// Configuração do WebSocket (obtida da store)
 const wsConfig = computed(() => ({
   url: userStore.wsConfig.url,
-  // 使用 user_chat_ + userId 作为设备ID，与后端自动创建的虚拟设备ID格式一致
+  // Usa user_chat_ + userId como ID do dispositivo, no mesmo formato do ID de dispositivo virtual criado automaticamente pelo backend
   deviceId: `user_chat_${userStore.userInfo?.userId}`,
   token: userStore.token
 }))
 
-// 获取角色列表
+// Obtém a lista de personagens
 const fetchRoles = async () => {
   try {
     const res = await queryRoles({})
     if (res.data?.list) {
       roleList.value = res.data.list
-      // 设置默认选中的角色（第一个默认角色或第一个角色）
+      // Define o personagem padrão selecionado (o primeiro personagem padrão ou o primeiro personagem)
       const defaultRole = roleList.value.find(r => r.isDefault === '1')
       selectedRoleId.value = defaultRole?.roleId || roleList.value[0]?.roleId
     }
   } catch (error) {
-    console.error('获取角色列表失败:', error)
+    console.error('Falha ao obter lista de personagens:', error)
   }
 }
 
-// 切换角色
+// Trocar personagem
 const handleRoleChange = async (roleId: number) => {
   try {
-    // 更新虚拟设备的角色ID
+    // Atualiza o ID do personagem do dispositivo virtual
     await updateDevice({
       deviceId: wsConfig.value.deviceId,
       roleId: roleId
     })
     
-    AMessage.success('角色切换成功')
+    AMessage.success('Personagem alterado com sucesso')
     
-    // 如果已连接，断开连接（下次发送消息时会自动重连，使用新角色）
+    // Se já estiver conectado, desconecta (reconecta automaticamente na próxima mensagem enviada, usando o novo personagem)
     if (isConnected.value) {
       disconnect()
     }
   } catch (error) {
-    AMessage.error('角色切换失败')
-    console.error('角色切换失败:', error)
+    AMessage.error('Falha ao trocar de personagem')
+    console.error('Falha ao trocar de personagem:', error)
   }
 }
 
-// 组件挂载时获取角色列表
+// Obtém a lista de personagens ao montar o componente
 fetchRoles()
 
-// 监听消息变化并滚动到底部
+// Observa mudanças nas mensagens e rola até o final
 watch(() => wsMessages.length, () => {
-  // 只有当用户在底部时，才自动滚动（避免打断用户查看历史消息）
+  // Só rola automaticamente quando o usuário está no final (evita interromper a leitura do histórico)
   if (isAtBottom.value || wsMessages.length === 1) {
     scrollToBottom()
   }
 })
 
-// 切换聊天窗口
+// Alternar janela de chat
 const toggleChat = () => {
   chatVisible.value = !chatVisible.value
   if (chatVisible.value) {
@@ -111,50 +111,50 @@ const toggleChat = () => {
   }
 }
 
-// 关闭聊天窗口
+// Fechar janela de chat
 const closeChat = () => {
   chatVisible.value = false
 }
 
-// 确保WebSocket连接
+// Garante a conexão WebSocket
 const ensureConnection = async (): Promise<boolean> => {
   if (!isConnected.value) {
     try {
       const success = await connect(wsConfig.value)
       if (!success) {
-        AMessage.error('未连接到服务器，请检查聊天配置')
+        AMessage.error('Não conectado ao servidor, verifique a configuração do chat')
         return false
       }
       await new Promise(resolve => setTimeout(resolve, 300))
     } catch (error) {
-      AMessage.error('连接失败: ' + error)
+      AMessage.error('Falha na conexão: ' + error)
       return false
     }
   }
   return true
 }
 
-// 发送文本消息
+// Enviar mensagem de texto
 const sendTextMessage = async () => {
   const text = inputMessage.value.trim()
   if (!text) return
 
-  // 确保连接
+  // Garante a conexão
   const connected = await ensureConnection()
   if (!connected) return
 
-  // 发送到服务器
+  // Envia ao servidor
   const success = sendText(text)
 
   if (success) {
     inputMessage.value = ''
     nextTick(() => scrollToBottom())
   } else {
-    AMessage.error('发送失败，请检查连接状态')
+    AMessage.error('Falha ao enviar, verifique o estado da conexão')
   }
 }
 
-// 处理回车键
+// Trata a tecla Enter
 const handleEnterKey = (e: KeyboardEvent) => {
   if (!e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
     e.preventDefault()
@@ -162,16 +162,16 @@ const handleEnterKey = (e: KeyboardEvent) => {
   }
 }
 
-// 切换输入模式
+// Alternar modo de entrada
 const toggleInputMode = () => {
   isVoiceMode.value = !isVoiceMode.value
 }
 
-// 开始录音
+// Iniciar gravação
 const startRecording = async () => {
   if (isRecording.value) return
 
-  // 确保连接
+  // Garante a conexão
   const connected = await ensureConnection()
   if (!connected) return
 
@@ -180,11 +180,11 @@ const startRecording = async () => {
     await wsStartRecording()
   } catch (error) {
     isRecording.value = false
-    AMessage.error('无法启动录音，请检查麦克风权限')
+    AMessage.error('Não foi possível iniciar a gravação, verifique a permissão do microfone')
   }
 }
 
-// 停止录音
+// Parar gravação
 const stopRecording = async () => {
   if (!isRecording.value) return
 
@@ -192,49 +192,49 @@ const stopRecording = async () => {
     isRecording.value = false
     await wsStopRecording()
   } catch (error) {
-    AMessage.error('停止录音失败')
+    AMessage.error('Falha ao parar a gravação')
   }
 }
 
-// 清空消息
+// Limpar mensagens
 const clearMessages = () => {
   wsMessages.splice(0, wsMessages.length)
 }
 
-// 格式化时间
+// Formatar horário
 const formatTime = (date: Date) => {
   const now = new Date()
   const diff = now.getTime() - date.getTime()
   const minutes = Math.floor(diff / 60000)
   
-  if (minutes < 1) return '刚刚'
-  if (minutes < 60) return `${minutes}分钟前`
+  if (minutes < 1) return 'agora mesmo'
+  if (minutes < 60) return `${minutes} min atrás`
   
   const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}小时前`
+  if (hours < 24) return `${hours}h atrás`
   
   return date.toLocaleString()
 }
 
-// 是否显示时间戳
+// Se deve exibir o carimbo de data/hora
 const showTimestamp = (index: number) => {
   if (index === 0) return true
   const prevMsg = wsMessages[index - 1]
   const currMsg = wsMessages[index]
   if (!prevMsg || !currMsg) return false
   const timeDiff = currMsg.timestamp.getTime() - prevMsg.timestamp.getTime()
-  return timeDiff > 5 * 60 * 1000 // 超过5分钟显示时间
+  return timeDiff > 5 * 60 * 1000 // Exibe o horário se passar de 5 minutos
 }
 
-// 连接状态文本
+// Texto do status de conexão
 const connectionStatusText = computed(() => {
   if (isConnected.value) {
-    return '在线'
+    return 'Online'
   }
   return connectionStatus.value
 })
 
-// 连接状态类型
+// Tipo do status de conexão
 const connectionStatusDot = computed(() => {
   return isConnected.value ? 'online' : 'offline'
 })
@@ -242,7 +242,7 @@ const connectionStatusDot = computed(() => {
 
 <template>
   <div class="floating-chat">
-    <!-- 浮动按钮 -->
+    <!-- Botão flutuante -->
     <a-float-button
       :type="chatVisible ? 'default' : 'primary'"
       @click="toggleChat"
@@ -254,16 +254,16 @@ const connectionStatusDot = computed(() => {
       </template>
     </a-float-button>
 
-    <!-- 聊天窗口 -->
+    <!-- Janela de chat -->
     <transition name="chat-slide">
       <div v-if="chatVisible" class="chat-window">
-        <!-- 头部 -->
+        <!-- Cabeçalho -->
         <div class="chat-header">
           <div class="header-info">
-            <!-- AI头像 -->
+            <!-- Avatar da IA -->
             <RobotAvatar :size="36" fill="#ffffff" background="rgba(255, 255, 255, 0.2)" />
             <div class="header-text">
-              <div class="header-title">AI 助手</div>
+              <div class="header-title">Assistente de IA</div>
               <div class="header-status">
                 <span class="status-dot" :class="connectionStatusDot"></span>
                 {{ connectionStatusText }}
@@ -271,10 +271,10 @@ const connectionStatusDot = computed(() => {
             </div>
           </div>
           <div class="header-actions">
-            <!-- 角色切换下拉框 -->
+            <!-- Seletor de personagem -->
             <a-select
               v-model:value="selectedRoleId"
-              placeholder="选择角色"
+              placeholder="Selecionar personagem"
               :style="{ width: '120px' }"
               size="small"
               @change="handleRoleChange"
@@ -292,7 +292,7 @@ const connectionStatusDot = computed(() => {
               type="text"
               size="small"
               @click="clearMessages"
-              title="清空消息"
+              title="Limpar mensagens"
             >
               <template #icon>
                 <DeleteOutlined />
@@ -310,10 +310,10 @@ const connectionStatusDot = computed(() => {
           </div>
         </div>
 
-        <!-- 消息区域 -->
+        <!-- Área de mensagens -->
         <div ref="chatContentRef" class="chat-content">
           <div v-if="wsMessages.length === 0" class="empty-chat">
-            <a-empty description="暂无对话记录">
+            <a-empty description="Nenhum registro de conversa">
               <template #image>
                 <MessageOutlined :style="{ fontSize: '48px', color: 'var(--ant-color-text-quaternary)' }" />
               </template>
@@ -321,22 +321,22 @@ const connectionStatusDot = computed(() => {
           </div>
           <div v-else class="chat-messages">
             <div v-for="(message, index) in wsMessages" :key="message.id">
-              <!-- 时间戳 -->
+              <!-- Carimbo de data/hora -->
               <div v-if="showTimestamp(index)" class="message-timestamp">
                 {{ formatTime(message.timestamp) }}
               </div>
 
-              <!-- 消息内容 -->
+              <!-- Conteúdo da mensagem -->
               <div class="message-wrapper" :class="{ 'user-message': message.isUser, 'ai-message': !message.isUser }">
-                <!-- 头像 -->
+                <!-- Avatar -->
                 <div class="message-avatar">
-                  <!-- 用户头像 -->
+                  <!-- Avatar do usuário -->
                   <a-avatar v-if="message.isUser" :src="userAvatar" :size="32" />
-                  <!-- AI头像 - SVG -->
+                  <!-- Avatar da IA - SVG -->
                   <RobotAvatar v-else :size="32" />
                 </div>
 
-                <!-- 消息气泡 -->
+                <!-- Balão de mensagem -->
                 <div class="message-content">
                   <div class="message-bubble">
                     <div class="message-text">{{ message.content }}</div>
@@ -350,10 +350,10 @@ const connectionStatusDot = computed(() => {
           </div>
         </div>
 
-        <!-- 输入区域 -->
+        <!-- Área de entrada -->
         <div class="chat-input">
           <div class="input-wrapper">
-            <!-- 模式切换按钮 -->
+            <!-- Botão de alternância de modo -->
             <a-button
               type="text"
               class="mode-toggle"
@@ -366,17 +366,17 @@ const connectionStatusDot = computed(() => {
               </template>
             </a-button>
 
-            <!-- 文本输入 -->
+            <!-- Entrada de texto -->
             <a-textarea
               v-if="!isVoiceMode"
               v-model:value="inputMessage"
-              placeholder="输入消息..."
+              placeholder="Digite uma mensagem..."
               :auto-size="{ minRows: 1, maxRows: 3 }"
               :bordered="false"
               @keypress.enter="handleEnterKey"
             />
 
-            <!-- 语音输入按钮 -->
+            <!-- Botão de entrada de voz -->
             <a-button
               v-else
               class="record-button"
@@ -388,10 +388,10 @@ const connectionStatusDot = computed(() => {
               @touchstart="startRecording"
               @touchend="stopRecording"
             >
-              {{ isRecording ? '松开结束' : '按住说话' }}
+              {{ isRecording ? 'Solte para encerrar' : 'Segure para falar' }}
             </a-button>
 
-            <!-- 发送按钮 -->
+            <!-- Botão de enviar -->
             <a-button
               v-if="!isVoiceMode"
               type="primary"
@@ -416,7 +416,7 @@ const connectionStatusDot = computed(() => {
   z-index: 1000;
 }
 
-// 聊天窗口动画
+// Animação da janela de chat
 .chat-slide-enter-active,
 .chat-slide-leave-active {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -428,7 +428,7 @@ const connectionStatusDot = computed(() => {
   transform: translateY(20px) scale(0.95);
 }
 
-// 聊天窗口
+// Janela de chat
 .chat-window {
   position: fixed;
   right: 24px;
@@ -443,7 +443,7 @@ const connectionStatusDot = computed(() => {
   overflow: hidden;
 }
 
-// 头部
+// Cabeçalho
 .chat-header {
   padding: 16px;
   background: var(--ant-color-primary);
@@ -507,7 +507,7 @@ const connectionStatusDot = computed(() => {
   align-items: center;
   gap: 8px;
 
-  // 角色选择器样式
+  // Estilo do seletor de personagem
   :deep(.ant-select) {
     .ant-select-selector {
       background: rgba(255, 255, 255, 0.2) !important;
@@ -548,7 +548,7 @@ const connectionStatusDot = computed(() => {
   }
 }
 
-// 消息区域
+// Área de mensagens
 .chat-content {
   flex: 1;
   overflow-y: auto;
@@ -645,7 +645,7 @@ const connectionStatusDot = computed(() => {
   max-width: 100%;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   
-  // 微信风格的小三角
+  // Pequeno triângulo estilo WeChat
   &::before {
     content: '';
     position: absolute;
@@ -660,7 +660,7 @@ const connectionStatusDot = computed(() => {
   background: #95ec69;
   color: #000;
   
-  // 右侧小三角
+  // Pequeno triângulo à direita
   &::before {
     right: -8px;
     border-width: 6px 0 6px 8px;
@@ -672,7 +672,7 @@ const connectionStatusDot = computed(() => {
   background: var(--ant-color-bg-container);
   color: var(--ant-color-text);
   
-  // 左侧小三角
+  // Pequeno triângulo à esquerda
   &::before {
     left: -7px;
     border-width: 6px 7px 6px 0;
@@ -693,7 +693,7 @@ const connectionStatusDot = computed(() => {
   align-self: flex-end;
 }
 
-// 输入区域
+// Área de entrada
 .chat-input {
   padding: 16px;
   background: var(--ant-color-bg-container);
@@ -796,7 +796,7 @@ const connectionStatusDot = computed(() => {
   }
 }
 
-// 响应式
+// Responsivo
 @media (max-width: 768px) {
   .chat-window {
     right: 16px;

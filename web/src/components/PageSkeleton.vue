@@ -1,15 +1,15 @@
 <script setup lang="ts">
-// 通用页面骨架屏组件
+// Componente genérico de esqueleto de página
 </script>
 
 <template>
   <div class="page-skeleton">
-    <!-- 搜索框骨架 -->
+    <!-- Esqueleto da caixa de pesquisa -->
     <a-card :bordered="false" class="skeleton-card">
       <a-skeleton-input :active="true" size="large" style="width: 100%; max-width: 400px" />
     </a-card>
 
-    <!-- 表格骨架 -->
+    <!-- Esqueleto da tabela -->
     <a-card :bordered="false" class="skeleton-card" style="margin-top: 20px">
       <a-skeleton 
         :active="true" 

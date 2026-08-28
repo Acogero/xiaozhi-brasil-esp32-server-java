@@ -1,29 +1,29 @@
 <template>
   <a-space :size="size">
-    <!-- 自定义操作插槽 -->
+    <!-- Slot de ação personalizada -->
     <slot name="actions" :record="record" />
     
-    <!-- 编辑按钮 -->
+    <!-- Botão de editar -->
     <a v-if="showEdit && hasPermission('edit')" @click="handleEdit">
       {{ editText || t('common.edit') }}
     </a>
     
-    <!-- 查看按钮 -->
+    <!-- Botão de visualizar -->
     <a v-if="showView && hasPermission('view')" @click="handleView">
       {{ viewText || t('common.view') }}
     </a>
     
-    <!-- 下载按钮 -->
+    <!-- Botão de download -->
     <a v-if="showDownload && hasPermission('download')" @click="handleDownload">
       {{ downloadText || t('common.download') }}
     </a>
     
-    <!-- 复制按钮 -->
+    <!-- Botão de copiar -->
     <a v-if="showCopy && hasPermission('copy')" @click="handleCopy">
       {{ copyText || t('common.copy') }}
     </a>
     
-    <!-- 设为默认按钮 -->
+    <!-- Botão de definir como padrão -->
     <a 
       v-if="showSetDefault && hasPermission('setDefault') && !isDefault" 
       @click="handleSetDefault"
@@ -31,12 +31,12 @@
       {{ setDefaultText || t('common.setAsDefault') }}
     </a>
     
-    <!-- 分隔线（如果有删除按钮） -->
+    <!-- Divisor (caso haja botão de excluir) -->
     <template v-if="showDelete && hasPermission('delete') && hasAnyVisibleButton">
       <a-divider v-if="showDivider" type="vertical" />
     </template>
     
-    <!-- 删除按钮（带确认） -->
+    <!-- Botão de excluir (com confirmação) -->
     <a-popconfirm
       v-if="showDelete && hasPermission('delete')"
       :title="deleteTitle || t('common.confirmDelete')"
@@ -51,7 +51,7 @@
       </a>
     </a-popconfirm>
     
-    <!-- 更多操作下拉菜单 -->
+    <!-- Menu suspenso de mais ações -->
     <a-dropdown v-if="moreActions && moreActions.length > 0" :trigger="['click']">
       <a @click.prevent>
         {{ moreText || t('common.more') }}
@@ -72,7 +72,7 @@
       </template>
     </a-dropdown>
     
-    <!-- 额外操作插槽（在最后） -->
+    <!-- Slot de ação extra (por último) -->
     <slot name="extra" :record="record" />
   </a-space>
 </template>
@@ -85,22 +85,22 @@ import { useUserStore } from '@/store/user'
 import type { Component } from 'vue'
 
 /**
- * 更多操作项
+ * Item de mais ações
  */
 export interface MoreAction {
-  /** 操作唯一键 */
+  /** Chave única da ação */
   key: string
-  /** 操作标签 */
+  /** Rótulo da ação */
   label: string
-  /** 操作图标 */
+  /** Ícone da ação */
   icon?: Component
-  /** 是否禁用 */
+  /** Se está desabilitado */
   disabled?: boolean
-  /** 是否为危险操作 */
+  /** Se é uma ação perigosa */
   danger?: boolean
-  /** 是否显示 */
+  /** Se deve exibir */
   visible?: boolean
-  /** 权限标识 */
+  /** Identificador de permissão */
   permission?: string | string[]
 }
 
@@ -115,59 +115,59 @@ export interface PermissionConfig {
 }
 
 export interface Props {
-  /** 当前行数据 */
+  /** Dados da linha atual */
   record?: any
-  /** 标准按钮权限前缀，例如 system:role、system:config:firmware */
+  /** Prefixo padrão de permissão do botão, por exemplo system:role, system:config:firmware */
   permissionPrefix?: string
-  /** 是否显示编辑按钮 */
+  /** Se deve exibir o botão de editar */
   showEdit?: boolean
-  /** 是否显示查看按钮 */
+  /** Se deve exibir o botão de visualizar */
   showView?: boolean
-  /** 是否显示删除按钮 */
+  /** Se deve exibir o botão de excluir */
   showDelete?: boolean
-  /** 是否显示下载按钮 */
+  /** Se deve exibir o botão de download */
   showDownload?: boolean
-  /** 是否显示复制按钮 */
+  /** Se deve exibir o botão de copiar */
   showCopy?: boolean
-  /** 是否显示设为默认按钮 */
+  /** Se deve exibir o botão de definir como padrão */
   showSetDefault?: boolean
   
-  /** 是否为默认项（用于设为默认按钮） */
+  /** Se é o item padrão (usado no botão de definir como padrão) */
   isDefault?: boolean
   
-  /** 自定义编辑按钮文本 */
+  /** Texto personalizado do botão de editar */
   editText?: string
-  /** 自定义查看按钮文本 */
+  /** Texto personalizado do botão de visualizar */
   viewText?: string
-  /** 自定义删除按钮文本 */
+  /** Texto personalizado do botão de excluir */
   deleteText?: string
-  /** 自定义下载按钮文本 */
+  /** Texto personalizado do botão de download */
   downloadText?: string
-  /** 自定义复制按钮文本 */
+  /** Texto personalizado do botão de copiar */
   copyText?: string
-  /** 自定义设为默认按钮文本 */
+  /** Texto personalizado do botão de definir como padrão */
   setDefaultText?: string
-  /** 自定义更多按钮文本 */
+  /** Texto personalizado do botão de mais */
   moreText?: string
   
-  /** 删除确认标题 */
+  /** Título de confirmação de exclusão */
   deleteTitle?: string
-  /** 删除按钮类名 */
+  /** Classe do botão de excluir */
   deleteClass?: string
-  /** 删除确认框位置 */
+  /** Posição da caixa de confirmação de exclusão */
   deletePopconfirmPlacement?: 'top' | 'left' | 'right' | 'bottom' | 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight' | 'leftTop' | 'leftBottom' | 'rightTop' | 'rightBottom'
-  /** 删除按钮确认类型 */
+  /** Tipo de confirmação do botão de excluir */
   deleteOkType?: 'default' | 'primary' | 'dashed' | 'link' | 'text' | 'danger'
   
-  /** 是否显示分隔线 */
+  /** Se deve exibir o divisor */
   showDivider?: boolean
   
-  /** 按钮间距 */
+  /** Espaçamento entre botões */
   size?: 'small' | 'middle' | 'large' | number
   
-  /** 更多操作 */
+  /** Mais ações */
   moreActions?: MoreAction[]
-  /** 特殊权限覆盖，优先级高于 permissionPrefix 自动推导 */
+  /** Sobrescrita de permissão especial, tem prioridade sobre a dedução automática de permissionPrefix */
   permissions?: PermissionConfig
 }
 
@@ -203,8 +203,8 @@ const { t } = useI18n()
 const userStore = useUserStore()
 
 /**
- * 标准操作走通用按钮权限，`view` 默认只受页面访问控制；
- * 只有少数特殊场景才通过 `permissions` 显式覆盖。
+ * Ações padrão usam a permissão de botão genérica; `view` por padrão é controlado apenas pelo controle de acesso à página;
+ * Apenas em poucos cenários especiais a sobrescrita explícita é feita via `permissions`.
  */
 const actionMap: Record<string, string> = {
   edit: 'update',
@@ -250,7 +250,7 @@ const hasPermission = (action: string): boolean => {
 }
 
 /**
- * 删除按钮前是否已经有其他标准操作可见，用于控制分隔线。
+ * Se já existe alguma outra ação padrão visível antes do botão de excluir, usado para controlar o divisor.
  */
 const hasAnyVisibleButton = computed(() => {
   return (
@@ -266,7 +266,7 @@ const visibleMoreActions = computed(() => {
   if (!props.moreActions) return []
 
   return props.moreActions.filter(action => {
-    // 检查 visible 属性
+    // Verifica a propriedade visible
     if (action.visible === false) return false
     const allowed = matchPermission(action.permission)
     return allowed !== false

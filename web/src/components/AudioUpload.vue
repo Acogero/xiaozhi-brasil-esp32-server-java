@@ -39,7 +39,7 @@ const { t } = useI18n()
 
 const audioTabKey = ref('upload')
 
-// 计算属性
+// Propriedade computada
 const hasAudio = computed(() => {
   return props.previewUrl && (
     props.fileList.length > 0 || 
@@ -58,7 +58,7 @@ const isOverRecommendedTime = computed(() => {
   return props.recordingTime > 15
 })
 
-// 方法
+// Métodos
 const formatTime = (seconds: number) => {
   const minutes = Math.floor(seconds / 60)
   const remainingSeconds = seconds % 60
@@ -78,9 +78,9 @@ const beforeUpload = (file: File) => {
     return false
   }
 
-  // 直接在这里触发上传事件
+  // Dispara o evento de upload diretamente aqui
   emit('file-upload', file)
-  return false // 阻止自动上传
+  return false // Impede o upload automático
 }
 
 const toggleRecording = () => {
@@ -110,7 +110,7 @@ const handleRestoreOriginal = () => {
       style="margin-bottom: 20px" 
     />
 
-    <!-- 上传/录制音频区域 -->
+    <!-- Área de upload/gravação de áudio -->
     <div>
       <a-tabs v-model:active-key="audioTabKey">
         <a-tab-pane key="upload" :tab="t('common.uploadAudio')">
@@ -152,12 +152,12 @@ const handleRestoreOriginal = () => {
         </a-tab-pane>
       </a-tabs>
 
-      <!-- 音频预览 -->
+      <!-- Pré-visualização do áudio -->
       <div v-if="hasAudio" class="audio-preview">
         <a-divider>{{ t('common.audioPreview') }}</a-divider>
         <AudioPlayer :audio-url="previewUrl || ''" />
 
-        <!-- 只有在不是使用原有音频时才显示清除按钮 -->
+        <!-- Exibe o botão de limpar somente quando não estiver usando o áudio original -->
         <a-button 
           v-if="!(isRetraining && useOriginalAudio)" 
           type="link" 
@@ -167,12 +167,12 @@ const handleRestoreOriginal = () => {
           {{ t('common.clearAudio') }}
         </a-button>
 
-        <!-- 只在再训练模式下显示音频来源信息 -->
+        <!-- Exibe informações da origem do áudio apenas no modo de retreinamento -->
         <div v-if="isRetraining" style="margin-top: 8px; color: var(--ant-color-text-tertiary); font-size: 12px;">
           <InfoCircleOutlined /> 
           {{ useOriginalAudio ? t('common.useOriginalAudio') : t('common.useNewAudio') }}
 
-          <!-- 如果使用新上传音频，提供恢复原有音频的选项 -->
+          <!-- Se um novo áudio foi enviado, oferece a opção de restaurar o áudio original -->
           <a 
             v-if="!useOriginalAudio" 
             style="margin-left: 8px;"

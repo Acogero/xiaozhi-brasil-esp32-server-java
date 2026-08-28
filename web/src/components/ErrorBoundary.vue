@@ -7,7 +7,7 @@ const { t } = useI18n()
 
 interface Props {
   /**
-   * 是否在开发环境显示错误详情
+   * Se deve exibir os detalhes do erro no ambiente de desenvolvimento
    */
   showDetails?: boolean
 }
@@ -16,34 +16,34 @@ const props = withDefaults(defineProps<Props>(), {
   showDetails: true,
 })
 
-// 错误状态
+// Estado de erro
 const hasError = ref(false)
 const errorMessage = ref('')
 const errorStack = ref('')
 
-// 计算属性：是否为开发环境
+// Propriedade computada: se é ambiente de desenvolvimento
 const isDev = computed(() => import.meta.env.DEV)
 
 /**
- * 捕获子组件错误
+ * Captura erros de componentes filhos
  */
 onErrorCaptured((error, instance, info) => {
   hasError.value = true
   errorMessage.value = error.message || t('component.errorBoundary.title')
   errorStack.value = error.stack || ''
 
-  console.error('ErrorBoundary 捕获到错误:', {
+  console.error('ErrorBoundary capturou um erro:', {
     error,
     instance,
     info,
   })
 
-  // 返回 false 阻止错误继续向上传播
+  // Retorna false para impedir que o erro continue se propagando
   return false
 })
 
 /**
- * 重置错误状态
+ * Reseta o estado de erro
  */
 const resetError = () => {
   hasError.value = false
@@ -52,22 +52,22 @@ const resetError = () => {
 }
 
 /**
- * 刷新页面
+ * Recarrega a página
  */
 const reloadPage = () => {
   window.location.reload()
 }
 
-// 提供重置方法给子组件
+// Fornece o método de reset para os componentes filhos
 provide('resetError', resetError)
 </script>
 
 <template>
   <div class="error-boundary">
-    <!-- 错误状态 -->
+    <!-- Estado de erro -->
     <div v-if="hasError" class="error-container">
       <div class="error-content">
-        <!-- 错误图标 -->
+        <!-- Ícone de erro -->
         <div class="error-icon">
           <svg
             viewBox="0 0 1024 1024"
@@ -87,19 +87,19 @@ provide('resetError', resetError)
           </svg>
         </div>
 
-        <!-- 错误标题 -->
+        <!-- Título do erro -->
         <h2 class="error-title">{{ t('component.errorBoundary.title') }}</h2>
 
-        <!-- 错误信息 -->
+        <!-- Informações do erro -->
         <p class="error-message">{{ t('component.errorBoundary.description') }}</p>
 
-        <!-- 操作按钮 -->
+        <!-- Botões de ação -->
         <div class="error-actions">
           <a-button type="primary" @click="resetError">{{ t('component.errorBoundary.retry') }}</a-button>
           <a-button @click="reloadPage">{{ t('component.errorBoundary.goHome') }}</a-button>
         </div>
 
-        <!-- 错误详情（开发环境） -->
+        <!-- Detalhes do erro (ambiente de desenvolvimento) -->
         <div
           v-if="props.showDetails && isDev && errorStack"
           class="error-details"
@@ -112,7 +112,7 @@ provide('resetError', resetError)
       </div>
     </div>
 
-    <!-- 正常内容 -->
+    <!-- Conteúdo normal -->
     <slot v-else />
   </div>
 </template>
