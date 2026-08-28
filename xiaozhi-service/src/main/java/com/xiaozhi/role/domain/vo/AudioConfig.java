@@ -1,7 +1,7 @@
 package com.xiaozhi.role.domain.vo;
 
 /**
- * VAD（语音活动检测）音频配置值对象。
+ * Objeto de valor de configuração de áudio VAD (detecção de atividade de voz).
  */
 public record AudioConfig(Float vadEnergyTh, Float vadSpeechTh,
                            Float vadSilenceTh, Integer vadSilenceMs) {

@@ -20,13 +20,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Role 聚合根仓储实现。
+ * Implementação do repositório da raiz de agregação Role.
  * <p>
- * 封装 MyBatis-Plus Mapper，负责：
+ * Encapsula o Mapper do MyBatis-Plus, responsável por:
  * <ul>
- *   <li>DO ↔ 聚合根转换（通过 {@link RoleConverter}）</li>
- *   <li>"唯一默认角色"不变式维护（save 时 reset 同用户其他角色）</li>
- *   <li>缓存失效</li>
+ *   <li>Conversão DO ↔ raiz de agregação (via {@link RoleConverter})</li>
+ *   <li>Manutenção do invariante "único papel padrão" (reset dos demais papéis do mesmo usuário ao salvar)</li>
+ *   <li>Invalidação de cache</li>
  * </ul>
  */
 @Repository
@@ -92,14 +92,14 @@ public class RoleRepositoryImpl implements RoleRepository {
         }
     }
 
-    /** 重置同用户所有角色的默认标记（insert 前调用） */
+    /** Redefine a marcação de padrão de todos os papéis do mesmo usuário (chamado antes do insert) */
     private void resetDefault(Integer userId) {
         roleMapper.update(null, new LambdaUpdateWrapper<RoleDO>()
                 .eq(RoleDO::getUserId, userId)
                 .set(RoleDO::getIsDefault, "0"));
     }
 
-    /** 重置同用户其他角色的默认标记（update 前调用，排除自身） */
+    /** Redefine a marcação de padrão dos demais papéis do mesmo usuário (chamado antes do update, excluindo o próprio) */
     private void resetDefault(Integer userId, Integer excludeRoleId) {
         roleMapper.update(null, new LambdaUpdateWrapper<RoleDO>()
                 .eq(RoleDO::getUserId, userId)
