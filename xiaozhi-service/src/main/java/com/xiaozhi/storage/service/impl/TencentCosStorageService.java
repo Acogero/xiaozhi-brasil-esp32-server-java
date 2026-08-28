@@ -19,15 +19,15 @@ import java.nio.file.Path;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 腾讯云 COS 存储实现。
+ * Implementação de armazenamento Tencent Cloud COS.
  * <p>
- * ConfigBO 字段映射：
+ * Mapeamento dos campos de ConfigBO:
  * <ul>
  *   <li>apiKey → SecretId</li>
  *   <li>apiSecret → SecretKey</li>
  *   <li>appId → Region</li>
  *   <li>configName → BucketName</li>
- *   <li>apiUrl → 路径前缀（可选，默认 "uploads/"）</li>
+ *   <li>apiUrl → Prefixo de caminho (opcional, padrão "uploads/")</li>
  * </ul>
  */
 @Slf4j
@@ -68,7 +68,7 @@ public class TencentCosStorageService implements StorageService {
             cosClient.putObject(new PutObjectRequest(bucketName, key, file.getInputStream(), metadata));
             return urlPrefix + key;
         } catch (Exception e) {
-            throw new IOException("上传到腾讯云 COS 失败: " + e.getMessage(), e);
+            throw new IOException("Falha ao enviar para o Tencent Cloud COS: " + e.getMessage(), e);
         }
     }
 
@@ -81,7 +81,7 @@ public class TencentCosStorageService implements StorageService {
             cosClient.putObject(new PutObjectRequest(bucketName, objectKey, is, metadata));
             return urlPrefix + objectKey;
         } catch (Exception e) {
-            throw new IOException("上传到腾讯云 COS 失败: " + e.getMessage(), e);
+            throw new IOException("Falha ao enviar para o Tencent Cloud COS: " + e.getMessage(), e);
         } finally {
             Files.deleteIfExists(localFile);
         }
@@ -97,7 +97,7 @@ public class TencentCosStorageService implements StorageService {
                 return is.readAllBytes();
             }
         } catch (Exception e) {
-            log.warn("从 COS 下载失败: {}", storedPath, e);
+            log.warn("Falha ao baixar do COS: {}", storedPath, e);
             return null;
         }
     }
@@ -109,7 +109,7 @@ public class TencentCosStorageService implements StorageService {
         try {
             cosClient.deleteObject(bucketName, key);
         } catch (Exception e) {
-            log.warn("从 COS 删除失败: {}", storedPath, e);
+            log.warn("Falha ao excluir do COS: {}", storedPath, e);
         }
     }
 

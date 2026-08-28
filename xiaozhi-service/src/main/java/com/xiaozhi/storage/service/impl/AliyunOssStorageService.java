@@ -15,14 +15,14 @@ import java.nio.file.Path;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 阿里云 OSS 存储实现。
+ * Implementação de armazenamento Alibaba Cloud OSS.
  * <p>
- * ConfigBO 字段映射：
+ * Mapeamento dos campos de ConfigBO:
  * <ul>
  *   <li>ak → AccessKey ID</li>
  *   <li>sk → AccessKey Secret</li>
- *   <li>apiUrl → Endpoint（如 oss-cn-hangzhou.aliyuncs.com）</li>
- *   <li>configName → Bucket 名称</li>
+ *   <li>apiUrl → Endpoint (ex.: oss-cn-hangzhou.aliyuncs.com)</li>
+ *   <li>configName → Nome do Bucket</li>
  * </ul>
  */
 @Slf4j
@@ -54,7 +54,7 @@ public class AliyunOssStorageService implements StorageService {
             ossClient.putObject(bucketName, key, file.getInputStream(), metadata);
             return urlPrefix + key;
         } catch (Exception e) {
-            throw new IOException("上传到阿里云 OSS 失败: " + e.getMessage(), e);
+            throw new IOException("Falha ao enviar para o Alibaba Cloud OSS: " + e.getMessage(), e);
         }
     }
 
@@ -67,7 +67,7 @@ public class AliyunOssStorageService implements StorageService {
             ossClient.putObject(bucketName, objectKey, is, metadata);
             return urlPrefix + objectKey;
         } catch (Exception e) {
-            throw new IOException("上传到阿里云 OSS 失败: " + e.getMessage(), e);
+            throw new IOException("Falha ao enviar para o Alibaba Cloud OSS: " + e.getMessage(), e);
         } finally {
             Files.deleteIfExists(localFile);
         }
@@ -83,7 +83,7 @@ public class AliyunOssStorageService implements StorageService {
                 return is.readAllBytes();
             }
         } catch (Exception e) {
-            log.warn("从 OSS 下载失败: {}", storedPath, e);
+            log.warn("Falha ao baixar do OSS: {}", storedPath, e);
             return null;
         }
     }
@@ -95,7 +95,7 @@ public class AliyunOssStorageService implements StorageService {
         try {
             ossClient.deleteObject(bucketName, key);
         } catch (Exception e) {
-            log.warn("从 OSS 删除失败: {}", storedPath, e);
+            log.warn("Falha ao excluir do OSS: {}", storedPath, e);
         }
     }
 

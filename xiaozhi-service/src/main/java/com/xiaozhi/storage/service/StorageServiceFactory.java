@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 存储服务工厂。
- * 从 sys_config（configType="oss"）读取默认 OSS 配置，按 provider 创建对应实现。
- * 无配置或配置无效时 fallback 到本地存储。
+ * Fábrica de serviços de armazenamento.
+ * Lê a configuração padrão de OSS a partir de sys_config (configType="oss") e cria a implementação correspondente por provider.
+ * Se não houver configuração ou ela for inválida, usa fallback para armazenamento local.
  * <p>
- * 云端客户端会被缓存复用（COS/OSS SDK 客户端均线程安全），当 provider 配置变更时自动重建。
+ * O cliente da nuvem é armazenado em cache e reutilizado (os clientes SDK do COS/OSS são thread-safe); reconstruído automaticamente quando a configuração do provider muda.
  */
 @Slf4j
 @Component
@@ -31,7 +31,7 @@ public class StorageServiceFactory {
     private volatile String cachedProvider;
 
     /**
-     * 获取当前生效的存储服务
+     * Obtém o serviço de armazenamento atualmente ativo
      */
     public StorageService getStorageService() {
         try {
@@ -53,24 +53,24 @@ public class StorageServiceFactory {
                 shutdownCached();
                 cachedCloudService = createStorageService(ossConfig);
                 cachedProvider = provider;
-                log.info("存储服务已切换到: {}", provider);
+                log.info("Serviço de armazenamento alterado para: {}", provider);
                 return cachedCloudService;
             }
         } catch (Exception e) {
-            log.warn("获取 OSS 配置失败，使用本地存储: {}", e.getMessage());
+            log.warn("Falha ao obter configuração do OSS, usando armazenamento local: {}", e.getMessage());
             return localStorageService;
         }
     }
 
     /**
-     * 根据配置创建对应的存储服务
+     * Cria o serviço de armazenamento correspondente com base na configuração
      */
     public StorageService createStorageService(ConfigBO config) {
         return switch (config.getProvider()) {
             case "tencent" -> new TencentCosStorageService(config);
             case "aliyun" -> new AliyunOssStorageService(config);
             default -> {
-                log.warn("未知的存储 provider: {}，使用本地存储", config.getProvider());
+                log.warn("Provider de armazenamento desconhecido: {}, usando armazenamento local", config.getProvider());
                 yield localStorageService;
             }
         };
