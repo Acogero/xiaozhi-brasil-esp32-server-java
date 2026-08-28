@@ -9,24 +9,24 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 设备端mcp相关属性
+ * Atributos relacionados ao MCP do dispositivo
  */
 @Data
 public class DeviceMcpHolder {
     /**
-     * mcp请求ID
+     * ID da requisição MCP
      */
     private final AtomicLong mcpRequestId = new AtomicLong(10000L);
     /**
-     * mcp初始化完成
+     * Inicialização do MCP concluída
      */
     private boolean mcpInitialized = false;
     /**
-     * mcp指令阻塞请求表
+     * Tabela de requisições bloqueantes de comandos MCP
      */
     private Map<Long, CompletableFuture<DeviceMcpMessage>> mcpPendingRequests = new HashMap<>();
     /**
-     * mcp工具获取游标 用于分页，首次请求为空字符串
+     * Cursor de obtenção de ferramentas MCP, usado para paginação; string vazia na primeira requisição
      */
     private String mcpCursor = "";
 
