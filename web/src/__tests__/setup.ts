@@ -1,9 +1,9 @@
 /**
- * Vitest 全局设置
- * 在所有测试执行前运行
+ * Configuração global do Vitest
+ * Executado antes de todos os testes
  */
 
-// Mock ant-design-vue message 组件（避免在测试中调用真实 DOM 通知）
+// Mock do componente message do ant-design-vue (evita chamadas reais de notificação DOM nos testes)
 vi.mock('ant-design-vue', () => ({
   message: {
     success: vi.fn(),
@@ -18,7 +18,7 @@ vi.mock('ant-design-vue', () => ({
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
-      // 返回 key 本身，方便断言
+      // Retorna a própria key, para facilitar as asserções
       if (params) {
         return `${key}:${JSON.stringify(params)}`
       }
