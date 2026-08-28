@@ -1,50 +1,50 @@
 import { test, expect } from '@playwright/test'
 
 /**
- * 页面导航 E2E 测试
+ * Teste E2E de navegação de páginas
  */
-test.describe('路由导航', () => {
-  test('访问不存在的路由跳转到 404', async ({ page }) => {
+test.describe('Navegação de rotas', () => {
+  test('acessar uma rota inexistente redireciona para 404', async ({ page }) => {
     await page.goto('/nonexistent-page-xyz')
-    // 等待路由跳转完成
+    // Aguarda a conclusão do redirecionamento de rota
     await page.waitForTimeout(1000)
-    // 应该显示 404 页面或被重定向
+    // Deve exibir a página 404 ou ser redirecionado
     const url = page.url()
     expect(url).toMatch(/\/(404|login)/)
   })
 
-  test('登录页可正常访问', async ({ page }) => {
+  test('a página de login está acessível normalmente', async ({ page }) => {
     const response = await page.goto('/login')
     expect(response?.status()).toBe(200)
   })
 
-  test('注册页可正常访问', async ({ page }) => {
+  test('a página de cadastro está acessível normalmente', async ({ page }) => {
     const response = await page.goto('/register')
     expect(response?.status()).toBe(200)
   })
 
-  test('403 页面可正常访问', async ({ page }) => {
+  test('a página 403 está acessível normalmente', async ({ page }) => {
     const response = await page.goto('/403')
     expect(response?.status()).toBe(200)
   })
 })
 
-test.describe('页面基础结构', () => {
-  test('登录页有正确的 HTML 结构', async ({ page }) => {
+test.describe('Estrutura básica da página', () => {
+  test('a página de login tem a estrutura HTML correta', async ({ page }) => {
     await page.goto('/login')
-    // 页面应有 #app 根节点
+    // A página deve ter o nó raiz #app
     await expect(page.locator('#app')).toBeVisible()
   })
 
-  test('页面正确加载 CSS 和 JS', async ({ page }) => {
+  test('a página carrega corretamente CSS e JS', async ({ page }) => {
     const response = await page.goto('/login')
     expect(response?.status()).toBe(200)
 
-    // 检查页面没有 JS 报错
+    // Verifica se a página não apresenta erros de JS
     const errors: string[] = []
     page.on('pageerror', (err) => errors.push(err.message))
     await page.waitForTimeout(2000)
-    // 允许某些已知的非关键错误（如 ResizeObserver）
+    // Permite alguns erros conhecidos não críticos (como ResizeObserver)
     const criticalErrors = errors.filter(
       (e) => !e.includes('ResizeObserver') && !e.includes('Script error'),
     )

@@ -1,55 +1,55 @@
 import { test, expect } from '@playwright/test'
 
 /**
- * 登录页面 E2E 测试
+ * Teste E2E da página de login
  */
-test.describe('登录页面', () => {
+test.describe('Página de login', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/login')
   })
 
-  test('正确渲染登录表单', async ({ page }) => {
-    // 页面标题或登录按钮应存在
+  test('renderiza corretamente o formulário de login', async ({ page }) => {
+    // O título da página ou o botão de login deve existir
     await expect(page.locator('form')).toBeVisible()
-    // 用户名输入框
-    await expect(page.locator('input[type="text"], input[placeholder*="用户名"], input[placeholder*="username"]').first()).toBeVisible()
-    // 密码输入框
+    // Campo de entrada de usuário
+    await expect(page.locator('input[type="text"], input[placeholder*="usuário"], input[placeholder*="username"]').first()).toBeVisible()
+    // Campo de entrada de senha
     await expect(page.locator('input[type="password"]').first()).toBeVisible()
   })
 
-  test('空表单提交显示验证错误', async ({ page }) => {
-    // 点击登录按钮
-    const loginBtn = page.locator('button[type="submit"], button:has-text("登录"), button:has-text("Login")').first()
+  test('envio de formulário vazio exibe erro de validação', async ({ page }) => {
+    // Clica no botão de login
+    const loginBtn = page.locator('button[type="submit"], button:has-text("Entrar"), button:has-text("Login")').first()
     await loginBtn.click()
 
-    // 等待验证消息出现
+    // Aguarda a mensagem de validação aparecer
     await page.waitForTimeout(500)
 
-    // 应该有验证提示
+    // Deve haver um alerta de validação
     const formErrors = page.locator('.ant-form-item-explain-error')
     await expect(formErrors.first()).toBeVisible()
   })
 
-  test('密码输入框支持显示/隐藏切换', async ({ page }) => {
+  test('campo de senha suporta alternar entre mostrar/ocultar', async ({ page }) => {
     const passwordInput = page.locator('input[type="password"]').first()
     await expect(passwordInput).toBeVisible()
 
-    // 输入密码
+    // Insere a senha
     await passwordInput.fill('testpassword')
     expect(await passwordInput.getAttribute('type')).toBe('password')
   })
 
-  test('未认证访问受保护页面重定向到登录', async ({ page }) => {
-    // 尝试访问 dashboard
+  test('acesso não autenticado a página protegida redireciona para o login', async ({ page }) => {
+    // Tenta acessar o dashboard
     await page.goto('/dashboard')
 
-    // 应该被重定向到登录页
+    // Deve ser redirecionado para a página de login
     await page.waitForURL(/\/login/)
     expect(page.url()).toContain('/login')
   })
 
-  test('登录页面有注册链接', async ({ page }) => {
-    const registerLink = page.locator('a[href*="register"], button:has-text("注册"), a:has-text("注册"), a:has-text("Register")').first()
+  test('a página de login tem um link de cadastro', async ({ page }) => {
+    const registerLink = page.locator('a[href*="register"], button:has-text("Cadastrar"), a:has-text("Cadastrar"), a:has-text("Register")').first()
     await expect(registerLink).toBeVisible()
   })
 })
