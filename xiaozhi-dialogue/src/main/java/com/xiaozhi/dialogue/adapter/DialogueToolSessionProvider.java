@@ -8,9 +8,9 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 /**
- * dialogue 层的 ToolSessionProvider 实现。
- * 将 ai 层的会话查找请求委托给 dialogue 的 SessionManager，
- * 通过 ChatSessionToolAdapter 包装，隔离通信层细节。
+ * Implementação de ToolSessionProvider da camada dialogue.
+ * Delega as requisições de busca de sessão da camada ai ao SessionManager do dialogue,
+ * encapsulando com ChatSessionToolAdapter para isolar os detalhes da camada de comunicação.
  */
 @Component
 public class DialogueToolSessionProvider implements ToolSessionProvider {
