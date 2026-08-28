@@ -16,19 +16,19 @@ import { i18n } from './locales'
 
 const app = createApp(App)
 
-// 1. 设置全局错误处理
+// 1. Configurar tratamento global de erros
 setupErrorHandler(app)
 
-// 2. 使用插件
+// 2. Usar plugins
 app.use(createPinia())
 app.use(router)
 app.use(Antd)
 app.use(i18n)
 
-// 2.1 注册自定义指令
+// 2.1 Registrar diretivas personalizadas
 setupDirectives(app)
 
-// 3. 设置路由守卫（登录验证、页面标题、进度条）
+// 3. Configurar guardas de rota (validação de login, título da página, barra de progresso)
 setupRouterGuards(router)
 
 app.mount('#app')
