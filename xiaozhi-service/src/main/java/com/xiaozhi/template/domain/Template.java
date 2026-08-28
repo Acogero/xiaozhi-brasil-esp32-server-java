@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Template 聚合根 —— 表示一条对话提示词模板。
+ * Template Raiz de agregação — representa um modelo de prompt de conversa.
  * <p>
- * 不变式：同一 userId 下最多一条默认模板（由 TemplateRepository.save 维护）。
+ * Invariante: no máximo um modelo padrão por userId (mantido por TemplateRepository.save).
  */
 @Getter
 public class Template {
@@ -35,7 +35,7 @@ public class Template {
 
     public Template() {}
 
-    // ── 工厂方法 ──────────────────────────────────────────────────────────────
+    // ── Métodos de fábrica ──────────────────────────────────────────────────
 
     public static Template newTemplate(Integer userId, String templateName, String templateDesc,
                                        String templateContent, String category, boolean isDefault) {
@@ -57,7 +57,7 @@ public class Template {
                 "1".equals(bo.getIsDefault()));
     }
 
-    /** 从持久层重建聚合根（Repository 专用，不产生任何信号）。 */
+    /** Reconstrói a raiz de agregação a partir da camada de persistência (uso exclusivo do Repository, não gera sinais). */
     public static Template reconstitute(Integer templateId, Integer userId,
                                         String templateName, String templateDesc,
                                         String templateContent, String category,
@@ -77,7 +77,7 @@ public class Template {
         return t;
     }
 
-    // ── 行为方法 ──────────────────────────────────────────────────────────────
+    // ── Métodos de comportamento ────────────────────────────────────────────
 
     public void setAsDefault() {
         if (!this.isDefault) {
@@ -118,7 +118,7 @@ public class Template {
         signals.add(DomainSignal.DISABLED);
     }
 
-    /** insert 后由 Repository 回填自增主键，不产生信号。 */
+    /** Preenchido pelo Repository após o insert com a chave primária autoincrementada, não gera sinais. */
     public void assignId(Integer templateId) {
         this.templateId = templateId;
     }
