@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 语音活动检测服务
+ * Serviço de detecção de atividade de voz
  */
 @Slf4j
 @Service
@@ -43,7 +43,7 @@ public class VadService {
     private static final int SILENCE_FRAME_THRESHOLD = 2;
     private static final int VAD_SAMPLE_SIZE = AudioUtils.BUFFER_SIZE;
     private static final int VAD_CONTEXT_SIZE = SileroVadModel.CONTEXT_SIZE;
-    // 连续静音帧数阈值，超过时重置GRU状态，防止长时间静音后GRU深度收敛（30帧 ≈ 约2秒）
+    // Limite de frames consecutivos de silêncio; ao ultrapassar, reseta o estado da GRU para evitar convergência profunda da GRU após silêncio prolongado (30 frames ≈ cerca de 2 segundos)
     private static final int SILENCE_RESET_FRAMES = 30;
 
     @Autowired
@@ -60,7 +60,7 @@ public class VadService {
 
     @PreDestroy
     public void cleanup() {
-        log.info("VAD服务资源已释放");
+        log.info("Recursos do serviço de VAD liberados");
         states.clear();
         locks.clear();
     }
@@ -72,12 +72,12 @@ public class VadService {
         private int consecutiveSilenceFrames = 0;
         private int consecutiveSpeechFrames = 0;
 
-        // 静音期间累计帧数，用于SPEECH_END时按比例移除静音帧
+        // Contagem acumulada de frames durante o silêncio, usada para remover proporcionalmente os frames de silêncio no SPEECH_END
         private int silenceFrameCount = 0;
 
         private final List<Float> originalProbs = new ArrayList<>();
         private float[][][] sileroState = new float[2][1][128];
-        // 跨帧样本拼接缓冲
+        // Buffer de concatenação de amostras entre frames
         private float[] sampleCarryOver = new float[0];
         private float[] vadContext = new float[VAD_CONTEXT_SIZE];
 
@@ -87,7 +87,7 @@ public class VadService {
 
         private final List<byte[]> pcmData = new ArrayList<>();
 
-        // 每个 session 复用同一个 OpusProcessor，避免每帧重新创建 native 编解码器
+        // Cada session reutiliza o mesmo OpusProcessor, evitando recriar o codec nativo a cada frame
         private final OpusProcessor opusProcessor = new OpusProcessor();
 
         public VadState() {
@@ -193,7 +193,7 @@ public class VadService {
             } else {
                 state.reset();
             }
-            log.info("VAD会话已初始化: {}", sessionId);
+            log.info("Sessão de VAD inicializada: {}", sessionId);
         }
     }
 
@@ -241,11 +241,11 @@ public class VadService {
                         return new VadResult(VadStatus.NO_SPEECH, null);
                     }
                 } catch (Exception e) {
-                    log.error("Opus解码失败: {}", e.getMessage());
+                    log.error("Falha ao decodificar Opus: {}", e.getMessage());
                     return new VadResult(VadStatus.ERROR, null);
                 }
 
-                // AEC 处理：消除麦克风中的扬声器回声
+                // Processamento de AEC: elimina o eco do alto-falante captado pelo microfone
                 if (aecService != null && aecService.isEnabled()) {
                     pcmData = aecService.process(sessionId, pcmData);
                 }
@@ -260,13 +260,13 @@ public class VadService {
 
                 boolean hasEnergy = energy > energyThreshold;
 
-                // 播放和静听使用完全相同的判断逻辑
+                // A reprodução e a escuta em silêncio usam exatamente a mesma lógica de decisão
                 boolean isSpeech = speechProb > speechThreshold && hasEnergy;
                 boolean isSilence = speechProb < silenceThreshold || !hasEnergy;
 
                 state.updateSilence(isSilence);
 
-                // 连续静音超过阈值时自动重置GRU状态，防止GRU深度收敛，导致在长时间静音状态下VAD无法被拉起
+                // Quando o silêncio consecutivo ultrapassa o limite, reseta automaticamente o estado da GRU, evitando a convergência profunda que impediria o VAD de ser reativado após silêncio prolongado
                 if (state.getConsecutiveSilenceFrames() >= SILENCE_RESET_FRAMES) {
                     state.sileroState = new float[2][1][128];
                     state.sampleCarryOver = new float[0];
@@ -290,7 +290,7 @@ public class VadService {
                     state.setSpeaking(true);
                     state.resetSilenceFrameCount();
 
-                    log.debug("检测到语音开始 - SessionId: {}, 概率: {}, 能量: {}, 阈值: {}",
+                    log.debug("Início de fala detectado - SessionId: {}, probabilidade: {}, energia: {}, limite: {}",
                             sessionId, String.format("%.4f", speechProb),
                             String.format("%.6f", energy), String.format("%.4f", speechThreshold));
 
@@ -317,7 +317,7 @@ public class VadService {
                                 }
                             }
                         }
-                        log.debug("语音结束: {}, 静音: {}ms", sessionId, silenceDuration);
+                        log.debug("Fala encerrada: {}, silêncio: {}ms", sessionId, silenceDuration);
 
                         state.resetSilenceFrameCount();
 
@@ -335,19 +335,19 @@ public class VadService {
                     return new VadResult(VadStatus.NO_SPEECH, null);
                 }
             } catch (Exception e) {
-                log.error("处理音频失败: {}, 错误: {}", sessionId, e.getMessage(), e);
+                log.error("Falha ao processar o áudio: {}, erro: {}", sessionId, e.getMessage(), e);
                 return new VadResult(VadStatus.ERROR, null);
             }
         }
     }
 
     /**
-     * 将上一帧剩余样本（sampleCarryOver）与本帧拼接，按VAD_SAMPLE_SIZE逐块推理。
-     * 始终使用有状态推理，通过连续静音定期重置GRU防止深度收敛。
+     * Concatena as amostras restantes do frame anterior (sampleCarryOver) com o frame atual, realizando a inferência em blocos de VAD_SAMPLE_SIZE.
+     * Sempre usa inferência com estado, resetando periodicamente a GRU durante silêncio contínuo para evitar convergência profunda.
      */
     private float detectSpeech(VadState state, float[] samples) {
         if (vadModel == null || samples == null || samples.length == 0) {
-            log.warn("VAD模型为空或样本为空");
+            log.warn("Modelo de VAD nulo ou amostras vazias");
             return 0.0f;
         }
         try {
@@ -376,7 +376,7 @@ public class VadService {
 
             return maxProb;
         } catch (Exception e) {
-            log.error("VAD推断失败: {}", e.getMessage());
+            log.error("Falha na inferência do VAD: {}", e.getMessage());
             return 0.0f;
         }
     }
@@ -398,7 +398,7 @@ public class VadService {
     }
 
     /**
-     * TTS播放结束时重置VAD隐状态，清除TTS期间麦克风拾音对GRU的污染。
+     * Reseta o estado oculto do VAD ao final da reprodução do TTS, eliminando a contaminação da GRU causada pela captação do microfone durante o TTS.
      */
     @EventListener
     public void onTtsPlaybackEnd(TtsPlaybackCompletedEvent event) {
