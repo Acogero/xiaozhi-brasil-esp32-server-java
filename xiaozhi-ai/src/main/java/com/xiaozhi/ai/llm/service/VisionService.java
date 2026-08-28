@@ -13,8 +13,8 @@ import com.xiaozhi.ai.llm.factory.ChatModelFactory;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 视觉识别服务。
- * 封装多模态视觉模型调用，供 MCP 工具或 REST 接口使用。
+ * Serviço de reconhecimento visual.
+ * Encapsula a chamada ao modelo multimodal de visão, para uso por ferramentas MCP ou por interfaces REST.
  */
 @Slf4j
 @Service
@@ -24,17 +24,17 @@ public class VisionService {
     private ChatModelFactory chatModelFactory;
 
     /**
-     * 识别图片内容。
+     * Reconhece o conteúdo da imagem.
      *
-     * @param file     图片文件
-     * @param question 用户提问
-     * @return 视觉模型返回的文本描述
-     * @throws IllegalStateException 无可用的视觉模型
+     * @param file     Arquivo de imagem
+     * @param question Pergunta do usuário
+     * @return Descrição textual retornada pelo modelo de visão
+     * @throws IllegalStateException Nenhum modelo de visão disponível
      */
     public String recognize(MultipartFile file, String question) {
         ChatModel chatModel = chatModelFactory.getVisionModel();
         if (chatModel == null) {
-            throw new IllegalStateException("无可用的视觉模型");
+            throw new IllegalStateException("Nenhum modelo de visão disponível");
         }
 
         MimeType mimeType = MimeType.valueOf(file.getContentType());
@@ -55,7 +55,7 @@ public class VisionService {
                 .messages(userMessage)
                 .call()
                 .content();
-        log.info("视觉识别完成 - 问题: {}, 结果: {}", question, result);
+        log.info("Reconhecimento visual concluído - pergunta: {}, resultado: {}", question, result);
         return result;
     }
 }
