@@ -1,291 +1,291 @@
-# 变更日志
+# Changelog
 
 ## [5.0.0] - 2025-04-10
 
-### 💥 重大变更
-- **refactor!: 项目拆分为多模块架构** 
-  - 从单体项目重构为 Maven 多模块：`xiaozhi-common`、`xiaozhi-service`、`xiaozhi-ai`、`xiaozhi-dialogue`、`xiaozhi-server`
-  - 模块间通过窄接口解耦，AI 模块与 Service 层解耦 (narrow ports)
-  - Web 组件从 common 迁移至 server 模块，职责更清晰
+### 💥 Mudanças Importantes
+- **refactor!: projeto dividido em arquitetura multi-módulo** 
+  - Refatorado de projeto monolítico para multi-módulo Maven: `xiaozhi-common`, `xiaozhi-service`, `xiaozhi-ai`, `xiaozhi-dialogue`, `xiaozhi-server`
+  - Módulos desacoplados por interfaces estreitas; módulo de IA desacoplado da camada de Service (narrow ports)
+  - Componentes Web migrados do módulo common para o server, com responsabilidades mais claras
 
-### 新增功能
+### Novos Recursos
 
-#### 架构 & 基础设施
-- feat: 引入 Flyway 数据库版本管理
-- feat: 引入 DDD 领域驱动设计模式（聚合根、领域事件、Pipeline）
-- feat: 新增通用 Shell 脚本用于服务管理
-- feat: 添加前端单元测试 (Vitest) 和 E2E 测试 (Playwright) 基础设施
-- feat: 新增审计日志注解 (AuditLog)，增强操作追踪
+#### Arquitetura & Infraestrutura
+- feat: introdução do Flyway para versionamento do banco de dados
+- feat: introdução do padrão DDD (Domain-Driven Design) (aggregate root, eventos de domínio, Pipeline)
+- feat: novos scripts Shell genéricos para gerenciamento de serviços
+- feat: infraestrutura de testes unitários (Vitest) e E2E (Playwright) no frontend
+- feat: nova anotação de log de auditoria (AuditLog), reforçando o rastreamento de operações
 
-#### 权限 & 安全
-- feat: 重构权限管理系统
-- feat: 新增权限管理页面（前端）
-- feat(auth): 暴露角色权限并在用户管理中展示
+#### Permissões & Segurança
+- feat: refatoração do sistema de gerenciamento de permissões
+- feat: nova página de gerenciamento de permissões (frontend)
+- feat(auth): exposição das permissões de papel e exibição no gerenciamento de usuários
 
-#### AI & 对话
-- feat: 增强长期记忆会话，支持图检索能力 (Graph Retrieval)
-- feat: 重构知识库，整合长期记忆与声纹识别
-- feat: 知识库 Pipeline 重构
-- feat: 实现 Edge TTS 流式语音合成
-- feat: 添加从输入流读取 Ogg Opus 格式音频帧的功能
+#### IA & Diálogo
+- feat: aprimoramento da memória de longo prazo, com suporte a recuperação em grafo (Graph Retrieval)
+- feat: refatoração da base de conhecimento, integrando memória de longo prazo e reconhecimento de voz
+- feat: refatoração do Pipeline da base de conhecimento
+- feat: implementação da síntese de voz em streaming via Edge TTS
+- feat: nova função para ler quadros de áudio no formato Ogg Opus a partir do stream de entrada
 
-#### 前端
-- feat: 新增音频播放器 fallback 支持
+#### Frontend
+- feat: novo suporte de fallback para o player de áudio
 
-### 重构 & 优化
+### Refatoração & Otimização
 
-#### 异常处理统一化
-- refactor: 全面统一 Controller 层异常处理（共 4 批次）
-- refactor: 统一 CRUD 操作失败语义（create/update/delete）
-- refactor: 统一语音克隆、声纹识别、用户校验等模块异常处理
-- refactor: 强化 OTA 协议、上传/TTS、特殊端点的错误处理
-- refactor: 消除 null 和 zero 失败语义，内部 BO 创建不再返回 null
+#### Padronização do Tratamento de Exceções
+- refactor: padronização completa do tratamento de exceções na camada Controller (em 4 etapas)
+- refactor: padronização da semântica de falha nas operações CRUD (create/update/delete)
+- refactor: padronização do tratamento de exceções em módulos como clonagem de voz, reconhecimento de voz e validação de usuário
+- refactor: reforço do tratamento de erros no protocolo OTA, upload/TTS e endpoints especiais
+- refactor: eliminação da semântica de falha por null e zero; a criação interna de BO não retorna mais null
 
-#### 领域模型 & 命名
-- refactor: SysSummary 替换为 SummaryBO
-- refactor: ConversationTurn 重命名为 DialogueTurn
-- refactor: functionNames 重命名为 mcpList
-- refactor: 统一 auth role permission 命名
-- refactor: 用户角色字段统一为 authRole
-- refactor: 重构 ApiResponse 统一响应格式
-- refactor: 重构 token 管理及 message 发送方法
+#### Modelo de Domínio & Nomenclatura
+- refactor: SysSummary substituído por SummaryBO
+- refactor: ConversationTurn renomeado para DialogueTurn
+- refactor: functionNames renomeado para mcpList
+- refactor: padronização da nomenclatura de auth role permission
+- refactor: campo de papel do usuário padronizado como authRole
+- refactor: refatoração do ApiResponse para padronizar o formato de resposta
+- refactor: refatoração do gerenciamento de token e dos métodos de envio de mensagem
 
-#### API & 接口
-- refactor: 重构 API 端点为 RESTful 风格
-- refactor: 分页参数从 start/limit 统一为 pageNo/pageSize
-- refactor: MCP Controller 错误契约标准化
-- refactor: 拆分 mcpServer 与 mcpEndpoint 模块
-- refactor: 替换手动 login id 转换为 sa-token typed API
+#### API & Interfaces
+- refactor: refatoração dos endpoints da API para o estilo RESTful
+- refactor: parâmetros de paginação padronizados de start/limit para pageNo/pageSize
+- refactor: padronização do contrato de erros do MCP Controller
+- refactor: separação dos módulos mcpServer e mcpEndpoint
+- refactor: substituição da conversão manual de login id pela API tipada do sa-token
 
-#### 架构解耦
-- refactor: 适度解耦 Session 架构
-- refactor: Dialogue 和 Server 模块只扫描需要的包
-- refactor: 移除 req 对象在 dialogue 和内部运行时流中的泄漏
-- refactor: 用户 ID 在 service 和 task 边界显式传递
-- refactor: 运行时路径配置整合，减少 STT/TTS 服务中的硬编码路径
-- refactor: 去除路径硬编码
-- refactor: 统一缓存位置
-- refactor: 统一领域事件
-- refactor: 优化对话逻辑并去掉冗余的虚拟线程方法
+#### Desacoplamento de Arquitetura
+- refactor: desacoplamento moderado da arquitetura de Session
+- refactor: os módulos Dialogue e Server passam a escanear apenas os pacotes necessários
+- refactor: remoção do vazamento do objeto req nos fluxos de dialogue e de runtime interno
+- refactor: o ID do usuário passa a ser transmitido explicitamente nas fronteiras de service e task
+- refactor: consolidação da configuração de caminhos em runtime, reduzindo caminhos fixos nos serviços STT/TTS
+- refactor: remoção de caminhos fixos no código
+- refactor: padronização do local de cache
+- refactor: padronização dos eventos de domínio
+- refactor: otimização da lógica de diálogo e remoção de métodos redundantes de virtual thread
 
-#### 清理
-- refactor: 移除未使用的 ExitKeywordDetector、IntentDetector 类
-- refactor: 移除未使用的 HttpSessionProvider、ResponseUtils、SessionProvider、DramaJson 类
-- refactor: 移除声纹阈值自定义功能
-- refactor: 移除多个过时的架构文档
-- delete: 去掉知识库中关于 userId 多余的传递
-- delete: 去除未使用的方法
+#### Limpeza
+- refactor: remoção das classes não utilizadas ExitKeywordDetector e IntentDetector
+- refactor: remoção das classes não utilizadas HttpSessionProvider, ResponseUtils, SessionProvider e DramaJson
+- refactor: remoção da funcionalidade de limiar de voz personalizado
+- refactor: remoção de vários documentos de arquitetura desatualizados
+- delete: remoção da transmissão redundante de userId na base de conhecimento
+- delete: remoção de métodos não utilizados
 
-### 修复
-- fix: 修复若干 bug 及优化集群部署
-- fix: 修复 endpoint 集群部署问题及 mcpServer 迁移依赖
-- fix: 修复 CosyVoice 音频句子发送 bug
-- fix: 修复角色更新后设备未及时更新问题
-- fix: 修复 MQTT 重复构建对话消息与唤醒词多次发送 start 问题
-- fix: 修复测试音效错误及音频缓存命中错误问题
-- fix: 修复类启动错误问题
-- fix: 修复调用错误方法
+### Correções
+- fix: correção de diversos bugs e otimização da implantação em cluster
+- fix: correção de problema de implantação em cluster do endpoint e da dependência de migração do mcpServer
+- fix: correção de bug no envio de frases de áudio do CosyVoice
+- fix: correção de problema em que o dispositivo não era atualizado a tempo após a atualização do papel/persona
+- fix: correção da construção duplicada de mensagens de diálogo via MQTT e do envio múltiplo de "start" pela palavra de ativação
+- fix: correção de erro no som de teste e de erro no acerto do cache de áudio
+- fix: correção de erro de inicialização de classe
+- fix: correção de chamada de método incorreta
 
-### Docker & 部署
-- refactor: 统一 Docker 网络、添加资源限制、调整上传大小为 100MB
-- update: Dockerfile-server 适配多模块构建
-- update: Dockerfile-node 构建上下文调整为 web 目录
-- update: .dockerignore 更新排除规则
-- update: docker-compose.yml 移除无用的 maven_repo 卷
+### Docker & Implantação
+- refactor: padronização da rede Docker, adição de limites de recursos e ajuste do tamanho de upload para 100MB
+- update: Dockerfile-server adaptado para o build multi-módulo
+- update: contexto de build do Dockerfile-node ajustado para o diretório web
+- update: regras de exclusão do .dockerignore atualizadas
+- update: remoção do volume maven_repo não utilizado do docker-compose.yml
 
-### 测试
-- test: 完成 Controller 测试基线
+### Testes
+- test: linha de base de testes do Controller concluída
 ---
 
 ## [3.0.0] - 2025-11-01
 
-### 💥 重大变更
-- **feat: 前端架构全面升级到 Vue3** 🎉
-  - 完整迁移到 Vue 3.5.22 + Composition API
-  - 使用 Vite 7 作为构建工具，提升开发体验和构建速度
-  - 采用 TypeScript 5.9 增强类型安全
-  - 状态管理升级到 Pinia 3
-  - 路由升级到 Vue Router 4
-  - 采用 Composables 模式重构代码，提高可复用性
+### 💥 Mudanças Importantes
+- **feat: arquitetura de frontend totalmente atualizada para Vue 3** 🎉
+  - Migração completa para Vue 3.5.22 + Composition API
+  - Uso do Vite 7 como ferramenta de build, melhorando a experiência de desenvolvimento e a velocidade de build
+  - Adoção do TypeScript 5.9 para reforçar a segurança de tipos
+  - Gerenciamento de estado atualizado para o Pinia 3
+  - Roteamento atualizado para o Vue Router 4
+  - Código refatorado com o padrão Composables, aumentando a reutilização
 
-- **feat: 后端架构全面升级与重构** 🚀
-  - 引入 JWT 认证机制，增强安全性
-  - 新增统一结果封装 (ResultMessage/ResultStatus)
-  - 新增事件驱动架构 (ChatSessionOpenEvent、ChatAbortEvent 等)
-  - 新增完整的权限管理系统 (RBAC)
-  - Controller 层全面重构，代码结构更清晰
+- **feat: arquitetura de backend totalmente atualizada e refatorada** 🚀
+  - Introdução do mecanismo de autenticação JWT, reforçando a segurança
+  - Novo encapsulamento padronizado de resultado (ResultMessage/ResultStatus)
+  - Nova arquitetura orientada a eventos (ChatSessionOpenEvent, ChatAbortEvent, etc.)
+  - Novo sistema completo de gerenciamento de permissões (RBAC)
+  - Camada Controller totalmente refatorada, com estrutura de código mais clara
 
-### 新增功能
+### Novos Recursos
 
-#### 前端
-- feat: 升级 Node.js 运行时到 v22
-- feat: 引入现代化开发工具链
-  - 使用 oxlint 和 ESLint 9 进行代码检查
-  - 集成 Vue DevTools 8 用于调试
-  - 采用 Prettier 3.6 统一代码风格
-- feat: UI 组件库升级到 Ant Design Vue 4.2.6
-- feat: 新增 @vueuse/core 工具库，提供丰富的组合式 API
-- feat: 新增全局加载组件和错误边界
-- feat: 新增浮动聊天组件，优化交互体验
+#### Frontend
+- feat: runtime Node.js atualizado para a v22
+- feat: introdução de um toolchain de desenvolvimento moderno
+  - Uso do oxlint e do ESLint 9 para lint do código
+  - Integração do Vue DevTools 8 para depuração
+  - Adoção do Prettier 3.6 para padronizar o estilo de código
+- feat: biblioteca de componentes de UI atualizada para o Ant Design Vue 4.2.6
+- feat: nova biblioteca de utilitários @vueuse/core, oferecendo uma rica API de composição
+- feat: novo componente de carregamento global e error boundary
+- feat: novo componente de chat flutuante, aprimorando a experiência de interação
 
-#### 后端核心功能
-- feat: 新增 JWT 认证系统 (JwtUtil)
-  - 支持 Token 生成和刷新
-  - 支持微信登录 Token
-  - 支持自定义 claims
-- feat: 新增微信登录服务 (WxLoginService)
-- feat: 新增权限管理系统
-  - 角色权限映射 (SysAuthRole, SysPermission, SysRolePermission)
-  - 完整的 RBAC 权限控制
-- feat: 新增验证码工具 (CaptchaUtils)
-- feat: 新增邮件工具 (EmailUtils)
-- feat: 新增短信服务 (SmsUtils)
-- feat: 新增文件哈希工具 (FileHashUtil)
-- feat: 新增音频增强工具 (AudioEnhancer)
+#### Funcionalidades Principais do Backend
+- feat: novo sistema de autenticação JWT (JwtUtil)
+  - Suporte à geração e renovação de Token
+  - Suporte a Token de login via WeChat
+  - Suporte a claims personalizadas
+- feat: novo serviço de login via WeChat (WxLoginService)
+- feat: novo sistema de gerenciamento de permissões
+  - Mapeamento de permissões por papel (SysAuthRole, SysPermission, SysRolePermission)
+  - Controle de permissões RBAC completo
+- feat: novo utilitário de captcha (CaptchaUtils)
+- feat: novo utilitário de e-mail (EmailUtils)
+- feat: novo serviço de SMS (SmsUtils)
+- feat: novo utilitário de hash de arquivos (FileHashUtil)
+- feat: novo utilitário de aprimoramento de áudio (AudioEnhancer)
 
 #### AI & LLM
-- feat: 新增 OpenAI LLM 服务 (OpenAiLlmService)
-  - 支持流式响应
-  - 支持深度思考模式
-  - 支持 Function Calling
-  - 新增 Token 回调机制
-- feat: 新增 MCP (Model Context Protocol) 支持
-  - MCP Session 管理
-  - MCP 设备服务集成
-- feat: 增强对话服务 (DialogueService)
-  - 优化会话管理
-  - 改进消息处理流程
-  - 支持事件驱动
-- feat: VAD 服务重大重构
-  - 优化语音活动检测
-  - 改进 Silero VAD 模型
-  - 新增高级参数配置
+- feat: novo serviço de LLM da OpenAI (OpenAiLlmService)
+  - Suporte a resposta em streaming
+  - Suporte ao modo de raciocínio profundo (deep thinking)
+  - Suporte a Function Calling
+  - Novo mecanismo de callback de Token
+- feat: novo suporte ao MCP (Model Context Protocol)
+  - Gerenciamento de MCP Session
+  - Integração do serviço de dispositivo MCP
+- feat: aprimoramento do serviço de diálogo (DialogueService)
+  - Otimização do gerenciamento de sessão
+  - Melhoria do fluxo de processamento de mensagens
+  - Suporte a arquitetura orientada a eventos
+- feat: grande refatoração do serviço de VAD
+  - Otimização da detecção de atividade de voz
+  - Melhoria do modelo Silero VAD
+  - Nova configuração de parâmetros avançados
 
-#### 依赖更新
-- update: 阿里云 SDK 全面升级
+#### Atualização de Dependências
+- update: SDK da Alibaba Cloud totalmente atualizado
   - nls-sdk-transcriber: 2.2.1 → 2.2.18
   - nls-sdk-tts: 2.2.17 → 2.2.18
   - dashscope-sdk-java: 2.20.2 → 2.20.6
-  - 新增阿里云短信服务 SDK 2.0.24
-- update: Spring Boot 依赖更新
-  - 新增 spring-boot-starter-data-redis (缓存增强)
-  - spring-ai-starter-mcp-client 集成
+  - Novo SDK de SMS da Alibaba Cloud 2.0.24
+- update: dependências do Spring Boot atualizadas
+  - Novo spring-boot-starter-data-redis (aprimoramento de cache)
+  - Integração do spring-ai-starter-mcp-client
 - update: commons-io: 2.11.0 → 2.18.0
-- update: okhttp: 5.0.0-alpha.14 → 4.9.3 (提升稳定性)
-- update: 新增 okio 3.13.0
+- update: okhttp: 5.0.0-alpha.14 → 4.9.3 (melhoria de estabilidade)
+- update: novo okio 3.13.0
 
-### 优化与改进
+### Otimizações e Melhorias
 
-#### 前端优化
-- perf: Vite 开发服务器性能大幅提升
-- perf: 生产构建体积优化和加载速度提升
-- perf: 优化路由守卫和权限检查
-- update: Docker 镜像更新到 node:22-alpine
-- update: 依赖包全面更新到最新稳定版本
-- update: 优化开发环境配置和热更新机制
-- dx: 更好的 TypeScript 类型推导和提示
-- dx: 更快的热模块替换 (HMR)
+#### Otimizações no Frontend
+- perf: desempenho do servidor de desenvolvimento do Vite bastante aprimorado
+- perf: otimização do tamanho do build de produção e melhoria da velocidade de carregamento
+- perf: otimização dos guards de rota e da verificação de permissões
+- update: imagem Docker atualizada para node:22-alpine
+- update: dependências totalmente atualizadas para as versões estáveis mais recentes
+- update: otimização da configuração do ambiente de desenvolvimento e do mecanismo de hot reload
+- dx: melhor inferência e sugestão de tipos do TypeScript
+- dx: Hot Module Replacement (HMR) mais rápido
 
-#### 后端优化
-- refactor: 全局异常处理增强 (GlobalExceptionHandler)
-  - 新增资源未找到异常 (ResourceNotFoundException)
-  - 新增未授权异常 (UnauthorizedException)
-  - 统一异常响应格式
-- refactor: 认证拦截器重构 (AuthenticationInterceptor)
-  - 支持 JWT 认证
-  - 优化权限验证逻辑
-- refactor: 会话管理重构 (SessionManager)
-  - 改进会话生命周期管理
-  - 优化并发处理
-- refactor: 消息处理器重构 (MessageHandler)
-  - 优化消息流转
-  - 改进错误处理
-- refactor: WebSocket 处理器优化 (WebSocketHandler)
-  - 增强连接管理
-  - 改进异常处理
-- refactor: 对话记忆系统优化
-  - DatabaseChatMemory 重构
-  - MessageWindowConversation 改进
-  - Conversation 接口优化
-- refactor: LLM 工具调用优化
-  - ToolsGlobalRegistry 改进
-  - XiaoZhiToolCallingManager 重构
-  - 新增 NewChatFunction
-- refactor: STT 服务优化
-  - 所有 STT 提供商代码优化
-  - 改进错误处理和日志
-- refactor: 实体类优化
-  - SysConfig, SysDevice, SysMessage, SysUser 改进
-- refactor: Mapper XML 优化
-  - 所有 Mapper 文件重构
-  - SQL 优化
-- refactor: Service 层全面重构
-  - 新增事务配置 (TransactionConfig)
-  - 优化业务逻辑
-  - 改进数据访问层
+#### Otimizações no Backend
+- refactor: aprimoramento do tratamento global de exceções (GlobalExceptionHandler)
+  - Nova exceção de recurso não encontrado (ResourceNotFoundException)
+  - Nova exceção de não autorizado (UnauthorizedException)
+  - Padronização do formato de resposta de exceções
+- refactor: refatoração do interceptor de autenticação (AuthenticationInterceptor)
+  - Suporte a autenticação JWT
+  - Otimização da lógica de verificação de permissões
+- refactor: refatoração do gerenciamento de sessão (SessionManager)
+  - Melhoria do gerenciamento do ciclo de vida da sessão
+  - Otimização do processamento concorrente
+- refactor: refatoração do processador de mensagens (MessageHandler)
+  - Otimização do fluxo de mensagens
+  - Melhoria do tratamento de erros
+- refactor: otimização do handler de WebSocket (WebSocketHandler)
+  - Reforço do gerenciamento de conexões
+  - Melhoria do tratamento de exceções
+- refactor: otimização do sistema de memória de diálogo
+  - Refatoração do DatabaseChatMemory
+  - Melhoria do MessageWindowConversation
+  - Otimização da interface Conversation
+- refactor: otimização da chamada de ferramentas do LLM
+  - Melhoria do ToolsGlobalRegistry
+  - Refatoração do XiaoZhiToolCallingManager
+  - Novo NewChatFunction
+- refactor: otimização do serviço de STT
+  - Otimização do código de todos os provedores de STT
+  - Melhoria do tratamento de erros e dos logs
+- refactor: otimização das classes de entidade
+  - Melhorias em SysConfig, SysDevice, SysMessage, SysUser
+- refactor: otimização dos Mapper XML
+  - Refatoração de todos os arquivos Mapper
+  - Otimização do SQL
+- refactor: refatoração completa da camada Service
+  - Nova configuração de transação (TransactionConfig)
+  - Otimização da lógica de negócio
+  - Melhoria da camada de acesso a dados
 
-### Docker 更新
-- update: docker-compose.yml 配置优化
-  - 改进服务依赖关系
-  - 优化健康检查
-  - 增强网络配置
-- update: Dockerfile-node 升级到 Node 22
+### Atualizações no Docker
+- update: otimização da configuração do docker-compose.yml
+  - Melhoria das dependências entre serviços
+  - Otimização do health check
+  - Reforço da configuração de rede
+- update: Dockerfile-node atualizado para o Node 22
 
 ---
 
 ## [2.8.17] - 2025-07-16
-### 新增
-- feat: 新增 Swagger
-- update: 模型增加辨识度标签
-- update: 删除全局聊天多余缩小按钮
-- update: 优化展示样式，可以切换浏览器标签页样式
-- update: 实体采用 Lombok 方法
-### 修复
-- fix: 修复地址错误问题
-- fix: 修复添加设备时验证码未生效问题
-- fix: 修复 init SQL 脚本初始化缺少字段问题
-- fix: 修复 issues #119 #120
-### 样式优化
-- style: 更新全局聊天缩放动画，更接近苹果效果
-- 优化: 聊天样式
-### 删除
-- delete: 删除无用 log
-### 重构
-- refactor(stt): 优化 VoskSttService 类的代码结构
-- refactor: 去掉多余 log
+### Novos Recursos
+- feat: novo Swagger
+- update: modelos com etiquetas de identificação adicionadas
+- update: remoção do botão de minimizar redundante no chat global
+- update: otimização do estilo de exibição, permitindo alternar o estilo da aba do navegador
+- update: entidades passam a usar métodos do Lombok
+### Correções
+- fix: correção de erro de endereço
+- fix: correção de problema em que o código de verificação não funcionava ao adicionar dispositivo
+- fix: correção de campo ausente na inicialização do script SQL init
+- fix: correção das issues #119 #120
+### Otimização de Estilo
+- style: atualização da animação de zoom do chat global, mais próxima do efeito estilo Apple
+- otimização: estilo do chat
+### Remoções
+- delete: remoção de logs inúteis
+### Refatoração
+- refactor(stt): otimização da estrutura de código da classe VoskSttService
+- refactor: remoção de logs redundantes
 
-# 变更日志
+# Changelog
 ## [2.8.16] - 2025-07-02
-### 其他变更
-- refactor:vad重构，去除agc
-- refactor:重构音频发送逻辑，按照实际帧位置发送
+### Outras Mudanças
+- refactor: refatoração do vad, removendo o agc
+- refactor: refatoração da lógica de envio de áudio, enviando conforme a posição real do quadro
 
-# 变更日志
+# Changelog
 ## [2.8.15] - 2025-07-01
 
-### 修复
-- fix:修复tag更新错误问题
-- fix:修复设备在聆听时，修改角色配置导致缓存更新时多次查询数据库的问题
-- fix:修复init初始化确实头像字段
+### Correções
+- fix: correção de erro na atualização de tag
+- fix: correção de problema em que, ao modificar a configuração do papel/persona durante a escuta do dispositivo, a atualização do cache causava múltiplas consultas ao banco de dados
+- fix: correção de campo de avatar ausente na inicialização (init)
 
-### 其他变更
-- refactor:优化token缓存，减少冗余代码
-- update:阿里巴巴sdk日志级别改为warn
+### Outras Mudanças
+- refactor: otimização do cache de token, reduzindo código redundante
+- update: nível de log do SDK da Alibaba alterado para warn
 
 ## [2.8.0] - 2025-06-15
 
-### 新功能
-- feat:增加logback输入 close #37
-- feat:新增橘色设备量展示
+### Novos Recursos
+- feat: adição de entrada do logback, fecha #37
+- feat: nova exibição da quantidade de dispositivos em laranja
 
-### 修复
+### Correções
 - fix(stt.aliyun): do not reuse recognizer
 - fix(stt.aliyun): support long speech recognition
 - fix: memory leak. Should clean up dialogue info after session closed
 
-### 其他变更
+### Outras Mudanças
 - chore: update version to 2.8.0 [skip ci]
-- update:角色返回增加modelName
+- update: retorno do papel/persona passa a incluir modelName
 - docs: update changelog for v2.7.68 [skip ci]
 - chore: update version to 2.7.68 [skip ci]
 - docs: update changelog for v2.7.67 [skip ci]
@@ -296,12 +296,12 @@
 
 ## [2.7.68] - 2025-06-14
 
-### 修复
+### Correções
 - fix(stt.aliyun): do not reuse recognizer
 - fix(stt.aliyun): support long speech recognition
 - fix: memory leak. Should clean up dialogue info after session closed
 
-### 其他变更
+### Outras Mudanças
 - chore: update version to 2.7.68 [skip ci]
 - docs: update changelog for v2.7.67 [skip ci]
 - chore: update version to 2.7.67 [skip ci]
@@ -311,36 +311,36 @@
 
 ## [2.7.67] - 2025-06-14
 
-### 修复
+### Correções
 - fix: memory leak. Should clean up dialogue info after session closed
 
-### 其他变更
+### Outras Mudanças
 - chore: update version to 2.7.67 [skip ci]
 - docs: update changelog for v2.7.66 [skip ci]
 - chore: update version to 2.7.66 [skip ci]
 
 ## [2.7.64] - 2025-06-12
 
-### 修复
+### Correções
 - Merge pull request #98 from vritser/main
 - fix(audio): merge audio files
 
-### 其他变更
+### Outras Mudanças
 - chore: update version to 2.7.64 [skip ci]
 - docs: update changelog for v2.7.63 [skip ci]
 - chore: update version to 2.7.63 [skip ci]
 
 ## [2.7.60] - 2025-06-11
 
-### 新功能
+### Novos Recursos
 - Merge pull request #96 from vritser/main
 - feat(tts): support minimax t2a
 
-### 修复
-- fix:修复阿里语音合成多余参数，删除
+### Correções
+- fix: correção de parâmetro redundante na síntese de voz da Alibaba, removido
 - fix(tts): tts service factory
 
-### 其他变更
+### Outras Mudanças
 - chore: update version to 2.7.60 [skip ci]
 - docs: update changelog for v2.7.59 [skip ci]
 - chore: update version to 2.7.59 [skip ci]
@@ -350,14 +350,14 @@
 
 ## [2.7.59] - 2025-06-11
 
-### 新功能
+### Novos Recursos
 - Merge pull request #96 from vritser/main
 - feat(tts): support minimax t2a
 
-### 修复
+### Correções
 - fix(tts): tts service factory
 
-### 其他变更
+### Outras Mudanças
 - chore: update version to 2.7.59 [skip ci]
 - refactor(tts): add default implements
 - docs: update changelog for v2.7.58 [skip ci]

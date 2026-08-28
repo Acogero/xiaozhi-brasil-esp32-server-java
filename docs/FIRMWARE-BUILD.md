@@ -1,14 +1,14 @@
-# 编译esp32固件
+# Compilar o Firmware do ESP32
 
-1. 下载`xiaozhi-esp32`
-   项目，按照这个教程配置项目环境[《Windows搭建 ESP IDF 5.3.2开发环境以及编译小智》](https://icnynnzcwou8.feishu.cn/wiki/JEYDwTTALi5s2zkGlFGcDiRknXf)
+1. Baixe o `xiaozhi-esp32`
+   projeto e configure o ambiente seguindo este tutorial [Configurando o ambiente de desenvolvimento ESP IDF 5.3.2 no Windows e compilando o Xiaozhi](https://icnynnzcwou8.feishu.cn/wiki/JEYDwTTALi5s2zkGlFGcDiRknXf)
 
-# 1.6.2以下版本固件
+# Firmware de versões anteriores à 1.6.2
 
-2. 打开`xiaozhi-esp32/main/Kconfig.projbuild`文件，找到`WEBSOCKET_URL`的`default`的内容，把`wss://api.tenclass.net`
-   改成你自己的地址，例如，我的接口地址是`ws://192.168.1.25:8091`，就把内容改成这个。
+2. Abra o arquivo `xiaozhi-esp32/main/Kconfig.projbuild`, encontre o conteúdo de `default` da variável `WEBSOCKET_URL` e substitua `wss://api.tenclass.net`
+   pelo seu próprio endereço. Por exemplo, se o endereço da minha API é `ws://192.168.1.25:8091`, altere o conteúdo para esse valor.
 
-修改前：
+Antes da alteração:
 
 ```
 config WEBSOCKET_URL
@@ -19,7 +19,7 @@ config WEBSOCKET_URL
         Communication with the server through websocket after wake up.
 ```
 
-修改后(示例)：
+Depois da alteração (exemplo):
 
 ```
 config WEBSOCKET_URL
@@ -30,18 +30,18 @@ config WEBSOCKET_URL
         Communication with the server through websocket after wake up.
 ```
 
-注意：你的地址是`ws://`开头，不是`wss://`开头，一定不要写错了。
+Atenção: seu endereço começa com `ws://`, não com `wss://` — não erre isso.
 
-注意：你的地址是`ws://`开头，不是`wss://`开头，一定不要写错了。
+Atenção: seu endereço começa com `ws://`, não com `wss://` — não erre isso.
 
-注意：你的地址是`ws://`开头，不是`wss://`开头，一定不要写错了。
+Atenção: seu endereço começa com `ws://`, não com `wss://` — não erre isso.
 
-# 1.6.2以后固件
+# Firmware a partir da versão 1.6.2
 
-找到`OTA_URL`的`default`的内容，把`https://api.tenclass.net/xiaozhi/ota/`
-   改成你自己的地址，例如，我的接口地址是`http://192.168.5.165:8091/api/device/ota/`，就把内容改成这个。
+Encontre o conteúdo de `default` da variável `OTA_URL` e substitua `https://api.tenclass.net/xiaozhi/ota/`
+   pelo seu próprio endereço. Por exemplo, se o endereço da minha API é `http://192.168.5.165:8091/api/device/ota/`, altere o conteúdo para esse valor.
 
-修改前：
+Antes da alteração:
 ```
 config OTA_VERSION_URL
     string "OTA Version URL"
@@ -50,7 +50,7 @@ config OTA_VERSION_URL
         The application will access this URL to check for updates.
 ```
 
-修改后(示例)：
+Depois da alteração (exemplo):
 ```
 config OTA_VERSION_URL
     string "OTA Version URL"
@@ -59,60 +59,60 @@ config OTA_VERSION_URL
         The application will access this URL to check for updates.
 ```
 
-注意：你的地址是`http://`开头，不是`https://`开头，一定不要写错了。
+Atenção: seu endereço começa com `http://`, não com `https://` — não erre isso.
 
-注意：你的地址是`http://`开头，不是`https://`开头，一定不要写错了。
+Atenção: seu endereço começa com `http://`, não com `https://` — não erre isso.
 
-注意：你的地址是`http://`开头，不是`https://`开头，一定不要写错了。
+Atenção: seu endereço começa com `http://`, não com `https://` — não erre isso.
 
 
-3. 设置编译参数
+3. Configurar os parâmetros de compilação
 
 ```
-# 终端命令行进入xiaozhi-esp32的根目录
+# No terminal, acesse o diretório raiz do xiaozhi-esp32
 cd xiaozhi-esp32
-# 例如我使用的板子是esp32s3，所以设置编译目标为esp32s3，如果你的板子是其他型号，请替换成对应的型号
+# Por exemplo, como estou usando a placa esp32s3, defino o alvo de compilação como esp32s3; se sua placa for outro modelo, substitua pelo modelo correspondente
 idf.py set-target esp32s3
-# 进入菜单配置
+# Acessar o menu de configuração
 idf.py menuconfig
 ```
 
-进入菜单配置后，再进入`Xiaozhi Assistant`，将`BOARD_TYPE`设置你板子的具体型号
-保存退出，回到终端命令行。
+Após acessar o menu de configuração, entre em `Xiaozhi Assistant` e defina `BOARD_TYPE` com o modelo específico da sua placa
+Salve e saia, retornando ao terminal.
 
-4. 编译固件
+4. Compilar o firmware
 
 ```
 idf.py build
 ```
 
-如果是vscode安装的idf可以使用`F1`或者`ctrl+shift+p`,输入idf然后直接选择进行编译
+Se você instalou o IDF pelo VSCode, pode usar `F1` ou `ctrl+shift+p`, digitar idf e selecionar diretamente a opção de compilação
 
-还可以直接进行烧录不用接下来的操作
+Também é possível gravar o firmware diretamente, sem precisar seguir os próximos passos
 
 <img src="./images/vscode_idf.png" width="500px"/>
 
-5. 打包bin固件
+5. Empacotar o firmware bin
 
 ```
 cd scripts
 python release.py
 ```
 
-编译成功后，会在项目根目录下的`build`目录下生成固件文件`merged-binary.bin`。
-这个`merged-binary.bin`就是要烧录到硬件上的固件文件。
+Após a compilação bem-sucedida, o arquivo de firmware `merged-binary.bin` será gerado no diretório `build`, na raiz do projeto.
+Esse `merged-binary.bin` é o arquivo de firmware que deve ser gravado no hardware.
 
-注意：如果执行到第二命令后，报了“zip”相关的错误，请忽略这个错误，只要`build`目录下生成固件文件`merged-binary.bin`
-，对你没有太大影响，请继续。
+Atenção: se, após executar o segundo comando, ocorrer um erro relacionado a "zip", ignore esse erro — desde que o arquivo de firmware `merged-binary.bin` tenha sido gerado no diretório `build`
+, isso não afeta significativamente o processo; continue normalmente.
 
-6. 烧录固件
-   将esp32设备连接电脑，使用chrome浏览器，打开以下网址
+6. Gravar o firmware
+   Conecte o dispositivo ESP32 ao computador, use o navegador Chrome e abra o seguinte endereço
 
 ```
 https://espressif.github.io/esp-launchpad/
 ```
 
-打开这个教程，[Flash工具/Web端烧录固件（无IDF开发环境）](https://ccnphfhqs21z.feishu.cn/wiki/Zpz4wXBtdimBrLk25WdcXzxcnNS)。
-翻到：`方式二：ESP-Launchpad 浏览器WEB端烧录`，从`3. 烧录固件/下载到开发板`开始，按照教程操作。
+Abra este tutorial, [Ferramenta Flash/Gravação de firmware pela Web (sem ambiente de desenvolvimento IDF)](https://ccnphfhqs21z.feishu.cn/wiki/Zpz4wXBtdimBrLk25WdcXzxcnNS).
+Vá até: `Método 2: Gravação via navegador com ESP-Launchpad`, comece em `3. Gravar firmware/Baixar para a placa` e siga as instruções do tutorial.
 
-烧录成功且联网成功后，通过唤醒词唤醒小智，留意server端输出的控制台信息。
+Após a gravação e a conexão à rede serem bem-sucedidas, desperte o Xiaozhi usando a palavra de ativação e observe as informações exibidas no console do servidor.

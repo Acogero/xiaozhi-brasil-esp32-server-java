@@ -1,17 +1,17 @@
-# Docker 部署指南
+# Guia de Implantação com Docker
 
-## 前提条件
+## Pré-requisitos
 
 - [Docker](https://docs.docker.com/get-docker/) + [Docker Compose](https://docs.docker.com/compose/install/)
 
-| 端口 | 服务 |
+| Porta | Serviço |
 |------|------|
 | 3306 | MySQL |
-| 8084 | 前端 |
-| 8091 | 管理后台 API（xiaozhi-server） |
-| 8092 | 对话服务（xiaozhi-dialogue） |
+| 8084 | Frontend |
+| 8091 | API do painel administrativo (xiaozhi-server) |
+| 8092 | Serviço de diálogo (xiaozhi-dialogue) |
 
-## 快速开始
+## Início Rápido
 
 ```bash
 git clone https://github.com/joey-zhou/xiaozhi-esp32-server-java/
@@ -19,81 +19,81 @@ cd xiaozhi-esp32-server-java
 docker-compose up -d
 ```
 
-启动 5 个服务：MySQL、Redis、Node 前端、Server 后台、Dialogue 对话。
+Inicia 5 serviços: MySQL, Redis, frontend Node, backend Server e serviço de diálogo Dialogue.
 
-| 服务 | 地址 |
+| Serviço | Endereço |
 |------|------|
-| 前端界面 | http://localhost:8084 |
-| 后台 API | http://localhost:8091 |
-| WebSocket | ws://宿主机IP:8092/ws/xiaozhi/v1/ |
+| Interface do frontend | http://localhost:8084 |
+| API do painel administrativo | http://localhost:8091 |
+| WebSocket | ws://IP_DO_HOST:8092/ws/xiaozhi/v1/ |
 
-默认管理员：admin / 123456
+Administrador padrão: admin / 123456
 
-> ESP32 设备连接时需使用宿主机实际 IP，不要用 localhost。
+> Ao conectar o dispositivo ESP32, use o IP real do host, não use localhost.
 
-## 模型与原生库
+## Modelos e Bibliotecas Nativas
 
-Docker 构建会自动下载：
-- **原生库** — sherpa-onnx JNI + onnxruntime + Vosk（linux-x64）
-- **VAD 模型** — silero_vad.onnx
-- **STT 模型** — Vosk 中文模型
-- **TTS 模型** — vits-melo 或 matcha
+O build do Docker baixa automaticamente:
+- **Bibliotecas nativas** — sherpa-onnx JNI + onnxruntime + Vosk (linux-x64)
+- **Modelo VAD** — silero_vad.onnx
+- **Modelo STT** — modelo Vosk em chinês
+- **Modelo TTS** — vits-melo ou matcha
 
-### 预下载（可选，加速构建）
+### Download Prévio (opcional, acelera o build)
 
-网络慢可提前下载，Docker 构建时会自动跳过已存在的文件：
-
-```bash
-./scripts/download_models.sh all       # 下载所有模型和原生库
-./scripts/download_models.sh status    # 查看状态
-```
-
-各模块也可独立下载：
+Se a rede estiver lenta, baixe antecipadamente — o build do Docker pula automaticamente os arquivos já existentes:
 
 ```bash
-./scripts/download_base.sh             # VAD 模型 + 原生库
-./scripts/download_stt.sh              # STT 模型
-./scripts/download_tts.sh              # TTS 模型
+./scripts/download_models.sh all       # baixa todos os modelos e bibliotecas nativas
+./scripts/download_models.sh status    # verifica o status
 ```
 
-## 环境变量
+Cada módulo também pode ser baixado individualmente:
 
-| 变量 | 默认值 | 说明 |
+```bash
+./scripts/download_base.sh             # modelo VAD + bibliotecas nativas
+./scripts/download_stt.sh              # modelo STT
+./scripts/download_tts.sh              # modelo TTS
+```
+
+## Variáveis de Ambiente
+
+| Variável | Valor Padrão | Descrição |
 |------|--------|------|
-| `VOSK_MODEL_SIZE` | `small` | Vosk 模型，可选 `standard`（~1.3GB，精度高） |
-| `TTS_MODEL` | `vits-melo-tts-zh_en` | TTS 模型，设为 `none` 跳过下载 |
+| `VOSK_MODEL_SIZE` | `small` | Modelo Vosk; pode usar `standard` (~1.3GB, maior precisão) |
+| `TTS_MODEL` | `vits-melo-tts-zh_en` | Modelo TTS; defina como `none` para pular o download |
 
 ```bash
 VOSK_MODEL_SIZE=standard docker-compose up -d
 ```
 
-## 持久化数据
+## Dados Persistentes
 
-| 卷名 | 说明 |
+| Nome do Volume | Descrição |
 |------|------|
-| `mysql_data` | MySQL 数据 |
-| `redis_data` | Redis 数据 |
+| `mysql_data` | Dados do MySQL |
+| `redis_data` | Dados do Redis |
 
-## 系统要求
+## Requisitos do Sistema
 
-| 配置 | CPU | 内存 | 存储 | 说明 |
+| Configuração | CPU | Memória | Armazenamento | Descrição |
 |------|-----|------|------|------|
-| 最低 | 2核 | 2GB | 10GB | 需第三方 STT/TTS API |
-| 推荐 | 2核 | 4GB | 20GB | 本地小模型 |
-| 完整 | 4核 | 8GB | 30GB | 本地大模型 |
+| Mínima | 2 núcleos | 2GB | 10GB | Requer API de STT/TTS de terceiros |
+| Recomendada | 2 núcleos | 4GB | 20GB | Modelos locais pequenos |
+| Completa | 4 núcleos | 8GB | 30GB | Modelos locais grandes |
 
-## 常用命令
+## Comandos Úteis
 
 ```bash
-docker-compose logs -f server      # 查看后台日志
-docker-compose logs -f dialogue    # 查看对话服务日志
-docker-compose ps                  # 查看容器状态
-docker-compose down                # 停止
-docker-compose down -v             # 停止并删除数据
-docker-compose build --no-cache    # 重新构建
+docker-compose logs -f server      # verificar logs do backend
+docker-compose logs -f dialogue    # verificar logs do serviço de diálogo
+docker-compose ps                  # verificar status dos containers
+docker-compose down                # parar
+docker-compose down -v             # parar e excluir dados
+docker-compose build --no-cache    # reconstruir
 ```
 
-## 更新
+## Atualização
 
 ```bash
 git pull
@@ -101,8 +101,8 @@ docker-compose build
 docker-compose up -d
 ```
 
-## 故障排除
+## Solução de Problemas
 
-- **容器启动失败**：`docker-compose logs <service_name>` 查看日志
-- **数据库连接问题**：`docker-compose ps mysql` 确认状态为 healthy
-- **WebSocket 连接失败**：确认使用宿主机 IP 而非 localhost，防火墙开放 8092 端口
+- **Falha ao iniciar o container**: `docker-compose logs <service_name>` para verificar os logs
+- **Problema de conexão com o banco de dados**: `docker-compose ps mysql` para confirmar que o status está healthy
+- **Falha na conexão WebSocket**: confirme que está usando o IP do host em vez de localhost, e que a porta 8092 está liberada no firewall

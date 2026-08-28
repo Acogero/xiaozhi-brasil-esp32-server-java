@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # =============================================================================
-# 所有服务管理脚本（server + dialogue）
-# 用法: bin/all.sh <start|stop|restart|status>
+# Script de gerenciamento de todos os serviços (server + dialogue)
+# Uso: bin/all.sh <start|stop|restart|status>
 # =============================================================================
 source "$(cd "$(dirname "$0")" && pwd)/_common.sh"
 
@@ -11,12 +11,12 @@ case "${1:-}" in
     start_service "xiaozhi-server"   "xiaozhi-server"   8091
     start_service "xiaozhi-dialogue" "xiaozhi-dialogue" 8092
     echo ""
-    _ok "全部启动完成"
+    _ok "Todos os serviços foram iniciados"
     ;;
   stop)
     stop_service "xiaozhi-server"
     stop_service "xiaozhi-dialogue"
-    _ok "全部已停止"
+    _ok "Todos os serviços foram parados"
     ;;
   restart)
     stop_service "xiaozhi-server"
@@ -26,7 +26,7 @@ case "${1:-}" in
     start_service "xiaozhi-server"   "xiaozhi-server"   8091
     start_service "xiaozhi-dialogue" "xiaozhi-dialogue" 8092
     echo ""
-    _ok "全部重启完成"
+    _ok "Todos os serviços foram reiniciados"
     ;;
   status)
     echo ""
@@ -35,7 +35,7 @@ case "${1:-}" in
     echo ""
     ;;
   *)
-    echo -e "用法: ${BOLD}bin/all.sh${NC} <start|stop|restart|status>"
+    echo -e "Uso: ${BOLD}bin/all.sh${NC} <start|stop|restart|status>"
     exit 1
     ;;
 esac

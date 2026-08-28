@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # =============================================================================
-# xiaozhi-dialogue 管理脚本
-# 用法: bin/dialogue.sh <start|stop|restart|status>
+# Script de gerenciamento do xiaozhi-dialogue
+# Uso: bin/dialogue.sh <start|stop|restart|status>
 # =============================================================================
 source "$(cd "$(dirname "$0")" && pwd)/_common.sh"
 
