@@ -101,16 +101,16 @@ onBeforeUnmount(() => {
 
         <!-- Área de conteúdo -->
         <a-layout-content class="layout-content">
-        <router-view v-slot="{ Component }">
-          <Suspense>
-            <template #default>
-              <component :is="Component" :key="$route.fullPath" />
-            </template>
-            <template #fallback>
-              <PageSkeleton />
-            </template>
-          </Suspense>
-        </router-view>
+          <router-view v-slot="{ Component }">
+            <Suspense>
+              <template #default>
+                <component :is="Component" :key="$route.fullPath" />
+              </template>
+              <template #fallback>
+                <PageSkeleton />
+              </template>
+            </Suspense>
+          </router-view>
         </a-layout-content>
 
         <!-- Rodapé -->

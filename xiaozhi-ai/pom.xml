@@ -79,6 +79,13 @@
             <groupId>com.alphacephei</groupId>
             <artifactId>vosk</artifactId>
         </dependency>
+        <!-- Usado apenas no Windows para ajustar a ordem de busca de DLLs nativas (SetDllDirectory),
+             evitando que uma onnxruntime.dll de outra origem (ex.: C:\Windows\System32) seja carregada
+             no lugar da versão empacotada com o sherpa-onnx -->
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+        </dependency>
         <!-- SDK de serviços em nuvem -->
         <dependency>
             <groupId>com.tencentcloudapi</groupId>

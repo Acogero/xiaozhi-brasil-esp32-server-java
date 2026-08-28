@@ -5,7 +5,7 @@ import GlobalLoading from './components/GlobalLoading.vue'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 import { useLocale } from './composables/useLocale'
 import { useAntdTheme } from './composables/useAntdTheme'
-import { useAppStore } from './store/app'
+import { useAppStore } from '@/store'
 
 const { antdLocale } = useLocale()
 const { antdTheme } = useAntdTheme()
