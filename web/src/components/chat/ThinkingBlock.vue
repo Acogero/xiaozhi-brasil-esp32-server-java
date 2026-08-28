@@ -3,11 +3,11 @@ import { useI18n } from 'vue-i18n'
 import { ThunderboltOutlined, RightOutlined } from '@ant-design/icons-vue'
 
 defineProps<{
-  /** 思考内容文本 */
+  /** Texto do conteúdo de raciocínio */
   content: string
-  /** 思考是否已完成 */
+  /** Se o raciocínio já foi concluído */
   done?: boolean
-  /** 是否展开 */
+  /** Se está expandido */
   expanded?: boolean
 }>()
 
