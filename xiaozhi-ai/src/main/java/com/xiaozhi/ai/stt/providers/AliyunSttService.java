@@ -51,25 +51,25 @@ public class AliyunSttService implements SttService {
             } else if (model.toLowerCase().contains("qwen") && model.toLowerCase().contains("realtime")) {
                 return streamRecognitionQwen(audioSink);
             } else {
-                // paraformer 逻辑
+                // Lógica do paraformer
                 String actualModel = model;
-                // 兼容以前的数据，如果不包含已知模型类型，则使用默认模型
+                // Compatibilidade com dados anteriores: se não corresponder a um tipo de modelo conhecido, usa o modelo padrão
                 if (!model.toLowerCase().contains("paraformer")
                         && !model.toLowerCase().contains("fun-asr")) {
                     actualModel = "paraformer-realtime-8k-v2";
-                    log.info("未识别的模型类型: {}，使用默认模型: {}", model, actualModel);
+                    log.info("Tipo de modelo não reconhecido: {}, usando o modelo padrão: {}", model, actualModel);
                 }
                 return streamRecognitionParaformer(audioSink, actualModel);
             }
         } catch (Exception e) {
-            log.error("使用{}模型语音识别失败：", model, e);
+            log.error("Falha no reconhecimento de voz usando o modelo {}: ", model, e);
             return SttResult.textOnly("");
         }
     }
 
     /**
-     * Paraformer 模型的流式识别。
-     * 支持情感识别的模型（如 paraformer-realtime-8k-v2）会返回情感信息，其余模型情感字段为 null。
+     * Reconhecimento em streaming do modelo Paraformer.
+     * Modelos que suportam reconhecimento de emoção (como paraformer-realtime-8k-v2) retornam informações de emoção; nos demais modelos, o campo de emoção é null.
      */
     private SttResult streamRecognitionParaformer(Flux<byte[]> audioSink, String modelName) {
         var recognizer = new Recognition();
@@ -81,7 +81,7 @@ public class AliyunSttService implements SttService {
                 .apiKey(apiKey)
                 .build();
 
-        // 收集每个 isSentenceEnd=true 的句子结果
+        // Coleta o resultado de cada frase com isSentenceEnd=true
         var recognition = Flux.<SttResult>create(sink -> {
             try {
                 recognizer.streamCall(param, Flowable.create(emitter -> {
@@ -98,32 +98,32 @@ public class AliyunSttService implements SttService {
                                         String emoTag = result.getSentence().getEmoTag();
                                         Double emoConfidence = result.getSentence().getEmoConfidence();
                                         SttResult sttResult = SttResult.withEmotion(text, emoTag, emoConfidence);
-                                        log.info("语音识别结果({}): {} [情感: {}, 置信度: {}]",
+                                        log.info("Resultado do reconhecimento de voz ({}): {} [emoção: {}, confiança: {}]",
                                                 modelName, text, emoTag, emoConfidence);
                                         sink.next(sttResult);
                                     }
                                 },
                                 error -> {
-                                    log.error("流式识别过程中发生错误({})", modelName, error);
-                                    // 使用complete而非error，保留已识别的部分结果
+                                    log.error("Erro durante o reconhecimento em streaming ({})", modelName, error);
+                                    // Usa complete em vez de error, preservando o resultado parcial já reconhecido
                                     sink.complete();
                                 },
                                 sink::complete
                         );
             } catch (Exception e) {
                 sink.error(e);
-                log.info("使用{}模型语音识别失败：", modelName, e);
+                log.info("Falha no reconhecimento de voz usando o modelo {}: ", modelName, e);
             }
         });
 
-        // 多句合并：文本拼接，情感取置信度最高的一句
+        // Mesclagem de múltiplas frases: concatena o texto; a emoção usa a frase de maior confiança
         try {
             return recognition.reduce(new SttResultAccumulator(), SttResultAccumulator::add)
                     .blockOptional()
                     .map(SttResultAccumulator::toSttResult)
                     .orElse(SttResult.textOnly(""));
         } finally {
-            // 主动关闭WebSocket连接，避免连接进入"无引用状态"后等待61秒才释放
+            // Fecha proativamente a conexão WebSocket, evitando que ela entre em "estado sem referência" e demore 61 segundos para ser liberada
             try {
                 recognizer.getDuplexApi().close(1000, "completed");
             } catch (Exception ignored) {
@@ -132,7 +132,7 @@ public class AliyunSttService implements SttService {
     }
 
     /**
-     * 多句结果累加器：合并文本，情感取置信度最高的句子。
+     * Acumulador de resultados de múltiplas frases: mescla o texto; a emoção usa a frase de maior confiança.
      */
     private static class SttResultAccumulator {
         private final StringBuilder text = new StringBuilder();
@@ -158,14 +158,14 @@ public class AliyunSttService implements SttService {
     }
 
     /**
-     * Gummy 模型的流式识别（支持实时翻译）
+     * Reconhecimento em streaming do modelo Gummy (com suporte a tradução em tempo real)
      */
     private SttResult streamRecognitionGummy(Flux<byte[]> audioSink) {
         StringBuilder result = new StringBuilder();
         CountDownLatch latch = new CountDownLatch(1);
         AtomicBoolean hasError = new AtomicBoolean(false);
 
-        // 初始化请求参数
+        // Inicializa os parâmetros da requisição
         var param = TranslationRecognizerParam.builder()
                 .apiKey(apiKey)
                 .model(model)
@@ -174,25 +174,25 @@ public class AliyunSttService implements SttService {
                 .transcriptionEnabled(true)
                 .sourceLanguage("auto")
                 .build();
-        // 初始化回调接口
+        // Inicializa a interface de callback
         ResultCallback<TranslationRecognizerResult> callback =
                 new ResultCallback<TranslationRecognizerResult>() {
                     @Override
                     public void onEvent(TranslationRecognizerResult recognizerResult) {
                         try {
 
-                            // 处理识别结果
+                            // Processa o resultado do reconhecimento
                             if (recognizerResult.getTranscriptionResult() != null) {
                                 if (recognizerResult.isSentenceEnd()) {
                                     String text = recognizerResult.getTranscriptionResult().getText();
-                                    log.info("语音识别结果({}): {}", model, text);
+                                    log.info("Resultado do reconhecimento de voz ({}): {}", model, text);
                                     synchronized (result) {
                                         result.append(text);
                                     }
                                 }
                             }
                         } catch (Exception e) {
-                            log.error("处理识别结果时发生错误", e);
+                            log.error("Erro ao processar o resultado do reconhecimento", e);
                         }
                     }
 
@@ -203,31 +203,31 @@ public class AliyunSttService implements SttService {
 
                     @Override
                     public void onError(Exception e) {
-                        log.error("语音识别错误({}): {}", model, e.getMessage(), e);
+                        log.error("Erro no reconhecimento de voz ({}): {}", model, e.getMessage(), e);
                         hasError.set(true);
                         latch.countDown();
                     }
                 };
 
-        // 初始化流式识别服务
+        // Inicializa o serviço de reconhecimento em streaming
         TranslationRecognizerRealtime translator = new TranslationRecognizerRealtime();
 
         try {
-            // 启动流式语音识别
+            // Inicia o reconhecimento de voz em streaming
             translator.call(param, callback);
 
-            // 订阅音频流并发送数据
+            // Assina o fluxo de áudio e envia os dados
             audioSink.subscribe(
                     audioChunk -> {
                         try {
                             ByteBuffer buffer = ByteBuffer.wrap(audioChunk);
                             translator.sendAudioFrame(buffer);
                         } catch (Exception e) {
-                            log.error("发送音频数据时发生错误", e);
+                            log.error("Erro ao enviar os dados de áudio", e);
                         }
                     },
                     error -> {
-                        log.error("音频流错误", error);
+                        log.error("Erro no fluxo de áudio", error);
                         translator.stop();
                         latch.countDown();
                     },
@@ -236,22 +236,22 @@ public class AliyunSttService implements SttService {
                     }
             );
 
-            // 等待识别完成，最多90秒
+            // Aguarda a conclusão do reconhecimento, no máximo 90 segundos
             boolean completed = latch.await(90, TimeUnit.SECONDS);
 
             if (!completed) {
-                log.warn("语音识别超时({})", model);
+                log.warn("Timeout no reconhecimento de voz ({})", model);
             }
 
         } catch (Exception e) {
-            log.error("流式识别过程中发生错误({})", model, e);
+            log.error("Erro durante o reconhecimento em streaming ({})", model, e);
             hasError.set(true);
         } finally {
-            // 关闭 websocket 连接
+            // Fecha a conexão websocket
             try {
                 translator.getDuplexApi().close(1000, "bye");
             } catch (Exception e) {
-                log.error("关闭连接时发生错误", e);
+                log.error("Erro ao fechar a conexão", e);
             }
         }
 
@@ -263,7 +263,7 @@ public class AliyunSttService implements SttService {
     }
 
     /**
-     * Qwen 模型的流式识别（qwen3-asr-flash-realtime）
+     * Reconhecimento em streaming do modelo Qwen (qwen3-asr-flash-realtime)
      */
     private SttResult streamRecognitionQwen(Flux<byte[]> audioSink) {
         StringBuilder result = new StringBuilder();
@@ -271,14 +271,14 @@ public class AliyunSttService implements SttService {
         AtomicBoolean hasError = new AtomicBoolean(false);
         AtomicBoolean isCompleted = new AtomicBoolean(false);
         AtomicReference<OmniRealtimeConversation> conversationRef = new AtomicReference<>(null);
-        // 初始化请求参数
+        // Inicializa os parâmetros da requisição
         OmniRealtimeParam param = OmniRealtimeParam.builder()
                 .model(model)
                 .url("wss://dashscope.aliyuncs.com/api-ws/v1/realtime")
                 .apikey(apiKey)
                 .build();
         try {
-            // 初始化回调接口
+            // Inicializa a interface de callback
             OmniRealtimeConversation conversation = new OmniRealtimeConversation(param, new OmniRealtimeCallback() {
                 @Override
                 public void onOpen() {
@@ -292,17 +292,17 @@ public class AliyunSttService implements SttService {
                             break;
                         case "conversation.item.input_audio_transcription.completed":
                             String transcript = message.get("transcript").getAsString();
-                            log.info("语音识别结果({}): {}", model, transcript);
+                            log.info("Resultado do reconhecimento de voz ({}): {}", model, transcript);
                             synchronized (result) {
                                 result.append(transcript);
                             }
-                            // 收到识别结果后关闭连接
+                            // Fecha a conexão após receber o resultado do reconhecimento
                             if (conversationRef.get() != null && !isCompleted.get()) {
                                 try {
                                     conversationRef.get().close(1000, "transcription_completed");
                                 } catch (Exception e) {
-                                    log.error("关闭连接时发生错误", e);
-                                    // 如果关闭失败，手动触发完成
+                                    log.error("Erro ao fechar a conexão", e);
+                                    // Se o fechamento falhar, aciona a conclusão manualmente
                                     if (isCompleted.compareAndSet(false, true)) {
                                         latch.countDown();
                                     }
@@ -325,7 +325,7 @@ public class AliyunSttService implements SttService {
 
                 @Override
                 public void onClose(int code, String reason) {
-                    log.info("Qwen 语音识别连接关闭 - code: {}, reason: {}", code, reason);
+                    log.info("Conexão de reconhecimento de voz do Qwen encerrada - code: {}, reason: {}", code, reason);
                     if (isCompleted.compareAndSet(false, true)) {
                         latch.countDown();
                     }
@@ -334,78 +334,78 @@ public class AliyunSttService implements SttService {
 
             conversationRef.set(conversation);
 
-            // 建立连接
+            // Estabelece a conexão
             try {
                 conversation.connect();
             } catch (NoApiKeyException e) {
-                log.error("API Key 无效", e);
+                log.error("API Key inválida", e);
                 hasError.set(true);
                 return SttResult.textOnly("");
             }
-            // 配置转录参数
+            // Configura os parâmetros de transcrição
             OmniRealtimeTranscriptionParam transcriptionParam = new OmniRealtimeTranscriptionParam();
             // transcriptionParam.setLanguage("zh");
             transcriptionParam.setInputAudioFormat("pcm");
             transcriptionParam.setInputSampleRate(AudioUtils.SAMPLE_RATE);
-            // 配置会话参数
+            // Configura os parâmetros da sessão
             OmniRealtimeConfig config = OmniRealtimeConfig.builder()
                     .modalities(Collections.singletonList(OmniRealtimeModality.TEXT))
                     .transcriptionConfig(transcriptionParam)
-                    .enableTurnDetection(false)  // 关闭服务端VAD
+                    .enableTurnDetection(false)  // Desativa o VAD do lado do servidor
                     .build();
 
             conversation.updateSession(config);
 
-            // 订阅音频流并发送数据
+            // Assina o fluxo de áudio e envia os dados
             audioSink.subscribe(
                     audioChunk -> {
                         try {
-                            // 将音频数据转换为 Base64
+                            // Converte os dados de áudio para Base64
                             String audioB64 = Base64.getEncoder().encodeToString(audioChunk);
                             conversation.appendAudio(audioB64);
                         } catch (Exception e) {
-                            log.error("发送音频数据时发生错误", e);
+                            log.error("Erro ao enviar os dados de áudio", e);
                         }
                     },
                     error -> {
-                        log.error("音频流错误", error);
+                        log.error("Erro no fluxo de áudio", error);
                         conversation.close(1000, "error");
                         if (isCompleted.compareAndSet(false, true)) {
                             latch.countDown();
                         }
                     },
                     () -> {
-                        // 本地VAD检测到语音结束（SPEECH_END）时会触发此回调
-                        // 由于关闭了服务端VAD，需要手动调用 commit() 触发识别
+                        // Este callback é acionado quando o VAD local detecta o fim da fala (SPEECH_END)
+                        // Como o VAD do lado do servidor está desativado, é necessário chamar commit() manualmente para acionar o reconhecimento
                         if (!isCompleted.get()) {
-                            // 手动提交识别请求（关闭服务端VAD后必须手动commit）
+                            // Envia manualmente a requisição de reconhecimento (é obrigatório fazer commit manual após desativar o VAD do servidor)
                             conversation.commit();
                         }
                     }
             );
 
-            // 等待识别完成，最多90秒
+            // Aguarda a conclusão do reconhecimento, no máximo 90 segundos
             boolean completed = latch.await(90, TimeUnit.SECONDS);
 
             if (!completed) {
-                log.warn("语音识别超时({})", model);
-                // 超时情况下主动关闭连接
+                log.warn("Timeout no reconhecimento de voz ({})", model);
+                // Fecha proativamente a conexão em caso de timeout
                 try {
                     conversation.close(1000, "timeout");
                 } catch (Exception e) {
-                    log.error("关闭连接时发生错误", e);
+                    log.error("Erro ao fechar a conexão", e);
                 }
             }
         } catch (Exception e) {
-            log.error("流式识别过程中发生错误({})", model, e);
+            log.error("Erro durante o reconhecimento em streaming ({})", model, e);
             hasError.set(true);
-            // 发生异常时尝试关闭连接
+            // Em caso de exceção, tenta fechar a conexão
             try {
                 if (conversationRef.get() != null) {
                     conversationRef.get().close(1000, "error");
                 }
             } catch (Exception ex) {
-                log.error("关闭连接时发生错误", ex);
+                log.error("Erro ao fechar a conexão", ex);
             }
         }
 

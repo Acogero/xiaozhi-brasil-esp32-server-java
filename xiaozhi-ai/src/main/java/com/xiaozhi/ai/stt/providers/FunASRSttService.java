@@ -20,13 +20,13 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * FunASR STT服务实现
+ * Implementação do serviço STT FunASR
  * <br/>
- * <a href="https://github.com/modelscope/FunASR/blob/main/runtime/docs/SDK_tutorial_online_zh.md">FunASR实时语音听写便捷部署教程</a>
+ * <a href="https://github.com/modelscope/FunASR/blob/main/runtime/docs/SDK_tutorial_online_zh.md">Tutorial de implantação rápida da transcrição de voz em tempo real do FunASR</a>
  *  <br/>
- * <a href="https://github.com/modelscope/FunASR/blob/main/runtime/docs/SDK_advanced_guide_online_zh.md">FunASR实时语音听写服务开发指南</a>
+ * <a href="https://github.com/modelscope/FunASR/blob/main/runtime/docs/SDK_advanced_guide_online_zh.md">Guia de desenvolvimento do serviço de transcrição de voz em tempo real do FunASR</a>
  *  <br/>
- * <a href="https://www.funasr.com/static/offline/index.html">体验地址</a>
+ * <a href="https://www.funasr.com/static/offline/index.html">Endereço de demonstração</a>
  */
 @Slf4j
 public class FunASRSttService implements SttService {
@@ -35,8 +35,8 @@ public class FunASRSttService implements SttService {
 
     private static final String SPEAKING_START = "{\"mode\":\"2pass\",\"wav_name\":\"voice.wav\",\"is_speaking\":true,\"wav_format\":\"pcm\",\"chunk_size\":[5,10,5],\"itn\":true}";
     private static final String SPEAKING_END = "{\"is_speaking\": false}";
-    private static final int QUEUE_TIMEOUT_MS = 100; // 队列等待超时时间
-    private static final long RECOGNITION_TIMEOUT_MS = 90000; // 识别超时时间（90秒）
+    private static final int QUEUE_TIMEOUT_MS = 100; // Tempo limite de espera da fila
+    private static final long RECOGNITION_TIMEOUT_MS = 90000; // Tempo limite de reconhecimento (90 segundos)
 
     private final String apiUrl;
 
@@ -51,32 +51,32 @@ public class FunASRSttService implements SttService {
 
     @Override
     public SttResult stream(Flux<byte[]> audioSink) {
-        // 使用阻塞队列存储音频数据
+        // Usa uma fila bloqueante para armazenar os dados de áudio
         BlockingQueue<byte[]> audioQueue = new LinkedBlockingQueue<>();
         AtomicBoolean isCompleted = new AtomicBoolean(false);
-        // 拼接所有2pass-offline离线修正结果
+        // Concatena todos os resultados de correção offline do modo 2pass-offline
         StringBuilder offlineResult = new StringBuilder();
         AtomicReference<String> finalResult = new AtomicReference<>("");
         CountDownLatch recognitionLatch = new CountDownLatch(1);
         
-        // 订阅Sink并将数据放入队列
+        // Assina o Sink e coloca os dados na fila
         audioSink.subscribe(
             data -> audioQueue.offer(data),
             error -> {
-                log.error("音频流处理错误", error);
+                log.error("Erro no processamento do fluxo de áudio", error);
                 isCompleted.set(true);
             },
             () -> isCompleted.set(true)
         );
         
-        // 创建WebSocket客户端
+        // Cria o cliente WebSocket
         WebSocketClient webSocketClient = new WebSocketClient(URI.create(apiUrl)) {
             @Override
             public void onOpen(ServerHandshake handshake) {
-                log.debug("FunASR WebSocket连接已打开");
+                log.debug("Conexão WebSocket do FunASR aberta");
                 send(SPEAKING_START);
                 
-                // 启动虚拟线程发送音频数据
+                // Inicia uma virtual thread para enviar os dados de áudio
                 Thread.startVirtualThread(() -> {
                     try {
                         while (!isCompleted.get() || !audioQueue.isEmpty()) {
@@ -84,8 +84,8 @@ public class FunASRSttService implements SttService {
                             try {
                                 audioChunk = audioQueue.poll(QUEUE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
                             } catch (InterruptedException e) {
-                                log.warn("音频数据队列等待被中断", e);
-                                Thread.currentThread().interrupt(); // 重新设置中断标志
+                                log.warn("Espera na fila de dados de áudio interrompida", e);
+                                Thread.currentThread().interrupt(); // Restaura o flag de interrupção
                                 break;
                             }
                             
@@ -94,12 +94,12 @@ public class FunASRSttService implements SttService {
                             }
                         }
                         
-                        // 发送结束信号
+                        // Envia o sinal de encerramento
                         if (isOpen()) {
                             send(SPEAKING_END);
                         }
                     } catch (Exception e) {
-                        log.error("发送音频数据时发生错误", e);
+                        log.error("Erro ao enviar os dados de áudio", e);
                     }
                 });
             }
@@ -111,49 +111,49 @@ public class FunASRSttService implements SttService {
                     boolean isFinal = Boolean.TRUE.equals(jsonObject.getBoolean("is_final"));
                     String mode = jsonObject.getString("mode");
                     String text = jsonObject.getString("text");
-                    // 2pass模式：拼接每个离线修正片段（VAD可能将一句话分为多段）
+                    // Modo 2pass: concatena cada trecho de correção offline (o VAD pode dividir uma frase em vários trechos)
                     if (isFinal && "2pass-offline".equals(mode)) {
                         if (text != null && !text.isEmpty()) {
                             offlineResult.append(text);
                         }
-                        log.debug("FunASR 离线修正片段: {}", text);
+                        log.debug("Trecho de correção offline do FunASR: {}", text);
                     }
                 } catch (Exception e) {
-                    log.error("解析FunASR响应失败", e);
+                    log.error("Falha ao interpretar a resposta do FunASR", e);
                 }
             }
 
             @Override
             public void onClose(int code, String reason, boolean remote) {
-                log.info("FunASR WS关闭，原因：{}", reason);
-                // 连接关闭时，离线修正结果已全部收到，设置最终结果
+                log.info("WebSocket do FunASR encerrado, motivo: {}", reason);
+                // Ao encerrar a conexão, todos os resultados de correção offline já foram recebidos; define o resultado final
                 finalResult.set(offlineResult.toString());
                 recognitionLatch.countDown();
             }
 
             @Override
             public void onError(Exception ex) {
-                log.error("FunASR WS错误", ex);
-                // 先设置已有的结果，再释放锁，避免主线程读到空结果
+                log.error("Erro no WebSocket do FunASR", ex);
+                // Define primeiro o resultado já obtido, e só então libera o lock, evitando que a thread principal leia um resultado vazio
                 finalResult.set(offlineResult.toString());
                 recognitionLatch.countDown();
             }
         };
 
         try {
-            // 连接WebSocket
+            // Conecta o WebSocket
             webSocketClient.connect();
             
-            // 等待识别完成或超时
+            // Aguarda a conclusão do reconhecimento ou o timeout
             boolean recognized = recognitionLatch.await(RECOGNITION_TIMEOUT_MS, TimeUnit.MILLISECONDS);
             
             if (!recognized) {
-                log.warn("FunASR识别超时");
+                log.warn("Timeout no reconhecimento do FunASR");
             }
         } catch (Exception e) {
-            log.error("FunASR识别过程中发生错误", e);
+            log.error("Erro durante o reconhecimento do FunASR", e);
         } finally {
-            // 关闭WebSocket连接
+            // Fecha a conexão WebSocket
             if (webSocketClient.isOpen()) {
                 webSocketClient.close();
             }

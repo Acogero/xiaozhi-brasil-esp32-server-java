@@ -24,24 +24,24 @@ import java.io.ByteArrayInputStream;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 火山引擎大模型流式语音识别服务
- * 基于 WebSocket 二进制协议实现
+ * Serviço de reconhecimento de voz em streaming de grande modelo da Volcengine
+ * Implementado com base no protocolo binário WebSocket
  * 
- * @see <a href="https://www.volcengine.com/docs/6561/1354869">大模型流式语音识别API</a>
+ * @see <a href="https://www.volcengine.com/docs/6561/1354869">API de reconhecimento de voz em streaming de grande modelo</a>
  */
 @Slf4j
 public class VolcengineSttService implements SttService {
     private static final String PROVIDER_NAME = "volcengine";
 
-    // WebSocket API地址
+    // Endereço da API WebSocket
     private static final String WS_API_URL = "wss://openspeech.bytedance.com/api/v3/sauc/bigmodel_async";
 
-    // 识别超时时间（90秒）
+    // Tempo limite de reconhecimento (90 segundos)
     private static final long RECOGNITION_TIMEOUT_MS = 90000;
-    // 队列等待超时时间
+    // Tempo limite de espera da fila
     private static final int QUEUE_TIMEOUT_MS = 100;
 
-    // 协议常量
+    // Constantes do protocolo
     private static final byte PROTOCOL_VERSION = 0b0001;
     private static final byte HEADER_SIZE = 0b0001;
     private static final byte FULL_CLIENT_REQUEST = 0b0001;
@@ -62,7 +62,7 @@ public class VolcengineSttService implements SttService {
     public VolcengineSttService(ConfigBO config) {
         this.appId = config.getAppId();
         this.accessToken = config.getApiKey();
-        // 固定使用豆包流式语音识别模型1.0小时版
+        // Usa fixamente o modelo de reconhecimento de voz em streaming Doubao versão 1.0 hora
         this.resourceId = "volc.bigasr.sauc.duration";
     }
 
@@ -73,9 +73,9 @@ public class VolcengineSttService implements SttService {
 
     @Override
     public SttResult stream(Flux<byte[]> audioFlux) {
-        // 检查配置是否已设置
+        // Verifica se a configuração já foi definida
         if (appId == null || accessToken == null) {
-            log.error("火山引擎语音识别配置未设置，无法进行识别");
+            log.error("A configuração de reconhecimento de voz da Volcengine não foi definida; não é possível reconhecer");
             return null;
         }
 
@@ -87,17 +87,17 @@ public class VolcengineSttService implements SttService {
         BlockingQueue<byte[]> audioQueue = new LinkedBlockingQueue<>();
         AtomicReference<WebSocket> webSocketRef = new AtomicReference<>();
 
-        // 订阅音频流
+        // Assina o fluxo de áudio
         audioFlux.subscribe(
                 data -> audioQueue.offer(data),
                 error -> {
-                    log.error("音频流处理错误", error);
+                    log.error("Erro no processamento do fluxo de áudio", error);
                     isCompleted.set(true);
                 },
                 () -> isCompleted.set(true)
         );
 
-        // 构建请求
+        // Monta a requisição
         Request request = new Request.Builder()
                 .url(WS_API_URL)
                 .addHeader("X-Api-App-Key", appId)
@@ -113,16 +113,16 @@ public class VolcengineSttService implements SttService {
             public void onOpen(WebSocket webSocket, Response response) {
                 webSocketRef.set(webSocket);
 
-                // 发送 full client request
+                // Envia o full client request
                 try {
                     byte[] fullRequest = buildFullClientRequest();
                     webSocket.send(okio.ByteString.of(fullRequest));
                 } catch (Exception e) {
-                    log.error("发送 full client request 失败", e);
-                    webSocket.close(1000, "发送请求失败");
+                    log.error("Falha ao enviar o full client request", e);
+                    webSocket.close(1000, "Falha ao enviar a requisição");
                 }
 
-                // 启动虚拟线程发送音频数据
+                // Inicia uma virtual thread para enviar os dados de áudio
                 Thread.startVirtualThread(() -> {
                     try {
                         while (!isCompleted.get() || !audioQueue.isEmpty()) {
@@ -132,21 +132,21 @@ public class VolcengineSttService implements SttService {
                                     byte[] audioRequest = buildAudioRequest(audioChunk, false);
                                     webSocket.send(okio.ByteString.of(audioRequest));
                                 } catch (Exception e) {
-                                    log.error("发送音频数据时发生错误", e);
+                                    log.error("Erro ao enviar os dados de áudio", e);
                                     break;
                                 }
                             }
                         }
 
-                        // 发送最后一包（空音频，标记结束）
+                        // Envia o último pacote (áudio vazio, marcando o fim)
                         try {
                             byte[] lastRequest = buildAudioRequest(new byte[0], true);
                             webSocket.send(okio.ByteString.of(lastRequest));
                         } catch (Exception e) {
-                            log.error("发送最后一包时发生错误", e);
+                            log.error("Erro ao enviar o último pacote", e);
                         }
                     } catch (Exception e) {
-                        log.error("处理音频流时发生错误", e);
+                        log.error("Erro ao processar o fluxo de áudio", e);
                     }
                 });
             }
@@ -156,13 +156,13 @@ public class VolcengineSttService implements SttService {
                 try {
                     parseServerResponse(bytes.toByteArray(), textBuilder, finalResult, recognitionLatch, latchReleased, connectId);
                 } catch (Exception e) {
-                    log.error("解析服务器响应失败", e);
+                    log.error("Falha ao interpretar a resposta do servidor", e);
                 }
             }
 
             @Override
             public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-                log.error("火山引擎识别失败", t);
+                log.error("Falha no reconhecimento da Volcengine", t);
                 if (latchReleased.compareAndSet(false, true)) {
                     recognitionLatch.countDown();
                 }
@@ -177,19 +177,19 @@ public class VolcengineSttService implements SttService {
         });
 
         try {
-            // 等待识别完成或超时
+            // Aguarda a conclusão do reconhecimento ou o timeout
             boolean recognized = recognitionLatch.await(RECOGNITION_TIMEOUT_MS, TimeUnit.MILLISECONDS);
             if (!recognized) {
-                log.warn("火山引擎识别超时 - ConnectId: {}", connectId);
+                log.warn("Timeout no reconhecimento da Volcengine - ConnectId: {}", connectId);
             }
         } catch (InterruptedException e) {
-            log.error("等待识别结果时被中断", e);
+            log.error("Interrompido ao aguardar o resultado do reconhecimento", e);
             Thread.currentThread().interrupt();
         } finally {
-            // 确保关闭 WebSocket 连接
+            // Garante o fechamento da conexão WebSocket
             WebSocket ws = webSocketRef.get();
             if (ws != null) {
-                ws.close(1000, "识别完成");
+                ws.close(1000, "Reconhecimento concluído");
             }
         }
 
@@ -197,18 +197,18 @@ public class VolcengineSttService implements SttService {
     }
 
     /**
-     * 构建 full client request 消息
+     * Monta a mensagem full client request
      */
     private byte[] buildFullClientRequest() throws Exception {
-        // 构建请求JSON
+        // Monta o JSON da requisição
         ObjectNode requestJson = objectMapper.createObjectNode();
 
-        // user 配置
+        // Configuração de user
         ObjectNode user = objectMapper.createObjectNode();
         user.put("uid", "xiaozhi-" + UUID.randomUUID().toString().substring(0, 8));
         requestJson.set("user", user);
 
-        // audio 配置
+        // Configuração de audio
         ObjectNode audio = objectMapper.createObjectNode();
         audio.put("format", "pcm");
         audio.put("codec", "raw");
@@ -217,7 +217,7 @@ public class VolcengineSttService implements SttService {
         audio.put("channel", 1);
         requestJson.set("audio", audio);
 
-        // request 配置
+        // Configuração de request
         ObjectNode request = objectMapper.createObjectNode();
         request.put("model_name", "bigmodel");
         request.put("enable_itn", true);
@@ -231,28 +231,28 @@ public class VolcengineSttService implements SttService {
         String jsonStr = objectMapper.writeValueAsString(requestJson);
         byte[] jsonBytes = jsonStr.getBytes("UTF-8");
 
-        // Gzip 压缩
+        // Compressão Gzip
         byte[] compressedPayload = gzipCompress(jsonBytes);
 
-        // 构建二进制消息
+        // Monta a mensagem binária
         return buildBinaryMessage(FULL_CLIENT_REQUEST, NO_SEQUENCE, JSON_SERIALIZATION, GZIP_COMPRESSION, compressedPayload);
     }
 
     /**
-     * 构建 audio only request 消息
+     * Monta a mensagem audio only request
      */
     private byte[] buildAudioRequest(byte[] audioData, boolean isLast) throws Exception {
-        // Gzip 压缩音频数据
+        // Comprime os dados de áudio com Gzip
         byte[] compressedPayload = gzipCompress(audioData);
 
         byte flags = isLast ? LAST_PACKET : NO_SEQUENCE;
 
-        // 构建二进制消息
+        // Monta a mensagem binária
         return buildBinaryMessage(AUDIO_ONLY_REQUEST, flags, (byte) 0b0000, GZIP_COMPRESSION, compressedPayload);
     }
 
     /**
-     * 构建二进制消息
+     * Monta a mensagem binária
      */
     private byte[] buildBinaryMessage(byte messageType, byte flags, byte serialization, byte compression, byte[] payload) {
         ByteBuffer buffer = ByteBuffer.allocate(4 + 4 + payload.length);
@@ -279,39 +279,39 @@ public class VolcengineSttService implements SttService {
     }
 
     /**
-     * 解析服务器响应
+     * Interpreta a resposta do servidor
      */
     private void parseServerResponse(byte[] data, StringBuilder textBuilder,
             AtomicReference<SttResult> finalResult, CountDownLatch latch, AtomicBoolean latchReleased,
             String connectId) throws Exception {
         if (data.length < 4) {
-            log.warn("响应数据过短");
+            log.warn("Dados de resposta muito curtos");
             return;
         }
 
         ByteBuffer buffer = ByteBuffer.wrap(data);
         buffer.order(ByteOrder.BIG_ENDIAN);
 
-        // 解析 header (4 bytes)
-        buffer.get(); // byte0: protocol version & header size, 跳过
+        // Interpreta o header (4 bytes)
+        buffer.get(); // byte0: protocol version & header size, ignorado
         byte byte1 = buffer.get();
         byte byte2 = buffer.get();
-        buffer.get(); // Reserved byte, 跳过
+        buffer.get(); // Reserved byte, ignorado
 
-        // 解析各字段 (仅使用需要的字段)
+        // Interpreta os campos (usa apenas os campos necessários)
         int messageType = (byte1 >> 4) & 0x0F;
         int flags = byte1 & 0x0F;
         int compression = byte2 & 0x0F;
 
-        // 检查是否有 sequence number（flags 包含 0b0001 或 0b0011）
+        // Verifica se há sequence number (flags contém 0b0001 ou 0b0011)
         boolean hasSequence = (flags & 0b0001) != 0;
         if (hasSequence && buffer.remaining() >= 4) {
-            buffer.getInt(); // 读取并跳过 sequence number
+            buffer.getInt(); // Lê e ignora o sequence number
         }
 
-        // 检查消息类型
+        // Verifica o tipo de mensagem
         if (messageType == (SERVER_ERROR_RESPONSE & 0x0F)) {
-            // 错误消息
+            // Mensagem de erro
             if (buffer.remaining() >= 8) {
                 int errorCode = buffer.getInt();
                 int errorMsgSize = buffer.getInt();
@@ -319,7 +319,7 @@ public class VolcengineSttService implements SttService {
                     byte[] errorMsgBytes = new byte[errorMsgSize];
                     buffer.get(errorMsgBytes);
                     String errorMsg = new String(errorMsgBytes, "UTF-8");
-                    log.error("火山引擎识别错误 - Code: {}, Message: {}", errorCode, errorMsg);
+                    log.error("Erro de reconhecimento da Volcengine - Code: {}, Message: {}", errorCode, errorMsg);
                 }
             }
             if (latchReleased.compareAndSet(false, true)) {
@@ -332,21 +332,21 @@ public class VolcengineSttService implements SttService {
             return;
         }
 
-        // 读取 payload
+        // Lê o payload
         if (buffer.remaining() < 4) {
             return;
         }
 
         int payloadSize = buffer.getInt();
         if (buffer.remaining() < payloadSize) {
-            log.warn("Payload 数据不完整");
+            log.warn("Dados do Payload incompletos");
             return;
         }
 
         byte[] payload = new byte[payloadSize];
         buffer.get(payload);
 
-        // 解压缩
+        // Descompacta
         byte[] decompressedPayload;
         if (compression == GZIP_COMPRESSION) {
             decompressedPayload = gzipDecompress(payload);
@@ -354,11 +354,11 @@ public class VolcengineSttService implements SttService {
             decompressedPayload = payload;
         }
 
-        // 解析 JSON
+        // Interpreta o JSON
         String jsonStr = new String(decompressedPayload, "UTF-8");
         JsonNode responseJson = objectMapper.readTree(jsonStr);
 
-        // 提取识别结果
+        // Extrai o resultado do reconhecimento
         if (responseJson.has("result")) {
             JsonNode result = responseJson.get("result");
             if (result.has("text")) {
@@ -368,7 +368,7 @@ public class VolcengineSttService implements SttService {
                         textBuilder.setLength(0);
                         textBuilder.append(text);
                     }
-                    // 从 utterances 中提取情感（取 definite=true 的分句里的情感）
+                    // Extrai a emoção a partir de utterances (usa a emoção da frase com definite=true)
                     String topEmotion = null;
                     Double topEmotionScore = null;
                     String topEmotionDegree = null;
@@ -396,11 +396,11 @@ public class VolcengineSttService implements SttService {
             }
         }
 
-        // 检查是否是最后一包响应（flags 包含 0b0010 或 0b0011）
+        // Verifica se é o último pacote de resposta (flags contém 0b0010 ou 0b0011)
         boolean isLast = (flags & 0b0010) != 0;
         if (isLast) {
             SttResult current = finalResult.get();
-            log.info("语音识别完成(volcengine): {} [情感: {}, 置信度: {}, 强度: {}, 强度置信度: {}]",
+            log.info("Reconhecimento de voz concluído (volcengine): {} [emoção: {}, confiança: {}, intensidade: {}, confiança da intensidade: {}]",
                     current.text(), current.emotion(), current.emotionScore(),
                     current.emotionDegree(), current.emotionDegreeScore());
             if (latchReleased.compareAndSet(false, true)) {
@@ -410,7 +410,7 @@ public class VolcengineSttService implements SttService {
     }
 
     /**
-     * Gzip 压缩
+     * Compressão Gzip
      */
     private byte[] gzipCompress(byte[] data) throws Exception {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -421,7 +421,7 @@ public class VolcengineSttService implements SttService {
     }
 
     /**
-     * Gzip 解压缩
+     * Descompressão Gzip
      */
     private byte[] gzipDecompress(byte[] data) throws Exception {
         ByteArrayInputStream bis = new ByteArrayInputStream(data);
