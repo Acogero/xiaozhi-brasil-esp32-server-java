@@ -21,7 +21,7 @@ export interface RequestError extends Error {
   isForbidden?: boolean
 }
 
-// 创建 axios 实例
+// Cria a instância do axios
 const request: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || '',
   timeout: 30000,
@@ -31,12 +31,12 @@ const request: AxiosInstance = axios.create({
   },
 })
 
-// 全局请求取消控制器：路由切换时自动取消所有进行中的请求
+// Controlador global de cancelamento de requisições: cancela automaticamente todas as requisições em andamento na troca de rota
 let globalController = new AbortController()
 let authExpiredHandling = false
 
 /**
- * 取消所有进行中的请求（路由守卫自动调用）
+ * Cancela todas as requisições em andamento (chamado automaticamente pelo guarda de rota)
  */
 export function cancelPendingRequests() {
   globalController.abort()
@@ -80,7 +80,7 @@ export function shouldIgnoreRequestError(error: unknown): boolean {
     (error instanceof Error && (error as RequestError).isSilent === true)
 }
 
-function handleAuthExpired(authMessage = '登录过期，请重新登录！') {
+function handleAuthExpired(authMessage = 'Sessão expirada, faça login novamente!') {
   const userStore = useUserStore()
   userStore.clearUserInfo()
   userStore.clearToken()
@@ -105,16 +105,16 @@ function handleAuthExpired(authMessage = '登录过期，请重新登录！') {
   })
 }
 
-// 请求拦截器
+// Interceptador de requisição
 request.interceptors.request.use(
   (config) => {
-    // 添加 Token 到请求头
+    // Adiciona o Token ao cabeçalho da requisição
     const userStore = useUserStore()
     if (userStore.token) {
       config.headers.Authorization = `Bearer ${userStore.token}`
     }
 
-    // 自动挂载全局取消信号（如果请求未自行指定 signal）
+    // Anexa automaticamente o sinal de cancelamento global (caso a requisição não especifique um signal próprio)
     if (!config.signal) {
       config.signal = globalController.signal
     }
@@ -126,21 +126,21 @@ request.interceptors.request.use(
   },
 )
 
-// 响应拦截器
+// Interceptador de resposta
 request.interceptors.response.use(
   (response: AxiosResponse<ApiResponse>) => {
-    // 如果是 blob 类型的响应，直接返回，不做业务处理
+    // Se for uma resposta do tipo blob, retorna diretamente, sem processamento de negócio
     if (response.config.responseType === 'blob') {
       return response
     }
 
     const { data } = response
 
-    // 处理业务错误码
+    // Trata o código de erro de negócio
     if (data.code === 401) {
       handleAuthExpired()
       return Promise.reject(
-        createRequestError(data.message || '未授权', {
+        createRequestError(data.message || 'Não autorizado', {
           code: 'ERR_AUTH_EXPIRED',
           isSilent: true,
           isAuthExpired: true,
@@ -150,22 +150,22 @@ request.interceptors.response.use(
 
     if (data.code === 403) {
       return Promise.reject(
-        createRequestError(data.message || '权限不足', {
+        createRequestError(data.message || 'Permissão insuficiente', {
           code: 'ERR_FORBIDDEN',
           isForbidden: true,
         })
       )
     }
 
-    // 返回数据部分，而不是整个 response
+    // Retorna apenas a parte dos dados, e não o response inteiro
     return data as unknown as AxiosResponse<ApiResponse>
   },
   (error) => {
-    // 判断是否是请求取消错误（快速切换页面导致）
+    // Verifica se é um erro de cancelamento de requisição (causado por troca rápida de página)
     if (error.code === 'ERR_CANCELED' || error.message?.includes('canceled') || error.message?.includes('aborted')) {
-      // 请求被取消是正常行为，不显示错误提示
-      console.debug('请求已取消:', error.config?.url)
-      const requestError = toRequestError(error, '请求已取消')
+      // O cancelamento da requisição é um comportamento normal, não exibe mensagem de erro
+      console.debug('Requisição cancelada:', error.config?.url)
+      const requestError = toRequestError(error, 'Requisição cancelada')
       requestError.code = 'ERR_CANCELED'
       requestError.isSilent = true
       requestError.isRequestCanceled = true
@@ -174,42 +174,42 @@ request.interceptors.response.use(
 
     if (error.code === 'ECONNABORTED' || error.message?.toLowerCase?.().includes('timeout')) {
       message.error({
-        content: '请求超时',
+        content: 'Tempo de requisição esgotado',
         key: 'timeout-error',
       })
       return Promise.reject(error)
     }
 
-    // HTTP 错误处理
+    // Tratamento de erro HTTP
     if (error.response) {
       const { status } = error.response
       if (status === 401) {
         handleAuthExpired()
-        const requestError = toRequestError(error, '登录过期，请重新登录！')
+        const requestError = toRequestError(error, 'Sessão expirada, faça login novamente!')
         requestError.code = 'ERR_AUTH_EXPIRED'
         requestError.isSilent = true
         requestError.isAuthExpired = true
         return Promise.reject(requestError)
       } else if (status === 403) {
-        const requestError = toRequestError(error, error.response.data?.message || '权限不足')
+        const requestError = toRequestError(error, error.response.data?.message || 'Permissão insuficiente')
         requestError.code = 'ERR_FORBIDDEN'
         requestError.isForbidden = true
         return Promise.reject(requestError)
       } else {
         message.error({
-          content: error.response.data?.message || `请求失败 (${status})`,
+          content: error.response.data?.message || `Falha na requisição (${status})`,
           key: 'request-error',
         })
       }
     } else if (error.request) {
       message.error({
-        content: '网络错误，请检查网络连接',
+        content: 'Erro de rede, verifique sua conexão com a internet',
         key: 'network-error',
       })
     } else {
-      // 其他错误（如请求配置错误等）
+      // Outros erros (como erro de configuração da requisição, etc.)
       message.error({
-        content: error.message || '请求失败',
+        content: error.message || 'Falha na requisição',
         key: 'unknown-error',
       })
     }
@@ -217,31 +217,31 @@ request.interceptors.response.use(
   },
 )
 
-// 导出请求方法
+// Exporta os métodos de requisição
 export default request
 
 /**
- * HTTP 请求便捷方法
- * 默认使用 JSON 格式提交数据，如需表单格式请使用 postForm
- * 路由切换时自动取消所有进行中的请求，无需手动处理
+ * Métodos de conveniência para requisições HTTP
+ * Por padrão, envia os dados no formato JSON; para o formato de formulário, utilize postForm
+ * Cancela automaticamente todas as requisições em andamento na troca de rota, sem necessidade de tratamento manual
  */
 export const http = {
   /**
-   * GET 请求
+   * Requisição GET
    */
   get<T = unknown>(url: string, params?: Record<string, unknown>): Promise<DataResponse<T>> {
     return request.get(url, { params })
   },
 
   /**
-   * POST 请求（JSON 格式）
+   * Requisição POST (formato JSON)
    */
   post<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<DataResponse<T>> {
     return request.post(url, data, config)
   },
 
   /**
-   * POST 请求（multipart/form-data）
+   * Requisição POST (multipart/form-data)
    */
   postMultipart<T = unknown>(url: string, data: FormData, config?: AxiosRequestConfig): Promise<DataResponse<T>> {
     return request.post(url, data, {
@@ -254,7 +254,7 @@ export const http = {
   },
 
   /**
-   * POST 请求（form-urlencoded 格式）
+   * Requisição POST (formato form-urlencoded)
    */
   postForm<T = unknown>(url: string, data?: Record<string, unknown>): Promise<DataResponse<T>> {
     return request.post(url, qs.stringify(data), {
@@ -265,35 +265,35 @@ export const http = {
   },
 
   /**
-   * PUT 请求（JSON 格式）
+   * Requisição PUT (formato JSON)
    */
   put<T = unknown>(url: string, data?: unknown): Promise<DataResponse<T>> {
     return request.put(url, data)
   },
 
   /**
-   * PATCH 请求（JSON 格式）
+   * Requisição PATCH (formato JSON)
    */
   patch<T = unknown>(url: string, data?: unknown): Promise<DataResponse<T>> {
     return request.patch(url, data)
   },
 
   /**
-   * DELETE 请求（查询参数方式）
+   * Requisição DELETE (via parâmetros de consulta)
    */
   delete<T = unknown>(url: string, params?: Record<string, unknown>): Promise<DataResponse<T>> {
     return request.delete(url, { params })
   },
 
   /**
-   * DELETE 请求（带 JSON 请求体）
+   * Requisição DELETE (com corpo JSON)
    */
   deleteBody<T = unknown>(url: string, data?: Record<string, unknown> | unknown[]): Promise<DataResponse<T>> {
     return request.delete(url, { data })
   },
 
   /**
-   * 分页查询（GET）
+   * Consulta paginada (GET)
    */
   getPage<T = unknown>(
     url: string,
@@ -303,7 +303,7 @@ export const http = {
   },
 
   /**
-   * 列表查询（GET，不带分页）
+   * Consulta em lista (GET, sem paginação)
    */
   getList<T = unknown>(url: string, params?: BaseQueryParams): Promise<ListResponse<T>> {
     return request.get(url, { params })

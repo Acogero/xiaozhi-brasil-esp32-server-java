@@ -4,7 +4,7 @@ import type { MemoryQueryParams, SummaryMemory, ChatMemory } from '@/types/memor
 import type { MessageQueryParams } from '@/types/message'
 
 /**
- * 查询摘要记忆
+ * Consulta a memória resumida
  */
 export function querySummaryMemory(params: MemoryQueryParams) {
   const { roleId, deviceId, pageNo = 1, pageSize = 10 } = params
@@ -15,7 +15,7 @@ export function querySummaryMemory(params: MemoryQueryParams) {
 }
 
 /**
- * 查询聊天记忆（使用现有的message接口）
+ * Consulta a memória de chat (utiliza a interface message existente)
  */
 export function queryChatMemory(params: {
   roleId: number
@@ -42,7 +42,7 @@ export function queryChatMemory(params: {
 }
 
 /**
- * 删除摘要记忆
+ * Exclui a memória resumida
  */
 export function deleteSummaryMemory(roleId: number, deviceId: string, summaryId?: number) {
   const url = `${api.memory.summary}/${roleId}/${deviceId}`

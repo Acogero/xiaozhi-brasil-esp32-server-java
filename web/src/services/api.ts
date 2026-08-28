@@ -65,7 +65,7 @@ export default {
   memory: {
     summary: '/memory/summary',
   },
-  // Web 聊天 API
+  // API de chat Web
   chat: {
     open: '/chat/open',
     stream: '/chat/stream',

@@ -1,7 +1,7 @@
-// WebSocket 服务 - Vue3 TypeScript版本
+// Serviço WebSocket - Versão Vue3 TypeScript
 
 // =============================
-// 类型定义
+// Definições de tipo
 // =============================
 
 export interface WebSocketConfig {
@@ -39,7 +39,7 @@ export interface ConnectionStatus {
 }
 
 // =============================
-// 状态变量
+// Variáveis de estado
 // =============================
 
 let webSocket: WebSocket | null = null
@@ -49,29 +49,29 @@ let reconnectAttempts = 0
 const maxReconnectAttempts = 5
 const reconnectDelay = 2000
 
-// 打字机效果相关
+// Relacionado ao efeito de máquina de escrever
 let typewriterTimer: number | null = null
-let typewriterQueue: string[] = [] // 待打字的文本队列
-let isTyping = false // 是否正在打字
-const TYPING_SPEED = 50 // 每个字的显示间隔（毫秒）
+let typewriterQueue: string[] = [] // Fila de textos aguardando digitação
+let isTyping = false // Indica se está digitando no momento
+const TYPING_SPEED = 50 // Intervalo de exibição entre caracteres (milissegundos)
 
-// 连接状态
+// Status de conexão
 const connectionStatus: ConnectionStatus = {
   isConnected: false,
-  connectionStatus: '未连接',
+  connectionStatus: 'Desconectado',
   connectionTime: null,
   sessionId: null
 }
 
 import { reactive } from 'vue'
 
-// 消息列表 - 使用响应式数组
+// Lista de mensagens - utiliza array reativo
 export const messages: ChatMessage[] = reactive([])
 
-// 当前正在构建的AI回复消息
+// Mensagem de resposta da IA em construção no momento
 let currentAIMessage: ChatMessage | null = null
 
-// 回调函数
+// Funções de callback
 type MessageHandler = (data: WebSocketMessage) => void
 type StatusChangeHandler = (status: ConnectionStatus) => void
 type BinaryHandler = (data: ArrayBuffer) => void
@@ -81,7 +81,7 @@ const statusChangeCallbacks: Set<StatusChangeHandler> = new Set()
 let binaryHandler: BinaryHandler | null = null
 
 // =============================
-// 日志管理
+// Gerenciamento de logs
 // =============================
 
 type LogLevel = 'debug' | 'info' | 'success' | 'warning' | 'error'
@@ -159,7 +159,7 @@ export function setLogLevel(level: LogLevel): boolean {
 }
 
 // =============================
-// 消息管理
+// Gerenciamento de mensagens
 // =============================
 
 export function addMessage(message: Partial<ChatMessage>): ChatMessage | null {
@@ -177,7 +177,7 @@ export function addMessage(message: Partial<ChatMessage>): ChatMessage | null {
   messages.push(newMessage)
 
   log(
-    `添加${newMessage.isUser ? '用户' : 'AI'}消息: ${newMessage.content.substring(0, 50)}${
+    `Adicionando mensagem de ${newMessage.isUser ? 'usuário' : 'IA'}: ${newMessage.content.substring(0, 50)}${
       newMessage.content.length > 50 ? '...' : ''
     }`,
     'debug'
@@ -188,13 +188,13 @@ export function addMessage(message: Partial<ChatMessage>): ChatMessage | null {
 
 export function clearMessages(): boolean {
   messages.splice(0, messages.length)
-  currentAIMessage = null // 重置当前AI消息
-  log('清空所有消息', 'info')
+  currentAIMessage = null // Reseta a mensagem da IA atual
+  log('Todas as mensagens foram limpas', 'info')
   return true
 }
 
 // =============================
-// 回调管理
+// Gerenciamento de callbacks
 // =============================
 
 export function registerMessageHandler(handler: MessageHandler): boolean {
@@ -223,10 +223,10 @@ export function unregisterStatusChangeCallback(callback: StatusChangeHandler): b
 
 export function registerBinaryHandler(handler: BinaryHandler): void {
   binaryHandler = handler
-  log('✅ 二进制消息处理函数已注册', 'info')
+  log('✅ Função de tratamento de mensagens binárias registrada', 'info')
 }
 
-// 通知状态变更
+// Notifica alteração de status
 function notifyStatusChange(): void {
   const status = { ...connectionStatus }
 
@@ -234,53 +234,53 @@ function notifyStatusChange(): void {
     try {
       callback(status)
     } catch (error) {
-      log(`状态变更回调执行错误: ${error}`, 'error')
+      log(`Erro ao executar callback de alteração de status: ${error}`, 'error')
     }
   })
 }
 
 // =============================
-// WebSocket 连接
+// Conexão WebSocket
 // =============================
 
 export async function connectToServer(config: WebSocketConfig): Promise<boolean> {
   if (webSocket && webSocket.readyState === WebSocket.OPEN) {
-    log('WebSocket已连接', 'info')
+    log('WebSocket já está conectado', 'info')
     return true
   }
 
   if (isConnecting) {
-    log('WebSocket正在连接中...', 'info')
+    log('WebSocket está conectando...', 'info')
     return false
   }
 
   try {
     isConnecting = true
-    connectionStatus.connectionStatus = '正在连接...'
+    connectionStatus.connectionStatus = 'Conectando...'
     connectionStatus.isConnected = false
 
-    // 清除之前的重连计时器
+    // Limpa o temporizador de reconexão anterior
     if (reconnectTimer) {
       clearTimeout(reconnectTimer)
       reconnectTimer = null
     }
 
-    // 关闭现有连接
+    // Fecha a conexão existente
     if (webSocket) {
       try {
         webSocket.close()
       } catch (e) {
-        // 忽略关闭错误
+        // Ignora erro de fechamento
       }
     }
 
-    // 构建连接URL
+    // Monta a URL de conexão
     let url = config.url
     if (!url.endsWith('/')) {
       url += '/'
     }
 
-    // 添加查询参数
+    // Adiciona parâmetros de consulta
     const params = new URLSearchParams()
     if (config.deviceId) {
       params.append('device-id', config.deviceId)
@@ -297,66 +297,66 @@ export async function connectToServer(config: WebSocketConfig): Promise<boolean>
       url += '?' + queryString
     }
 
-    log(`正在连接到: ${url}`, 'info')
+    log(`Conectando a: ${url}`, 'info')
 
-    // 创建WebSocket连接
+    // Cria a conexão WebSocket
     webSocket = new WebSocket(url)
     webSocket.binaryType = 'arraybuffer'
 
-    // 连接打开事件
+    // Evento de abertura da conexão
     webSocket.onopen = () => {
       isConnecting = false
       connectionStatus.isConnected = true
-      connectionStatus.connectionStatus = '已连接'
+      connectionStatus.connectionStatus = 'Conectado'
       connectionStatus.connectionTime = new Date()
       reconnectAttempts = 0
-      log('WebSocket连接已建立', 'success')
+      log('Conexão WebSocket estabelecida', 'success')
       notifyStatusChange()
     }
 
-    // 接收消息事件
+    // Evento de recebimento de mensagem
     webSocket.onmessage = (event) => {
       handleWebSocketMessage(event)
     }
 
-    // 连接关闭事件
+    // Evento de fechamento da conexão
     webSocket.onclose = (event) => {
       isConnecting = false
       connectionStatus.isConnected = false
 
       if (event.wasClean) {
-        connectionStatus.connectionStatus = '已断开'
-        log(`WebSocket连接已关闭: 代码=${event.code}, 原因=${event.reason}`, 'info')
+        connectionStatus.connectionStatus = 'Desconectado'
+        log(`Conexão WebSocket fechada: código=${event.code}, motivo=${event.reason}`, 'info')
       } else {
-        connectionStatus.connectionStatus = '连接已断开'
-        log('WebSocket连接意外断开', 'error')
+        connectionStatus.connectionStatus = 'Conexão desconectada'
+        log('Conexão WebSocket desconectada inesperadamente', 'error')
         scheduleReconnect(config)
       }
 
       notifyStatusChange()
     }
 
-    // 连接错误事件
+    // Evento de erro de conexão
     webSocket.onerror = () => {
       isConnecting = false
       connectionStatus.isConnected = false
-      connectionStatus.connectionStatus = '连接错误'
-      log('WebSocket连接错误', 'error')
+      connectionStatus.connectionStatus = 'Erro de conexão'
+      log('Erro na conexão WebSocket', 'error')
       notifyStatusChange()
     }
 
-    // 等待连接完成或超时
+    // Aguarda a conclusão da conexão ou timeout
     return new Promise((resolve) => {
       const timeoutId = setTimeout(() => {
         if (!connectionStatus.isConnected) {
-          log('WebSocket连接超时', 'error')
+          log('Tempo de conexão WebSocket esgotado', 'error')
           isConnecting = false
-          connectionStatus.connectionStatus = '连接超时'
+          connectionStatus.connectionStatus = 'Tempo de conexão esgotado'
 
           try {
             webSocket?.close()
           } catch (e) {
-            // 忽略关闭错误
+            // Ignora erro de fechamento
           }
 
           resolve(false)
@@ -368,9 +368,9 @@ export async function connectToServer(config: WebSocketConfig): Promise<boolean>
           clearTimeout(timeoutId)
           resolve(true)
         } else if (
-          connectionStatus.connectionStatus.includes('错误') ||
-          connectionStatus.connectionStatus.includes('超时') ||
-          connectionStatus.connectionStatus.includes('失败')
+          connectionStatus.connectionStatus.includes('Erro') ||
+          connectionStatus.connectionStatus.includes('esgotado') ||
+          connectionStatus.connectionStatus.includes('Falha')
         ) {
           clearTimeout(timeoutId)
           resolve(false)
@@ -384,18 +384,18 @@ export async function connectToServer(config: WebSocketConfig): Promise<boolean>
   } catch (error) {
     isConnecting = false
     connectionStatus.isConnected = false
-    connectionStatus.connectionStatus = '连接失败'
-    log(`WebSocket连接失败: ${error}`, 'error')
+    connectionStatus.connectionStatus = 'Falha na conexão'
+    log(`Falha na conexão WebSocket: ${error}`, 'error')
     notifyStatusChange()
     return false
   }
 }
 
-// 安排重新连接
+// Agenda a reconexão
 function scheduleReconnect(config: WebSocketConfig): void {
   if (reconnectAttempts >= maxReconnectAttempts) {
-    log(`已达到最大重连次数(${maxReconnectAttempts})，停止重连`, 'warning')
-    connectionStatus.connectionStatus = '重连失败'
+    log(`Número máximo de tentativas de reconexão atingido (${maxReconnectAttempts}), interrompendo a reconexão`, 'warning')
+    connectionStatus.connectionStatus = 'Falha na reconexão'
     notifyStatusChange()
     return
   }
@@ -403,10 +403,10 @@ function scheduleReconnect(config: WebSocketConfig): void {
   const delay = reconnectDelay * Math.pow(1.5, reconnectAttempts)
 
   log(
-    `计划在${delay / 1000}秒后重新连接(尝试${reconnectAttempts + 1}/${maxReconnectAttempts})`,
+    `Reconexão programada para daqui a ${delay / 1000} segundos (tentativa ${reconnectAttempts + 1}/${maxReconnectAttempts})`,
     'info'
   )
-  connectionStatus.connectionStatus = `${Math.ceil(delay / 1000)}秒后重连...`
+  connectionStatus.connectionStatus = `${Math.ceil(delay / 1000)}s até a reconexão...`
   notifyStatusChange()
 
   reconnectTimer = window.setTimeout(() => {
@@ -415,50 +415,50 @@ function scheduleReconnect(config: WebSocketConfig): void {
   }, delay)
 }
 
-// 处理WebSocket消息
+// Processa mensagens WebSocket
 function handleWebSocketMessage(event: MessageEvent): void {
   try {
-    // 详细检查消息类型
-    log(`📨 收到WebSocket消息，类型: ${typeof event.data}, 构造函数: ${event.data.constructor.name}`, 'debug')
+    // Verifica detalhadamente o tipo da mensagem
+    log(`📨 Mensagem WebSocket recebida, tipo: ${typeof event.data}, construtor: ${event.data.constructor.name}`, 'debug')
     
-    // 检查是否是二进制数据
+    // Verifica se são dados binários
     if (event.data instanceof ArrayBuffer) {
-      log(`🔢 收到二进制数据: ${event.data.byteLength}字节`, 'info')
+      log(`🔢 Dados binários recebidos: ${event.data.byteLength} bytes`, 'info')
       if (binaryHandler) {
-        log('✅ 调用二进制处理函数', 'debug')
+        log('✅ Chamando a função de tratamento de dados binários', 'debug')
         binaryHandler(event.data)
       } else {
-        log('❌ 未注册二进制消息处理函数', 'warning')
+        log('❌ Nenhuma função de tratamento de mensagens binárias registrada', 'warning')
       }
       return
     }
 
-    // 检查是否是Blob数据
+    // Verifica se são dados Blob
     if (event.data instanceof Blob) {
-      log(`🔢 收到Blob数据: ${event.data.size}字节`, 'info')
+      log(`🔢 Dados Blob recebidos: ${event.data.size} bytes`, 'info')
       event.data.arrayBuffer().then(buffer => {
         if (binaryHandler) {
-          log('✅ 调用二进制处理函数 (Blob转ArrayBuffer)', 'debug')
+          log('✅ Chamando a função de tratamento de dados binários (Blob convertido para ArrayBuffer)', 'debug')
           binaryHandler(buffer)
         } else {
-          log('❌ 未注册二进制消息处理函数', 'warning')
+          log('❌ Nenhuma função de tratamento de mensagens binárias registrada', 'warning')
         }
       })
       return
     }
 
-    // 处理文本数据
-    log(`📝 收到文本消息: ${event.data.substring(0, 100)}...`, 'debug')
+    // Processa dados de texto
+    log(`📝 Mensagem de texto recebida: ${event.data.substring(0, 100)}...`, 'debug')
     const data: WebSocketMessage = JSON.parse(event.data)
 
-    // 记录会话ID
+    // Registra o ID da sessão
     if (data.session_id && !connectionStatus.sessionId) {
       connectionStatus.sessionId = data.session_id
-      log(`会话ID: ${connectionStatus.sessionId}`, 'info')
+      log(`ID da sessão: ${connectionStatus.sessionId}`, 'info')
       notifyStatusChange()
     }
 
-    // 根据消息类型处理
+    // Processa de acordo com o tipo de mensagem
     switch (data.type) {
       case 'stt':
         handleSTTMessage(data)
@@ -467,23 +467,23 @@ function handleWebSocketMessage(event: MessageEvent): void {
         handleTTSMessage(data)
         break
       default:
-        log(`收到未知类型的消息: ${data.type}`, 'warning')
+        log(`Mensagem de tipo desconhecido recebida: ${data.type}`, 'warning')
     }
 
-    // 调用所有注册的消息处理函数
+    // Chama todas as funções de tratamento de mensagens registradas
     messageHandlers.forEach(handler => {
       try {
         handler(data)
       } catch (error) {
-        log(`消息处理函数执行错误: ${error}`, 'error')
+        log(`Erro ao executar a função de tratamento de mensagens: ${error}`, 'error')
       }
     })
   } catch (error) {
-    log(`处理WebSocket消息出错: ${error}`, 'error')
+    log(`Erro ao processar mensagem WebSocket: ${error}`, 'error')
   }
 }
 
-// 处理STT消息（语音识别）
+// Processa mensagens STT (reconhecimento de voz)
 function handleSTTMessage(data: WebSocketMessage): void {
   if (data.text) {
     addMessage({
@@ -491,22 +491,22 @@ function handleSTTMessage(data: WebSocketMessage): void {
       type: 'stt',
       isUser: true
     })
-    log(`语音识别结果: ${data.text}`, 'info')
+    log(`Resultado do reconhecimento de voz: ${data.text}`, 'info')
   }
 }
 
-// 打字机效果：逐字显示文本
+// Efeito de máquina de escrever: exibe o texto caractere por caractere
 function startTypewriter(text: string): void {
-  // 将文本添加到队列
+  // Adiciona o texto à fila
   typewriterQueue.push(text)
   
-  // 如果没有在打字，启动打字机
+  // Se não estiver digitando, inicia a máquina de escrever
   if (!isTyping) {
     processTypewriterQueue()
   }
 }
 
-// 处理打字机队列
+// Processa a fila da máquina de escrever
 function processTypewriterQueue(): void {
   if (typewriterQueue.length === 0) {
     isTyping = false
@@ -515,10 +515,10 @@ function processTypewriterQueue(): void {
   
   isTyping = true
   const text = typewriterQueue.shift()!
-  const chars = Array.from(text) // 支持 emoji 和多字节字符
+  const chars = Array.from(text) // Suporta emoji e caracteres multibyte
   let currentIndex = 0
   
-  // 如果是第一次打字，创建消息
+  // Se for a primeira digitação, cria a mensagem
   if (!currentAIMessage) {
     currentAIMessage = {
       id: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
@@ -529,16 +529,16 @@ function processTypewriterQueue(): void {
       isLoading: false
     }
     messages.push(currentAIMessage)
-    log(`📝 创建新的AI回复消息 (ID: ${currentAIMessage.id})`, 'info')
+    log(`📝 Nova mensagem de resposta da IA criada (ID: ${currentAIMessage.id})`, 'info')
   }
   
-  // 逐字添加
+  // Adiciona caractere por caractere
   const typeNextChar = () => {
     if (currentIndex < chars.length) {
       currentAIMessage!.content += chars[currentIndex]
       currentIndex++
       
-      // 强制触发响应式更新
+      // Força o acionamento da atualização reativa
       const index = messages.findIndex(msg => msg.id === currentAIMessage!.id)
       if (index !== -1) {
         messages[index] = { ...currentAIMessage! }
@@ -546,8 +546,8 @@ function processTypewriterQueue(): void {
       
       typewriterTimer = window.setTimeout(typeNextChar, TYPING_SPEED)
     } else {
-      // 当前文本打完，处理下一个
-      log(`✅ 完成打字: "${text}"`, 'debug')
+      // Texto atual concluído, processando o próximo
+      log(`✅ Digitação concluída: "${text}"`, 'debug')
       processTypewriterQueue()
     }
   }
@@ -555,7 +555,7 @@ function processTypewriterQueue(): void {
   typeNextChar()
 }
 
-// 停止打字机效果
+// Interrompe o efeito de máquina de escrever
 function stopTypewriter(): void {
   if (typewriterTimer) {
     clearTimeout(typewriterTimer)
@@ -565,33 +565,33 @@ function stopTypewriter(): void {
   typewriterQueue = []
 }
 
-// 处理TTS消息（文本转语音）
+// Processa mensagens TTS (texto para voz)
 function handleTTSMessage(data: WebSocketMessage): void {
   if (data.state === 'start') {
-    log('🎵 TTS开始，准备接收音频', 'info')
+    log('🎵 TTS iniciado, preparando para receber áudio', 'info')
     
-    // 重置打字机和当前AI消息
+    // Reinicia a máquina de escrever e a mensagem da IA atual
     stopTypewriter()
     currentAIMessage = null
     
-    // 通知音频服务准备接收新的音频流
+    // Notifica o serviço de áudio para se preparar a receber um novo stream de áudio
     if (window.dispatchEvent) {
       window.dispatchEvent(new CustomEvent('audio-stream-start'))
     }
   } else if (data.state === 'sentence_start' && data.text) {
-    // 将新句子加入打字机队列
-    log(`📥 收到新句子: "${data.text}"`, 'info')
+    // Adiciona a nova frase à fila da máquina de escrever
+    log(`📥 Nova frase recebida: "${data.text}"`, 'info')
     startTypewriter(data.text)
   } else if (data.state === 'stop') {
-    log('🛑 TTS结束，音频流结束', 'info')
+    log('🛑 TTS finalizado, stream de áudio encerrado', 'info')
     
-    // 等待打字机完成后再清理（最多等待10秒）
+    // Aguarda a conclusão da máquina de escrever antes de limpar (aguarda no máximo 10 segundos)
     let waitCount = 0
     const maxWait = 100 // 100 * 100ms = 10s
     const waitForTyping = () => {
       if (!isTyping && typewriterQueue.length === 0 || waitCount >= maxWait) {
         if (currentAIMessage) {
-          log(`✅ AI回复完成，最终内容: "${currentAIMessage.content}"`, 'info')
+          log(`✅ Resposta da IA concluída, conteúdo final: "${currentAIMessage.content}"`, 'info')
           currentAIMessage = null
         }
       } else {
@@ -601,7 +601,7 @@ function handleTTSMessage(data: WebSocketMessage): void {
     }
     waitForTyping()
     
-    // 通知音频服务流已结束
+    // Notifica o serviço de áudio que o stream terminou
     if (window.dispatchEvent) {
       window.dispatchEvent(new CustomEvent('audio-stream-end'))
     }
@@ -609,12 +609,12 @@ function handleTTSMessage(data: WebSocketMessage): void {
 }
 
 // =============================
-// 消息发送
+// Envio de mensagens
 // =============================
 
 function sendJsonMessage(data: Record<string, unknown>): boolean {
   if (!webSocket || webSocket.readyState !== WebSocket.OPEN) {
-    log('WebSocket未连接，无法发送消息', 'error')
+    log('WebSocket não conectado, não é possível enviar a mensagem', 'error')
     return false
   }
 
@@ -623,7 +623,7 @@ function sendJsonMessage(data: Record<string, unknown>): boolean {
     webSocket.send(message)
     return true
   } catch (error) {
-    log(`发送JSON消息失败: ${error}`, 'error')
+    log(`Falha ao enviar mensagem JSON: ${error}`, 'error')
     return false
   }
 }
@@ -642,14 +642,14 @@ export function sendTextMessage(text: string): boolean {
 
     return sendJsonMessage(message)
   } catch (error) {
-    log(`发送文本消息失败: ${error}`, 'error')
+    log(`Falha ao enviar mensagem de texto: ${error}`, 'error')
     return false
   }
 }
 
 export async function startDirectRecording(): Promise<boolean> {
   if (!webSocket || webSocket.readyState !== WebSocket.OPEN) {
-    throw new Error('WebSocket未连接')
+    throw new Error('WebSocket não conectado')
   }
 
   try {
@@ -659,18 +659,18 @@ export async function startDirectRecording(): Promise<boolean> {
     }
 
     sendJsonMessage(startMessage)
-    log('已发送开始录音命令', 'info')
+    log('Comando de início de gravação enviado', 'info')
 
     return true
   } catch (error) {
-    log(`开始录音失败: ${error}`, 'error')
+    log(`Falha ao iniciar a gravação: ${error}`, 'error')
     throw error
   }
 }
 
 export async function stopDirectRecording(): Promise<boolean> {
   if (!webSocket || webSocket.readyState !== WebSocket.OPEN) {
-    throw new Error('WebSocket未连接')
+    throw new Error('WebSocket não conectado')
   }
 
   try {
@@ -680,22 +680,22 @@ export async function stopDirectRecording(): Promise<boolean> {
     }
 
     sendJsonMessage(stopMessage)
-    log('已发送停止录音命令', 'info')
+    log('Comando de parada de gravação enviado', 'info')
 
     return true
   } catch (error) {
-    log(`停止录音失败: ${error}`, 'error')
+    log(`Falha ao parar a gravação: ${error}`, 'error')
     throw error
   }
 }
 
 // =============================
-// 连接控制
+// Controle de conexão
 // =============================
 
 export async function reconnectToServer(config: WebSocketConfig): Promise<boolean> {
   try {
-    log('手动触发重连...', 'info')
+    log('Reconexão manual acionada...', 'info')
 
     await disconnectFromServer()
 
@@ -703,8 +703,8 @@ export async function reconnectToServer(config: WebSocketConfig): Promise<boolea
 
     return await connectToServer(config)
   } catch (error) {
-    log(`手动重连失败: ${error}`, 'error')
-    connectionStatus.connectionStatus = '重连失败'
+    log(`Falha na reconexão manual: ${error}`, 'error')
+    connectionStatus.connectionStatus = 'Falha na reconexão'
     notifyStatusChange()
     return false
   }
@@ -715,19 +715,19 @@ export function stopAutoReconnect(): boolean {
     if (reconnectTimer) {
       clearTimeout(reconnectTimer)
       reconnectTimer = null
-      log('已停止自动重连', 'info')
+      log('Reconexão automática interrompida', 'info')
     }
 
     reconnectAttempts = 0
 
-    if (connectionStatus.connectionStatus.includes('重连')) {
-      connectionStatus.connectionStatus = '已停止重连'
+    if (connectionStatus.connectionStatus.includes('reconexão')) {
+      connectionStatus.connectionStatus = 'Reconexão interrompida'
       notifyStatusChange()
     }
 
     return true
   } catch (error) {
-    log(`停止自动重连失败: ${error}`, 'error')
+    log(`Falha ao interromper a reconexão automática: ${error}`, 'error')
     return false
   }
 }
@@ -738,7 +738,7 @@ export function disconnectFromServer(): boolean {
     reconnectTimer = null
   }
   
-  // 停止打字机效果
+  // Interrompe o efeito de máquina de escrever
   stopTypewriter()
   currentAIMessage = null
 
@@ -749,19 +749,19 @@ export function disconnectFromServer(): boolean {
 
   try {
     if (webSocket.readyState === WebSocket.OPEN) {
-      webSocket.close(1000, '用户主动断开')
+      webSocket.close(1000, 'Desconexão iniciada pelo usuário')
     }
 
     webSocket = null
     connectionStatus.isConnected = false
-    connectionStatus.connectionStatus = '已断开'
+    connectionStatus.connectionStatus = 'Desconectado'
     connectionStatus.sessionId = null
-    log('WebSocket连接已断开', 'info')
+    log('Conexão WebSocket desconectada', 'info')
     notifyStatusChange()
 
     return true
   } catch (error) {
-    log(`断开WebSocket连接失败: ${error}`, 'error')
+    log(`Falha ao desconectar o WebSocket: ${error}`, 'error')
     return false
   }
 }

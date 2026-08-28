@@ -4,37 +4,37 @@ import type { User, UserQueryParams, UpdateUserParams } from '@/types/user'
 import type { LoginResponse } from '@/store/user'
 
 /**
- * 用户登录
+ * Login do usuário
  */
 export function login(data: { username: string; password: string }) {
   return http.post<LoginResponse>(api.user.login, data)
 }
 
 /**
- * 手机号验证码登录
+ * Login por código de verificação via celular
  */
 export function telLogin(data: { tel: string; code: string }) {
   return http.post<LoginResponse>(api.user.telLogin, data)
 }
 
 /**
- * 检查Token有效性
- * 用于页面刷新时验证登录状态
+ * Verifica a validade do Token
+ * Utilizado para validar o status de login ao atualizar a página
  */
 export function checkToken() {
   return http.get<LoginResponse>(api.user.checkToken)
 }
 
 /**
- * 刷新Token
- * 延长登录有效期
+ * Atualiza o Token
+ * Estende o período de validade do login
  */
 export function refreshToken() {
   return http.post<LoginResponse>(api.user.refreshToken)
 }
 
 /**
- * 用户注册
+ * Registro de usuário
  */
 export function register(data: {
   name: string
@@ -44,13 +44,13 @@ export function register(data: {
   password: string
   verifyCode: string
 }) {
-  // 后端期望的参数名是 code，前端使用 verifyCode 更语义化
+  // O backend espera o parâmetro com o nome code; o frontend usa verifyCode por ser mais semântico
   const { verifyCode, ...rest } = data
   return http.post(api.user.add, { ...rest, code: verifyCode })
 }
 
 /**
- * 重置密码
+ * Redefine a senha
  */
 export function resetPassword(data: {
   email: string
@@ -61,42 +61,42 @@ export function resetPassword(data: {
 }
 
 /**
- * 检查用户是否存在
+ * Verifica se o usuário existe
  */
 export function checkUser(data: { username?: string; email?: string }) {
   return http.get(api.user.checkUser, data)
 }
 
 /**
- * 发送邮箱验证码
+ * Envia o código de verificação por e-mail
  */
 export function sendEmailCaptcha(data: { email: string; type: string }) {
   return http.post(api.user.sendEmailCaptcha, data)
 }
 
 /**
- * 发送短信验证码
+ * Envia o código de verificação por SMS
  */
 export function sendSmsCaptcha(data: { tel: string; type: string }) {
   return http.post(api.user.sendSmsCaptcha, data)
 }
 
 /**
- * 验证验证码
+ * Valida o código de verificação
  */
 export function checkCaptcha(data: { email: string; code: string; type: string }) {
   return http.get(api.user.checkCaptcha, data)
 }
 
 /**
- * 查询用户列表
+ * Consulta a lista de usuários
  */
 export function queryUsers(params: Partial<UserQueryParams>) {
   return http.getPage<User>(api.user.query, params)
 }
 
 /**
- * 更新用户信息
+ * Atualiza as informações do usuário
  */
 export function updateUser(data: Partial<UpdateUserParams>) {
   const { userId, ...updateData } = data
@@ -104,7 +104,7 @@ export function updateUser(data: Partial<UpdateUserParams>) {
 }
 
 /**
- * 添加用户
+ * Adiciona um usuário
  */
 export function addUser(data: Partial<User>) {
   return http.post(api.user.add, data)

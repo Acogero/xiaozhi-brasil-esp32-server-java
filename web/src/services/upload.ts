@@ -17,11 +17,11 @@ export interface UploadOptions {
 }
 
 /**
- * 通用文件上传方法
- * @param file 要上传的文件
- * @param type 文件类型: avatar, firmware 等
- * @param options 上传配置选项
- * @returns 默认返回URL，fullResponse=true时返回完整响应
+ * Método genérico de upload de arquivos
+ * @param file Arquivo a ser enviado
+ * @param type Tipo de arquivo: avatar, firmware, etc.
+ * @param options Opções de configuração do upload
+ * @returns Por padrão retorna a URL; quando fullResponse=true, retorna a resposta completa
  */
 export function uploadFile(
   file: File,
@@ -34,12 +34,12 @@ export function uploadFile(
     formData.append('type', type)
 
     const xhr = new XMLHttpRequest()
-    // 使用完整的 API URL，避免相对路径解析到前端域名
+    // Usa a URL completa da API, evitando que o caminho relativo seja resolvido para o domínio do frontend
     const baseURL = import.meta.env.VITE_API_BASE_URL || ''
     const uploadUrl = `${baseURL}${api.upload}`
     xhr.open('POST', uploadUrl, true)
 
-    // 添加认证 token（使用 Bearer 格式）
+    // Adiciona o token de autenticação (formato Bearer)
     const userStore = useUserStore()
     if (userStore.token) {
       xhr.setRequestHeader('Authorization', `Bearer ${userStore.token}`)
@@ -61,18 +61,18 @@ export function uploadFile(
           if (response.code === 200) {
             resolve(options?.fullResponse ? response : response.url)
           } else {
-            reject(new Error(response.message || '上传失败'))
+            reject(new Error(response.message || 'Falha no upload'))
           }
         } catch (error) {
-          reject(new Error('响应解析失败'))
+          reject(new Error('Falha ao analisar a resposta'))
         }
       } else {
-        reject(new Error(`上传失败，状态码: ${xhr.status}`))
+        reject(new Error(`Falha no upload, código de status: ${xhr.status}`))
       }
     }
 
     xhr.onerror = function () {
-      reject(new Error('网络错误'))
+      reject(new Error('Erro de rede'))
     }
 
     xhr.send(formData)
