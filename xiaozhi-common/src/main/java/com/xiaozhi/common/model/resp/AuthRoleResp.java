@@ -7,29 +7,29 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@Schema(description = "后台权限角色")
+@Schema(description = "Papel de permissão do backend")
 public class AuthRoleResp {
 
-    @Schema(description = "角色ID")
+    @Schema(description = "ID do papel")
     private Integer authRoleId;
 
-    @Schema(description = "角色名称")
+    @Schema(description = "Nome do papel")
     private String authRoleName;
 
-    @Schema(description = "角色标识")
+    @Schema(description = "Identificador do papel")
     private String roleKey;
 
-    @Schema(description = "角色描述")
+    @Schema(description = "Descrição do papel")
     private String description;
 
-    @Schema(description = "状态")
+    @Schema(description = "Status")
     private String status;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Schema(description = "创建时间")
+    @Schema(description = "Data de criação")
     private LocalDateTime createTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @Schema(description = "更新时间")
+    @Schema(description = "Data de atualização")
     private LocalDateTime updateTime;
 }

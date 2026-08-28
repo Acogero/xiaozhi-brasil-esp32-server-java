@@ -8,9 +8,9 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Schema(description = "权限树节点")
+@Schema(description = "Nó da árvore de permissões")
 public class PermissionTreeResp extends PermissionResp {
 
-    @Schema(description = "子权限")
+    @Schema(description = "Subpermissão")
     private List<PermissionTreeResp> children;
 }

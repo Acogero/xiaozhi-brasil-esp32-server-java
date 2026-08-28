@@ -6,21 +6,21 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-@Schema(description = "会话响应")
+@Schema(description = "Resposta de sessão")
 public class ConversationResp {
 
-    @Schema(description = "会话ID")
+    @Schema(description = "ID da sessão")
     private String sessionId;
 
-    @Schema(description = "角色ID")
+    @Schema(description = "ID do papel")
     private Integer roleId;
 
-    @Schema(description = "角色名称")
+    @Schema(description = "Nome do papel")
     private String roleName;
 
-    @Schema(description = "会话标题（第一条消息内容）")
+    @Schema(description = "Título da sessão (conteúdo da primeira mensagem)")
     private String title;
 
-    @Schema(description = "最近更新时间")
+    @Schema(description = "Data da última atualização")
     private Date updateTime;
 }
