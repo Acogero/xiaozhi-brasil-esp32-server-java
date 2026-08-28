@@ -17,13 +17,13 @@ import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 视觉对话（MCP 识图接口）
- * 由设备 MCP 客户端调用，Bearer token 为 sessionId。
+ * Diálogo visual (interface de reconhecimento de imagem via MCP)
+ * Chamado pelo cliente MCP do dispositivo; o Bearer token é o sessionId.
  */
 @Slf4j
 @RestController
 @RequestMapping("/api/vl")
-@Tag(name = "视觉对话管理", description = "视觉对话相关操作")
+@Tag(name = "Gerenciamento de diálogo visual", description = "Operações relacionadas ao diálogo visual")
 public class VLChatController {
 
     @Resource
@@ -34,38 +34,38 @@ public class VLChatController {
 
     @SaIgnore
     @PostMapping(value = "/chat", produces = "application/json;charset=UTF-8")
-    @Operation(summary = "图片识别", description = "根据问题返回识别结果")
+    @Operation(summary = "Reconhecimento de imagem", description = "Retorna o resultado do reconhecimento com base na pergunta")
     public Map<String, Object> vlChat(
-        @Parameter(description = "文件") @RequestParam("file") MultipartFile file,
-        @Parameter(description = "问题") @RequestParam String question,
+        @Parameter(description = "Arquivo") @RequestParam("file") MultipartFile file,
+        @Parameter(description = "Pergunta") @RequestParam String question,
         HttpServletRequest request) {
         if (file == null || file.isEmpty()) {
-            return failure("图片不能为空");
+            return failure("A imagem não pode estar vazia");
         }
         if (!StringUtils.hasText(question)) {
-            return failure("问题不能为空");
+            return failure("A pergunta não pode estar vazia");
         }
 
         String authorization = request.getHeader("authorization");
         if (authorization == null || !authorization.startsWith("Bearer ")) {
-            return failure("缺少认证信息或格式错误");
+            return failure("Informações de autenticação ausentes ou em formato inválido");
         }
 
         String sessionId = authorization.substring(7);
         var session = sessionManager.getSession(sessionId);
         if (session == null) {
-            return failure("session不存在");
+            return failure("A sessão não existe");
         }
 
         try {
             String result = visionService.recognize(file, question);
             return success(result);
         } catch (IllegalArgumentException | IllegalStateException e) {
-            log.warn("视觉对话请求失败, sessionId={}, error={}", sessionId, e.getMessage());
+            log.warn("Falha na requisição de diálogo visual, sessionId={}, error={}", sessionId, e.getMessage());
             return failure(e.getMessage());
         } catch (RuntimeException e) {
-            log.error("视觉对话处理失败, sessionId={}", sessionId, e);
-            return failure("视觉对话处理失败，请稍后重试");
+            log.error("Falha ao processar o diálogo visual, sessionId={}", sessionId, e);
+            return failure("Falha ao processar o diálogo visual, tente novamente mais tarde");
         }
     }
 
