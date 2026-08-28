@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * 星辰Agent API 响应模型
- * 基于文档: https://www.xfyun.cn/doc/spark/Agent04-API%E6%8E%A5%E5%85%A5.html
+ * Modelo de resposta da API do Agent XingChen
+ * Baseado na documentação: https://www.xfyun.cn/doc/spark/Agent04-API%E6%8E%A5%E5%85%A5.html
  */
 @Data
 @Builder
@@ -20,145 +20,145 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class XingChenResponse {
     /**
-     * 错误码 (0表示成功)
+     * Código de erro (0 indica sucesso)
      */
     private Integer code;
 
     /**
-     * 错误消息
+     * Mensagem de erro
      */
     private String message;
 
     /**
-     * 消息ID
+     * ID da mensagem
      */
     private String id;
 
     /**
-     * 创建时间戳
+     * Timestamp de criação
      */
     private Long created;
 
     /**
-     * 响应选项列表
+     * Lista de opções de resposta
      */
     private List<Choices> choices;
 
     /**
-     * 事件数据 (工具调用相关)
+     * Dados do evento (relacionados à chamada de ferramenta)
      */
     @JsonProperty("event_data")
     private EventData eventData;
 
     /**
-     * 响应选项
+     * Opção de resposta
      */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Choices {
         /**
-         * 增量内容
+         * Conteúdo incremental
          */
         private Delta delta;
         
         /**
-         * 选项索引
+         * Índice da opção
          */
         private Integer index;
 
         /**
-         * 完成原因: stop/length/null
+         * Motivo de conclusão: stop/length/null
          */
         @JsonProperty("finish_reason")
         private String finishReason;
 
         /**
-         * 增量消息内容
+         * Conteúdo incremental da mensagem
          */
         @Data
         @NoArgsConstructor
         @AllArgsConstructor
         public static class Delta {
             /**
-             * 角色: assistant
+             * Papel: assistant
              */
             private String role;
             
             /**
-             * 消息内容
+             * Conteúdo da mensagem
              */
             private String content;
         }
     }
 
     /**
-     * 事件数据 (工具调用/中断等场景)
+     * Dados do evento (cenários de chamada de ferramenta/interrupção etc.)
      */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class EventData {
         /**
-         * 事件ID
+         * ID do evento
          */
         @JsonProperty("event_id")
         private String eventId;
         
         /**
-         * 事件类型: function_call/interrupt等
+         * Tipo de evento: function_call/interrupt, etc.
          */
         @JsonProperty("event_type")
         private String eventType;
         
         /**
-         * 是否需要回复: true/false
+         * Se requer resposta: true/false
          */
         @JsonProperty("need_reply")
         private String needReply;
         
         /**
-         * 事件值
+         * Valor do evento
          */
         private ReplayValue value;
 
         /**
-         * 回复值
+         * Valor da resposta
          */
         @Data
         @NoArgsConstructor
         @AllArgsConstructor
         public static class ReplayValue {
             /**
-             * 事件ID
+             * ID do evento
              */
             @JsonProperty("event_id")
             private String eventId;
             
             /**
-             * 事件类型
+             * Tipo de evento
              */
             @JsonProperty("event_type")
             private String eventType;
             
             /**
-             * 是否需要回复
+             * Se requer resposta
              */
             @JsonProperty("need_reply")
             private String needReply;
             
             /**
-             * 值
+             * Valor
              */
             private String value;
             
             /**
-             * 中断类型
+             * Tipo de interrupção
              */
             private String type;
             
             /**
-             * 中断内容
+             * Conteúdo da interrupção
              */
             private String content;
         }
