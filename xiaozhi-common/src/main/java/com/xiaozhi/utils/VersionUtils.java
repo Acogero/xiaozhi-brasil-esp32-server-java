@@ -1,19 +1,19 @@
 package com.xiaozhi.utils;
 
 /**
- * 版本号比较工具类
+ * Classe utilitária de comparação de números de versão
  */
 public class VersionUtils {
 
     /**
-     * 比较两个版本号
-     * @param version1 版本1
-     * @param version2 版本2
-     * @return 如果version1 < version2返回负数，相等返回0，version1 > version2返回正数
+     * Compara dois números de versão
+     * @param version1 versão 1
+     * @param version2 versão 2
+     * @return retorna número negativo se version1 < version2, 0 se forem iguais, número positivo se version1 > version2
      */
     public static int compareVersion(String version1, String version2) {
         if (version1 == null || version2 == null) {
-            throw new IllegalArgumentException("版本号不能为空");
+            throw new IllegalArgumentException("O número de versão não pode ser vazio");
         }
 
         String[] v1Parts = version1.split("\\.");
@@ -36,11 +36,11 @@ public class VersionUtils {
     }
 
     /**
-     * 解析版本号的每一部分（支持1.2.0-beta这种格式）
+     * Analisa cada parte do número de versão (suporta formatos como 1.2.0-beta)
      */
     private static int parseVersionPart(String part) {
         try {
-            // 如果包含非数字字符（如1.2.0-beta），只取数字部分
+            // Se contiver caracteres não numéricos (como em 1.2.0-beta), pega apenas a parte numérica
             String numericPart = part.replaceAll("[^0-9].*", "");
             return numericPart.isEmpty() ? 0 : Integer.parseInt(numericPart);
         } catch (NumberFormatException e) {

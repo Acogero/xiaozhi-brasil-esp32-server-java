@@ -12,8 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 表情符号处理工具类
- * 用于从文本中提取表情符号、过滤表情符号并映射为情感词
+ * Classe utilitária de processamento de emojis
+ * Usada para extrair emojis do texto, filtrar emojis e mapeá-los para palavras de emoção
  *
  * @author yuchen
  * @date 2025/4/14
@@ -21,132 +21,132 @@ import java.util.regex.Pattern;
 @Slf4j
 public class EmojiUtils {
 
-    // 定义表情符号的Unicode范围
+    // Define os intervalos Unicode dos emojis
     private static final int[][] EMOJI_RANGES = {
-            { 0x1F600, 0x1F64F }, // 表情符号
-            { 0x1F300, 0x1F5FF }, // 符号和图案
-            { 0x1F680, 0x1F6FF }, // 交通工具和地图符号
-            { 0x1F900, 0x1F9FF }, // 补充符号
-            { 0x1FA70, 0x1FAFF }, // 更多补充符号
-            { 0x2600, 0x26FF }, // 杂项符号
-            { 0x2700, 0x27BF }, // 装饰符号
-            { 0x1F1E6, 0x1F1FF }, // 国旗表情
-            { 0x1F700, 0x1F77F }, // 额外的表情符号
-            { 0x20000, 0x2A6DF }, // 补充符号（更多表情）
-            { 0x1F3FB, 0x1F3FF }, // 表情符号修饰符
-            { 0x200D, 0x200D }, // 零宽连接符
-            { 0xFE0F, 0xFE0F }, // 变体选择器
+            { 0x1F600, 0x1F64F }, // Emojis (rostos)
+            { 0x1F300, 0x1F5FF }, // Símbolos e pictogramas
+            { 0x1F680, 0x1F6FF }, // Transportes e símbolos de mapa
+            { 0x1F900, 0x1F9FF }, // Símbolos suplementares
+            { 0x1FA70, 0x1FAFF }, // Mais símbolos suplementares
+            { 0x2600, 0x26FF }, // Símbolos diversos
+            { 0x2700, 0x27BF }, // Símbolos decorativos
+            { 0x1F1E6, 0x1F1FF }, // Emojis de bandeiras
+            { 0x1F700, 0x1F77F }, // Emojis adicionais
+            { 0x20000, 0x2A6DF }, // Símbolos suplementares (mais emojis)
+            { 0x1F3FB, 0x1F3FF }, // Modificadores de emoji
+            { 0x200D, 0x200D }, // Zero-width joiner
+            { 0xFE0F, 0xFE0F }, // Seletor de variação
     };
 
     private static final Pattern HTML_TAG_PATTERN = Pattern.compile("<[^>]+>");
     private static final Pattern SPECIAL_CHARS_PATTERN = Pattern.compile("[@#№$%&*]");
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
     
-    // 颜文字模式 - 匹配常见的颜文字组合
+    // Padrão de kaomoji - corresponde às combinações de kaomoji comuns
     private static final Pattern KAOMOJI_PATTERN = Pattern.compile(
-        "[(（][^)）]{1,10}[)）]|" +  // 如 (^_^) (・ω・) (≧▽≦)
-        "[<＜][^>＞]{1,10}[>＞]|" +  // 如 <(￣︶￣)>
-        "[\\\\¯\\\\*][_-]{1,2}[\\\\¯\\\\*]|" +  // 如 \_/ \*_*\
+        "[(（][^)）]{1,10}[)）]|" +  // Ex: (^_^) (・ω・) (≧▽≦)
+        "[<＜][^>＞]{1,10}[>＞]|" +  // Ex: <(￣︶￣)>
+        "[\\\\¯\\\\*][_-]{1,2}[\\\\¯\\\\*]|" +  // Ex: \_/ \*_*\
         "\\\\o/|" +                 // \o/
         ":-?[)D(]|" +               // :-) :D :-(
         ";-?[)]|" +                 // ;-)
         "=\\\\?[_/]"                // =_= =/=
     );
 
-    // 表情符号到情绪单词的映射
+    // Mapeamento de emoji para palavra de emoção
     private static final Map<String, String> emojiToEmotionMap = new HashMap<>();
 
     static {
-        // 初始化表情符号到情绪的映射关系
+        // Inicializa o mapeamento de emoji para emoção
         initEmojiToEmotionMap();
     }
 
     /**
-     * 初始化表情符号到情绪的映射
+     * Inicializa o mapeamento de emoji para emoção
      */
     private static void initEmojiToEmotionMap() {
         Map<String, String[]> emotionToEmojis = new HashMap<>();
-        // 中立
+        // Neutro
         emotionToEmojis.put("neutral", new String[] { "😐", "😶" });
-        // 开心
+        // Feliz
         emotionToEmojis.put("happy", new String[] { "🌈", "😊", "🎈", "🐱" });
-        // 笑
+        // Rindo
         emotionToEmojis.put("laughing", new String[] { "😀", "😃", "😁", "😏", "😄", "🤪" });
-        // 搞笑
+        // Engraçado
         emotionToEmojis.put("funny", new String[] { "😂", "🤣", "😆" });
-        // 悲伤
+        // Triste
         emotionToEmojis.put("sad", new String[] { "😢", "😔", "😞", "😑" });
-        // 生气
+        // Bravo
         emotionToEmojis.put("angry", new String[] { "😠", "😡", "😒", "😤", "🤬" });
-        // 哭泣
+        // Chorando
         emotionToEmojis.put("crying", new String[] { "😭" });
-        // 爱
+        // Amando
         emotionToEmojis.put("loving", new String[] { "❤️", "💕", "😍", "🥰", "💖" });
-        // 尴尬
+        // Envergonhado
         emotionToEmojis.put("embarrassed", new String[] { "😳", "😓", "😅" });
-        // 惊讶
+        // Surpreso
         emotionToEmojis.put("surprised", new String[] { "😮", "😲", "😯" });
-        // 震惊
+        // Chocado
         emotionToEmojis.put("shocked", new String[] { "😱", "😨", "😬" });
-        // 思考
+        // Pensando
         emotionToEmojis.put("thinking", new String[] { "🤔", "💭", "💬", "🧐" });
-        // 眨眼
+        // Piscando
         emotionToEmojis.put("winking", new String[] { "😉", "🤗", "👋", "🌟", "🐶" });
-        // 酷
+        // Descolado
         emotionToEmojis.put("cool", new String[] { "😎" });
-        // 放松
+        // Relaxado
         emotionToEmojis.put("relaxed", new String[] { "😌" });
-        // 美味
+        // Delicioso
         emotionToEmojis.put("delicious", new String[] { "😋", "🤤", "🍽️" });
-        // 亲吻
+        // Beijo
         emotionToEmojis.put("kissy", new String[] { "😘", "💋", "😚", "😗", "😙" });
-        // 自信
+        // Confiante
         emotionToEmojis.put("confident", new String[] { "💪" });
-        // 困倦
+        // Sonolento
         emotionToEmojis.put("sleepy", new String[] { "😴" });
-        // 愚蠢
+        // Bobo
         emotionToEmojis.put("silly", new String[] { "😛", "😜", "😝" });
-        // 困惑
+        // Confuso
         emotionToEmojis.put("confused", new String[] { "😕", "🙄" });
 
-        // 填充表情符号到情绪单词的映射
+        // Preenche o mapeamento de emoji para palavra de emoção
         for (Map.Entry<String, String[]> entry : emotionToEmojis.entrySet()) {
             String emotion = entry.getKey();
             for (String emoji : entry.getValue()) {
-                // 将表情符号的字符逐个映射到情绪单词
+                // Mapeia cada caractere de emoji para a palavra de emoção
                 emojiToEmotionMap.put(emoji, emotion);
             }
         }
     }
 
     /**
-     * 清理文本，移除HTML标签、特殊字符和控制字符
+     * Limpa o texto, removendo tags HTML, caracteres especiais e caracteres de controle
      *
-     * @param text 输入文本
-     * @return 清理后的文本
+     * @param text texto de entrada
+     * @return texto limpo
      */
     public static String cleanText(String text) {
-        // 移除控制字符
+        // Remove caracteres de controle
         text = text.replaceAll("[\\t\\n\\r\b\\f]", "");
 
-        // 移除HTML标签
+        // Remove tags HTML
         text = HTML_TAG_PATTERN.matcher(text).replaceAll("");
 
-        // 移除特殊符号
+        // Remove símbolos especiais
         text = SPECIAL_CHARS_PATTERN.matcher(text).replaceAll("");
 
-        // 替换连续的空白字符为单个空格
+        // Substitui sequências de espaços em branco por um único espaço
         text = WHITESPACE_PATTERN.matcher(text).replaceAll(" ");
 
-        // 去除首尾空格
+        // Remove espaços no início e no fim
         return text.trim();
     }
 
     /**
-     * 检查字符是否是表情符号
+     * Verifica se o caractere é um emoji
      *
-     * @param codePoint 输入字符的Unicode码点
-     * @return 如果是表情符号返回true，否则返回false
+     * @param codePoint código de ponto Unicode do caractere de entrada
+     * @return true se for um emoji, false caso contrário
      */
     public static boolean isEmoji(int codePoint) {
         for (int[] range : EMOJI_RANGES) {
@@ -158,10 +158,10 @@ public class EmojiUtils {
     }
 
     /**
-     * 检查文本是否包含颜文字
+     * Verifica se o texto contém kaomoji
      *
-     * @param text 要检查的文本
-     * @return 如果包含颜文字返回true，否则返回false
+     * @param text texto a ser verificado
+     * @return true se contiver kaomoji, false caso contrário
      */
     public static boolean containsKaomoji(String text) {
         if (text == null || text.isEmpty()) {
@@ -172,24 +172,24 @@ public class EmojiUtils {
     }
 
     /**
-     * 过滤文本中的颜文字
+     * Filtra os kaomojis do texto
      *
-     * @param text 要过滤的文本
-     * @return 过滤后的文本
+     * @param text texto a ser filtrado
+     * @return texto filtrado
      */
     public static String filterKaomoji(String text) {
         if (text == null) {
             return null;
         }
-        // 将颜文字替换为空字符串
+        // Substitui os kaomojis por string vazia
         return KAOMOJI_PATTERN.matcher(text).replaceAll("");
     }
 
     /**
-     * 提取句子中的表情符号
+     * Extrai os emojis presentes na frase
      *
-     * @param text 输入的句子
-     * @return 包含所有表情符号的列表
+     * @param text frase de entrada
+     * @return lista contendo todos os emojis
      */
     public static List<String> extractEmojis(String text) {
         List<String> emojis = new ArrayList<>();
@@ -207,17 +207,17 @@ public class EmojiUtils {
     }
 
     /**
-     * 通过表情符号获取情绪单词
+     * Obtém a palavra de emoção a partir do emoji
      *
-     * @param emoji 表情符号
-     * @return 情绪单词，如果没有匹配则返回"happy"
+     * @param emoji o emoji
+     * @return palavra de emoção; retorna "happy" se não houver correspondência
      */
     public static String getEmotionByEmoji(String emoji) {
         return emojiToEmotionMap.getOrDefault(emoji, "happy");
     }
 
     /**
-     * 所有可用的情绪词列表（用于随机选取）
+     * Lista de todas as palavras de emoção disponíveis (usada para seleção aleatória)
      */
     private static final String[] EMOTIONS = {
             "neutral", "happy", "laughing", "funny", "sad", "angry", "crying",
@@ -226,17 +226,17 @@ public class EmojiUtils {
     };
 
     /**
-     * 随机返回一个情绪词（当句子没有表情符号时使用）
+     * Retorna uma palavra de emoção aleatória (usada quando a frase não tem emoji)
      */
     public static String getRandomEmotion() {
         return EMOTIONS[ThreadLocalRandom.current().nextInt(EMOTIONS.length)];
     }
 
     /**
-     * 处理句子，移除表情符号并映射为心情单词
+     * Processa a frase, removendo os emojis e mapeando-os para palavras de humor
      *
-     * @param text 输入的句子
-     * @return 返回包含处理后句子和表情列表的对象
+     * @param text frase de entrada
+     * @return retorna a frase processada e a lista de emojis
      */
     public static String processSentence(String text, List<String> moods) {
         Assert.notNull(moods, "moods cannot be null");
@@ -248,22 +248,22 @@ public class EmojiUtils {
         for (int i = 0; i < length;) {
             int codePoint = text.codePointAt(i);
             if (isEmoji(codePoint)) {
-                // 转换为表情字符串并匹配情感词
+                // Converte para string de emoji e busca a palavra de emoção correspondente
                 String emoji = new String(Character.toChars(codePoint));
                 String mood = getEmotionByEmoji(emoji);
                 if (mood != null && !mood.isEmpty()) {
                     moods.add(mood);
                 }
-                // 跳过当前表情符号
+                // Pula o emoji atual
                 i += Character.charCount(codePoint);
             } else {
-                // 保留非表情字符
+                // Mantém o caractere que não é emoji
                 cleanedText.appendCodePoint(codePoint);
                 i++;
             }
         }
         
-        // 过滤颜文字
+        // Filtra os kaomojis
         String filteredText = filterKaomoji(cleanedText.toString().trim());
         
         return  filteredText;

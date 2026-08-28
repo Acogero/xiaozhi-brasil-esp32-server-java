@@ -43,10 +43,10 @@ public class ImageUtils {
     }
 
     /**
-     * 绘制字体头像。
-     * 如果是英文名，只显示首字母大写；如果是中文名，只显示最后两个字。
+     * Desenha o avatar com base no nome.
+     * Se for nome em inglês, exibe apenas a primeira letra maiúscula; se for nome em chinês, exibe apenas os últimos dois caracteres.
      *
-     * @return 生成的头像文件相对路径
+     * @return caminho relativo do arquivo de avatar gerado
      */
     public String generateAvatar(String name) throws IOException {
         int width = 100;

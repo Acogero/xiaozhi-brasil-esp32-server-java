@@ -6,18 +6,18 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
- * 请求上下文工具类
- * 提供从 Spring RequestContextHolder 获取客户端 IP 的方法
+ * Classe utilitária de contexto de requisição
+ * Fornece métodos para obter o IP do cliente a partir do Spring RequestContextHolder
  *
  * @author Joey
  */
 public class RequestContextUtils {
 
     /**
-     * 获取客户端真实 IP 地址
-     * 优先从代理头（X-Forwarded-For、X-Real-IP 等）获取，最后回退到 RemoteAddr
+     * Obtém o endereço IP real do cliente
+     * Prioriza a obtenção a partir dos cabeçalhos de proxy (X-Forwarded-For, X-Real-IP, etc.), recorrendo por fim ao RemoteAddr
      *
-     * @return 客户端 IP 地址
+     * @return endereço IP do cliente
      */
     public static String getClientIp() {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
@@ -29,15 +29,15 @@ public class RequestContextUtils {
     }
 
     /**
-     * 从 HttpServletRequest 获取客户端真实 IP 地址
+     * Obtém o endereço IP real do cliente a partir do HttpServletRequest
      *
-     * @param request HTTP 请求对象
-     * @return 客户端 IP 地址
+     * @param request objeto de requisição HTTP
+     * @return endereço IP do cliente
      */
     public static String getClientIp(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
         if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
-            // X-Forwarded-For 可能包含多个 IP，取第一个
+            // X-Forwarded-For pode conter múltiplos IPs, pega o primeiro
             int index = ip.indexOf(',');
             if (index != -1) {
                 return ip.substring(0, index).trim();

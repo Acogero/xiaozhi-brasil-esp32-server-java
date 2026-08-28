@@ -20,20 +20,20 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class AudioUtils {
-    /** 由 {@link com.xiaozhi.common.config.RuntimePathConfig} 在启动时初始化 */
+    /** Inicializado na inicialização por {@link com.xiaozhi.common.config.RuntimePathConfig} */
     public static String AUDIO_PATH;
 
     public static final int AUDIO_RETENTION_DAYS = 30;
     public static final int FRAME_SIZE = 960;
-    public static final int SAMPLE_RATE = 16000; // 采样率
-    public static final int CHANNELS = 1; // 单声道
-    public static final int BITRATE = 48000; // 48kbps比特率（高质量，接近透明质量）
-    public static final int SAMPLE_FORMAT = 1; // AV_SAMPLE_FMT_S16, 16位PCM
-    public static final int BUFFER_SIZE = 512; // 窗口大小
-    public static final int OPUS_FRAME_DURATION_MS = 60; // OPUS帧持续时间（毫秒）
+    public static final int SAMPLE_RATE = 16000; // Taxa de amostragem
+    public static final int CHANNELS = 1; // Mono
+    public static final int BITRATE = 48000; // Taxa de bits de 48kbps (alta qualidade, próxima da transparência)
+    public static final int SAMPLE_FORMAT = 1; // AV_SAMPLE_FMT_S16, PCM de 16 bits
+    public static final int BUFFER_SIZE = 512; // Tamanho da janela
+    public static final int OPUS_FRAME_DURATION_MS = 60; // Duração do frame OPUS (milissegundos)
 
     /**
-     * 删除文件（静默处理异常）
+     * Exclui o arquivo (trata exceções silenciosamente)
      */
     public static void deleteFile(String path) {
         if (path == null || path.isBlank()) {
@@ -42,7 +42,7 @@ public class AudioUtils {
         try {
             Files.deleteIfExists(Path.of(path));
         } catch (IOException e) {
-            log.warn("删除文件失败: {}", path, e);
+            log.warn("Falha ao excluir o arquivo: {}", path, e);
         }
     }
 
@@ -55,11 +55,11 @@ public class AudioUtils {
                 try {
                     Files.delete(path);
                 } catch (IOException e) {
-                    log.warn("删除失败: {}", path, e);
+                    log.warn("Falha ao excluir: {}", path, e);
                 }
             });
         } catch (IOException e) {
-            log.warn("删除目录失败: {}", dir, e);
+            log.warn("Falha ao excluir o diretório: {}", dir, e);
         }
     }
 
@@ -71,61 +71,61 @@ public class AudioUtils {
         return AUDIO_PATH + fileName;
     }
     /**
-     * 将原始音频数据保存为WAV文件
+     * Salva os dados de áudio brutos como um arquivo WAV
      *
-     * @param audioData 音频数据
-     * @return 文件名
+     * @param audioData dados de áudio
+     * @return nome do arquivo
      */
     public static void saveAsWav(Path path, byte[] audioData) {
 
-        // WAV文件参数
-        int bitsPerSample = 16; // 16位采样
+        // Parâmetros do arquivo WAV
+        int bitsPerSample = 16; // Amostragem de 16 bits
 
         try {
-            // 确保音频目录存在
+            // Garante que o diretório de áudio exista
             Files.createDirectories(path.getParent());
 
             try (FileOutputStream fos = new FileOutputStream(path.toFile());
                  DataOutputStream dos = new DataOutputStream(fos)) {
 
-                // 写入WAV文件头
-                // RIFF头
+                // Escreve o cabeçalho do arquivo WAV
+                // Cabeçalho RIFF
                 dos.writeBytes("RIFF");
-                dos.writeInt(Integer.reverseBytes(36 + audioData.length)); // 文件长度
+                dos.writeInt(Integer.reverseBytes(36 + audioData.length)); // Tamanho do arquivo
                 dos.writeBytes("WAVE");
 
-                // fmt子块
+                // Subchunk fmt
                 dos.writeBytes("fmt ");
-                dos.writeInt(Integer.reverseBytes(16)); // 子块大小
-                dos.writeShort(Short.reverseBytes((short) 1)); // 音频格式 (1 = PCM)
-                dos.writeShort(Short.reverseBytes((short) CHANNELS)); // 通道数
-                dos.writeInt(Integer.reverseBytes(SAMPLE_RATE)); // 采样率
-                dos.writeInt(Integer.reverseBytes(SAMPLE_RATE * CHANNELS * bitsPerSample / 8)); // 字节率
-                dos.writeShort(Short.reverseBytes((short) (CHANNELS * bitsPerSample / 8))); // 块对齐
-                dos.writeShort(Short.reverseBytes((short) bitsPerSample)); // 每个样本的位数
+                dos.writeInt(Integer.reverseBytes(16)); // Tamanho do subchunk
+                dos.writeShort(Short.reverseBytes((short) 1)); // Formato de áudio (1 = PCM)
+                dos.writeShort(Short.reverseBytes((short) CHANNELS)); // Número de canais
+                dos.writeInt(Integer.reverseBytes(SAMPLE_RATE)); // Taxa de amostragem
+                dos.writeInt(Integer.reverseBytes(SAMPLE_RATE * CHANNELS * bitsPerSample / 8)); // Taxa de bytes
+                dos.writeShort(Short.reverseBytes((short) (CHANNELS * bitsPerSample / 8))); // Alinhamento de bloco
+                dos.writeShort(Short.reverseBytes((short) bitsPerSample)); // Bits por amostra
 
-                // data子块
+                // Subchunk data
                 dos.writeBytes("data");
-                dos.writeInt(Integer.reverseBytes(audioData.length)); // 数据大小
+                dos.writeInt(Integer.reverseBytes(audioData.length)); // Tamanho dos dados
 
-                // 写入音频数据
+                // Escreve os dados de áudio
                 dos.write(audioData);
             }
         } catch (IOException e) {
-            log.error("写入WAV文件时发生错误", e);
+            log.error("Erro ao escrever o arquivo WAV", e);
         }
     }
 
     /**
-     * 合并多个音频文件为一个WAV文件
-     * 支持合并的格式： wav, mp3, pcm
+     * Mescla múltiplos arquivos de áudio em um único arquivo WAV
+     * Formatos suportados para mesclagem: wav, mp3, pcm
      *
-     * @param path 输出的WAV文件路径
-     * @param audioPaths 要合并的音频文件路径列表
+     * @param path caminho do arquivo WAV de saída
+     * @param audioPaths lista de caminhos dos arquivos de áudio a mesclar
      */
     public static void mergeAudioFiles(Path path, List<String> audioPaths) {
         if (audioPaths.size() == 1) {
-            // 单文件直接移动，避免不必要的读取和重新编码
+            // Arquivo único é movido diretamente, evitando leitura e recodificação desnecessárias
             try {
                 var sourcePath = Paths.get(audioPaths.getFirst());
                 if (!sourcePath.isAbsolute()) {
@@ -135,7 +135,7 @@ public class AudioUtils {
                 Files.move(sourcePath, path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
                 return;
             } catch (Exception e) {
-                log.warn("文件移动失败，回退到合并逻辑: {}", e.getMessage());
+                log.warn("Falha ao mover o arquivo, retornando à lógica de mesclagem: {}", e.getMessage());
             }
         }
 //        var uuid = UUID.randomUUID().toString().replace("-", "");
@@ -143,9 +143,9 @@ public class AudioUtils {
 //        var outputPath = Paths.get(AUDIO_PATH, outputFileName).toString();
 
         try {
-            // 确保音频目录存在
+            // Garante que o diretório de áudio exista
             Files.createDirectories(path.getParent());
-            // 计算所有PCM数据的总大小
+            // Calcula o tamanho total de todos os dados PCM
             var totalPcmSize = 0L;
             var audioChunks = new ArrayList<byte[]>();
             for (var audioPath : audioPaths) {
@@ -158,62 +158,62 @@ public class AudioUtils {
                 audioChunks.add(pcmData);
             }
 
-            // 创建输出WAV文件
+            // Cria o arquivo WAV de saída
             try (FileOutputStream fos = new FileOutputStream(path.toFile());
                  DataOutputStream dos = new DataOutputStream(fos)) {
 
-                // 写入WAV文件头
-                int bitsPerSample = 16; // 16位采样
+                // Escreve o cabeçalho do arquivo WAV
+                int bitsPerSample = 16; // Amostragem de 16 bits
 
-                // RIFF头
+                // Cabeçalho RIFF
                 dos.writeBytes("RIFF");
-                dos.writeInt(Integer.reverseBytes(36 + (int) totalPcmSize)); // 文件长度
+                dos.writeInt(Integer.reverseBytes(36 + (int) totalPcmSize)); // Tamanho do arquivo
                 dos.writeBytes("WAVE");
 
-                // fmt子块
+                // Subchunk fmt
                 dos.writeBytes("fmt ");
-                dos.writeInt(Integer.reverseBytes(16)); // 子块大小
-                dos.writeShort(Short.reverseBytes((short) 1)); // 音频格式 (1 = PCM)
-                dos.writeShort(Short.reverseBytes((short) CHANNELS)); // 通道数
-                dos.writeInt(Integer.reverseBytes(SAMPLE_RATE)); // 采样率
-                dos.writeInt(Integer.reverseBytes(SAMPLE_RATE * CHANNELS * bitsPerSample / 8)); // 字节率
-                dos.writeShort(Short.reverseBytes((short) (CHANNELS * bitsPerSample / 8))); // 块对齐
-                dos.writeShort(Short.reverseBytes((short) bitsPerSample)); // 每个样本的位数
+                dos.writeInt(Integer.reverseBytes(16)); // Tamanho do subchunk
+                dos.writeShort(Short.reverseBytes((short) 1)); // Formato de áudio (1 = PCM)
+                dos.writeShort(Short.reverseBytes((short) CHANNELS)); // Número de canais
+                dos.writeInt(Integer.reverseBytes(SAMPLE_RATE)); // Taxa de amostragem
+                dos.writeInt(Integer.reverseBytes(SAMPLE_RATE * CHANNELS * bitsPerSample / 8)); // Taxa de bytes
+                dos.writeShort(Short.reverseBytes((short) (CHANNELS * bitsPerSample / 8))); // Alinhamento de bloco
+                dos.writeShort(Short.reverseBytes((short) bitsPerSample)); // Bits por amostra
 
-                // data子块
+                // Subchunk data
                 dos.writeBytes("data");
-                dos.writeInt(Integer.reverseBytes((int) totalPcmSize)); // 数据大小
+                dos.writeInt(Integer.reverseBytes((int) totalPcmSize)); // Tamanho dos dados
 
-                // 依次写入每个文件的PCM数据
+                // Escreve os dados PCM de cada arquivo, um após o outro
                 for (var pcmData : audioChunks) {
                     dos.write(pcmData);
                 }
             }
-            // 因为会采用音频缓存，所以不需要删除已经合并了的文件。
+            // Como o cache de áudio é utilizado, não é necessário excluir os arquivos já mesclados.
             // for (var audioPath : audioPaths) {
             //     var fullPath = audioPath.startsWith(AUDIO_PATH) ? audioPath : AUDIO_PATH + audioPath;
             //     Files.deleteIfExists(Paths.get(fullPath));
             // }
 
         } catch (Exception e) {
-            log.error("合并音频文件时发生错误", e);
+            log.error("Erro ao mesclar arquivos de áudio", e);
         }
     }
 
     /**
-     * 从WAV字节数组中提取PCM数据
+     * Extrai dados PCM de um array de bytes WAV
      *
-     * @param wavData WAV文件的原始字节数组
-     * @return PCM数据字节数组
+     * @param wavData array de bytes bruto do arquivo WAV
+     * @return array de bytes com os dados PCM
      */
     public static byte[] wavToPcm(byte[] wavData) throws IOException {
         if (wavData == null || wavData.length < 44) {
-            throw new IOException("无效的WAV数据");
+            throw new IOException("Dados WAV inválidos");
         }
 
         if (wavData[0] != 'R' || wavData[1] != 'I' || wavData[2] != 'F' || wavData[3] != 'F' ||
                 wavData[8] != 'W' || wavData[9] != 'A' || wavData[10] != 'V' || wavData[11] != 'E') {
-            throw new IOException("不是有效的WAV文件格式");
+            throw new IOException("Não é um formato de arquivo WAV válido");
         }
 
         int dataOffset = -1;
@@ -225,7 +225,7 @@ public class AudioUtils {
         }
 
         if (dataOffset == -1) {
-            throw new IOException("在WAV文件中找不到data子块");
+            throw new IOException("Subchunk data não encontrado no arquivo WAV");
         }
 
         int dataSize = wavData.length - dataOffset;
@@ -235,42 +235,42 @@ public class AudioUtils {
     }
 
     /**
-     * 从WAV文件中提取PCM数据
+     * Extrai dados PCM de um arquivo WAV
      *
-     * @param wavPath WAV文件路径
-     * @return PCM数据字节数组
+     * @param wavPath caminho do arquivo WAV
+     * @return array de bytes com os dados PCM
      */
     public static byte[] wavToPcm(String wavPath) throws IOException {
 
         byte[] wavData = Files.readAllBytes(Paths.get(wavPath));
 
-        if (wavData == null || wavData.length < 44) { // WAV头至少44字节
-            throw new IOException("无效的WAV数据");
+        if (wavData == null || wavData.length < 44) { // O cabeçalho WAV tem pelo menos 44 bytes
+            throw new IOException("Dados WAV inválidos");
         }
 
-        // 检查WAV文件标识
+        // Verifica a assinatura do arquivo WAV
         if (wavData[0] != 'R' || wavData[1] != 'I' || wavData[2] != 'F' || wavData[3] != 'F' ||
                 wavData[8] != 'W' || wavData[9] != 'A' || wavData[10] != 'V' || wavData[11] != 'E') {
-            throw new IOException("不是有效的WAV文件格式");
+            throw new IOException("Não é um formato de arquivo WAV válido");
         }
 
-        // 查找data子块
+        // Localiza o subchunk data
         int dataOffset = -1;
         for (int i = 12; i < wavData.length - 4; i++) {
             if (wavData[i] == 'd' && wavData[i + 1] == 'a' && wavData[i + 2] == 't' && wavData[i + 3] == 'a') {
-                dataOffset = i + 8; // 跳过"data"和数据大小字段
+                dataOffset = i + 8; // Pula o campo "data" e o campo de tamanho dos dados
                 break;
             }
         }
 
         if (dataOffset == -1) {
-            throw new IOException("在WAV文件中找不到data子块");
+            throw new IOException("Subchunk data não encontrado no arquivo WAV");
         }
 
-        // 计算PCM数据大小
+        // Calcula o tamanho dos dados PCM
         int dataSize = wavData.length - dataOffset;
 
-        // 提取PCM数据
+        // Extrai os dados PCM
         byte[] pcmData = new byte[dataSize];
         System.arraycopy(wavData, dataOffset, pcmData, 0, dataSize);
 
@@ -278,7 +278,7 @@ public class AudioUtils {
     }
 
     /**
-     * 判断文件是否为 OGG Opus 格式（.ogg 或 .opus 扩展名）
+     * Verifica se o arquivo está no formato OGG Opus (extensão .ogg ou .opus)
      */
     public static boolean isOggOpus(String filePath) {
         String lower = filePath.toLowerCase();
@@ -286,10 +286,10 @@ public class AudioUtils {
     }
 
     /**
-     * 从文件读取PCM数据，自动处理WAV和MP3格式
+     * Lê dados PCM de um arquivo, tratando automaticamente os formatos WAV e MP3
      *
-     * @param filePath 音频文件路径
-     * @return PCM数据字节数组
+     * @param filePath caminho do arquivo de áudio
+     * @return array de bytes com os dados PCM
      */
     public static byte[] readAsPcm(String filePath) throws IOException {
         if (filePath.toLowerCase().endsWith(".wav")) {
@@ -297,25 +297,25 @@ public class AudioUtils {
         } else if (filePath.toLowerCase().endsWith(".mp3")) {
             return mp3ToPcm(filePath);
         } else if (filePath.toLowerCase().endsWith(".pcm")) {
-            // 直接读取PCM文件
+            // Lê o arquivo PCM diretamente
             return Files.readAllBytes(Paths.get(filePath));
         } else if (isOggOpus(filePath)) {
             return opusToPcm(filePath);
         } else {
-            throw new IOException("不支持的音频格式: " + filePath);
+            throw new IOException("Formato de áudio não suportado: " + filePath);
         }
     }
 
     /**
-     * 从文件读取PCM数据并按Opus帧大小（3840字节 = 60ms）分块返回。
-     * 避免将整个音频文件作为单个byte[]持有，减少内存峰值。
+     * Lê dados PCM de um arquivo e retorna divididos em blocos do tamanho de um frame Opus (3840 bytes = 60ms).
+     * Evita manter o arquivo de áudio inteiro como um único byte[], reduzindo o pico de memória.
      *
-     * @param filePath 音频文件路径
-     * @return PCM数据分块列表，每块3840字节（最后一块可能更小）
+     * @param filePath caminho do arquivo de áudio
+     * @return lista de blocos de dados PCM, cada um com 3840 bytes (o último pode ser menor)
      */
     public static List<byte[]> readAsPcmChunks(String filePath) throws IOException {
         byte[] pcmData = readAsPcm(filePath);
-        // 每个Opus帧对应的PCM大小：60ms × 16000Hz × 16bit / 8 = 3840 bytes
+        // Tamanho de PCM correspondente a cada frame Opus: 60ms × 16000Hz × 16bit / 8 = 3840 bytes
         int chunkSize = OPUS_FRAME_DURATION_MS * SAMPLE_RATE * 2 / 1000; // 3840
         List<byte[]> chunks = new ArrayList<>();
         for (int i = 0; i < pcmData.length; i += chunkSize) {
@@ -328,55 +328,55 @@ public class AudioUtils {
     }
 
     /**
-     * 从文件读取Opus帧数据，自动处理各种音频格式
+     * Lê dados de frames Opus de um arquivo, tratando automaticamente diversos formatos de áudio
      *
-     * @param filePath 音频文件路径
-     * @return Opus帧列表
+     * @param filePath caminho do arquivo de áudio
+     * @return lista de frames Opus
      */
     public static List<byte[]> readAsOpus(String filePath) throws IOException {
         if (isOggOpus(filePath)) {
-            // 直接读取 OGG Opus 文件
+            // Lê o arquivo OGG Opus diretamente
             return readOpus(new File(filePath));
         } else {
-            // 其他格式先转为 PCM，再编码为 Opus
+            // Outros formatos são primeiro convertidos para PCM, depois codificados em Opus
             byte[] pcmData = readAsPcm(filePath);
             return new OpusProcessor().pcmToOpus(pcmData, false);
         }
     }
 
     /**
-     * 将PCM数据从指定采样率重采样到目标采样率（线性插值）
-     * 适用于实时流式场景（纯内存操作，无I/O延迟）
+     * Reamostra os dados PCM de uma taxa de amostragem para outra (interpolação linear)
+     * Adequado para cenários de streaming em tempo real (operação puramente em memória, sem latência de I/O)
      *
-     * @param pcmData      原始PCM数据（16位有符号小端序）
-     * @param fromRate     源采样率（Hz），如 24000
-     * @param toRate       目标采样率（Hz），如 16000
-     * @return 重采样后的PCM数据
+     * @param pcmData      dados PCM originais (16 bits, com sinal, little-endian)
+     * @param fromRate     taxa de amostragem de origem (Hz), por exemplo 24000
+     * @param toRate       taxa de amostragem de destino (Hz), por exemplo 16000
+     * @return dados PCM reamostrados
      */
     public static byte[] resamplePcm(byte[] pcmData, int fromRate, int toRate) {
         if (fromRate == toRate || pcmData == null || pcmData.length == 0) {
             return pcmData;
         }
 
-        // 每个样本 2 字节（16位）
+        // Cada amostra tem 2 bytes (16 bits)
         int inputSamples = pcmData.length / 2;
         int outputSamples = (int) Math.ceil((long) inputSamples * toRate / fromRate);
         byte[] output = new byte[outputSamples * 2];
 
         for (int i = 0; i < outputSamples; i++) {
-            // 源采样位置（浮点）
+            // Posição de amostra de origem (ponto flutuante)
             double srcPos = (double) i * fromRate / toRate;
             int srcIndex = (int) srcPos;
             double frac = srcPos - srcIndex;
 
-            // 读取相邻两个样本（16位小端序有符号）
+            // Lê as duas amostras adjacentes (16 bits, com sinal, little-endian)
             short s0 = readShortLE(pcmData, srcIndex);
             short s1 = (srcIndex + 1 < inputSamples) ? readShortLE(pcmData, srcIndex + 1) : s0;
 
-            // 线性插值
+            // Interpolação linear
             short interpolated = (short) Math.round(s0 + frac * (s1 - s0));
 
-            // 写入输出（小端序）
+            // Escreve a saída (little-endian)
             output[i * 2] = (byte) (interpolated & 0xFF);
             output[i * 2 + 1] = (byte) ((interpolated >> 8) & 0xFF);
         }
@@ -385,7 +385,7 @@ public class AudioUtils {
     }
 
     /**
-     * 将 float[] PCM 样本（范围 -1.0 ~ 1.0）转换为 16-bit PCM byte[]（小端序）
+     * Converte amostras PCM float[] (intervalo -1.0 a 1.0) em byte[] PCM de 16 bits (little-endian)
      */
     public static byte[] floatToPcm16(float[] samples) {
         ByteBuffer buffer = ByteBuffer.allocate(samples.length * 2).order(ByteOrder.LITTLE_ENDIAN);
@@ -403,10 +403,10 @@ public class AudioUtils {
     }
 
     /**
-     * 将MP3转换为PCM格式
+     * Converte MP3 para o formato PCM
      *
-     * @param mp3Path MP3文件路径
-     * @return PCM数据字节数组（16kHz 16bit mono）
+     * @param mp3Path caminho do arquivo MP3
+     * @return array de bytes com os dados PCM (16kHz, 16 bits, mono)
      */
     public static byte[] mp3ToPcm(String mp3Path) throws IOException {
         try (FileInputStream fis = new FileInputStream(mp3Path)) {
@@ -435,18 +435,18 @@ public class AudioUtils {
             bitstream.close();
 
             byte[] pcmData = pcmOut.toByteArray();
-            // 如果 MP3 采样率不是 16kHz，进行重采样
+            // Se a taxa de amostragem do MP3 não for 16kHz, realiza a reamostragem
             if (mp3SampleRate > 0 && mp3SampleRate != SAMPLE_RATE) {
                 pcmData = resamplePcm(pcmData, mp3SampleRate, SAMPLE_RATE);
             }
             return pcmData;
         } catch (BitstreamException | DecoderException e) {
-            throw new IOException("JLayer 解码 MP3 失败: " + e.getMessage(), e);
+            throw new IOException("Falha ao decodificar MP3 com o JLayer: " + e.getMessage(), e);
         }
     }
 
     /**
-     * 合并多个 PCM 帧为一个连续的字节数组
+     * Mescla múltiplos frames PCM em um único array de bytes contínuo
      */
     public static byte[] joinPcmFrames(List<byte[]> pcmFrames) {
         if (pcmFrames == null || pcmFrames.isEmpty()) {
@@ -463,23 +463,23 @@ public class AudioUtils {
     }
 
     /**
-     * 读取标准Ogg Opus文件并转换为PCM数据
+     * Lê um arquivo Ogg Opus padrão e converte para dados PCM
      *
-     * @param opusFilePath Ogg Opus文件路径
-     * @return PCM数据
-     * @throws IOException 文件读取异常
+     * @param opusFilePath caminho do arquivo Ogg Opus
+     * @return dados PCM
+     * @throws IOException exceção de leitura do arquivo
      */
     public static byte[] opusToPcm(String opusFilePath) throws IOException {
-        // 读取 Opus 帧
+        // Lê os frames Opus
         List<byte[]> opusFrames = readOpus(new File(opusFilePath));
 
         if (opusFrames.isEmpty()) {
-            throw new IOException("Opus文件为空或读取失败");
+            throw new IOException("Arquivo Opus vazio ou falha na leitura");
         }
 
         OpusProcessor opusProcessor = new OpusProcessor();
 
-        // 解码所有帧为 PCM
+        // Decodifica todos os frames para PCM
         List<byte[]> pcmChunks = new ArrayList<>();
         for (byte[] opusFrame : opusFrames) {
             try {
@@ -488,15 +488,15 @@ public class AudioUtils {
                     pcmChunks.add(pcmData);
                 }
             } catch (Exception e) {
-                // 静默跳过损坏的帧
+                // Ignora silenciosamente frames corrompidos
             }
         }
 
         if (pcmChunks.isEmpty()) {
-            throw new IOException("没有有效的PCM数据");
+            throw new IOException("Nenhum dado PCM válido");
         }
 
-        // 计算总大小并合并所有 PCM 数据
+        // Calcula o tamanho total e mescla todos os dados PCM
         int totalSize = pcmChunks.stream().mapToInt(chunk -> chunk.length).sum();
         byte[] result = new byte[totalSize];
 
@@ -510,33 +510,33 @@ public class AudioUtils {
     }
 
     /**
-     * 保存Opus帧数据为标准Ogg Opus文件
+     * Salva os dados dos frames Opus como um arquivo Ogg Opus padrão
      *
-     * @param opusFrames Opus帧数据列表
-     * @param filePath 保存文件路径
-     * @throws IOException 文件操作异常
+     * @param opusFrames lista de dados de frames Opus
+     * @param filePath caminho do arquivo a salvar
+     * @throws IOException exceção de operação de arquivo
      */
     public static void saveAsOpus(List<byte[]> opusFrames, String filePath) throws IOException {
         if (opusFrames == null || opusFrames.isEmpty()) {
             return;
         }
 
-        // 创建OpusInfo对象，设置基本参数
+        // Cria o objeto OpusInfo, definindo os parâmetros básicos
         OpusInfo oi = new OpusInfo();
         oi.setSampleRate(SAMPLE_RATE);
         oi.setNumChannels(CHANNELS);
         oi.setPreSkip(0);
 
-        // 创建OpusTags对象
+        // Cria o objeto OpusTags
         OpusTags ot = new OpusTags();
         ot.addComment("TITLE", "Xiaozhi TTS Audio");
         ot.addComment("ARTIST", "Xiaozhi ESP32 Server");
 
-        // 使用try-with-resources管理所有资源
+        // Usa try-with-resources para gerenciar todos os recursos
         try (FileOutputStream fos = new FileOutputStream(filePath);
              OpusFile opusFile = new OpusFile(fos, oi, ot)) {
 
-            // 写入每个Opus帧
+            // Escreve cada frame Opus
             for (byte[] frame : opusFrames) {
                 opusFile.writeAudioData(new OpusAudioData(frame));
             }
@@ -544,10 +544,10 @@ public class AudioUtils {
     }
 
     /**
-     * 获取音频文件的时长
+     * Obtém a duração do arquivo de áudio
      *
-     * @param path 音频文件路径
-     * @return 时长（秒），失败返回-1
+     * @param path caminho do arquivo de áudio
+     * @return duração (segundos); retorna -1 em caso de falha
      */
     public static double getAudioDuration(Path path) {
         String pathStr = path.toString().toLowerCase();
@@ -563,7 +563,7 @@ public class AudioUtils {
                 return (double) fileSize / (SAMPLE_RATE * CHANNELS * 2);
             }
         } catch (Exception e) {
-            log.debug("获取音频时长失败: {}", path, e);
+            log.debug("Falha ao obter a duração do áudio: {}", path, e);
         }
         return -1;
     }
@@ -573,10 +573,10 @@ public class AudioUtils {
         try (InputStream is = Files.newInputStream(path)) {
             if (is.read(header) < 44) return -1;
         }
-        // 读取采样率（字节 24-27，小端序）
+        // Lê a taxa de amostragem (bytes 24-27, little-endian)
         int sampleRate = (header[24] & 0xFF) | ((header[25] & 0xFF) << 8)
                 | ((header[26] & 0xFF) << 16) | ((header[27] & 0xFF) << 24);
-        // 读取字节率（字节 28-31，小端序）
+        // Lê a taxa de bytes (bytes 28-31, little-endian)
         int byteRate = (header[28] & 0xFF) | ((header[29] & 0xFF) << 8)
                 | ((header[30] & 0xFF) << 16) | ((header[31] & 0xFF) << 24);
         if (byteRate <= 0) return -1;
@@ -587,7 +587,7 @@ public class AudioUtils {
     private static double getOpusDuration(Path path) throws IOException {
         List<byte[]> frames = readOpus(path.toFile());
         if (frames.isEmpty()) return -1;
-        // 每帧 60ms（OPUS_FRAME_DURATION_MS）
+        // Cada frame tem 60ms (OPUS_FRAME_DURATION_MS)
         return frames.size() * OPUS_FRAME_DURATION_MS / 1000.0;
     }
 
@@ -603,16 +603,16 @@ public class AudioUtils {
             bitstream.close();
             return totalSeconds;
         } catch (BitstreamException e) {
-            throw new IOException("JLayer 读取 MP3 时长失败", e);
+            throw new IOException("Falha ao ler a duração do MP3 com o JLayer", e);
         }
     }
 
     /**
-     * 读取标准Ogg Opus文件
+     * Lê um arquivo Ogg Opus padrão
      *
-     * @param file Ogg Opus文件
-     * @return Opus帧列表
-     * @throws IOException 文件读取异常
+     * @param file arquivo Ogg Opus
+     * @return lista de frames Opus
+     * @throws IOException exceção de leitura do arquivo
      */
     public static List<byte[]> readOpus(File file) {
         List<byte[]> frames = new ArrayList<>();
@@ -633,7 +633,7 @@ public class AudioUtils {
                 }
             }
         } catch (Exception e) {
-            log.error("读取Ogg Opus文件失败: {}", file.getAbsolutePath(), e);
+            log.error("Falha ao ler o arquivo Ogg Opus: {}", file.getAbsolutePath(), e);
             return frames;
         }
 
@@ -641,10 +641,10 @@ public class AudioUtils {
     }
 
     /**
-     * 从输入流读取 Ogg Opus 格式的音频帧（用于从云存储字节数组解析）。
+     * Lê frames de áudio no formato Ogg Opus a partir de um InputStream (usado para interpretar arrays de bytes vindos de armazenamento em nuvem).
      *
-     * @param inputStream Ogg Opus 数据流
-     * @return Opus帧列表
+     * @param inputStream stream de dados Ogg Opus
+     * @return lista de frames Opus
      */
     public static List<byte[]> readOpus(InputStream inputStream) {
         List<byte[]> frames = new ArrayList<>();
@@ -660,7 +660,7 @@ public class AudioUtils {
                 }
             }
         } catch (Exception e) {
-            log.error("从输入流读取Ogg Opus失败", e);
+            log.error("Falha ao ler Ogg Opus a partir do stream de entrada", e);
         }
         return frames;
     }
