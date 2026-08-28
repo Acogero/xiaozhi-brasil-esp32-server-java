@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import MainLayout from '../layouts/MainLayout.vue'
 
-// 扩展 RouteMeta 类型
+// Estende o tipo RouteMeta
 declare module 'vue-router' {
   interface RouteMeta {
     title?: string
@@ -11,8 +11,8 @@ declare module 'vue-router' {
     isAdmin?: boolean
     parent?: string
     hideInMenu?: boolean
-    permission?: string // 单个权限
-    permissions?: string[] // 多个权限（任一即可）
+    permission?: string // Permissão única
+    permissions?: string[] // Múltiplas permissões (basta ter uma)
   }
 }
 
@@ -45,11 +45,11 @@ const routes: RouteRecordRaw[] = [
     },
   },
 
-  // 主应用路由
+  // Rotas do aplicativo principal
   {
     path: '/',
     component: MainLayout,
-    // redirect: '/dashboard', // 在路由守卫中动态处理
+    // redirect: '/dashboard', // Tratado dinamicamente na guarda de rota
     children: [
       {
         path: 'dashboard',
@@ -130,7 +130,7 @@ const routes: RouteRecordRaw[] = [
           permission: 'system:role',
         },
       },
-      // 配置管理
+      // Gerenciamento de configuração
       {
         path: 'config/model',
         name: 'config-model',
@@ -186,7 +186,7 @@ const routes: RouteRecordRaw[] = [
           permission: 'system:config',
         },
       },
-      // Web 聊天
+      // Chat Web
       {
         path: 'chat',
         name: 'chat',
@@ -209,7 +209,7 @@ const routes: RouteRecordRaw[] = [
           permission: 'system:auth-role',
         },
       },
-      // 个人中心
+      // Central pessoal
       {
         path: 'setting/account',
         name: 'setting-account',
@@ -221,7 +221,7 @@ const routes: RouteRecordRaw[] = [
           permission: 'system:setting',
         },
       },
-      // 个人设置（暂时禁用）
+      // Configurações pessoais (temporariamente desativado)
       // {
       //   path: 'setting/config',
       //   name: 'setting-config',
@@ -236,7 +236,7 @@ const routes: RouteRecordRaw[] = [
     ],
   },
 
-  // 异常页面
+  // Páginas de exceção
   {
     path: '/403',
     name: '403',
@@ -256,7 +256,7 @@ const routes: RouteRecordRaw[] = [
     },
   },
 
-  // 捕获所有未匹配的路由
+  // Captura todas as rotas não correspondidas
   {
     path: '/:pathMatch(.*)*',
     redirect: '/404',

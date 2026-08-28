@@ -6,25 +6,25 @@ import { i18n } from '@/locales'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
-// 配置 NProgress
+// Configurar NProgress
 NProgress.configure({ showSpinner: false, speed: 500 })
 
-// 不需要登录的白名单
+// Lista branca de rotas que não exigem login
 const whiteList: string[] = [ROUTES.LOGIN, ROUTES.REGISTER, ROUTES.FORGET]
 
 export function setupRouterGuards(router: Router) {
-  // 前置守卫 - 页面跳转前执行
+  // Guarda de entrada - executado antes da navegação
   router.beforeEach((to, from, next) => {
-    // 取消上一个页面所有进行中的请求
+    // Cancela todas as requisições em andamento da página anterior
     cancelPendingRequests()
 
-    // 开始进度条
+    // Inicia a barra de progresso
     NProgress.start()
 
-    // 设置页面标题
-    const baseTitle = import.meta.env.VITE_APP_TITLE || 'Connect Ai-智能物联网管理平台'
+    // Define o título da página
+    const baseTitle = import.meta.env.VITE_APP_TITLE || 'Connect Ai - Plataforma de Gerenciamento de IoT Inteligente'
     if (to.meta.title) {
-      // 如果是翻译键，则进行翻译
+      // Se for uma chave de tradução, traduz
       const title = to.meta.title.startsWith('router.')
         ? i18n.global.t(to.meta.title)
         : to.meta.title
@@ -37,28 +37,28 @@ export function setupRouterGuards(router: Router) {
     const hasToken = !!userStore.token
     const { isAdmin } = userStore
 
-    // 1. 未登录处理
+    // 1. Tratamento para não autenticado
     if (!hasToken) {
       if (whiteList.includes(to.path)) {
-        // 在白名单中，直接访问
+        // Está na lista branca, acesso direto
         next()
       } else {
-        // 不在白名单中，跳转到登录页
+        // Não está na lista branca, redireciona para a página de login
         next(`${ROUTES.LOGIN}?redirect=${to.path}`)
         NProgress.done()
       }
       return
     }
 
-    // 2. 已登录处理
+    // 2. Tratamento para já autenticado
     if (to.path === ROUTES.LOGIN) {
-      // 如果已登录，访问登录页则跳转到首页
+      // Se já estiver autenticado, ao acessar a página de login redireciona para a página inicial
       next({ path: ROUTES.DASHBOARD })
       NProgress.done()
       return
     }
 
-    // 2.1 处理根路径重定向（根据用户类型跳转到不同首页）
+    // 2.1 Trata o redirecionamento do caminho raiz (redireciona para páginas iniciais diferentes conforme o tipo de usuário)
     if (to.path === '/') {
       const defaultPath = isAdmin ? ROUTES.DASHBOARD : ROUTES.DEVICE
       next({ path: defaultPath })
@@ -66,32 +66,32 @@ export function setupRouterGuards(router: Router) {
       return
     }
 
-    // 3. 权限检查
+    // 3. Verificação de permissão
     if (to.meta.requiresAuth) {
-      // 检查是否需要管理员权限
+      // Verifica se é necessária permissão de administrador
       if (to.meta.isAdmin && !isAdmin) {
-        console.warn(`用户无权限访问: ${to.path}`)
+        console.warn(`Usuário sem permissão para acessar: ${to.path}`)
         next(ROUTES.ERROR_403)
         NProgress.done()
         return
       }
 
-      // 检查特定权限
+      // Verifica permissão específica
       if (to.meta.permission) {
         const hasPermission = userStore.hasPermission(to.meta.permission)
         if (!hasPermission) {
-          console.warn(`用户无权限访问: ${to.path}, 需要权限: ${to.meta.permission}`)
+          console.warn(`Usuário sem permissão para acessar: ${to.path}, permissão necessária: ${to.meta.permission}`)
           next(ROUTES.ERROR_403)
           NProgress.done()
           return
         }
       }
 
-      // 检查多个权限（任一即可）
+      // Verifica múltiplas permissões (basta ter uma)
       if (to.meta.permissions && to.meta.permissions.length > 0) {
         const hasAnyPermission = userStore.hasAnyPermission(to.meta.permissions)
         if (!hasAnyPermission) {
-          console.warn(`用户无权限访问: ${to.path}, 需要权限之一: ${to.meta.permissions.join(', ')}`)
+          console.warn(`Usuário sem permissão para acessar: ${to.path}, é necessária uma destas permissões: ${to.meta.permissions.join(', ')}`)
           next(ROUTES.ERROR_403)
           NProgress.done()
           return
@@ -99,30 +99,30 @@ export function setupRouterGuards(router: Router) {
       }
     }
 
-    // 4. 放行
+    // 4. Libera a navegação
     next()
   })
 
-  // 后置守卫 - 页面跳转后执行
+  // Guarda de saída - executado após a navegação
   router.afterEach(() => {
-    // 结束进度条
+    // Finaliza a barra de progresso
     NProgress.done()
   })
 
-  // 错误处理
+  // Tratamento de erros
   router.onError((error) => {
-    console.error('路由错误:', error)
+    console.error('Erro de rota:', error)
     NProgress.done()
 
-    // 检测动态导入失败（chunk 加载失败）
+    // Detecta falha na importação dinâmica (falha ao carregar chunk)
     if (
       error.message?.includes('Failed to fetch dynamically imported module') ||
       error.message?.includes('Importing a module script failed') ||
       (error.message?.includes('Failed to fetch') && error.message?.match(/\.js/))
     ) {
-      console.warn('路由模块加载失败，页面版本可能已更新，即将刷新页面')
+      console.warn('Falha ao carregar o módulo de rota, a versão da página pode ter sido atualizada, a página será recarregada')
 
-      // 延迟一小段时间后刷新，避免立即刷新造成的闪烁
+      // Aguarda um curto período antes de recarregar, evitando o flash causado por um recarregamento imediato
       setTimeout(() => {
         window.location.reload()
       }, 100)
@@ -130,7 +130,7 @@ export function setupRouterGuards(router: Router) {
   })
 }
 
-// 使用示例：
-// 在 main.ts 中：
+// Exemplo de uso:
+// Em main.ts:
 // import { setupRouterGuards } from './router/guards'
 // setupRouterGuards(router)
