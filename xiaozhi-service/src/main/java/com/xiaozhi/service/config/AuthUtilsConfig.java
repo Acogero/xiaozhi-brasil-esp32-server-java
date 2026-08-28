@@ -7,7 +7,7 @@ import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 认证工具类配置
+ * Configuração da classe utilitária de autenticação
  *
  * @author Joey
  */

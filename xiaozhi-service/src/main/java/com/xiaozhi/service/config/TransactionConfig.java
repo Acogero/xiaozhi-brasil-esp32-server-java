@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 
 /**
- * 事务管理器配置
+ * Configuração do gerenciador de transações
  *
  * @author Joey
  */
@@ -19,8 +19,8 @@ import javax.sql.DataSource;
 public class TransactionConfig {
 
     /**
-     * 创建主要事务管理器
-     * 这样@Transactional注解就不需要每次都指定transactionManager
+     * Cria o gerenciador de transações principal
+     * Assim, a anotação @Transactional não precisa especificar transactionManager toda vez
      */
     @Primary
     @Bean("transactionManager")
