@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 工具调用事件的日志记录处理器。
- * 监听 ToolCallCompletedEvent，记录工具调用的名称、耗时和成功/失败状态。
+ * Handler de log dos eventos de chamada de ferramenta.
+ * Escuta o ToolCallCompletedEvent, registrando o nome da ferramenta, o tempo decorrido e o status de sucesso/falha da chamada.
  */
 @Slf4j
 @Component
@@ -16,10 +16,10 @@ public class ToolLogger {
     @EventListener
     public void onToolCallCompletedEvent(ToolCallCompletedEvent event) {
         if (event.isSuccess()) {
-            log.info("工具调用成功 - session: {}, tool: {}, 耗时: {}ms",
+            log.info("Chamada de ferramenta bem-sucedida - session: {}, tool: {}, tempo decorrido: {}ms",
                     event.getSessionId(), event.getToolName(), event.getDurationMs());
         } else {
-            log.warn("工具调用失败 - session: {}, tool: {}, 耗时: {}ms, 结果: {}",
+            log.warn("Falha na chamada de ferramenta - session: {}, tool: {}, tempo decorrido: {}ms, resultado: {}",
                     event.getSessionId(), event.getToolName(), event.getDurationMs(), event.getResult());
         }
     }
