@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 操作日志 BO（对应 sys_operation_log 表）。
+ * BO de log de operação (correspondente à tabela sys_operation_log).
  */
 @Data
 public class OperationLogBO {

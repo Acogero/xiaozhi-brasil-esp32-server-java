@@ -28,9 +28,9 @@ public class MessageBO {
     private String sender;
     private String message;
     /**
-     * UserMessage 附加元数据（声纹说话人、情绪等）。
-     * 仅 sender=user 的行可能有值，其他为 null。
-     * 读取送 LLM 时由 Conversation 层与 createTime 一起拼成文本前缀。
+     * Metadados adicionais do UserMessage (locutor por impressão de voz, emoção, etc.).
+     * Só pode ter valor em linhas com sender=user; nas demais é null.
+     * Ao ler para enviar ao LLM, a camada Conversation monta o prefixo de texto junto com o createTime.
      */
     private MessageMetadataBO metadata;
     private LocalDate statDate;
