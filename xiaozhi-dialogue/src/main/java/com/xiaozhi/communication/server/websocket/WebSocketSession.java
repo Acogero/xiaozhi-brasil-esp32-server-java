@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WebSocketSession extends ChatSession {
     /**
-     * 当前会话的链接 session
+     * Sessão de conexão da sessão atual
      */
     protected org.springframework.web.socket.WebSocketSession session;
 
@@ -39,7 +39,7 @@ public class WebSocketSession extends ChatSession {
             try {
                 session.close();
             } catch (IOException e) {
-                log.error("关闭WebSocket会话时发生错误 - SessionId: {}", getSessionId(), e);
+                log.error("Erro ao fechar a sessão WebSocket - SessionId: {}", getSessionId(), e);
             }
         }
     }
@@ -59,7 +59,7 @@ public class WebSocketSession extends ChatSession {
         try {
             session.sendMessage(new TextMessage(message));
         } catch (IOException e) {
-            log.error("发送Text消息失败, message: {}", message, e);
+            log.error("Falha ao enviar a mensagem Text, message: {}", message, e);
         }
     }
 
@@ -68,7 +68,7 @@ public class WebSocketSession extends ChatSession {
         try {
             session.sendMessage(new BinaryMessage(message));
         } catch (IOException e) {
-            log.error("发送Binary消息失败", e);
+            log.error("Falha ao enviar a mensagem Binary", e);
         }
     }
 }

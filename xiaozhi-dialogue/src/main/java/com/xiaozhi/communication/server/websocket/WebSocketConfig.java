@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    // 路径常量已移至 ServerAddressProvider.WS_PATH（xiaozhi-common），保留引用以兼容现有代码
+    // A constante de caminho foi movida para ServerAddressProvider.WS_PATH (xiaozhi-common); a referência foi mantida para compatibilidade com o código existente
     public static final String WS_PATH = ServerAddressProvider.WS_PATH;
 
     @Resource
@@ -45,7 +45,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
                 .setAllowedOrigins("*");
 
         log.info("==========================================================");
-        log.info("WebSocket服务地址: {}", serverAddressProvider.getWebsocketAddress());
+        log.info("Endereço do serviço WebSocket: {}", serverAddressProvider.getWebsocketAddress());
         log.info("==========================================================");
     }
 
