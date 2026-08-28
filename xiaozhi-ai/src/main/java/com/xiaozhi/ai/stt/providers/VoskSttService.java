@@ -25,20 +25,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * Vosk STT服务实现
- * 使用JDK 21虚拟线程实现异步处理
+ * Implementação do serviço STT Vosk
+ * Implementa o processamento assíncrono usando virtual threads do JDK 21
  */
 @Slf4j
 public class VoskSttService implements SttService {
 
     private static final String PROVIDER_NAME = "vosk";
 
-    // 使用平台线程池执行 JNI native 识别任务，避免虚拟线程与 native 内存绑定冲突
+    // Usa um pool de platform threads para executar as tarefas de reconhecimento JNI native, evitando conflitos de vinculação de memória nativa com virtual threads
     private static final ExecutorService recognizerExecutor =
             Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     static {
-        // 注册JVM关闭钩子，确保线程池被正确关闭
+        // Registra um shutdown hook da JVM, garantindo que o pool de threads seja encerrado corretamente
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             recognizerExecutor.shutdown();
             try {
@@ -52,7 +52,7 @@ public class VoskSttService implements SttService {
         }, "vosk-stt-shutdown"));
     }
 
-    // Vosk模型相关对象
+    // Objetos relacionados ao modelo Vosk
     private Model model;
     private String voskModelPath;
     private boolean modelLoaded = false;
@@ -64,48 +64,48 @@ public class VoskSttService implements SttService {
     }
 
     /**
-     * 初始化Vosk模型
+     * Inicializa o modelo Vosk
      *
-     * @throws Exception 如果模型加载失败
+     * @throws Exception Se o carregamento do modelo falhar
      */
     @PostConstruct
     public void initialize() throws Exception {
         try {
-            // 检查是否是 macOS 操作系统
+            // Verifica se é o sistema operacional macOS
             String osName = System.getProperty("os.name").toLowerCase();
-            // 检查是否是 ARM 架构（用于 M 系列芯片）
+            // Verifica se é arquitetura ARM (para chips da série M)
             String osArch = System.getProperty("os.arch").toLowerCase();
 
             if (osName.contains("mac") && osArch.contains("aarch64")) {
-                // 如果是 macOS 并且是 ARM 架构（M 系列芯片）
+                // Se for macOS e arquitetura ARM (chips da série M)
                 Path libPath = Path.of(nativeLibDir).toAbsolutePath().normalize().resolve("libvosk.dylib");
                 System.load(libPath.toString());
                 log.info("Vosk library loaded for macOS M-series chip.");
             } else {
                 log.info("Not macOS M-series chip, skipping Vosk library load.");
             }
-            // 禁用Vosk日志输出
+            // Desativa a saída de log do Vosk
             LibVosk.setLogLevel(LogLevel.WARNINGS);
 
-            // 加载模型，路径为配置的模型目录
+            // Carrega o modelo, usando o diretório configurado
             voskModelPath = Path.of(voskModelPath).toAbsolutePath().normalize().toString();
             if (!Files.isDirectory(Path.of(voskModelPath))) {
                 throw new Exception("Vosk model directory not found: " + voskModelPath);
             }
             model = new Model(voskModelPath);
             modelLoaded = true;
-            log.info("Vosk 模型加载成功！路径: {}", voskModelPath);
+            log.info("Modelo Vosk carregado com sucesso! Caminho: {}", voskModelPath);
         } catch (Exception e) {
             modelLoaded = false;
-            log.warn("Vosk 模型加载失败！将使用其他STT服务: {}", e.getMessage());
+            log.warn("Falha ao carregar o modelo Vosk! Outro serviço STT será usado: {}", e.getMessage());
             throw new Exception("Vosk model loading failed: " + e.getMessage(), e);
         }
     }
 
     /**
-     * 检查模型是否成功加载
+     * Verifica se o modelo foi carregado com sucesso
      *
-     * @return 如果模型加载成功返回true，否则返回false
+     * @return true se o modelo foi carregado com sucesso; caso contrário, false
      */
     public boolean isModelLoaded() {
         return modelLoaded && model != null;
@@ -119,27 +119,27 @@ public class VoskSttService implements SttService {
     @Override
     public SttResult stream(Flux<byte[]> audioSink) {
         if (!isModelLoaded()) {
-            log.error("Vosk模型未加载，无法进行流式识别！");
+            log.error("O modelo Vosk não foi carregado; não é possível realizar o reconhecimento em streaming!");
             return null;
         }
 
-        // 使用阻塞队列存储音频数据
+        // Usa uma fila bloqueante para armazenar os dados de áudio
         BlockingQueue<byte[]> audioQueue = new LinkedBlockingQueue<>();
         AtomicBoolean isCompleted = new AtomicBoolean(false);
         List<String> recognizedText = new ArrayList<>();
         StringBuilder finalResult = new StringBuilder();
 
-        // 订阅Sink并将数据放入队列
+        // Assina o Sink e coloca os dados na fila
         audioSink.subscribe(
                 data -> audioQueue.offer(data),
                 error -> {
-                    log.error("音频流处理错误", error);
+                    log.error("Erro no processamento do fluxo de áudio", error);
                     isCompleted.set(true);
                 },
                 () -> isCompleted.set(true)
         );
 
-        // 使用平台线程池执行识别任务，避免虚拟线程与 JNI native 内存绑定冲突
+        // Usa o pool de platform threads para executar a tarefa de reconhecimento, evitando conflitos de vinculação de memória nativa com virtual threads
         Future<?> future = recognizerExecutor.submit(() -> {
             try (Recognizer recognizer = new Recognizer(model, AudioUtils.SAMPLE_RATE)) {
                 while (!isCompleted.get() || !audioQueue.isEmpty()) {
@@ -148,18 +148,18 @@ public class VoskSttService implements SttService {
                         if (audioChunk != null) {
                             boolean hasResult = recognizer.acceptWaveForm(audioChunk, audioChunk.length);
                             if (hasResult) {
-                                // 提取部分识别结果中的文本
+                                // Extrai o texto do resultado parcial de reconhecimento
                                 String result = recognizer.getResult();
                                 JSONObject jsonResult = new JSONObject(result);
                                 if (jsonResult.has("text") && !jsonResult.getString("text").isEmpty()) {
                                     String text = jsonResult.getString("text").replaceAll("\\s+", "");
                                     recognizedText.add(text);
-                                    log.debug("Vosk识别中间结果: {}", text);
+                                    log.debug("Resultado intermediário do reconhecimento Vosk: {}", text);
                                 }
                             }
                         }
 
-                        // 如果已完成且队列为空，获取最终结果
+                        // Se já concluído e a fila estiver vazia, obtém o resultado final
                         if (isCompleted.get() && audioQueue.isEmpty()) {
                             String finalText = recognizer.getFinalResult();
                             JSONObject jsonFinal = new JSONObject(finalText);
@@ -167,36 +167,36 @@ public class VoskSttService implements SttService {
                                 String text = jsonFinal.getString("text").replaceAll("\\s+", "");
                                 if (!text.isEmpty()) {
                                     recognizedText.add(text);
-                                    log.debug("Vosk识别最终结果: {}", text);
+                                    log.debug("Resultado final do reconhecimento Vosk: {}", text);
                                 }
                             }
                             break;
                         }
                     } catch (InterruptedException e) {
-                        log.warn("音频数据队列等待被中断", e);
+                        log.warn("Espera na fila de dados de áudio interrompida", e);
                         Thread.currentThread().interrupt();
                         break;
                     }
                 }
 
-                // 合并所有识别结果
+                // Mescla todos os resultados de reconhecimento
                 for (String text : recognizedText) {
                     finalResult.append(text);
                 }
 
             } catch (Exception e) {
-                log.error("Vosk流式识别过程中发生错误", e);
+                log.error("Erro durante o reconhecimento em streaming do Vosk", e);
             }
         });
 
         try {
             future.get(90, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            log.warn("等待Vosk识别完成时被中断", e);
+            log.warn("Interrompido ao aguardar a conclusão do reconhecimento do Vosk", e);
             Thread.currentThread().interrupt();
             future.cancel(true);
         } catch (Exception e) {
-            log.error("Vosk识别任务执行失败", e);
+            log.error("Falha na execução da tarefa de reconhecimento do Vosk", e);
             future.cancel(true);
         }
 

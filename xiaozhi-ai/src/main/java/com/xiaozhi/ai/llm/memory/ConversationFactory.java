@@ -4,13 +4,13 @@ import com.xiaozhi.common.model.bo.RoleBO;
 
 public interface ConversationFactory {
     /**
-     * 不同的ChatMemory实现类，可以有不同的处理策略，可以初始化不同的Conversation子类。
+     * Diferentes implementações de ChatMemory podem ter estratégias de processamento distintas e podem inicializar diferentes subclasses de Conversation.
      *
-     * @param ownerId   聊天参与者标识（设备场景: deviceId, Web 场景: userId）
-     * @param userId    用户ID
-     * @param role      角色
-     * @param sessionId 会话ID
-     * @return 会话
+     * @param ownerId   Identificador do participante do chat (cenário de dispositivo: deviceId; cenário Web: userId)
+     * @param userId    ID do usuário
+     * @param role      Papel/role
+     * @param sessionId ID da sessão
+     * @return Conversation (sessão)
      */
     Conversation initConversation(String ownerId, Integer userId, RoleBO role, String sessionId);
 }

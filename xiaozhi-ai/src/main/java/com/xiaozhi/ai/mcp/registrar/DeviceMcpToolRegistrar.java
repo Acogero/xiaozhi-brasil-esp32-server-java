@@ -9,9 +9,9 @@ import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 设备端 MCP 工具注册器。
- * 设备端MCP工具在设备初始化时已通过 DeviceMcpService.initialize() 注册到 toolSession，
- * 此处仅作占位，日志记录已注册状态。
+ * Registrador de ferramentas MCP do lado do dispositivo.
+ * As ferramentas MCP do lado do dispositivo já são registradas no toolSession através de DeviceMcpService.initialize() durante a inicialização do dispositivo,
+ * aqui serve apenas como placeholder, registrando em log o estado já registrado.
  */
 @Slf4j
 @Component
@@ -21,7 +21,7 @@ public class DeviceMcpToolRegistrar implements ToolRegistrar {
     @Override
     public void register(ToolSession toolSession, Set<String> excludedTools) {
         if (toolSession.isDeviceMcpInitialized()) {
-            log.debug("SessionId: {}, 设备端MCP工具已初始化", toolSession.getSessionId());
+            log.debug("SessionId: {}, ferramentas MCP do dispositivo já inicializadas", toolSession.getSessionId());
         }
     }
 }

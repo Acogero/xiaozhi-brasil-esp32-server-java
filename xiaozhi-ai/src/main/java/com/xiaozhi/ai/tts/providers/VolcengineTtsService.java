@@ -23,18 +23,18 @@ public class VolcengineTtsService implements TtsService {
     private static final String API_URL = "https://openspeech.bytedance.com/api/v1/tts";
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-    // 重试机制常量
+    // Constantes do mecanismo de retry
     private static final int MAX_RETRY_ATTEMPTS = 3;
     private static final long RETRY_DELAY_MS = 1000;
 
-    // 音频输出路径
+    // Caminho de saída do áudio
     private String outputPath;
 
-    // API相关
+    // Relacionado à API
     private String appId;
-    private String accessToken; // 对应 apiKey
+    private String accessToken; // Corresponde à apiKey
 
-    // 语音参数（voiceName, pitch, speed）
+    // Parâmetros de voz (voiceName, pitch, speed)
     private final XiaozhiTtsOptions options;
 
     private final OkHttpClient client = HttpUtil.client;
@@ -59,68 +59,68 @@ public class VolcengineTtsService implements TtsService {
     @Override
     public Path textToSpeech(String text) throws Exception {
         if (text == null || text.isEmpty()) {
-            log.warn("文本内容为空！");
+            log.warn("Conteúdo de texto vazio!");
             return null;
         }
 
         int attempts = 0;
         while (attempts < MAX_RETRY_ATTEMPTS) {
             try {
-                // 生成音频文件名
+                // Gera o nome do arquivo de áudio
                 String audioFileName = getAudioFileName();
                 String audioFilePath = outputPath + audioFileName;
 
-                // 发送POST请求
+                // Envia a requisição POST
                 boolean success = sendRequest(text, audioFilePath);
 
                 if (success) {
                     return Path.of(audioFilePath);
                 } else {
-                    throw new Exception("语音合成失败");
+                    throw new Exception("Falha na síntese de voz");
                 }
             } catch (Exception e) {
                 attempts++;
                 if (attempts < MAX_RETRY_ATTEMPTS) {
-                    log.warn("火山语音合成失败，正在重试 ({}/{}): {}", attempts, MAX_RETRY_ATTEMPTS, e.getMessage());
+                    log.warn("Falha na síntese de voz da Volcengine, tentando novamente ({}/{}): {}", attempts, MAX_RETRY_ATTEMPTS, e.getMessage());
                     try {
                         Thread.sleep(RETRY_DELAY_MS);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
-                        log.error("重试等待被中断", ie);
+                        log.error("Espera de retry interrompida", ie);
                         throw e;
                     }
                 } else {
-                    log.error("火山语音合成失败，已达到最大重试次数", e);
+                    log.error("Falha na síntese de voz da Volcengine; número máximo de tentativas atingido", e);
                     throw e;
                 }
             }
         }
-        throw new Exception("语音合成失败");
+        throw new Exception("Falha na síntese de voz");
     }
 
     /**
-     * 发送POST请求到火山引擎API，获取语音合成结果
+     * Envia a requisição POST para a API da Volcengine, obtendo o resultado da síntese de voz
      */
     private boolean sendRequest(String text, String audioFilePath) throws Exception {
         try {
-            // 构建请求参数
+            // Monta os parâmetros da requisição
             JsonObject requestJson = new JsonObject();
 
-            // app部分
+            // Seção app
             JsonObject app = new JsonObject();
             app.addProperty("appid", appId);
             app.addProperty("token", accessToken);
-            // 根据音色类型选择 cluster：克隆音色使用 volcano_mega，普通音色使用 volcano_tts
+            // Seleciona o cluster de acordo com o tipo de timbre: timbre clonado usa volcano_mega, timbre comum usa volcano_tts
             String cluster = (getVoiceName() != null && getVoiceName().startsWith("S_")) ? "volcano_mega" : "volcano_tts";
             app.addProperty("cluster", cluster);
             requestJson.add("app", app);
 
-            // user部分
+            // Seção user
             JsonObject user = new JsonObject();
             user.addProperty("uid", UUID.randomUUID().toString());
             requestJson.add("user", user);
 
-            // audio部分
+            // Seção audio
             JsonObject audio = new JsonObject();
             audio.addProperty("voice_type", getVoiceName());
             audio.addProperty("encoding", "wav");
@@ -130,7 +130,7 @@ public class VolcengineTtsService implements TtsService {
             audio.addProperty("rate", AudioUtils.SAMPLE_RATE);
             requestJson.add("audio", audio);
 
-            // request部分
+            // Seção request
             JsonObject request_JsonObject = new JsonObject();
             request_JsonObject.addProperty("reqid", UUID.randomUUID().toString());
             request_JsonObject.addProperty("text", text);
@@ -140,45 +140,45 @@ public class VolcengineTtsService implements TtsService {
             request_JsonObject.addProperty("frontend_type", "unitTson");
             requestJson.add("request", request_JsonObject);
 
-            // 使用Bearer Token鉴权方式
-            String bearerToken = "Bearer; " + accessToken; // 注意分号是火山引擎的特殊格式
+            // Usa autenticação por Bearer Token
+            String bearerToken = "Bearer; " + accessToken; // Atenção: o ponto e vírgula é um formato específico da Volcengine
 
             RequestBody requestBody = RequestBody.create(JSON, requestJson.toString());
 
-            // 设置请求头和请求体
+            // Define o header e o corpo da requisição
             Request request = new Request.Builder()
                     .url(API_URL)
                     .addHeader("Content-Type", "application/json")
-                    .addHeader("Authorization", bearerToken) // 添加Authorization头
+                    .addHeader("Authorization", bearerToken) // Adiciona o header Authorization
                     .post(requestBody)
                     .build();
 
             try (Response response = client.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
-                    String errorBody = response.body() != null ? response.body().string() : "无响应体";
-                    log.error("TTS请求失败: {} {}, 错误信息: {}, 原始内容: {}", response.code(), response.message(), errorBody, text);
+                    String errorBody = response.body() != null ? response.body().string() : "sem corpo de resposta";
+                    log.error("Falha na requisição TTS: {} {}, mensagem de erro: {}, conteúdo original: {}", response.code(), response.message(), errorBody, text);
                     return false;
                 }
 
-                // 解析响应
+                // Interpreta a resposta
                 if (response.body() != null) {
                     String responseBody = response.body().string();
                     JsonObject jsonResponse = JsonParser.parseString(responseBody).getAsJsonObject();
 
-                    // 检查响应是否包含错误
+                    // Verifica se a resposta contém erro
                     if (jsonResponse.has("code") && jsonResponse.get("code").getAsInt() != 3000) {
-                        log.error("TTS请求返回错误: code={}, message={}",
+                        log.error("A requisição TTS retornou erro: code={}, message={}",
                                 jsonResponse.get("code").getAsInt(),
                                 jsonResponse.get("message").getAsString());
                         return false;
                     }
 
-                    // 获取音频数据
+                    // Obtém os dados de áudio
                     if (jsonResponse.has("data")) {
                         String base64Audio = jsonResponse.get("data").getAsString();
                         byte[] audioData = Base64.getDecoder().decode(base64Audio);
 
-                        // 保存音频文件
+                        // Salva o arquivo de áudio
                         File audioFile = new File(audioFilePath);
                         try (FileOutputStream fout = new FileOutputStream(audioFile)) {
                             fout.write(audioData);
@@ -186,17 +186,17 @@ public class VolcengineTtsService implements TtsService {
 
                         return true;
                     } else {
-                        log.error("TTS响应中未找到音频数据: {}", responseBody);
+                        log.error("Nenhum dado de áudio encontrado na resposta TTS: {}", responseBody);
                         return false;
                     }
                 } else {
-                    log.error("TTS响应体为空");
+                    log.error("Corpo da resposta TTS vazio");
                     return false;
                 }
             }
         } catch (Exception e) {
-            log.error("发送TTS请求时发生错误", e);
-            throw new Exception("发送TTS请求失败", e);
+            log.error("Erro ao enviar a requisição TTS", e);
+            throw new Exception("Falha ao enviar a requisição TTS", e);
         }
     }
 }

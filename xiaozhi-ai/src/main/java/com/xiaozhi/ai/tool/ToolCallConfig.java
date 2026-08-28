@@ -26,8 +26,8 @@ public class ToolCallConfig {
     }
 
     /**
-     * 注册工具调用观察处理器
-     * 这个Bean会自动被Spring的ObservationRegistry发现并注册
+     * Registra o handler de observação de chamadas de ferramenta
+     * Este Bean é automaticamente descoberto e registrado pelo ObservationRegistry do Spring
      */
     @Bean
     public ToolCallingObservationHandler toolCallingObservationHandler() {

@@ -11,23 +11,23 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 讯飞星辰Agent API 客户端实现
- * 基于文档: https://www.xfyun.cn/doc/spark/Agent04-API%E6%8E%A5%E5%85%A5.html
+ * Implementação do cliente da API do Agent XingChen (iFLYTEK)
+ * Baseado na documentação: https://www.xfyun.cn/doc/spark/Agent04-API%E6%8E%A5%E5%85%A5.html
  * 
- * API地址: https://xingchen-api.xf-yun.com/workflow/v1/chat/completions
- * 认证方式: Bearer token (使用 APIKey:APISecret 格式)
+ * Endereço da API: https://xingchen-api.xf-yun.com/workflow/v1/chat/completions
+ * Forma de autenticação: Bearer token (usando o formato APIKey:APISecret)
  */
 @Slf4j
 public class XingChenClient {
 
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     
-    // API 端点
+    // Endpoint da API
     private static final String API_BASE_URL = "https://xingchen-api.xf-yun.com";
     private static final String CHAT_COMPLETIONS_PATH = "/workflow/v1/chat/completions";
     private static final String RESUME_PATH = "/workflow/v1/resume";
     
-    // 流式响应标识
+    // Identificador de resposta em streaming
     private static final String DATA_PREFIX = "data:";
     private static final String EVENT_PREFIX = "event:";
     
@@ -37,10 +37,10 @@ public class XingChenClient {
     private final OkHttpClient httpClient;
 
     /**
-     * 构造函数
-     * @param apiKey API密钥
-     * @param apiSecret API密钥
-     * @param flowId 工作流ID
+     * Construtor
+     * @param apiKey Chave de API
+     * @param apiSecret Chave secreta de API
+     * @param flowId ID do workflow
      */
     public XingChenClient(String baseUrl, String apiKey, String apiSecret, String flowId) {
         this.baseUrl = baseUrl != null && !baseUrl.isEmpty() ? baseUrl : API_BASE_URL;
@@ -52,11 +52,11 @@ public class XingChenClient {
                 .writeTimeout(30, TimeUnit.SECONDS)
                 .build();
         
-        log.info("XingChenClient初始化: baseUrl={}, flowId={}", this.baseUrl, flowId);
+        log.info("XingChenClient inicializado: baseUrl={}, flowId={}", this.baseUrl, flowId);
     }
 
     /**
-     * 兼容旧构造函数
+     * Compatibilidade com o construtor antigo
      */
     public XingChenClient(String endpoint, String apiKey, String apiSecret) {
         this(endpoint, apiKey, apiSecret, null);
@@ -67,16 +67,16 @@ public class XingChenClient {
     }
 
     /**
-     * 发送同步聊天消息
+     * Envia uma mensagem de chat síncrona
      */
     public XingChenResponse sendChatMessage(XingChenRequest request) throws IOException {
-        log.debug("发送同步对话消息: flowId={}, uid={}", request.getFlowId(), request.getUid());
+        log.debug("Enviando mensagem de conversa síncrona: flowId={}, uid={}", request.getFlowId(), request.getUid());
         
-        // 确保非流式
+        // Garante que não seja em streaming
         request.setStream(false);
         
         String jsonBody = JsonUtil.toJson(request);
-        log.debug("请求体: {}", jsonBody);
+        log.debug("Corpo da requisição: {}", jsonBody);
         
         Request httpRequest = new Request.Builder()
                 .url(baseUrl + CHAT_COMPLETIONS_PATH)
@@ -87,29 +87,29 @@ public class XingChenClient {
         
         try (Response response = httpClient.newCall(httpRequest).execute()) {
             if (!response.isSuccessful()) {
-                String errorBody = response.body() != null ? response.body().string() : "无响应体";
-                log.error("API请求失败: code={}, body={}", response.code(), errorBody);
-                throw new IOException("API请求失败: " + response.code() + ", " + errorBody);
+                String errorBody = response.body() != null ? response.body().string() : "sem corpo de resposta";
+                log.error("Falha na requisição da API: code={}, body={}", response.code(), errorBody);
+                throw new IOException("Falha na requisição da API: " + response.code() + ", " + errorBody);
             }
             
             String responseBody = response.body().string();
-            log.debug("响应: {}", responseBody);
+            log.debug("Resposta: {}", responseBody);
             
             return JsonUtil.fromJson(responseBody, XingChenResponse.class);
         }
     }
 
     /**
-     * 发送流式聊天消息
+     * Envia uma mensagem de chat em streaming
      */
     public void sendChatMessageStream(XingChenRequest request, XingChenChatStreamCallback callback) throws IOException {
-        log.debug("发送流式对话消息: flowId={}, uid={}", request.getFlowId(), request.getUid());
+        log.debug("Enviando mensagem de conversa em streaming: flowId={}, uid={}", request.getFlowId(), request.getUid());
         
-        // 确保流式模式
+        // Garante o modo streaming
         request.setStream(true);
         
         String jsonBody = JsonUtil.toJson(request);
-        log.debug("请求体: {}", jsonBody);
+        log.debug("Corpo da requisição: {}", jsonBody);
         
         Request httpRequest = new Request.Builder()
                 .url(baseUrl + CHAT_COMPLETIONS_PATH)
@@ -120,19 +120,19 @@ public class XingChenClient {
         
         try (Response response = httpClient.newCall(httpRequest).execute()) {
             if (!response.isSuccessful()) {
-                String errorBody = response.body() != null ? response.body().string() : "无响应体";
-                log.error("API请求失败: code={}, body={}", response.code(), errorBody);
-                callback.onException(new IOException("API请求失败: " + response.code() + ", " + errorBody));
+                String errorBody = response.body() != null ? response.body().string() : "sem corpo de resposta";
+                log.error("Falha na requisição da API: code={}, body={}", response.code(), errorBody);
+                callback.onException(new IOException("Falha na requisição da API: " + response.code() + ", " + errorBody));
                 return;
             }
             
             ResponseBody body = response.body();
             if (body == null) {
-                callback.onException(new IOException("响应体为空"));
+                callback.onException(new IOException("Corpo da resposta vazio"));
                 return;
             }
             
-            // 处理SSE流
+            // Processa o stream SSE
             try (BufferedReader reader = new BufferedReader(
                     new InputStreamReader(body.byteStream(), StandardCharsets.UTF_8))) {
                 String line;
@@ -141,18 +141,18 @@ public class XingChenClient {
                         continue;
                     }
                     
-                    // 处理SSE事件
+                    // Processa o evento SSE
                     if (line.startsWith(EVENT_PREFIX)) {
                         String eventType = line.substring(EVENT_PREFIX.length()).trim();
-                        log.debug("收到事件类型: {}", eventType);
+                        log.debug("Tipo de evento recebido: {}", eventType);
                         continue;
                     }
                     
-                    // 处理数据行
+                    // Processa a linha de dados
                     if (line.startsWith(DATA_PREFIX)) {
                         String jsonData = line.substring(DATA_PREFIX.length()).trim();
                         if (jsonData.isEmpty() || "[DONE]".equals(jsonData)) {
-                            log.debug("流结束");
+                            log.debug("Stream encerrado");
                             callback.onMessageEnd(null);
                             break;
                         }
@@ -160,22 +160,22 @@ public class XingChenClient {
                         try {
                             XingChenResponse event = JsonUtil.fromJson(jsonData, XingChenResponse.class);
                             
-                            // 检查是否有错误
+                            // Verifica se há erro
                             if (event.getCode() != null && event.getCode() != 0) {
-                                log.error("API返回错误: code={}, message={}", event.getCode(), event.getMessage());
+                                log.error("A API retornou erro: code={}, message={}", event.getCode(), event.getMessage());
                                 callback.onError(event);
                                 continue;
                             }
                             
-                            // 检查是否是工具调用事件
+                            // Verifica se é um evento de chamada de ferramenta
                             if (event.getEventData() != null) {
-                                log.debug("收到工具调用事件: {}", JsonUtil.toJson(event.getEventData()));
+                                log.debug("Evento de chamada de ferramenta recebido: {}", JsonUtil.toJson(event.getEventData()));
                                 callback.onFunctionCall(event);
                             } else if (event.getChoices() != null && !event.getChoices().isEmpty()) {
-                                // 普通消息事件
+                                // Evento de mensagem comum
                                 XingChenResponse.Choices choice = event.getChoices().get(0);
                                 if ("stop".equals(choice.getFinishReason())) {
-                                    log.debug("消息结束");
+                                    log.debug("Mensagem encerrada");
                                     callback.onMessageEnd(event);
                                     break;
                                 } else {
@@ -183,7 +183,7 @@ public class XingChenClient {
                                 }
                             }
                         } catch (Exception e) {
-                            log.error("解析响应数据失败: {}", jsonData, e);
+                            log.error("Falha ao interpretar os dados de resposta: {}", jsonData, e);
                             callback.onException(e);
                         }
                     }
@@ -191,16 +191,16 @@ public class XingChenClient {
             }
             
         } catch (Exception e) {
-            log.error("流式请求失败", e);
+            log.error("Falha na requisição em streaming", e);
             callback.onException(e);
         }
     }
 
     /**
-     * 发送Resume请求(用于工具调用后继续对话)
+     * Envia a requisição de Resume (usada para continuar a conversa após a chamada de ferramenta)
      */
     public void resume(XingChenResume resume, XingChenChatStreamCallback callback) throws IOException {
-        log.debug("发送Resume请求: {}", JsonUtil.toJson(resume));
+        log.debug("Enviando a requisição de Resume: {}", JsonUtil.toJson(resume));
         
         String jsonBody = JsonUtil.toJson(resume);
         
@@ -213,19 +213,19 @@ public class XingChenClient {
         
         try (Response response = httpClient.newCall(httpRequest).execute()) {
             if (!response.isSuccessful()) {
-                String errorBody = response.body() != null ? response.body().string() : "无响应体";
-                log.error("Resume请求失败: code={}, body={}", response.code(), errorBody);
-                callback.onException(new IOException("Resume请求失败: " + response.code() + ", " + errorBody));
+                String errorBody = response.body() != null ? response.body().string() : "sem corpo de resposta";
+                log.error("Falha na requisição de Resume: code={}, body={}", response.code(), errorBody);
+                callback.onException(new IOException("Falha na requisição de Resume: " + response.code() + ", " + errorBody));
                 return;
             }
             
             ResponseBody body = response.body();
             if (body == null) {
-                callback.onException(new IOException("响应体为空"));
+                callback.onException(new IOException("Corpo da resposta vazio"));
                 return;
             }
             
-            // 处理SSE流
+            // Processa o stream SSE
             try (BufferedReader reader = new BufferedReader(
                     new InputStreamReader(body.byteStream(), StandardCharsets.UTF_8))) {
                 String line;
@@ -234,11 +234,11 @@ public class XingChenClient {
                         continue;
                     }
                     
-                    // 处理数据行
+                    // Processa a linha de dados
                     if (line.startsWith(DATA_PREFIX)) {
                         String jsonData = line.substring(DATA_PREFIX.length()).trim();
                         if (jsonData.isEmpty() || "[DONE]".equals(jsonData)) {
-                            log.debug("Resume流结束");
+                            log.debug("Stream do Resume encerrado");
                             callback.onMessageEnd(null);
                             break;
                         }
@@ -246,18 +246,18 @@ public class XingChenClient {
                         try {
                             XingChenResponse event = JsonUtil.fromJson(jsonData, XingChenResponse.class);
                             
-                            // 检查是否有错误
+                            // Verifica se há erro
                             if (event.getCode() != null && event.getCode() != 0) {
-                                log.error("Resume返回错误: code={}, message={}", event.getCode(), event.getMessage());
+                                log.error("O Resume retornou erro: code={}, message={}", event.getCode(), event.getMessage());
                                 callback.onError(event);
                                 continue;
                             }
                             
-                            // 检查结束标志
+                            // Verifica a flag de encerramento
                             if (event.getChoices() != null && !event.getChoices().isEmpty()) {
                                 XingChenResponse.Choices choice = event.getChoices().get(0);
                                 if ("stop".equals(choice.getFinishReason())) {
-                                    log.debug("Resume消息结束");
+                                    log.debug("Mensagem do Resume encerrada");
                                     callback.onMessageEnd(event);
                                     break;
                                 }
@@ -265,7 +265,7 @@ public class XingChenClient {
                             
                             callback.onMessage(event);
                         } catch (Exception e) {
-                            log.error("解析Resume响应失败: {}", jsonData, e);
+                            log.error("Falha ao interpretar a resposta do Resume: {}", jsonData, e);
                             callback.onException(e);
                         }
                     }
@@ -273,7 +273,7 @@ public class XingChenClient {
             }
             
         } catch (Exception e) {
-            log.error("Resume请求失败", e);
+            log.error("Falha na requisição de Resume", e);
             callback.onException(e);
         }
     }

@@ -8,9 +8,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 /**
- * 根据角色的 memoryType 构造对应的 Conversation。
+ * Constrói a Conversation correspondente com base no memoryType do papel/role.
  * <p>
- * Conversation 只负责消息容器 / 窗口策略 / 摘要策略。
+ * A Conversation é responsável apenas pelo contêiner de mensagens / estratégia de janela / estratégia de resumo.
  */
 @Primary
 @Service
@@ -38,7 +38,7 @@ public class DefaultConversationFactory implements ConversationFactory {
                     .sessionId(sessionId)
                     .build();
             default -> {
-                log.warn("系统目前不支持这类未知的记忆类型：{} ，将启用默认的MessageWindowConversation", role.getMemoryType());
+                log.warn("O sistema atualmente não suporta este tipo de memória desconhecido: {}, será usado o MessageWindowConversation padrão", role.getMemoryType());
                 yield MessageWindowConversation.builder().chatMemory(chatMemory)
                     .maxMessages(maxMessages)
                     .ownerId(ownerId)

@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class TtsServiceFactory {
 
-    // 缓存已初始化的服务：键为"provider:configId:voiceName"格式，确保音色变化时创建新实例
+    // Cache dos serviços já inicializados: a chave segue o formato "provider:configId:voiceName", garantindo que uma nova instância seja criada quando o timbre mudar
     private final Map<String, TtsService> serviceCache = new ConcurrentHashMap<>();
 
     @Resource
@@ -29,21 +29,21 @@ public class TtsServiceFactory {
     @Resource
     private RuntimePathConfig runtimePathConfig;
 
-    // 默认服务提供商名称
+    // Nome do provedor de serviço padrão
     private static final String DEFAULT_PROVIDER = "edge";
 
-    // 默认 EDGE TTS 服务默认语音名称
+    // Nome de voz padrão do serviço EDGE TTS padrão
     private static final String DEFAULT_VOICE = "zh-CN-XiaoyiNeural";
 
     /**
-     * 获取默认TTS服务
+     * Obtém o serviço TTS padrão
      */
     public TtsService getDefaultTtsService() {
         var config = new ConfigBO().setProvider(DEFAULT_PROVIDER);
         return getTtsService(config, TtsServiceFactory.DEFAULT_VOICE, 1.0, 1.0);
     }
 
-    // 创建缓存键（包含pitch和speed）
+    // Cria a chave de cache (incluindo pitch e speed)
     private String createCacheKey(ConfigBO config, String provider, String voiceName, Double pitch, Double speed) {
         Integer configId = -1;
         if (config != null && config.getConfigId() != null) {
@@ -53,19 +53,19 @@ public class TtsServiceFactory {
     }
 
     /**
-     * 根据配置获取TTS服务（带pitch和speed参数）
+     * Obtém o serviço TTS com base na configuração (com os parâmetros pitch e speed)
      */
     public TtsService getTtsService(ConfigBO config, String voiceName, Double pitch, Double speed) {
         final ConfigBO finalConfig = !ObjectUtils.isEmpty(config) ? config : new ConfigBO().setProvider(DEFAULT_PROVIDER);
         String provider = finalConfig.getProvider();
         String cacheKey = createCacheKey(finalConfig, provider, voiceName, pitch, speed);
 
-        // 使用 computeIfAbsent 确保原子性操作，避免并发创建多个实例
+        // Usa computeIfAbsent para garantir uma operação atômica, evitando a criação concorrente de múltiplas instâncias
         return serviceCache.computeIfAbsent(cacheKey, k -> createApiService(finalConfig, voiceName, pitch, speed));
     }
 
     /**
-     * 根据配置创建API类型的TTS服务（带pitch和speed参数）
+     * Cria um serviço TTS do tipo API com base na configuração (com os parâmetros pitch e speed)
      */
     private TtsService createApiService(ConfigBO config, String voiceName, Double pitch, Double speed) {
         // Make sure output dir exists
@@ -106,26 +106,26 @@ public class TtsServiceFactory {
         String provider = config.getProvider();
         Integer configId = config.getConfigId();
 
-        // 如果是阿里云NLS，需要额外清理NlsClient缓存
+        // Se for o Alibaba Cloud NLS, é necessário limpar também o cache do NlsClient
         if ("aliyun-nls".equals(provider)) {
             AliyunNlsTtsService.clearClientCache(configId);
         }
 
-        // 如果是sherpa-onnx，需要额外清理模型缓存
+        // Se for o sherpa-onnx, é necessário limpar também o cache do modelo
         if ("sherpa-onnx".equals(provider) && config.getApiUrl() != null) {
             SherpaOnnxTtsService.clearModelCache(config.getApiUrl());
         }
 
-        // 遍历缓存的所有键，找到匹配的键并移除
+        // Percorre todas as chaves do cache, encontra a chave correspondente e a remove
         serviceCache.keySet().removeIf(key -> {
             String[] parts = key.split(":");
-            if (parts.length < 5) {  // 新格式是 provider:configId:voiceName:pitch:speed
+            if (parts.length < 5) {  // O novo formato é provider:configId:voiceName:pitch:speed
                 return false;
             }
             String keyProvider = parts[0];
             String keyConfigId = parts[1];
 
-            // 检查provider和configId是否匹配
+            // Verifica se o provider e o configId correspondem
             return keyProvider.equals(provider) && keyConfigId.equals(String.valueOf(configId));
         });
 

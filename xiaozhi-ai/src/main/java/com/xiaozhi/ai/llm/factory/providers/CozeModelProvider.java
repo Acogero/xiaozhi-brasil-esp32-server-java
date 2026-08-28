@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * Coze模型提供者
+ * Provedor de modelo Coze
  */
 @Slf4j
 @Component
@@ -35,7 +35,7 @@ public class CozeModelProvider implements ChatModelProvider {
     public ChatModel createChatModel(ConfigBO config, RoleBO role) {
         String model = config.getConfigName();
         
-        // Coze需要查询agent配置获取Token
+        // Coze precisa consultar a configuração do agent para obter o Token
         List<ConfigBO> configs = configLookup.listConfigs(
                 config.getUserId(),
                 "agent",
@@ -44,7 +44,7 @@ public class CozeModelProvider implements ChatModelProvider {
                 null,
                 ConfigBO.STATE_ENABLED);
         if (configs == null || configs.isEmpty()) {
-            throw new IllegalStateException("未找到Coze agent配置, userId=" + config.getUserId());
+            throw new IllegalStateException("Configuração de agent Coze não encontrada, userId=" + config.getUserId());
         }
         ConfigBO queryConfig = configs.get(0);
         String token = tokenResolver.getToken(queryConfig);

@@ -3,8 +3,8 @@ package com.xiaozhi.ai.llm.tool;
 import org.springframework.ai.tool.metadata.ToolMetadata;
 
 /**
- * @param returnDirect 调用工具后直接返回工具调用结果，不再调用大语言模型
- * @param disturbed 调用此工具的特定语言指令会污染对话上下文，标识从Conversation里剔除触发此工具调用的UserMessage。
+ * @param returnDirect Após chamar a ferramenta, retorna diretamente o resultado da chamada, sem chamar novamente o modelo de linguagem
+ * @param disturbed A instrução de linguagem específica que chama esta ferramenta polui o contexto da conversa; indica que a UserMessage que disparou esta chamada de ferramenta deve ser removida da Conversation.
  */
 public record XiaozhiToolMetadata(boolean returnDirect) implements ToolMetadata {
 }

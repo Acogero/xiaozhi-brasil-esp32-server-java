@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * Dify模型提供者
+ * Provedor de modelo Dify
  */
 @Slf4j
 @Component
@@ -31,7 +31,7 @@ public class DifyModelProvider implements ChatModelProvider {
     public ChatModel createChatModel(ConfigBO config, RoleBO role) {
         String endpoint = config.getApiUrl();
         
-        // Dify需要查询agent配置获取ApiKey
+        // Dify precisa consultar a configuração do agent para obter a ApiKey
         List<ConfigBO> configs = configLookup.listConfigs(
                 config.getUserId(),
                 "agent",
@@ -40,7 +40,7 @@ public class DifyModelProvider implements ChatModelProvider {
                 null,
                 ConfigBO.STATE_ENABLED);
         if (configs == null || configs.isEmpty()) {
-            throw new IllegalStateException("未找到Dify agent配置, userId=" + config.getUserId());
+            throw new IllegalStateException("Configuração de agent Dify não encontrada, userId=" + config.getUserId());
         }
         ConfigBO queryConfig = configs.get(0);
         String apiKey = queryConfig.getApiKey();

@@ -7,69 +7,69 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * 聊天记忆接口，全局对象，不针对单个会话，而是负责全局记忆的存储策略及针对不同类型数据库的适配。
- * 方向一：不同于 MessageService，此接口应该是一个更高的抽象层，更多是负责存储策略而并非底层存储的增删改查。
- * 方向二：理解为与 MessageService 同层级的同类功能的接口，但必须支持批量保存与数据库类型适配。
- * 当前设计选择方向二：支持批量操作，以求减少IO，提升服务器支持更大的吞吐。
- * 已经参考了spring ai 的ChatMemory接口，暂时放弃spring ai 的ChatMemory。
- * 以后使用ChatClient与Advisor时直接实现一个更本地友好的ChatMemoryAdvisor。
- * Conversation则是参考了 langchain4j 的ChatMemory。
+ * Interface de memória de chat: um objeto global, não voltado a uma única sessão, responsável pela estratégia de armazenamento da memória global e pela adaptação a diferentes tipos de banco de dados.
+ * Direção 1: diferente do MessageService, esta interface deveria ser uma camada de abstração mais alta, responsável principalmente pela estratégia de armazenamento, e não pelo CRUD de baixo nível do armazenamento.
+ * Direção 2: entendida como uma interface de funcionalidade similar, no mesmo nível do MessageService, mas que precisa suportar salvamento em lote e adaptação a tipos de banco de dados.
+ * O design atual optou pela Direção 2: suporta operações em lote, buscando reduzir o IO e permitir que o servidor suporte maior throughput.
+ * A interface ChatMemory do Spring AI foi consultada como referência, mas por ora o ChatMemory do Spring AI foi descartado.
+ * No futuro, ao usar ChatClient com Advisor, será implementado diretamente um ChatMemoryAdvisor mais amigável ao contexto local.
+ * Já a Conversation foi inspirada no ChatMemory do langchain4j.
  *
  */
 public interface ChatMemory {
     String TIME_MILLIS_KEY = "TIME_MILLIS";
     String AUDIO_PATH = "AUDIO_PATH";
-    String USAGE_KEY = "llm_usage";  // 用于存储LLM使用情况的键
+    String USAGE_KEY = "llm_usage";  // Chave usada para armazenar o uso do LLM
 
 
 
     /**
-     * 保存会话的基本信息（ID，摘要，totalTokens,创建时间）
+     * Salva as informações básicas da sessão (ID, resumo, totalTokens, data de criação)
      * @param summary
      */
     void save(SummaryBO summary);
 
     /**
-     * 查询最近的Conversation Summary
-     * @param ownerId 聊天参与者标识（设备场景: deviceId, Web 场景: userId）
+     * Consulta o Summary mais recente da Conversation
+     * @param ownerId Identificador do participante do chat (cenário de dispositivo: deviceId; cenário Web: userId)
      * @param roleId
      * @return
      */
     SummaryBO findLastSummary(String ownerId, int roleId);
 
     /**
-     * 按 ownerId + roleId 获取历史对话消息列表（设备场景：跨 session 聚合）。
+     * Obtém a lista de mensagens do histórico de conversa por ownerId + roleId (cenário de dispositivo: agregação entre sessions).
      *
-     * @param ownerId 聊天参与者标识（设备场景: deviceId）
-     * @param roleId 角色ID
-     * @param limit 限制数量，此参数对于性能是必要的。
-     * @return 消息列表，按 createTime 升序
+     * @param ownerId Identificador do participante do chat (cenário de dispositivo: deviceId)
+     * @param roleId ID do papel/role
+     * @param limit Quantidade limite; este parâmetro é necessário para a performance.
+     * @return Lista de mensagens, em ordem crescente por createTime
      */
     List<Message> find(String ownerId, int roleId, int limit);
 
     /**
-     * 按 sessionId 获取历史对话消息列表（Web 场景：按会话隔离）。
-     * 与 {@link #find(String, int, int)} 参数数量不同构成方法重载。
+     * Obtém a lista de mensagens do histórico de conversa por sessionId (cenário Web: isolado por sessão).
+     * A diferença na quantidade de parâmetros em relação a {@link #find(String, int, int)} constitui uma sobrecarga de método.
      *
-     * @param sessionId 会话 ID
-     * @param limit 限制数量
-     * @return 消息列表，按 createTime 升序
+     * @param sessionId ID da sessão
+     * @param limit Quantidade limite
+     * @return Lista de mensagens, em ordem crescente por createTime
      */
     List<Message> find(String sessionId, int limit);
 
     /**
-     * 获取历史对话消息列表
-     * @param ownerId 聊天参与者标识（设备场景: deviceId, Web 场景: userId）
-     * @param roleId 角色ID
-     * @param timeMillis 在这个时间戳后的消息
+     * Obtém a lista de mensagens do histórico de conversa
+     * @param ownerId Identificador do participante do chat (cenário de dispositivo: deviceId; cenário Web: userId)
+     * @param roleId ID do papel/role
+     * @param timeMillis Mensagens após este timestamp
      * @return
      */
     List<Message> find(String ownerId, int roleId, Instant timeMillis);
     /**
-     * 清除历史记录
-     * 不是提供给Conversation使用，而是用于强制使其失忆的场景。
+     * Limpa o histórico
+     * Não é destinado ao uso pela Conversation, mas sim para cenários que forçam a perda de memória.
      *
-     * @param ownerId 聊天参与者标识（设备场景: deviceId, Web 场景: userId）
+     * @param ownerId Identificador do participante do chat (cenário de dispositivo: deviceId; cenário Web: userId)
      */
     void delete(String ownerId, int roleId);
 

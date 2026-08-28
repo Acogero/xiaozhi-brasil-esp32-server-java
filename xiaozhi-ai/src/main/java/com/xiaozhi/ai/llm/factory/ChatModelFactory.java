@@ -19,10 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * ChatModel
  * 
- * 设计模式: 策略模式 + 工厂模式
- * - 通过ChatModelProvider接口定义统一的创建策略
- * - 每个LLM提供商实现独立的Provider
- * - 工厂类通过Spring自动注入所有Provider,自动路由到对应实现
+ * Padrão de projeto: Strategy + Factory
+ * - Define uma estratégia de criação unificada através da interface ChatModelProvider
+ * - Cada provedor de LLM implementa um Provider independente
+ * - A classe factory injeta automaticamente todos os Providers via Spring, roteando para a implementação correspondente
  */
 @Slf4j
 @Component
@@ -32,19 +32,19 @@ public class ChatModelFactory {
     private ConfigLookup configLookup;
     
     /**
-     * 所有的ChatModel提供者,Spring会自动注入所有实现了ChatModelProvider接口的Bean
+     * Todos os provedores de ChatModel; o Spring injeta automaticamente todos os Beans que implementam a interface ChatModelProvider
      */
     private final Map<String, ChatModelProvider> providers;
 
     @Autowired
     private ObservationRegistry registry;
     /**
-     * 构造函数,自动注入所有ChatModelProvider
-     * @param providers 所有的Provider实现
+     * Construtor, injeta automaticamente todos os ChatModelProvider
+     * @param providers Todas as implementações de Provider
      */
     @Autowired
     public ChatModelFactory(List<ChatModelProvider> providers) {
-        // 将Provider列表转换为Map,key为provider名称(小写),value为Provider实例
+        // Converte a lista de Providers em um Map, chave = nome do provider (minúsculo), valor = instância do Provider
         this.providers = providers.stream()
                 .collect(Collectors.toMap(
                         p -> p.getProviderName().toLowerCase(),
@@ -55,33 +55,33 @@ public class ChatModelFactory {
     public ChatModel getChatModel(RoleBO role) {
         RoleBO effectiveRole = role != null ? role : new RoleBO();
         Integer modelId = effectiveRole.getModelId();
-        Assert.notNull(modelId, "配置ID不能为空");
-        // 根据配置ID查询配置
+        Assert.notNull(modelId, "ID de configuração não pode ser vazio");
+        // Consulta a configuração pelo ID de configuração
         ConfigBO config = configLookup.getConfig(modelId);
         return createChatModel(config, effectiveRole);
     }
 
     public ChatModel getVisionModel() {
         ConfigBO config = configLookup.getDefaultConfig("llm", ConfigBO.ModelType.vision.getValue());
-        Assert.notNull(config, "未配置多模态模型");
+        Assert.notNull(config, "Modelo multimodal não configurado");
         return createChatModel(config, new RoleBO());
     }
 
     public ChatModel getIntentModel() {
         ConfigBO config = configLookup.getDefaultConfig("llm", ConfigBO.ModelType.intent.getValue());
-        Assert.notNull(config, "未配置意图识别模型");
+        Assert.notNull(config, "Modelo de reconhecimento de intenção não configurado");
         return createChatModel(config, new RoleBO());
     }
 
     public EmbeddingModel getEmbeddingModel(Integer configId) {
-        Assert.notNull(configId, "配置ID不能为空");
+        Assert.notNull(configId, "ID de configuração não pode ser vazio");
         ConfigBO config = configLookup.getConfig(configId);
-        Assert.notNull(config, "未找到配置, configId=" + configId);
+        Assert.notNull(config, "Configuração não encontrada, configId=" + configId);
         return getEmbeddingModel(config);
     }
 
     public EmbeddingModel getEmbeddingModel(ConfigBO config) {
-        Assert.notNull(config, "未配置向量模型");
+        Assert.notNull(config, "Modelo de vetor (embedding) não configurado");
         String providerName = config.getProvider().toLowerCase();
         ChatModelProvider provider = providers.get(providerName);
         if (provider != null) {
@@ -92,36 +92,36 @@ public class ChatModelFactory {
             return provider.createEmbeddingModel(config);
         }
         throw new IllegalArgumentException(
-                String.format("不支持的Provider: %s, 可用的Providers: %s", providerName, providers.keySet()));
+                String.format("Provider não suportado: %s, Providers disponíveis: %s", providerName, providers.keySet()));
     }
 
     /**
-     * 创建ChatModel
+     * Cria o ChatModel
      *
-     * @param config 模型配置
-     * @param role 角色配置
-     * @return ChatModel实例
+     * @param config Configuração do modelo
+     * @param role Configuração do papel/role
+     * @return Instância de ChatModel
      */
     private ChatModel createChatModel(ConfigBO config, RoleBO role) {
         String providerName = config.getProvider().toLowerCase();
         
-        // 从providers Map中获取对应的Provider
+        // Obtém o Provider correspondente a partir do Map de providers
         ChatModelProvider provider = providers.get(providerName);
         
         if (provider != null) {
             return provider.createChatModel(config, role);
         }
         
-        // 如果没有找到对应的Provider,尝试使用OpenAI Provider作为默认(兼容OpenAI协议)
+        // Se não encontrar o Provider correspondente, tenta usar o Provider OpenAI como padrão (compatível com o protocolo OpenAI)
         provider = providers.get("openai");
         
         if (provider != null) {
             return provider.createChatModel(config, role);
         }
         
-        // 如果连OpenAI Provider都没有,抛出异常
+        // Se nem o Provider OpenAI existir, lança exceção
         throw new IllegalArgumentException(
-                String.format("不支持的Provider: %s, 可用的Providers: %s", 
+                String.format("Provider não suportado: %s, Providers disponíveis: %s", 
                         providerName, 
                         providers.keySet())
         );

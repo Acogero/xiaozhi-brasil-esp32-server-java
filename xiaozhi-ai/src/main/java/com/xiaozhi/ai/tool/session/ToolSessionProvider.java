@@ -1,7 +1,7 @@
 package com.xiaozhi.ai.tool.session;
 
 /**
- * 会话查找器 — 替代直接依赖 SessionManager。
+ * Localizador de sessão — substitui a dependência direta de SessionManager.
  */
 public interface ToolSessionProvider {
 

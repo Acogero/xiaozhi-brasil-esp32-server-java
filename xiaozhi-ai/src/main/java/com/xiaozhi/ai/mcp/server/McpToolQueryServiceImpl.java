@@ -11,8 +11,8 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * MCP 工具查询服务实现。
- * 委托 ToolsGlobalRegistry 获取全局工具元数据。
+ * Implementação do serviço de consulta de ferramentas MCP.
+ * Delega ao ToolsGlobalRegistry a obtenção dos metadados globais das ferramentas.
  */
 @Slf4j
 @Service
@@ -26,12 +26,12 @@ public class McpToolQueryServiceImpl implements McpToolQueryService {
 
     @Override
     public List<Map<String, String>> getSystemGlobalToolSummaries() {
-        // 优先使用本进程已注册的 GlobalFunction（dialogue 进程 / 单体部署）
+        // Prioriza o GlobalFunction já registrado neste processo (processo dialogue / implantação monolítica)
         List<Map<String, String>> inMemory = toolsGlobalRegistry.getGlobalToolSummaries();
         if (!inMemory.isEmpty()) {
             return inMemory;
         }
-        // 回退到 Redis 共享注册表（server 进程跨进程读取 dialogue 发布的元数据）
+        // Recorre ao registro compartilhado no Redis (o processo server lê entre processos os metadados publicados pelo dialogue)
         if (globalToolRedisRegistry == null) {
             return inMemory;
         }

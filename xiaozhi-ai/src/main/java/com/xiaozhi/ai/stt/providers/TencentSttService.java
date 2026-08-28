@@ -29,10 +29,10 @@ import lombok.extern.slf4j.Slf4j;
 public class TencentSttService implements SttService {
     private static final String PROVIDER_NAME = "tencent";
     private static final String API_URL = "https://asr.tencentcloudapi.com";
-    private static final int QUEUE_TIMEOUT_MS = 100; // 队列等待超时时间
-    private static final long RECOGNITION_TIMEOUT_MS = 90000; // 识别超时时间（90秒）
+    private static final int QUEUE_TIMEOUT_MS = 100; // Tempo limite de espera da fila
+    private static final long RECOGNITION_TIMEOUT_MS = 90000; // Tempo limite de reconhecimento (90 segundos)
 
-    // 使用腾讯云SDK的默认URL
+    // Usa a URL padrão do SDK da Tencent Cloud
     private static final String WS_API_URL = "wss://asr.cloud.tencent.com/asr/v2/";
 
     private String secretId;
@@ -41,10 +41,10 @@ public class TencentSttService implements SttService {
 
     private final static OkHttpClient client = HttpUtil.client;
 
-    // 全局共享的SpeechClient实例
+    // Instância compartilhada globalmente do SpeechClient
     private final SpeechClient speechClient = new SpeechClient(WS_API_URL);
 
-    // 存储当前活跃的识别会话
+    // Armazena as sessões de reconhecimento atualmente ativas
     private final ConcurrentHashMap<String, SpeechRecognizer> activeRecognizers = new ConcurrentHashMap<>();
 
     static {
@@ -52,9 +52,9 @@ public class TencentSttService implements SttService {
             try {
                 Request request = new Request.Builder().url(API_URL).head().build();
                 Response response = client.newCall(request).execute();
-                response.close(); // 不读取内容，仅建立连接，用以提速后续的请求
+                response.close(); // Não lê o conteúdo, apenas estabelece a conexão, para acelerar requisições futuras
             } catch (Exception e) {
-                log.error("初始化TencentSttService STT服务时发生错误", e);
+                log.error("Erro ao inicializar o serviço STT do TencentSttService", e);
             }
         });
     }
@@ -74,62 +74,62 @@ public class TencentSttService implements SttService {
 
     @Override
     public SttResult stream(Flux<byte[]> audioSink) {
-        // 检查配置是否已设置
+        // Verifica se a configuração já foi definida
         if (secretId == null || secretKey == null || appId == null) {
-            log.error("腾讯云语音识别配置未设置，无法进行识别");
+            log.error("A configuração de reconhecimento de voz da Tencent Cloud não foi definida; não é possível reconhecer");
             return null;
         }
 
-        // 使用阻塞队列存储音频数据
+        // Usa uma fila bloqueante para armazenar os dados de áudio
         BlockingQueue<byte[]> audioQueue = new LinkedBlockingQueue<>();
         AtomicBoolean isCompleted = new AtomicBoolean(false);
         AtomicReference<String> finalResult = new AtomicReference<>("");
         CountDownLatch recognitionLatch = new CountDownLatch(1);
         
-        // 订阅Sink并将数据放入队列
+        // Assina o Sink e coloca os dados na fila
         audioSink.subscribe(
             data -> audioQueue.offer(data),
             error -> {
-                log.error("音频流处理错误", error);
+                log.error("Erro no processamento do fluxo de áudio", error);
                 isCompleted.set(true);
             },
             () -> isCompleted.set(true)
         );
 
-        // 生成唯一的语音ID
+        // Gera um ID de voz único
         String voiceId = UUID.randomUUID().toString();
 
         try {
-            // 创建腾讯云凭证
+            // Cria as credenciais da Tencent Cloud
             Credential credential = new Credential(appId, secretId, secretKey);
 
-            // 创建识别请求
+            // Cria a requisição de reconhecimento
             SpeechRecognizerRequest request = SpeechRecognizerRequest.init();
-            request.setEngineModelType("16k_zh"); // 16k采样率中文模型
-            request.setVoiceFormat(1); // PCM格式
+            request.setEngineModelType("16k_zh"); // Modelo em chinês com taxa de amostragem de 16k
+            request.setVoiceFormat(1); // Formato PCM
             request.setVoiceId(voiceId);
 
-            // 创建识别监听器
+            // Cria o listener de reconhecimento
             SpeechRecognizerListener listener = new SpeechRecognizerListener() {
                 private final StringBuilder textBuilder = new StringBuilder();
                 
                 @Override
                 public void onRecognitionStart(SpeechRecognizerResponse response) {
-                    log.debug("腾讯云识别开始 - VoiceId: {}", voiceId);
+                    log.debug("Reconhecimento da Tencent Cloud iniciado - VoiceId: {}", voiceId);
                 }
 
                 @Override
                 public void onSentenceBegin(SpeechRecognizerResponse response) {
-                    // 句子开始，可以不处理
+                    // Início da frase; pode ser ignorado
                 }
 
                 @Override
                 public void onRecognitionResultChange(SpeechRecognizerResponse response) {
-                    // 非稳态结果，可能会变化
+                    // Resultado não estável, pode mudar
                     if (response.getResult() != null && response.getResult().getVoiceTextStr() != null) {
                         String text = response.getResult().getVoiceTextStr();
                         if (!text.isEmpty()) {
-                            // 更新当前识别结果
+                            // Atualiza o resultado atual do reconhecimento
                             synchronized (textBuilder) {
                                 textBuilder.setLength(0);
                                 textBuilder.append(text);
@@ -140,11 +140,11 @@ public class TencentSttService implements SttService {
 
                 @Override
                 public void onSentenceEnd(SpeechRecognizerResponse response) {
-                    // 稳态结果，不再变化
+                    // Resultado estável, não muda mais
                     if (response.getResult() != null && response.getResult().getVoiceTextStr() != null) {
                         String text = response.getResult().getVoiceTextStr();
                         if (!text.isEmpty()) {
-                            // 更新最终结果
+                            // Atualiza o resultado final
                             synchronized (textBuilder) {
                                 textBuilder.setLength(0);
                                 textBuilder.append(text);
@@ -156,13 +156,13 @@ public class TencentSttService implements SttService {
 
                 @Override
                 public void onRecognitionComplete(SpeechRecognizerResponse response) {
-                    // 识别完成，获取最终结果
+                    // Reconhecimento concluído, obtém o resultado final
                     if (response.getResult() != null && response.getResult().getVoiceTextStr() != null) {
                         String text = response.getResult().getVoiceTextStr();
                         if (!text.isEmpty()) {
                             finalResult.set(text);
                         } else {
-                            // 如果最终结果为空，使用之前积累的结果
+                            // Se o resultado final estiver vazio, usa o resultado acumulado anteriormente
                             synchronized (textBuilder) {
                                 if (textBuilder.length() > 0) {
                                     finalResult.set(textBuilder.toString());
@@ -171,44 +171,44 @@ public class TencentSttService implements SttService {
                         }
                     }
                     
-                    // 释放锁，表示识别完成
+                    // Libera o lock, indicando que o reconhecimento foi concluído
                     recognitionLatch.countDown();
                     
-                    // 从活跃识别器中移除
+                    // Remove do conjunto de reconhecedores ativos
                     activeRecognizers.remove(voiceId);
                 }
 
                 @Override
                 public void onFail(SpeechRecognizerResponse response) {
-                    log.error("识别失败 - VoiceId: {}, 错误: {}", voiceId,
-                            response.getMessage() != null ? response.getMessage() : "未知错误");
+                    log.error("Falha no reconhecimento - VoiceId: {}, erro: {}", voiceId,
+                            response.getMessage() != null ? response.getMessage() : "erro desconhecido");
                     
-                    // 释放锁，表示识别失败
+                    // Libera o lock, indicando que o reconhecimento falhou
                     recognitionLatch.countDown();
                     
-                    // 从活跃识别器中移除
+                    // Remove do conjunto de reconhecedores ativos
                     activeRecognizers.remove(voiceId);
                 }
 
                 @Override
                 public void onMessage(SpeechRecognizerResponse response) {
-                    // 可以记录所有消息，但不需要特别处理
+                    // Pode registrar todas as mensagens, mas não requer tratamento especial
                 }
             };
 
-            // 创建识别器
+            // Cria o reconhecedor
             SpeechRecognizer recognizer = new SpeechRecognizer(speechClient, credential, request, listener);
 
-            // 存储到活跃识别器映射中
+            // Armazena no mapa de reconhecedores ativos
             activeRecognizers.put(voiceId, recognizer);
 
-            // 启动识别器
+            // Inicia o reconhecedor
             recognizer.start();
 
-            // 标记是否已经发送了停止信号
+            // Marca se o sinal de parada já foi enviado
             AtomicBoolean stopSent = new AtomicBoolean(false);
 
-            // 启动虚拟线程发送音频数据
+            // Inicia uma virtual thread para enviar os dados de áudio
             Thread.startVirtualThread(() -> {
                 try {
                     while (!isCompleted.get() || !audioQueue.isEmpty()) {
@@ -216,8 +216,8 @@ public class TencentSttService implements SttService {
                         try {
                             audioChunk = audioQueue.poll(QUEUE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
                         } catch (InterruptedException e) {
-                            log.warn("音频数据队列等待被中断", e);
-                            Thread.currentThread().interrupt(); // 重新设置中断标志
+                            log.warn("Espera na fila de dados de áudio interrompida", e);
+                            Thread.currentThread().interrupt(); // Restaura o flag de interrupção
                             break;
                         }
                         
@@ -225,69 +225,69 @@ public class TencentSttService implements SttService {
                             try {
                                 recognizer.write(audioChunk);
                             } catch (Exception e) {
-                                log.error("发送音频数据时发生错误 - VoiceId: {}", voiceId, e);
+                                log.error("Erro ao enviar os dados de áudio - VoiceId: {}", voiceId, e);
                                 break;
                             }
                         }
                     }
                     
-                    // 发送停止信号
+                    // Envia o sinal de parada
                     if (activeRecognizers.containsKey(voiceId) && !stopSent.getAndSet(true)) {
                         try {
                             recognizer.stop();
                         } catch (Exception e) {
-                            log.error("停止识别器时发生错误 - VoiceId: {}", voiceId, e);
+                            log.error("Erro ao parar o reconhecedor - VoiceId: {}", voiceId, e);
                         }
                     }
                 } catch (Exception e) {
-                    log.error("处理音频流时发生错误 - VoiceId: {}", voiceId, e);
+                    log.error("Erro ao processar o fluxo de áudio - VoiceId: {}", voiceId, e);
                 }
             });
 
-            // 等待识别完成或超时
+            // Aguarda a conclusão do reconhecimento ou o timeout
             boolean recognized = recognitionLatch.await(RECOGNITION_TIMEOUT_MS, TimeUnit.MILLISECONDS);
             
             if (!recognized) {
-                // 超时后清理资源
+                // Limpa os recursos após o timeout
                 if (activeRecognizers.containsKey(voiceId)) {
                     try {
                         recognizer.stop();
                         recognizer.close();
                         activeRecognizers.remove(voiceId);
                     } catch (Exception e) {
-                        log.error("清理超时识别器资源时发生错误 - VoiceId: {}", voiceId, e);
+                        log.error("Erro ao limpar os recursos do reconhecedor após o timeout - VoiceId: {}", voiceId, e);
                     }
                 }
             } else {
-                // 正常完成后也关闭recognizer释放资源
+                // Após a conclusão normal, também fecha o recognizer para liberar recursos
                 try {
                     recognizer.close();
                 } catch (Exception e) {
-                    log.error("关闭识别器时发生错误 - VoiceId: {}", voiceId, e);
+                    log.error("Erro ao fechar o reconhecedor - VoiceId: {}", voiceId, e);
                 }
             }
 
         } catch (Exception e) {
-            log.error("创建语音识别会话时发生错误", e);
+            log.error("Erro ao criar a sessão de reconhecimento de voz", e);
         }
         
         return SttResult.textOnly(finalResult.get());
     }
 
-    // 在服务关闭时释放资源
+    // Libera recursos ao encerrar o serviço
     public void shutdown() {
-        // 关闭所有活跃的识别器
+        // Fecha todos os reconhecedores ativos
         activeRecognizers.forEach((id, recognizer) -> {
             try {
                 recognizer.stop();
                 recognizer.close();
             } catch (Exception e) {
-                log.error("关闭识别器时发生错误 - VoiceId: {}", id, e);
+                log.error("Erro ao fechar o reconhecedor - VoiceId: {}", id, e);
             }
         });
         activeRecognizers.clear();
 
-        // 关闭SpeechClient
+        // Fecha o SpeechClient
         speechClient.shutdown();
     }
 

@@ -4,59 +4,59 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 /**
- * TTS服务接口。
- * 与 Spring AI 的 {@link org.springframework.ai.audio.tts.TextToSpeechModel} 对齐关系：
+ * Interface de serviço TTS.
+ * Relação de alinhamento com o {@link org.springframework.ai.audio.tts.TextToSpeechModel} do Spring AI:
  * <ul>
- *   <li>TtsService → TextToSpeechModel（call 模式） — 通过 {@link TtsServiceAdapter} 桥接</li>
- *   <li>{@link XiaozhiTtsOptions} → TextToSpeechOptions — 直接实现</li>
+ *   <li>TtsService → TextToSpeechModel (modo call) — em ponte via {@link TtsServiceAdapter}</li>
+ *   <li>{@link XiaozhiTtsOptions} → TextToSpeechOptions — implementação direta</li>
  * </ul>
  *
- * @see TtsServiceAdapter 将 TtsService 适配为 Spring AI TextToSpeechModel 的适配器
+ * @see TtsServiceAdapter Adaptador que adapta o TtsService para o TextToSpeechModel do Spring AI
  */
 public interface TtsService {
 
   /**
-   * 获取服务提供商名称
+   * Obtém o nome do provedor do serviço
    */
   String getProviderName();
 
   /**
-   * 获取 TTS 参数配置
+   * Obtém a configuração de parâmetros do TTS
    */
   XiaozhiTtsOptions getOptions();
 
   /**
-   * 获取音色名称
+   * Obtém o nome do timbre de voz
    */
   default String getVoiceName() {
     return getOptions().getVoiceName();
   }
 
   /**
-   * 获取语速
+   * Obtém a velocidade da fala
    */
   default Double getSpeed() {
     return getOptions().getSpeed();
   }
 
   /**
-   * 获取音调
+   * Obtém o tom de voz
    */
   default Double getPitch() {
     return getOptions().getPitch();
   }
 
   /**
-   * 音频格式
+   * Formato de áudio
    */
   default String audioFormat() {
     return "wav";
   }
 
   /**
-   * 生成文件名称
+   * Gera o nome do arquivo
    * 
-   * @return 文件名称
+   * @return Nome do arquivo
    */
   default String getAudioFileName() {
     return UUID.randomUUID().toString().replace("-", "") + "." + audioFormat();
@@ -64,10 +64,10 @@ public interface TtsService {
 
 
   /**
-   * 将文本转换为语音（带自定义语音）
+   * Converte o texto em voz (com voz customizada)
    *
-   * @param text 要转换为语音的文本
-   * @return 生成的音频文件路径
+   * @param text Texto a ser convertido em voz
+   * @return Caminho do arquivo de áudio gerado
    */
   Path textToSpeech(String text) throws Exception;
 

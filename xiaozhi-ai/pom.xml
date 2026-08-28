@@ -8,16 +8,16 @@
     </parent>
     <artifactId>xiaozhi-ai</artifactId>
     <name>xiaozhi-ai</name>
-    <description>AI 能力平台：LLM/TTS/STT provider + 记忆管理</description>
+    <description>Plataforma de capacidades de IA: providers de LLM/TTS/STT + gerenciamento de memória</description>
 
     <dependencies>
         <dependency>
             <groupId>com.xiaozhi</groupId>
             <artifactId>xiaozhi-service</artifactId>
         </dependency>
-        <!-- xiaozhi-common 通过 xiaozhi-service 传递 -->
+        <!-- xiaozhi-common é propagado através de xiaozhi-service -->
         <!-- Spring AI -->
-        <!-- ChatClient API（Spring AI 1.1 起从 spring-ai-model 拆出到独立 artifact） -->
+        <!-- API do ChatClient (a partir do Spring AI 1.1, foi separada de spring-ai-model para um artifact independente) -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-client-chat</artifactId>
@@ -70,7 +70,7 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
         </dependency>
-        <!-- 音频处理 -->
+        <!-- Processamento de áudio -->
         <dependency>
             <groupId>io.github.whitemagic2014</groupId>
             <artifactId>tts-edge-java</artifactId>
@@ -79,7 +79,7 @@
             <groupId>com.alphacephei</groupId>
             <artifactId>vosk</artifactId>
         </dependency>
-        <!-- 云服务 SDK -->
+        <!-- SDK de serviços em nuvem -->
         <dependency>
             <groupId>com.tencentcloudapi</groupId>
             <artifactId>tencentcloud-speech-sdk-java</artifactId>
@@ -112,7 +112,7 @@
             <groupId>io.github.imfangs</groupId>
             <artifactId>dify-java-client</artifactId>
         </dependency>
-        <!-- Sherpa-ONNX（从项目内仓库 repo/ 解析，版本由父 POM 统一管理） -->
+        <!-- Sherpa-ONNX (resolvido a partir do repositório interno do projeto repo/, versão gerenciada de forma centralizada pelo POM pai) -->
         <dependency>
             <groupId>com.k2fsa</groupId>
             <artifactId>sherpa-onnx</artifactId>

@@ -5,17 +5,17 @@ import com.xiaozhi.ai.tool.session.ToolSession;
 import java.util.Set;
 
 /**
- * 工具注册器接口。
- * 每种工具来源对应一个实现：系统全局工具、设备端MCP工具、远程MCP Server工具、本地MCP Endpoint工具。
- * Spring 自动收集注入。
+ * Interface do registrador de ferramentas.
+ * Cada origem de ferramenta corresponde a uma implementação: ferramentas globais do sistema, ferramentas MCP do dispositivo, ferramentas de MCP Server remoto, ferramentas de MCP Endpoint local.
+ * Coletadas e injetadas automaticamente pelo Spring.
  */
 public interface ToolRegistrar {
 
     /**
-     * 向会话注册工具
+     * Registra ferramentas na sessão
      *
-     * @param toolSession   当前设备会话
-     * @param excludedTools 需排除的工具名称集合
+     * @param toolSession   Sessão atual do dispositivo
+     * @param excludedTools Conjunto de nomes de ferramentas a excluir
      */
     void register(ToolSession toolSession, Set<String> excludedTools);
 }

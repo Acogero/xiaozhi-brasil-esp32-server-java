@@ -41,7 +41,7 @@ public class XfyunSttService implements SttService {
 
     private static final String PROVIDER_NAME = "xfyun";
 
-    // 识别超时时间（90秒）
+    // Tempo limite de reconhecimento (90 segundos)
     private static final long RECOGNITION_TIMEOUT_MS = 90000;
 
     private static final String hostUrl = "https://iat-api.xfyun.cn/v2/iat";
@@ -64,28 +64,28 @@ public class XfyunSttService implements SttService {
     }
 
     /**
-     * 处理返回结果（包括全量返回与流式返回（结果修正））
+     * Processa o resultado retornado (inclui retorno completo e retorno em streaming (correção de resultado))
      */
     private void handleResultText(Text textObject, List<Text> resultSegments) {
-        // 处理流式返回的替换结果
+        // Processa o resultado de substituição do retorno em streaming
         if ("rpl".equals(textObject.getPgs()) && textObject.getRg() != null && textObject.getRg().length == 2) {
-            // 返回结果序号sn字段的最小值为1
+            // O valor mínimo do campo sn (número de sequência) do resultado retornado é 1
             int start = textObject.getRg()[0] - 1;
             int end = textObject.getRg()[1] - 1;
 
-            // 将指定区间的结果设置为删除状态
+            // Marca os resultados do intervalo especificado como excluídos
             for (int i = start; i <= end && i < resultSegments.size(); i++) {
                 resultSegments.get(i).setDeleted(true);
             }
-            // log.info("替换操作，服务端返回结果为：" + textObject);
+            // log.info("Operação de substituição, resultado retornado pelo servidor: " + textObject);
         }
 
-        // 通用逻辑，添加当前文本到结果列表
+        // Lógica geral: adiciona o texto atual à lista de resultados
         resultSegments.add(textObject);
     }
 
     /**
-     * 获取最终结果
+     * Obtém o resultado final
      */
     private String getFinalResult(List<Text> resultSegments) {
         StringBuilder finalResult = new StringBuilder();
@@ -129,18 +129,18 @@ public class XfyunSttService implements SttService {
 
     @Override
     public SttResult stream(Flux<byte[]> audioSink) {
-        // 检查配置是否已设置
+        // Verifica se a configuração já foi definida
         if (secretId == null || secretKey == null || appId == null) {
-            log.error("讯飞云语音识别配置未设置，无法进行识别");
+            log.error("A configuração de reconhecimento de voz da iFLYTEK Cloud não foi definida; não é possível reconhecer");
             return null;
         }
 
-        // 构建鉴权URL
+        // Monta a URL de autenticação
         String authUrl;
         try {
             authUrl = getAuthUrl(secretId, secretKey);
         } catch (Exception e) {
-            log.error("构建鉴权URL时发生错误！", e);
+            log.error("Erro ao montar a URL de autenticação!", e);
             return SttResult.textOnly("");
         }
 
@@ -160,34 +160,34 @@ public class XfyunSttService implements SttService {
             public void onOpen(WebSocket webSocket, Response response) {
                 webSocketRef.set(webSocket);
                 isClosed.set(false);
-                // 使用 Flux 订阅音频流
-                audioSink.subscribeOn(Schedulers.single())  // 保证顺序执行
+                // Usa o Flux para assinar o fluxo de áudio
+                audioSink.subscribeOn(Schedulers.single())  // Garante a execução em ordem
                         .subscribe(
                                 chunk -> {
                                     if (isClosed.get()) return;
                                     try {
                                         if (chunk == null || chunk.length == 0) {
-                                            log.debug("audioSink 数据为空，跳过此帧");
+                                            log.debug("Dados do audioSink vazios, pulando este frame");
                                             return;
                                         }
                                         if ((status.compareAndSet(StatusFirstFrame, StatusContinueFrame))) {
-                                            log.debug("xfyun开始发送音频首帧");
+                                            log.debug("xfyun começando a enviar o primeiro frame de áudio");
                                             frameQueue.offer(buildFirstFrame(chunk, chunk.length));
                                         } else {
-                                            // log.debug("xfyun继续发送音频帧");
+                                            // log.debug("xfyun continuando a enviar frames de áudio");
                                             frameQueue.offer(buildContinueFrame(chunk, chunk.length));
                                         }
                                     } catch (Exception e) {
-                                        log.error("发送音频帧失败", e);
+                                        log.error("Falha ao enviar o frame de áudio", e);
                                     }
                                 },
                                 error -> {
-                                    log.error("音频流错误", error);
+                                    log.error("Erro no fluxo de áudio", error);
                                 },
                                 () -> {
                                     if (isClosed.get()) return;
-                                    // 流结束，通过队列发送最后一帧，保证帧顺序
-                                    log.debug("audioSink结束发送结束通知");
+                                    // Fim do fluxo; envia o último frame pela fila, garantindo a ordem dos frames
+                                    log.debug("Notificação de encerramento do audioSink enviada");
                                     JsonObject frame = buildLastFrame();
                                     frameQueue.offer(frame);
                                 }
@@ -214,14 +214,14 @@ public class XfyunSttService implements SttService {
                         recognitionLatch.countDown();
                     }
                     // wsClose();
-                    wsClose(webSocketRef, isClosed); // 显式关闭
+                    wsClose(webSocketRef, isClosed); // Fechamento explícito
                 }
             }
 
             @Override
             public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-                log.error("流式识别失败", t);
-                wsClose(webSocketRef, isClosed); // 显式关闭
+                log.error("Falha no reconhecimento em streaming", t);
+                wsClose(webSocketRef, isClosed); // Fechamento explícito
                 isClosed.set(true);
                 webSocketRef.set(null);
                 if (latchReleased.compareAndSet(false, true)) {
@@ -231,14 +231,14 @@ public class XfyunSttService implements SttService {
 
             @Override
             public void onClosed(WebSocket webSocket, int code, String reason) {
-                wsClose(webSocketRef, isClosed); // 显式关闭
+                wsClose(webSocketRef, isClosed); // Fechamento explícito
                 isClosed.set(true);
                 webSocketRef.set(null);
                 super.onClosed(webSocket, code, reason);
             }
         });
 
-        // 发送帧线程
+        // Thread de envio de frames
         Thread.startVirtualThread(() -> {
             while (!isClosed.get()) {
                 try {
@@ -250,20 +250,20 @@ public class XfyunSttService implements SttService {
                         }
                     }
                 } catch (Exception e) {
-                    log.error("发送音频帧失败", e);
+                    log.error("Falha ao enviar o frame de áudio", e);
                 }
             }
         });
 
         try {
-            // 等待识别完成或超时
+            // Aguarda a conclusão do reconhecimento ou o timeout
             boolean recognized = recognitionLatch.await(RECOGNITION_TIMEOUT_MS, TimeUnit.MILLISECONDS);
             String finalText = "";
             if (recognized) {
                 finalText = getFinalResult(resultSegments);
             } else {
                 String partialResult = getFinalResult(resultSegments);
-                // 即使超时也返回已识别的部分文本
+                // Mesmo em caso de timeout, retorna o texto parcial já reconhecido
                 if (StringUtils.hasText(partialResult)) {
                     finalText = partialResult;
                 }
@@ -271,9 +271,9 @@ public class XfyunSttService implements SttService {
             }
             return SttResult.textOnly(finalText);
         } catch (Exception e) {
-            log.error("创建语音识别会话时发生错误", e);
+            log.error("Erro ao criar a sessão de reconhecimento de voz", e);
             wsClose(webSocketRef, isClosed);
-            // 主动关闭会话
+            // Fecha proativamente a sessão
             return SttResult.textOnly(getFinalResult(resultSegments));
         }
     }
@@ -283,9 +283,9 @@ public class XfyunSttService implements SttService {
             WebSocket ws = webSocketRef.get();
             if (ws != null) {
                 try {
-                    ws.close(1000, "程序关闭");
+                    ws.close(1000, "Encerramento do programa");
                 } catch (Exception e) {
-                    log.warn("关闭 WebSocket 时发生异常", e);
+                    log.warn("Exceção ao fechar o WebSocket", e);
                 }
             }
         }

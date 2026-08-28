@@ -5,9 +5,9 @@ import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 意图检测器 — 在调用 LLM 之前，通过关键词匹配检测用户输入的明确意图（<1ms）。
+ * Detector de intenção — detecta a intenção explícita da entrada do usuário por correspondência de palavras-chave antes de chamar o LLM (<1ms).
  * <p>
- * 只处理确定性意图（如退出），未来可扩展更多快路径意图。
+ * Trata apenas intenções determinísticas (como sair); no futuro pode ser expandido para mais intenções de caminho rápido.
  */
 @Slf4j
 @Service
@@ -16,33 +16,33 @@ public class IntentService {
     private final ExitKeywordDetector exitKeywordDetector = new ExitKeywordDetector();
 
     /**
-     * 确定性意图枚举。未来可扩展：HELP、RESET、SWITCH_ROLE 等。
+     * Enum de intenções determinísticas. Pode ser expandido no futuro: HELP, RESET, SWITCH_ROLE, etc.
      */
     public enum Intent {
-        /** 退出对话 */
+        /** Sair da conversa */
         EXIT,
-        /** 无特殊意图，继续正常流程 */
+        /** Sem intenção especial, continua o fluxo normal */
         NONE
     }
 
     /**
-     * 检测用户输入的明确意图。
+     * Detecta a intenção explícita da entrada do usuário.
      *
-     * @param userText 用户输入文本
-     * @return 检测到的意图，无特殊意图返回 NONE
+     * @param userText Texto de entrada do usuário
+     * @return A intenção detectada; retorna NONE se não houver intenção especial
      */
     public Intent detect(String userText) {
         if (!StringUtils.hasText(userText)) {
             return Intent.NONE;
         }
 
-        // 退出意图
+        // Intenção de saída
         if (exitKeywordDetector.detectExitIntent(userText)) {
-            log.info("检测到退出意图: \"{}\"", userText);
+            log.info("Intenção de saída detectada: \"{}\"", userText);
             return Intent.EXIT;
         }
 
-        // 未来可在此扩展更多意图检测
+        // Mais detecções de intenção podem ser adicionadas aqui no futuro
 
         return Intent.NONE;
     }

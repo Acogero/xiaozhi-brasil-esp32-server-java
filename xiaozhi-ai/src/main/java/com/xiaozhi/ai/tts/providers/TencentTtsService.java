@@ -23,24 +23,24 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TencentTtsService implements TtsService {
     private static final String PROVIDER_NAME = "tencent";
-    // 默认的腾讯云TTS WebSocket地址
+    // Endereço WebSocket padrão do TTS da Tencent Cloud
     private static final String DEFAULT_TTS_REQ_URL = "wss://tts.cloud.tencent.com/stream_ws";
-    // 识别超时时间（60秒）
+    // Tempo limite de reconhecimento (60 segundos)
     private static final long SYNTHESIS_TIMEOUT_MS = 60000;
 
-    // 重试机制常量
+    // Constantes do mecanismo de retry
     private static final int MAX_RETRY_ATTEMPTS = 3;
     private static final long RETRY_DELAY_MS = 1000;
 
-    // 腾讯云认证信息
+    // Informações de autenticação da Tencent Cloud
     private String appId;
     private String secretId;
     private String secretKey;
 
-    // 语音参数（voiceName, pitch, speed）
+    // Parâmetros de voz (voiceName, pitch, speed)
     private final XiaozhiTtsOptions options;
 
-    // SpeechClient应用全局创建一个即可,生命周期可和整个应用保持一致
+    // Basta criar um SpeechClient globalmente na aplicação; seu ciclo de vida pode acompanhar toda a aplicação
     private static final SpeechClient speechClient = new SpeechClient(DEFAULT_TTS_REQ_URL);
 
     public TencentTtsService(ConfigBO config, String voiceName, Double pitch, Double speed, String outputPath) {
@@ -67,12 +67,12 @@ public class TencentTtsService implements TtsService {
 
     private Flux<byte[]> stream(String text) throws Exception {
         if (text == null || text.isEmpty()) {
-            log.warn("文本内容为空！");
+            log.warn("Conteúdo de texto vazio!");
             return Flux.empty();
         }
 
-        // 腾讯云 SDK 的 start() 是非阻塞的，音频数据通过 onAudioResult 回调异步推送。
-        // 使用 Sinks.Many 替代 CountDownLatch.await()，避免阻塞 Reactor 调度器线程。
+        // O método start() do SDK da Tencent Cloud é não bloqueante; os dados de áudio são enviados de forma assíncrona pelo callback onAudioResult.
+        // Usa Sinks.Many em vez de CountDownLatch.await(), evitando bloquear a thread do scheduler do Reactor.
         return Flux.defer(() -> {
             Sinks.Many<byte[]> dataSink = Sinks.many().unicast().onBackpressureBuffer();
 
@@ -83,7 +83,7 @@ public class TencentTtsService implements TtsService {
             int voiceType = Integer.parseInt(getVoiceName());
             request.setVoiceType(voiceType);
 
-            // 将我们的参数（0.5-2.0）映射到腾讯云的参数（-2到6）
+            // Mapeia nosso parâmetro (0.5-2.0) para o parâmetro da Tencent Cloud (-2 a 6)
             float tencentSpeed = (float) ((getSpeed() - 0.5) * (4.0 / 1.5) - 2.0);
             tencentSpeed = Math.max(-2.0f, Math.min(6.0f, tencentSpeed));
             request.setSpeed(tencentSpeed);
@@ -114,21 +114,21 @@ public class TencentTtsService implements TtsService {
 
                 @Override
                 public void onSynthesisFail(SpeechSynthesizerResponse response) {
-                    String message = response.getMessage() != null ? response.getMessage() : "未知错误";
-                    log.error("腾讯云TTS合成失败 - SessionId: {}, 错误: {}",
+                    String message = response.getMessage() != null ? response.getMessage() : "erro desconhecido";
+                    log.error("Falha na síntese TTS da Tencent Cloud - SessionId: {}, erro: {}",
                             response.getSessionId(), message);
                     dataSink.tryEmitError(new Exception(message));
                 }
             };
 
-            // 创建语音合成器（synthesizer不可重复使用，每次合成需要重新生成新对象）
+            // Cria o sintetizador de voz (o synthesizer não pode ser reutilizado; a cada síntese é necessário criar um novo objeto)
             SpeechSynthesizer[] synthRef = new SpeechSynthesizer[1];
             try {
                 SpeechSynthesizer synthesizer = new SpeechSynthesizer(speechClient, credential, request, listener);
                 synthRef[0] = synthesizer;
                 synthesizer.start();
             } catch (Exception e) {
-                log.error("腾讯云TTS合成过程中发生错误", e);
+                log.error("Erro durante a síntese TTS da Tencent Cloud", e);
                 return Flux.error(e);
             }
 
@@ -137,25 +137,25 @@ public class TencentTtsService implements TtsService {
                     .doFinally(signal -> {
                         SpeechSynthesizer synth = synthRef[0];
                         if (synth != null) {
-                            try { synth.stop(); } catch (Exception e) { log.warn("停止腾讯云TTS时发生错误", e); }
-                            try { synth.close(); } catch (Exception e) { log.error("关闭腾讯云TTS合成器时发生错误", e); }
+                            try { synth.stop(); } catch (Exception e) { log.warn("Erro ao parar o TTS da Tencent Cloud", e); }
+                            try { synth.close(); } catch (Exception e) { log.error("Erro ao fechar o sintetizador TTS da Tencent Cloud", e); }
                         }
                     });
         }).retryWhen(Retry.fixedDelay(MAX_RETRY_ATTEMPTS - 1, Duration.ofMillis(RETRY_DELAY_MS)))
-          .doOnError(e -> log.error("腾讯云流式语音合成失败，已达到最大重试次数", e));
+          .doOnError(e -> log.error("Falha na síntese de voz em streaming da Tencent Cloud; número máximo de tentativas atingido", e));
     }
 
     @Override
     public Path textToSpeech(String text) throws Exception {
         if (text == null || text.isEmpty()) {
-            log.warn("文本内容为空！");
+            log.warn("Conteúdo de texto vazio!");
             return null;
         }
 
         int attempts = 0;
         while (attempts < MAX_RETRY_ATTEMPTS) {
             try {
-                // 使用流式接口合成音频，然后合并所有音频片段
+                // Usa a interface de streaming para sintetizar o áudio e depois mescla todos os fragmentos
                 ByteArrayOutputStream audioBuffer = new ByteArrayOutputStream();
                 final Exception[] error = new Exception[1];
 
@@ -164,25 +164,25 @@ public class TencentTtsService implements TtsService {
                         try {
                             audioBuffer.write(audioData);
                         } catch (Exception e) {
-                            log.error("写入音频数据失败", e);
+                            log.error("Falha ao gravar os dados de áudio", e);
                             error[0] = e;
                         }
                     }
                 });
 
-                // 如果有错误，抛出异常
+                // Se houver erro, lança exceção
                 if (error[0] != null) {
                     throw error[0];
                 }
 
-                // 将合并后的PCM音频数据转换为WAV格式并保存
+                // Converte os dados de áudio PCM mesclados para o formato WAV e salva
                 byte[] pcmData = audioBuffer.toByteArray();
                 if (pcmData.length == 0) {
-                    log.warn("合成的音频数据为空");
+                    log.warn("Dados de áudio sintetizados vazios");
                     return null;
                 }
 
-                // 转换为WAV并保存
+                // Converte para WAV e salva
                 String filePath = AudioUtils.saveAsWav(pcmData);
 
                 return Path.of(filePath);
@@ -190,21 +190,21 @@ public class TencentTtsService implements TtsService {
             } catch (Exception e) {
                 attempts++;
                 if (attempts < MAX_RETRY_ATTEMPTS) {
-                    log.warn("腾讯云语音合成失败，正在重试 ({}/{}): {}", attempts, MAX_RETRY_ATTEMPTS, e.getMessage());
+                    log.warn("Falha na síntese de voz da Tencent Cloud, tentando novamente ({}/{}): {}", attempts, MAX_RETRY_ATTEMPTS, e.getMessage());
                     try {
                         Thread.sleep(RETRY_DELAY_MS);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
-                        log.error("重试等待被中断", ie);
+                        log.error("Espera de retry interrompida", ie);
                         throw e;
                     }
                 } else {
-                    log.error("腾讯云语音合成失败，已达到最大重试次数", e);
-                    throw new Exception("非流式语音合成失败", e);
+                    log.error("Falha na síntese de voz da Tencent Cloud; número máximo de tentativas atingido", e);
+                    throw new Exception("Falha na síntese de voz não streaming", e);
                 }
             }
         }
-        throw new Exception("语音合成失败");
+        throw new Exception("Falha na síntese de voz");
     }
 
 }

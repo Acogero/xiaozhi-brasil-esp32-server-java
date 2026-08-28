@@ -6,38 +6,38 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 
 /**
- * ChatModel提供者接口
- * 每个LLM提供商实现此接口以创建自己的ChatModel
+ * Interface de provedor de ChatModel
+ * Cada provedor de LLM implementa esta interface para criar seu próprio ChatModel
  */
 public interface ChatModelProvider {
 
     /**
-     * 获取提供商名称(小写)
-     * @return 提供商名称,如: openai, ollama, zhipu, dify, xingchen, coze, xinghuo
+     * Obtém o nome do provedor (minúsculo)
+     * @return Nome do provedor, ex.: openai, ollama, zhipu, dify, xingchen, coze, xinghuo
      */
     String getProviderName();
 
     /**
-     * 创建ChatModel实例
-     * @param config 模型配置
-     * @param role 角色配置
-     * @return ChatModel实例
+     * Cria uma instância de ChatModel
+     * @param config Configuração do modelo
+     * @param role Configuração do papel/role
+     * @return Instância de ChatModel
      */
     ChatModel createChatModel(ConfigBO config, RoleBO role);
 
     /**
-     * 创建EmbeddingModel实例，不支持的提供商直接抛出异常
-     * @param config 模型配置
-     * @return EmbeddingModel实例
+     * Cria uma instância de EmbeddingModel; provedores não suportados lançam exceção diretamente
+     * @param config Configuração do modelo
+     * @return Instância de EmbeddingModel
      */
     default EmbeddingModel createEmbeddingModel(ConfigBO config) {
-        throw new UnsupportedOperationException(getProviderName() + " 不支持 Embedding 模型");
+        throw new UnsupportedOperationException(getProviderName() + " não suporta modelo de Embedding");
     }
 
     /**
-     * 是否支持该提供商
-     * @param provider 提供商名称(小写)
-     * @return true表示支持
+     * Indica se este provedor é suportado
+     * @param provider Nome do provedor (minúsculo)
+     * @return true indica que é suportado
      */
     default boolean supports(String provider) {
         return getProviderName().equalsIgnoreCase(provider);

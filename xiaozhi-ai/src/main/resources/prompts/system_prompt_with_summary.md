@@ -1,4 +1,4 @@
 {role_desc}
 
-聊天记忆：
+Memória da conversa:
 {summary}

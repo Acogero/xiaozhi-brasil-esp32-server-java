@@ -47,7 +47,7 @@ public class AliyunTtsService implements TtsService {
             });
 
     static {
-        // 注册JVM关闭钩子，确保线程池被正确关闭
+        // Registra um shutdown hook da JVM, garantindo que o pool de threads seja encerrado corretamente
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             sharedExecutor.shutdown();
             try {
@@ -61,54 +61,54 @@ public class AliyunTtsService implements TtsService {
         }, "aliyun-tts-shutdown"));
     }
     
-    // 音色映射表：将音色名称映射到AudioParameters.Voice枚举
-    // 包含所有Qwen音色
+    // Tabela de mapeamento de timbres: mapeia o nome do timbre para o enum AudioParameters.Voice
+    // Contém todos os timbres do Qwen
     private static final Map<String, AudioParameters.Voice> VOICE_MAP = new HashMap<>();
 
     static {
-        VOICE_MAP.put("Cherry", AudioParameters.Voice.CHERRY);          // 芊悦 - 阳光积极、亲切自然小姐姐
-        VOICE_MAP.put("Ethan", AudioParameters.Voice.ETHAN);            // 晨煦 - 标准普通话，阳光温暖
-        VOICE_MAP.put("Nofish", AudioParameters.Voice.NOFISH);          // 不吃鱼 - 不会翘舌音的设计师
-        VOICE_MAP.put("Jennifer", AudioParameters.Voice.JENNIFER);      // 詹妮弗 - 品牌级、电影质感般美语女声
-        VOICE_MAP.put("Ryan", AudioParameters.Voice.RYAN);              // 甜茶 - 节奏拉满，戏感炸裂
-        VOICE_MAP.put("Katerina", AudioParameters.Voice.KATERINA);      // 卡捷琳娜 - 御姐音色，韵律回味十足
-        VOICE_MAP.put("Elias", AudioParameters.Voice.ELIAS);            // 墨讲师 - 学科严谨性与叙事技巧
-        VOICE_MAP.put("Jada", AudioParameters.Voice.JADA);              // 上海-阿珍 - 风风火火的沪上阿姐
-        VOICE_MAP.put("Dylan", AudioParameters.Voice.DYLAN);            // 北京-晓东 - 北京胡同里长大的少年
-        VOICE_MAP.put("Sunny", AudioParameters.Voice.SUNNY);            // 四川-晴儿 - 甜到你心里的川妹子
-        VOICE_MAP.put("Li", AudioParameters.Voice.LI);                  // 南京-老李 - 耐心的瑜伽老师
-        VOICE_MAP.put("Marcus", AudioParameters.Voice.MARCUS);          // 陕西-秦川 - 面宽话短，心实声沉
-        VOICE_MAP.put("Roy", AudioParameters.Voice.ROY);                // 闽南-阿杰 - 诙谐直爽、市井活泼
-        VOICE_MAP.put("Peter", AudioParameters.Voice.PETER);            // 天津-李彼得 - 天津相声，专业捧人
-        VOICE_MAP.put("Rocky", AudioParameters.Voice.ROCKY);            // 粤语-阿强 - 幽默风趣的阿强
-        VOICE_MAP.put("Kiki", AudioParameters.Voice.KIKI);              // 粤语-阿清 - 甜美的港妹闺蜜
-        VOICE_MAP.put("Eric", AudioParameters.Voice.ERIC);              // 四川-程川 - 跳脱市井的四川成都男子
-        VOICE_MAP.put("Serena", AudioParameters.Voice.SERENA);              // 苏瑶 - 温柔小姐姐
-        VOICE_MAP.put("Chelsie", AudioParameters.Voice.CHELSIE);            // 千雪 - 二次元虚拟女友
-        VOICE_MAP.put("Momo", AudioParameters.Voice.MOMO);                  // 茉兔 - 撒娇搞怪，逗你开心
-        VOICE_MAP.put("Moon", AudioParameters.Voice.MOON);                  // 月白 - 率性帅气的月白
-        VOICE_MAP.put("Maia", AudioParameters.Voice.MAIA);                  // 四月 - 知性与温柔的碰撞
-        VOICE_MAP.put("Kai", AudioParameters.Voice.KAI);                    // 凯 - 耳朵的一场SPA
-        VOICE_MAP.put("Bella", AudioParameters.Voice.BELLA);                // 萌宝 - 喝酒不打醉拳的小萝莉
-        VOICE_MAP.put("Aiden", AudioParameters.Voice.AIDEN);                // 艾登 - 精通厨艺的美语大男孩
-        VOICE_MAP.put("EldricSage", AudioParameters.Voice.ELDRIC_SAGE);     // 沧明子 - 沉稳睿智的老者
-        VOICE_MAP.put("Mia", AudioParameters.Voice.MIA);                    // 乖小妹 - 温顺如春水，乖巧如初雪
-        VOICE_MAP.put("Bellona", AudioParameters.Voice.BELLONA);            // 燕铮莺 - 声音洪亮，吐字清晰
-        VOICE_MAP.put("Vincent", AudioParameters.Voice.VINCENT);            // 田叔 - 一口独特的沙哑烟嗓
-        VOICE_MAP.put("Bunny", AudioParameters.Voice.BUNNY);                // 萌小姬 - 萌系可爱女声
-        VOICE_MAP.put("Arthur", AudioParameters.Voice.ARTHUR);              // 徐大爷 - 被岁月和旱烟浸泡过的质朴嗓音
-        VOICE_MAP.put("Ebona", AudioParameters.Voice.EBONA);                // 诡婆婆 - 低语像一把生锈的钥匙
-        VOICE_MAP.put("Seren", AudioParameters.Voice.SEREN);                // 小婉 - 温和舒缓的声线
-        VOICE_MAP.put("Bodega", AudioParameters.Voice.BODEGA);              // 博德加 - 热情的西班牙大叔
-        VOICE_MAP.put("Sonrisa", AudioParameters.Voice.SONRISA);            // 索尼莎 - 热情开朗的拉美大姐
-        VOICE_MAP.put("Alek", AudioParameters.Voice.ALEK);                  // 阿列克 - 战斗民族的冷与暖
-        VOICE_MAP.put("OnoAnna", AudioParameters.Voice.ONO_ANNA);           // 小野杏 - 鬼灵精怪的青梅竹马
-        VOICE_MAP.put("Lenn", AudioParameters.Voice.LENN);                  // 莱恩 - 理性是底色，叛逆藏在细节里
-        VOICE_MAP.put("Emilien", AudioParameters.Voice.EMILIEN);            // 埃米尔安 - 浪漫的法国大哥哥
-        VOICE_MAP.put("Andre", AudioParameters.Voice.ANDRE);                // 安德雷 - 声音磁性
+        VOICE_MAP.put("Cherry", AudioParameters.Voice.CHERRY);          // Qianyue - Moça alegre, positiva, gentil e natural
+        VOICE_MAP.put("Ethan", AudioParameters.Voice.ETHAN);            // Chenxu - Mandarim padrão, caloroso e solar
+        VOICE_MAP.put("Nofish", AudioParameters.Voice.NOFISH);          // Buchiyu - Designer que não pronuncia sons retroflexos
+        VOICE_MAP.put("Jennifer", AudioParameters.Voice.JENNIFER);      // Jennifer - Voz feminina em inglês americano, nível premium, com textura cinematográfica
+        VOICE_MAP.put("Ryan", AudioParameters.Voice.RYAN);              // Tianca - Ritmo intenso, dramaticidade explosiva
+        VOICE_MAP.put("Katerina", AudioParameters.Voice.KATERINA);      // Katerina - Timbre de "onee-sama", com cadência marcante
+        VOICE_MAP.put("Elias", AudioParameters.Voice.ELIAS);            // Professor Mo - Rigor acadêmico com técnica narrativa
+        VOICE_MAP.put("Jada", AudioParameters.Voice.JADA);              // Xangai-Ah Zhen - Senhora enérgica e decidida de Xangai
+        VOICE_MAP.put("Dylan", AudioParameters.Voice.DYLAN);            // Pequim-Xiaodong - Jovem criado nos hutongs de Pequim
+        VOICE_MAP.put("Sunny", AudioParameters.Voice.SUNNY);            // Sichuan-Qing'er - Moça de Sichuan com um doce que chega ao coração
+        VOICE_MAP.put("Li", AudioParameters.Voice.LI);                  // Nanjing-Velho Li - Professor de yoga paciente
+        VOICE_MAP.put("Marcus", AudioParameters.Voice.MARCUS);          // Shaanxi-Qinchuan - Rosto largo, fala curta, coração sincero e voz grave
+        VOICE_MAP.put("Roy", AudioParameters.Voice.ROY);                // Minnan-Ah Jie - Espirituoso, direto e cheio de vida popular
+        VOICE_MAP.put("Peter", AudioParameters.Voice.PETER);            // Tianjin-Li Peter - Xiangsheng de Tianjin, especialista em fazer contracenas
+        VOICE_MAP.put("Rocky", AudioParameters.Voice.ROCKY);            // Cantonês-Ah Keung - Ah Keung, bem-humorado e divertido
+        VOICE_MAP.put("Kiki", AudioParameters.Voice.KIKI);              // Cantonês-Ah Ching - Melhor amiga doce de Hong Kong
+        VOICE_MAP.put("Eric", AudioParameters.Voice.ERIC);              // Sichuan-Chengchuan - Homem de Chengdu, Sichuan, espontâneo e popular
+        VOICE_MAP.put("Serena", AudioParameters.Voice.SERENA);              // Su Yao - Moça gentil e doce
+        VOICE_MAP.put("Chelsie", AudioParameters.Voice.CHELSIE);            // Qianxue - Namorada virtual estilo anime
+        VOICE_MAP.put("Momo", AudioParameters.Voice.MOMO);                  // Motu - Manhosa e brincalhona, sempre te alegrando
+        VOICE_MAP.put("Moon", AudioParameters.Voice.MOON);                  // Yuebai - Descontraído e cheio de estilo
+        VOICE_MAP.put("Maia", AudioParameters.Voice.MAIA);                  // Siyue - Encontro entre intelectualidade e doçura
+        VOICE_MAP.put("Kai", AudioParameters.Voice.KAI);                    // Kai - Um spa para os ouvidos
+        VOICE_MAP.put("Bella", AudioParameters.Voice.BELLA);                // Mengbao - Garotinha que bebe sem cambalear
+        VOICE_MAP.put("Aiden", AudioParameters.Voice.AIDEN);                // Aiden - Rapaz de inglês americano que manja de culinária
+        VOICE_MAP.put("EldricSage", AudioParameters.Voice.ELDRIC_SAGE);     // Cangmingzi - Ancião sereno e sábio
+        VOICE_MAP.put("Mia", AudioParameters.Voice.MIA);                    // Guaixiaomei - Dócil como água de primavera, meiga como a primeira neve
+        VOICE_MAP.put("Bellona", AudioParameters.Voice.BELLONA);            // Yan Zhengying - Voz forte e dicção clara
+        VOICE_MAP.put("Vincent", AudioParameters.Voice.VINCENT);            // Tio Tian - Voz rouca e única de fumante
+        VOICE_MAP.put("Bunny", AudioParameters.Voice.BUNNY);                // Mengxiaoji - Voz feminina fofa estilo "moe"
+        VOICE_MAP.put("Arthur", AudioParameters.Voice.ARTHUR);              // Vovô Xu - Voz simples marcada pelo tempo e pelo cachimbo
+        VOICE_MAP.put("Ebona", AudioParameters.Voice.EBONA);                // Vovó Misteriosa - Sussurro como uma chave enferrujada
+        VOICE_MAP.put("Seren", AudioParameters.Voice.SEREN);                // Xiaowan - Voz suave e tranquila
+        VOICE_MAP.put("Bodega", AudioParameters.Voice.BODEGA);              // Bodega - Senhor espanhol caloroso
+        VOICE_MAP.put("Sonrisa", AudioParameters.Voice.SONRISA);            // Sonrisa - Mulher latina alegre e efusiva
+        VOICE_MAP.put("Alek", AudioParameters.Voice.ALEK);                  // Alek - O frio e o calor do "povo guerreiro" (russo)
+        VOICE_MAP.put("OnoAnna", AudioParameters.Voice.ONO_ANNA);           // Ono Anna - Amiga de infância travessa e cheia de vida
+        VOICE_MAP.put("Lenn", AudioParameters.Voice.LENN);                  // Lenn - Racional por natureza, rebeldia nos detalhes
+        VOICE_MAP.put("Emilien", AudioParameters.Voice.EMILIEN);            // Emilien - Rapaz francês romântico
+        VOICE_MAP.put("Andre", AudioParameters.Voice.ANDRE);                // Andre - Voz magnética
     }
 
-    // 阿里云配置
+    // Configuração da Alibaba Cloud
     private final String apiKey;
     private final XiaozhiTtsOptions options;
     private final String outputPath;
@@ -121,58 +121,58 @@ public class AliyunTtsService implements TtsService {
     }
 
     /**
-     * 解析千问音色参数，支持格式：
-     * 1. "qwen3-tts-flash-realtime:Cherry" - 指定模型和音色（冒号分隔）
-     * 2. "qwen3-tts-instruct-flash-realtime:Cherry" - 指定模型和音色（冒号分隔）
-     * 3. "qwen-tts-realtime:Cherry" - 指定模型和音色（冒号分隔）
-     * 4. "Cherry" - 只有音色，默认使用 qwen3-tts-flash-realtime
+     * Interpreta o parâmetro de timbre do Qwen, suportando os formatos:
+     * 1. "qwen3-tts-flash-realtime:Cherry" - especifica o modelo e o timbre (separados por dois-pontos)
+     * 2. "qwen3-tts-instruct-flash-realtime:Cherry" - especifica o modelo e o timbre (separados por dois-pontos)
+     * 3. "qwen-tts-realtime:Cherry" - especifica o modelo e o timbre (separados por dois-pontos)
+     * 4. "Cherry" - apenas o timbre, usa por padrão qwen3-tts-flash-realtime
      *
-     * @param voiceParam 音色参数
-     * @return [模型名, 音色名]
+     * @param voiceParam Parâmetro de timbre
+     * @return [nome do modelo, nome do timbre]
      */
     private String[] parseQwenVoiceParam(String voiceParam) {
         if (voiceParam == null || voiceParam.isEmpty()) {
             return new String[]{"qwen3-tts-flash-realtime", voiceParam};
         }
 
-        // 检查是否包含模型前缀（冒号分隔格式）
+        // Verifica se contém o prefixo do modelo (formato separado por dois-pontos)
         if (voiceParam.contains(":")) {
             String[] parts = voiceParam.split(":", 2);
             String model = parts[0];
             String voice = parts.length > 1 ? parts[1] : "";
 
-            // 验证模型名称是否为有效的千问模型
+            // Valida se o nome do modelo é um modelo Qwen válido
             if (model.startsWith("qwen") && model.contains("tts")) {
                 return new String[]{model, voice};
             }
-            // 如果模型名称无效，将整个字符串视为音色名
-            log.warn("无效的千问模型名称: {}, 使用默认模型 qwen3-tts-flash-realtime", model);
+            // Se o nome do modelo for inválido, trata a string inteira como nome do timbre
+            log.warn("Nome de modelo Qwen inválido: {}, usando o modelo padrão qwen3-tts-flash-realtime", model);
             return new String[]{"qwen3-tts-flash-realtime", voiceParam};
         }
 
-        // 没有模型前缀，使用默认模型
+        // Sem prefixo de modelo, usa o modelo padrão
         return new String[]{"qwen3-tts-flash-realtime", voiceParam};
     }
 
     /**
-     * 解析音色参数，支持格式：
-     * 1. "cosyvoice-v3-plus-voiceclone-xxx" - 音色克隆返回的格式，自动识别模型前缀
-     * 2. "cosyvoice-v3-flash-voiceclone-xxx" - 音色克隆返回的格式，自动识别模型前缀
-     * 3. "cosyvoice-v2-voiceclone-xxx" - 音色克隆返回的格式，自动识别模型前缀
-     * 4. "cosyvoice-v2:longanyang" - 指定模型和音色（冒号分隔）
-     * 5. "cosyvoice-v3-flash:longanyang" - 指定模型和音色（冒号分隔）
-     * 6. "cosyvoice-v3-plus:longanyang" - 指定模型和音色（冒号分隔）
-     * 7. "longanyang" - 只有音色，默认使用 cosyvoice-v2
+     * Interpreta o parâmetro de timbre, suportando os formatos:
+     * 1. "cosyvoice-v3-plus-voiceclone-xxx" - formato retornado pela clonagem de voz, com identificação automática do prefixo do modelo
+     * 2. "cosyvoice-v3-flash-voiceclone-xxx" - formato retornado pela clonagem de voz, com identificação automática do prefixo do modelo
+     * 3. "cosyvoice-v2-voiceclone-xxx" - formato retornado pela clonagem de voz, com identificação automática do prefixo do modelo
+     * 4. "cosyvoice-v2:longanyang" - especifica o modelo e o timbre (separados por dois-pontos)
+     * 5. "cosyvoice-v3-flash:longanyang" - especifica o modelo e o timbre (separados por dois-pontos)
+     * 6. "cosyvoice-v3-plus:longanyang" - especifica o modelo e o timbre (separados por dois-pontos)
+     * 7. "longanyang" - apenas o timbre, usa por padrão cosyvoice-v2
      *
-     * @param voiceParam 音色参数
-     * @return [模型名, 音色名]
+     * @param voiceParam Parâmetro de timbre
+     * @return [nome do modelo, nome do timbre]
      */
     private String[] parseCosyVoiceParam(String voiceParam) {
         if (voiceParam == null || voiceParam.isEmpty()) {
             return new String[]{"cosyvoice-v2", voiceParam};
         }
 
-        // 检查是否是音色克隆返回的格式（如：cosyvoice-v3-plus-voiceclone-xxx）
+        // Verifica se é o formato retornado pela clonagem de voz (ex.: cosyvoice-v3-plus-voiceclone-xxx)
         if (voiceParam.startsWith("cosyvoice-v3-plus-")) {
             return new String[]{"cosyvoice-v3-plus", voiceParam};
         } else if (voiceParam.startsWith("cosyvoice-v3-flash-")) {
@@ -181,22 +181,22 @@ public class AliyunTtsService implements TtsService {
             return new String[]{"cosyvoice-v2", voiceParam};
         }
 
-        // 检查是否包含模型前缀（冒号分隔格式，如：cosyvoice-v3-plus:longanyang）
+        // Verifica se contém o prefixo do modelo (formato separado por dois-pontos, ex.: cosyvoice-v3-plus:longanyang)
         if (voiceParam.contains(":")) {
             String[] parts = voiceParam.split(":", 2);
             String model = parts[0];
             String voice = parts.length > 1 ? parts[1] : "";
 
-            // 验证模型名称是否为有效的 CosyVoice 模型
+            // Valida se o nome do modelo é um modelo CosyVoice válido
             if ("cosyvoice-v2".equals(model) || "cosyvoice-v3-flash".equals(model) || "cosyvoice-v3-plus".equals(model)) {
                 return new String[]{model, voice};
             }
-            // 如果模型名称无效，将整个字符串视为音色名
-            log.warn("无效的 CosyVoice 模型名称: {}, 使用默认模型 cosyvoice-v2", model);
+            // Se o nome do modelo for inválido, trata a string inteira como nome do timbre
+            log.warn("Nome de modelo CosyVoice inválido: {}, usando o modelo padrão cosyvoice-v2", model);
             return new String[]{"cosyvoice-v2", voiceParam};
         }
 
-        // 没有模型前缀，使用默认模型
+        // Sem prefixo de modelo, usa o modelo padrão
         return new String[]{"cosyvoice-v2", voiceParam};
     }
 
@@ -216,7 +216,7 @@ public class AliyunTtsService implements TtsService {
             if (getVoiceName().contains("sambert")) {
                 return ttsSambert(text);
             } else {
-                // 解析千问音色参数
+                // Interpreta o parâmetro de timbre do Qwen
                 String[] parsed = parseQwenVoiceParam(getVoiceName());
                 String actualVoiceName = parsed[1];
 
@@ -227,14 +227,14 @@ public class AliyunTtsService implements TtsService {
                 }
             }
         } catch (Exception e) {
-            log.error("语音合成aliyun -使用{}模型语音合成失败：", getVoiceName(), e);
-            throw new Exception("语音合成失败");
+            log.error("Síntese de voz aliyun - falha na síntese usando o modelo {}: ", getVoiceName(), e);
+            throw new Exception("Falha na síntese de voz");
         }
     }
 
     private Path ttsQwen(String text) {
         int attempts = 0;
-        // 解析音色参数
+        // Interpreta o parâmetro de timbre
         String[] parsed = parseQwenVoiceParam(getVoiceName());
         String actualVoiceName = parsed[1];
 
@@ -242,48 +242,48 @@ public class AliyunTtsService implements TtsService {
             try {
                 AudioParameters.Voice voice = VOICE_MAP.get(actualVoiceName);
                 MultiModalConversationParam param = MultiModalConversationParam.builder()
-                        // 非实时SDK（MultiModalConversation）只支持 qwen3-tts-flash，不能用 realtime 模型名
+                        // O SDK não realtime (MultiModalConversation) suporta apenas qwen3-tts-flash; não é possível usar nomes de modelo realtime
                         .model("qwen3-tts-flash")
                         .apiKey(apiKey)
                         .text(text)
                         .voice(voice)
                         .build();
                 
-                // 使用共享线程池而不是每次创建新的
+                // Usa o pool de threads compartilhado em vez de criar um novo a cada vez
                 Future<MultiModalConversationResult> future = sharedExecutor.submit(() -> {
                     MultiModalConversation conv = new MultiModalConversation();
                     return conv.call(param);
                 });
                 
-                // 等待结果，设置超时
+                // Aguarda o resultado, com timeout definido
                 MultiModalConversationResult result;
                 try {
                     result = future.get(TTS_TIMEOUT_SECONDS, TimeUnit.SECONDS);
                 } catch (TimeoutException e) {
                     future.cancel(true);
-                    log.warn("语音合成aliyun - 使用{}模型超时，正在重试 ({}/{})", getVoiceName(), attempts + 1, MAX_RETRY_ATTEMPTS);
+                    log.warn("Síntese de voz aliyun - timeout usando o modelo {}, tentando novamente ({}/{})", getVoiceName(), attempts + 1, MAX_RETRY_ATTEMPTS);
                     attempts++;
                     if (attempts >= MAX_RETRY_ATTEMPTS) {
-                        log.error("语音合成aliyun - 使用{}模型多次超时，放弃重试", getVoiceName());
+                        log.error("Síntese de voz aliyun - timeout repetido usando o modelo {}, desistindo das tentativas", getVoiceName());
                         return null;
                     }
-                    // 等待一段时间后重试
+                    // Aguarda um tempo antes de tentar novamente
                     TimeUnit.MILLISECONDS.sleep(RETRY_DELAY_MS);
                     continue;
                 }
 
-                // 检查结果是否有效
+                // Verifica se o resultado é válido
                 if (result == null || result.getOutput() == null ||
                     result.getOutput().getAudio() == null ||
                     result.getOutput().getAudio().getUrl() == null) {
 
-                    log.warn("语音合成aliyun - 使用{}模型返回无效结果，正在重试 ({}/{})", getVoiceName(), attempts + 1, MAX_RETRY_ATTEMPTS);
+                    log.warn("Síntese de voz aliyun - resultado inválido usando o modelo {}, tentando novamente ({}/{})", getVoiceName(), attempts + 1, MAX_RETRY_ATTEMPTS);
                     attempts++;
                     if (attempts >= MAX_RETRY_ATTEMPTS) {
-                        log.error("语音合成aliyun - 使用{}模型多次返回无效结果，放弃重试", getVoiceName());
+                        log.error("Síntese de voz aliyun - resultado inválido repetido usando o modelo {}, desistindo das tentativas", getVoiceName());
                         return null;
                     }
-                    // 等待一段时间后重试
+                    // Aguarda um tempo antes de tentar novamente
                     TimeUnit.MILLISECONDS.sleep(RETRY_DELAY_MS);
                     continue;
                 }
@@ -291,7 +291,7 @@ public class AliyunTtsService implements TtsService {
                 String audioUrl = result.getOutput().getAudio().getUrl();
                 Path outPath = Path.of(outputPath, getAudioFileName());
 
-                // 下载 WAV（24kHz），重采样到 16kHz 后保存
+                // Baixa o WAV (24kHz), reamostra para 16kHz e salva
                 Future<Boolean> downloadFuture = sharedExecutor.submit(() -> {
                     try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
                          InputStream in = URI.create(audioUrl).toURL().openStream()) {
@@ -312,17 +312,17 @@ public class AliyunTtsService implements TtsService {
                 try {
                     Boolean downloadSuccess = downloadFuture.get(TTS_TIMEOUT_SECONDS, TimeUnit.SECONDS);
                     if (!downloadSuccess) {
-                        throw new IOException("下载音频文件失败");
+                        throw new IOException("Falha ao baixar o arquivo de áudio");
                     }
                 } catch (TimeoutException e) {
                     downloadFuture.cancel(true);
-                    log.warn("语音合成aliyun - 使用{}模型下载音频超时，正在重试 ({}/{})", getVoiceName(), attempts + 1, MAX_RETRY_ATTEMPTS);
+                    log.warn("Síntese de voz aliyun - timeout ao baixar áudio usando o modelo {}, tentando novamente ({}/{})", getVoiceName(), attempts + 1, MAX_RETRY_ATTEMPTS);
                     attempts++;
                     if (attempts >= MAX_RETRY_ATTEMPTS) {
-                        log.error("语音合成aliyun - 使用{}模型多次下载超时，放弃重试", getVoiceName());
+                        log.error("Síntese de voz aliyun - timeout de download repetido usando o modelo {}, desistindo das tentativas", getVoiceName());
                         return null;
                     }
-                    // 等待一段时间后重试
+                    // Aguarda um tempo antes de tentar novamente
                     TimeUnit.MILLISECONDS.sleep(RETRY_DELAY_MS);
                     continue;
                 }
@@ -331,17 +331,17 @@ public class AliyunTtsService implements TtsService {
             } catch (Exception e) {
                 attempts++;
                 if (attempts < MAX_RETRY_ATTEMPTS) {
-                    log.warn("语音合成aliyun - 使用{}模型失败，正在重试 ({}/{}): {}", getVoiceName(), attempts, MAX_RETRY_ATTEMPTS, e.getMessage());
+                    log.warn("Síntese de voz aliyun - falha usando o modelo {}, tentando novamente ({}/{}): {}", getVoiceName(), attempts, MAX_RETRY_ATTEMPTS, e.getMessage());
                     try {
-                        // 等待一段时间后重试
+                        // Aguarda um tempo antes de tentar novamente
                         TimeUnit.MILLISECONDS.sleep(RETRY_DELAY_MS);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
-                        log.error("重试等待被中断", ie);
+                        log.error("Espera de retry interrompida", ie);
                         return null;
                     }
                 } else {
-                    log.error("语音合成aliyun - 使用{}模型语音合成失败，已达到最大重试次数：", getVoiceName(), e);
+                    log.error("Síntese de voz aliyun - falha usando o modelo {}, número máximo de tentativas atingido: ", getVoiceName(), e);
                     return null;
                 }
             }
@@ -349,10 +349,10 @@ public class AliyunTtsService implements TtsService {
         return null;
     }
 
-    // cosyvoice默认并发只有3个，所以需要增加一个重试机制
+    // O CosyVoice tem concorrência padrão de apenas 3, portanto é necessário um mecanismo de retry adicional
     private Path ttsCosyvoice(String text) {
         int attempts = 0;
-        // 解析音色参数，获取模型名和音色名
+        // Interpreta o parâmetro de timbre, obtendo o nome do modelo e do timbre
         String[] parsed = parseCosyVoiceParam(getVoiceName());
         String modelName = parsed[0];
         String actualVoiceName = parsed[1];
@@ -361,56 +361,56 @@ public class AliyunTtsService implements TtsService {
                 com.alibaba.dashscope.audio.ttsv2.SpeechSynthesisParam param =
                 com.alibaba.dashscope.audio.ttsv2.SpeechSynthesisParam.builder()
                                 .apiKey(apiKey)
-                                .model(modelName)  // 使用解析出的模型名
-                                .voice(actualVoiceName)  // 使用解析出的音色名
+                                .model(modelName)  // Usa o nome do modelo interpretado
+                                .voice(actualVoiceName)  // Usa o nome do timbre interpretado
                                 .speechRate(getSpeed().floatValue())
                                 .pitchRate(getPitch().floatValue())
                                 .format(com.alibaba.dashscope.audio.ttsv2.SpeechSynthesisAudioFormat.WAV_16000HZ_MONO_16BIT)
                                 .build();
 
-                // 使用共享线程池
+                // Usa o pool de threads compartilhado
                 Future<ByteBuffer> future = sharedExecutor.submit(() -> {
                     com.alibaba.dashscope.audio.ttsv2.SpeechSynthesizer synthesizer =
                         new com.alibaba.dashscope.audio.ttsv2.SpeechSynthesizer(param, null);
                     try {
                         return synthesizer.call(text);
                     } finally {
-                        // 主动关闭WebSocket连接，避免僵尸连接占满连接池
+                        // Fecha proativamente a conexão WebSocket, evitando que conexões zumbis lotem o pool de conexões
                         try {
                             synthesizer.getDuplexApi().close(1000, "completed");
                         } catch (Exception e) {
-                            log.debug("关闭CosyVoice TTS连接时发生错误", e);
+                            log.debug("Erro ao fechar a conexão TTS do CosyVoice", e);
                         }
                     }
                 });
 
-                // 等待结果，设置超时
+                // Aguarda o resultado, com timeout definido
                 ByteBuffer audio;
                 try {
                     audio = future.get(TTS_TIMEOUT_SECONDS, TimeUnit.SECONDS);
                 } catch (TimeoutException e) {
                     future.cancel(true);
-                    log.warn("语音合成aliyun - 使用{}模型超时，正在重试 ({}/{}) - 音色: {}", modelName, attempts + 1, MAX_RETRY_ATTEMPTS, actualVoiceName);
+                    log.warn("Síntese de voz aliyun - timeout usando o modelo {}, tentando novamente ({}/{}) - timbre: {}", modelName, attempts + 1, MAX_RETRY_ATTEMPTS, actualVoiceName);
                     attempts++;
                     if (attempts >= MAX_RETRY_ATTEMPTS) {
-                        log.error("语音合成aliyun - 使用{}模型多次超时，放弃重试 - 音色: {}", modelName, actualVoiceName);
+                        log.error("Síntese de voz aliyun - timeout repetido usando o modelo {}, desistindo das tentativas - timbre: {}", modelName, actualVoiceName);
                         return null;
                     }
-                    // 等待一段时间后重试
+                    // Aguarda um tempo antes de tentar novamente
                     TimeUnit.MILLISECONDS.sleep(RETRY_DELAY_MS);
                     continue;
                 }
 
-                // 检查返回的ByteBuffer是否为null
+                // Verifica se o ByteBuffer retornado é null
                 if (audio == null) {
                     attempts++;
                     if (attempts < MAX_RETRY_ATTEMPTS) {
-                        log.warn("语音合成aliyun - 使用{}模型返回null，正在重试 ({}/{}) - 音色: {}", modelName, attempts, MAX_RETRY_ATTEMPTS, actualVoiceName);
-                        // 等待一段时间后重试
+                        log.warn("Síntese de voz aliyun - retorno null usando o modelo {}, tentando novamente ({}/{}) - timbre: {}", modelName, attempts, MAX_RETRY_ATTEMPTS, actualVoiceName);
+                        // Aguarda um tempo antes de tentar novamente
                         TimeUnit.MILLISECONDS.sleep(RETRY_DELAY_MS);
                         continue;
                     } else {
-                        log.error("语音合成aliyun - 使用{}模型多次返回null，放弃重试 - 音色: {}", modelName, actualVoiceName);
+                        log.error("Síntese de voz aliyun - retorno null repetido usando o modelo {}, desistindo das tentativas - timbre: {}", modelName, actualVoiceName);
                         return null;
                     }
                 }
@@ -419,24 +419,24 @@ public class AliyunTtsService implements TtsService {
                 try (FileOutputStream fos = new FileOutputStream(outPath.toFile())) {
                     fos.write(audio.array());
                 } catch (IOException e) {
-                    log.error("语音合成aliyun -使用{}模型语音合成失败 - 音色: {}", modelName, actualVoiceName, e);
+                    log.error("Síntese de voz aliyun - falha na síntese usando o modelo {} - timbre: {}", modelName, actualVoiceName, e);
                     return null;
                 }
                 return outPath;
             } catch (Exception e) {
                 attempts++;
                 if (attempts < MAX_RETRY_ATTEMPTS) {
-                    log.warn("语音合成aliyun - 使用{}模型失败，正在重试 ({}/{}) - 音色: {}: {}", modelName, attempts, MAX_RETRY_ATTEMPTS, actualVoiceName, e.getMessage());
+                    log.warn("Síntese de voz aliyun - falha usando o modelo {}, tentando novamente ({}/{}) - timbre: {}: {}", modelName, attempts, MAX_RETRY_ATTEMPTS, actualVoiceName, e.getMessage());
                     try {
-                        // 等待一段时间后重试
+                        // Aguarda um tempo antes de tentar novamente
                         TimeUnit.MILLISECONDS.sleep(RETRY_DELAY_MS);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
-                        log.error("重试等待被中断 - 模型: {}", modelName, ie);
+                        log.error("Espera de retry interrompida - modelo: {}", modelName, ie);
                         return null;
                     }
                 } else {
-                    log.error("语音合成aliyun -使用{}模型语音合成失败，已达到最大重试次数 - 音色: {}", modelName, actualVoiceName, e);
+                    log.error("Síntese de voz aliyun - falha na síntese usando o modelo {}, número máximo de tentativas atingido - timbre: {}", modelName, actualVoiceName, e);
                     return null;
                 }
             }
@@ -458,39 +458,39 @@ public class AliyunTtsService implements TtsService {
                         .format(SpeechSynthesisAudioFormat.WAV)
                         .build();
                 
-                // 使用共享线程池
+                // Usa o pool de threads compartilhado
                 Future<ByteBuffer> future = sharedExecutor.submit(() -> {
                     SpeechSynthesizer synthesizer = new SpeechSynthesizer();
                     return synthesizer.call(param);
                 });
                 
-                // 等待结果，设置超时
+                // Aguarda o resultado, com timeout definido
                 ByteBuffer audio;
                 try {
                     audio = future.get(TTS_TIMEOUT_SECONDS, TimeUnit.SECONDS);
                 } catch (TimeoutException e) {
                     future.cancel(true);
-                    log.warn("语音合成aliyun - 使用{}模型超时，正在重试 ({}/{})，文本：{}", getVoiceName(), attempts + 1, MAX_RETRY_ATTEMPTS, text);
+                    log.warn("Síntese de voz aliyun - timeout usando o modelo {}, tentando novamente ({}/{}), texto: {}", getVoiceName(), attempts + 1, MAX_RETRY_ATTEMPTS, text);
                     attempts++;
                     if (attempts >= MAX_RETRY_ATTEMPTS) {
-                        log.error("语音合成aliyun - 使用{}模型多次超时，放弃重试，文本：{}", getVoiceName(), text);
+                        log.error("Síntese de voz aliyun - timeout repetido usando o modelo {}, desistindo das tentativas, texto: {}", getVoiceName(), text);
                         return null;
                     }
-                    // 等待一段时间后重试
+                    // Aguarda um tempo antes de tentar novamente
                     TimeUnit.MILLISECONDS.sleep(RETRY_DELAY_MS);
                     continue;
                 }
                 
-                // 检查返回的ByteBuffer是否为null
+                // Verifica se o ByteBuffer retornado é null
                 if (audio == null) {
                     attempts++;
                     if (attempts < MAX_RETRY_ATTEMPTS) {
-                        log.warn("语音合成aliyun - 使用{}模型返回null，正在重试 ({}/{})", getVoiceName(), attempts, MAX_RETRY_ATTEMPTS);
-                        // 等待一段时间后重试
+                        log.warn("Síntese de voz aliyun - retorno null usando o modelo {}, tentando novamente ({}/{})", getVoiceName(), attempts, MAX_RETRY_ATTEMPTS);
+                        // Aguarda um tempo antes de tentar novamente
                         TimeUnit.MILLISECONDS.sleep(RETRY_DELAY_MS);
                         continue;
                     } else {
-                        log.error("语音合成aliyun - 使用{}模型多次返回null，放弃重试", getVoiceName());
+                        log.error("Síntese de voz aliyun - retorno null repetido usando o modelo {}, desistindo das tentativas", getVoiceName());
                         return null;
                     }
                 }
@@ -499,24 +499,24 @@ public class AliyunTtsService implements TtsService {
                 try (FileOutputStream fos = new FileOutputStream(outPath.toFile())) {
                     fos.write(audio.array());
                 } catch (IOException e) {
-                    log.error("语音合成aliyun - 使用{}模型失败：", getVoiceName(), e);
+                    log.error("Síntese de voz aliyun - falha usando o modelo {}: ", getVoiceName(), e);
                     return null;
                 }
                 return outPath;
             } catch (Exception e) {
                 attempts++;
                 if (attempts < MAX_RETRY_ATTEMPTS) {
-                    log.warn("语音合成aliyun - 使用{}模型失败，正在重试 ({}/{}): {}", getVoiceName(), attempts, MAX_RETRY_ATTEMPTS, e.getMessage());
+                    log.warn("Síntese de voz aliyun - falha usando o modelo {}, tentando novamente ({}/{}): {}", getVoiceName(), attempts, MAX_RETRY_ATTEMPTS, e.getMessage());
                     try {
-                        // 等待一段时间后重试
+                        // Aguarda um tempo antes de tentar novamente
                         TimeUnit.MILLISECONDS.sleep(RETRY_DELAY_MS);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
-                        log.error("重试等待被中断", ie);
+                        log.error("Espera de retry interrompida", ie);
                         return null;
                     }
                 } else {
-                    log.error("语音合成aliyun - 使用{}模型失败，已达到最大重试次数：", getVoiceName(), e);
+                    log.error("Síntese de voz aliyun - falha usando o modelo {}, número máximo de tentativas atingido: ", getVoiceName(), e);
                     return null;
                 }
             }

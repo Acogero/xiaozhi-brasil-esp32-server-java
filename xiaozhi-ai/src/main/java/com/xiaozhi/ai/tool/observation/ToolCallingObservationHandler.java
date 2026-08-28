@@ -12,8 +12,8 @@ import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationHandler;
 
 /**
- * 工具调用观察处理器，用于捕获工具调用前后的信息。
- * 包括函数名称、参数、callId、工具名称、参数和执行结果。
+ * Handler de observação de chamadas de ferramenta, usado para capturar informações antes e depois da chamada.
+ * Inclui nome da função, parâmetros, callId, nome da ferramenta, parâmetros e resultado da execução.
  */
 @Slf4j
 @Component
@@ -34,13 +34,13 @@ public class ToolCallingObservationHandler implements ObservationHandler<ToolCal
             return;
         }
 
-        // 获取 sessionId
+        // Obtém o sessionId
         Object sessionIdObj = context.get(SESSION_ID_KEY);
         if (!(sessionIdObj instanceof String sessionId)) {
             return;
         }
 
-        // 从 ToolSessionProvider 获取 ToolSession
+        // Obtém o ToolSession a partir do ToolSessionProvider
         if (toolSessionProvider == null) {
             return;
         }
@@ -49,7 +49,7 @@ public class ToolCallingObservationHandler implements ObservationHandler<ToolCal
             return;
         }
 
-        // 标记工具调用开始，防止播放器提前sendStop
+        // Marca o início da chamada de ferramenta, evitando que o player chame sendStop antecipadamente
         session.setToolCalling(true);
     }
 
@@ -72,7 +72,7 @@ public class ToolCallingObservationHandler implements ObservationHandler<ToolCal
             return;
         }
 
-        // 清除工具调用状态
+        // Limpa o estado da chamada de ferramenta
         session.setToolCalling(false);
     }
 
@@ -83,7 +83,7 @@ public class ToolCallingObservationHandler implements ObservationHandler<ToolCal
         Throwable error = context.getError();
         log.error("ToolCalling#onError - toolName: {}, error: {}", toolName, error.getMessage(), error);
 
-        // 工具调用出错时也要清除toolCalling状态，防止播放器永远不sendStop
+        // Em caso de erro na chamada de ferramenta, também é necessário limpar o estado toolCalling, evitando que o player nunca chame sendStop
         if (context.containsKey(SESSION_ID_KEY)) {
             Object sessionIdObj = context.get(SESSION_ID_KEY);
             if (sessionIdObj instanceof String sessionId && toolSessionProvider != null) {

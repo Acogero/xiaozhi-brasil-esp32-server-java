@@ -5,9 +5,9 @@ import org.springframework.ai.chat.messages.Message;
 import java.time.Instant;
 
 /**
- * Conversation 运行时消息元数据工具。
- * 目前主要负责在 Spring AI Message 上读写对话时间戳，
- * 供 DialogueTurn、SummaryConversation 等运行时/记忆组件复用。
+ * Utilitário de metadados de mensagens em tempo de execução da Conversation.
+ * Atualmente é responsável, principalmente, por ler e gravar o timestamp da conversa na Message do Spring AI,
+ * para reutilização por componentes de execução/memória como DialogueTurn e SummaryConversation.
  */
 public final class MessageTimeMetadata {
 

@@ -5,30 +5,30 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * 退出关键词检测器
- * 用于检测用户输入中是否包含明确的退出意图关键词
- * 作为工具类被 IntentService 使用
+ * Detector de palavras-chave de saída
+ * Usado para detectar se a entrada do usuário contém palavras-chave que indicam claramente intenção de sair
+ * Usado como classe utilitária pelo IntentService
  */
 class ExitKeywordDetector {
 
     /**
-     * 退出关键词列表
-     * 包含各种表达退出、结束对话的词汇
+     * Lista de palavras-chave de saída
+     * Contém diversas expressões que indicam saída ou encerramento da conversa
      */
     private static final List<String> EXIT_KEYWORDS = Arrays.asList(
-            "拜拜",
-            "再见",
-            "退下",
-            "走了",
-            "我走了",
-            "我要走了",
-            "结束对话",
-            "退出",
-            "下线",
-            "结束",
-            "告辞",
-            "告退",
-            "离开",
+            "tchau",
+            "até logo",
+            "adeus",
+            "vou embora",
+            "eu vou embora",
+            "já vou",
+            "encerrar conversa",
+            "sair",
+            "desconectar",
+            "encerrar",
+            "até mais",
+            "falou",
+            "ir embora",
             "goodbye",
             "bye",
             "bye bye",
@@ -38,53 +38,53 @@ class ExitKeywordDetector {
     );
 
     /**
-     * 精确匹配的短语模式
-     * 匹配包含退出意图关键词的输入
+     * Padrão de frase de correspondência exata
+     * Corresponde a entradas que contêm palavras-chave de intenção de saída
      */
     private static final Pattern EXIT_PATTERN = Pattern.compile(
-            ".*(?:拜拜|再见|退下|结束对话|退出|告辞|告退"
-            + "|(?:我|你)?(?:先)?(?:要)?(?:走了|离开|下线)"
+            ".*(?:tchau|até logo|adeus|encerrar conversa|sair|até mais|falou"
+            + "|(?:eu\\s+)?(?:j[áa]\\s+)?(?:vou\\s+embora|vou\\s+sair|desconectar|ir\\s+embora)"
             + "|bye\\s*bye|goodbye|see\\s+(?:you|ya)).*",
             Pattern.CASE_INSENSITIVE
     );
 
     /**
-     * 排除的短语模式
-     * 包含这些短语时不应该触发退出
-     * 例如："不要退出"、"别走"、"不离开" 等
+     * Padrão de frase de exclusão
+     * Quando contém estas frases, a saída não deve ser acionada
+     * Exemplo: "não quero sair", "não vá", "não vou embora", etc.
      */
     private static final Pattern EXCLUDE_PATTERN = Pattern.compile(
-            ".*(?:不|别|不要|为什么|怎么|如何|能否|可以|会|什么).*(?:退出|离开|走|退下|结束).*"
+            ".*(?:não|nunca|por que|como|poderia|pode|vai|o que).*(?:sair|ir embora|encerrar|desconectar).*"
             + "|.*(?:don't|not).*(?:leave|exit|quit|bye).*",
             Pattern.CASE_INSENSITIVE
     );
 
     /**
-     * 检测输入文本是否包含退出意图
+     * Detecta se o texto de entrada contém intenção de saída
      *
-     * @param input 用户输入的文本
-     * @return 如果检测到退出意图返回 true，否则返回 false
+     * @param input Texto de entrada do usuário
+     * @return true se a intenção de saída for detectada; caso contrário, false
      */
     public boolean detectExitIntent(String input) {
         if (input == null || input.trim().isEmpty()) {
             return false;
         }
 
-        // 去除空格和标点符号，统一转为小写
+        // Remove espaços e pontuação, convertendo tudo para minúsculas
         String normalizedInput = input.trim().toLowerCase();
 
-        // 首先检查排除模式，如果匹配到排除模式则不触发退出
+        // Primeiro verifica o padrão de exclusão; se corresponder, a saída não é acionada
         if (EXCLUDE_PATTERN.matcher(normalizedInput).matches()) {
             return false;
         }
 
-        // 检查精确匹配模式
+        // Verifica o padrão de correspondência exata
         if (EXIT_PATTERN.matcher(normalizedInput).matches()) {
             return true;
         }
 
-        // 检查简单关键词（适用于单独的短消息）
-        // 只有当输入很短（少于15个字符）时才使用简单关键词匹配
+        // Verifica palavras-chave simples (aplicável a mensagens curtas isoladas)
+        // A correspondência simples de palavras-chave só é usada quando a entrada é curta (menos de 15 caracteres)
         if (normalizedInput.length() <= 15) {
             for (String keyword : EXIT_KEYWORDS) {
                 if (normalizedInput.contains(keyword.toLowerCase())) {

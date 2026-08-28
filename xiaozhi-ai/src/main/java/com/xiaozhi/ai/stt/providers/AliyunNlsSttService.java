@@ -19,27 +19,27 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 阿里云NLS实时语音识别服务
- * 使用阿里云智能语音交互SDK实现STT功能
- * 参考文档: https://help.aliyun.com/zh/isi/developer-reference/sdk-for-java-8
+ * Serviço de reconhecimento de voz em tempo real Alibaba Cloud NLS
+ * Implementa a funcionalidade STT usando o SDK de Interação de Voz Inteligente da Alibaba Cloud
+ * Documentação de referência: https://help.aliyun.com/zh/isi/developer-reference/sdk-for-java-8
  */
 @Slf4j
 public class AliyunNlsSttService implements SttService {
     private static final String PROVIDER_NAME = "aliyun-nls";
 
-    // 阿里云NLS服务的默认URL
+    // URL padrão do serviço Alibaba Cloud NLS
     private static final String NLS_URL = "wss://nls-gateway.aliyuncs.com/ws/v1";
 
-    // 超时时间
-    private static final long RECOGNITION_TIMEOUT_MS = 90000; // 识别超时时间（90秒）
+    // Tempo de timeout
+    private static final long RECOGNITION_TIMEOUT_MS = 90000; // Tempo limite de reconhecimento (90 segundos)
 
     /**
-     * 全局NlsClient缓存（按configId共享）
+     * Cache global de NlsClient (compartilhado por configId)
      */
     private static final ConcurrentHashMap<Integer, CachedNlsClient> globalClientCache = new ConcurrentHashMap<>();
 
     /**
-     * 缓存的NlsClient包装类
+     * Classe wrapper do NlsClient em cache
      */
     private static class CachedNlsClient {
         final NlsClient client;
@@ -51,10 +51,10 @@ public class AliyunNlsSttService implements SttService {
         }
     }
 
-    // 阿里云配置
+    // Configuração da Alibaba Cloud
     private final ConfigBO config;
 
-    // Token管理器
+    // Gerenciador de Token
     private final TokenResolver tokenResolver;
 
     public AliyunNlsSttService(ConfigBO config, TokenResolver tokenResolver) {
@@ -63,12 +63,12 @@ public class AliyunNlsSttService implements SttService {
     }
 
     /**
-     * 获取或创建NlsClient实例（支持连接复用）
+     * Obtém ou cria uma instância de NlsClient (suporta reutilização de conexão)
      */
     private NlsClient getOrCreateClient() throws Exception {
         String currentToken = tokenResolver.getToken(config);
         if (currentToken == null) {
-            throw new RuntimeException("无法获取阿里云Token");
+            throw new RuntimeException("Não foi possível obter o Token da Alibaba Cloud");
         }
 
         Integer configId = config.getConfigId();
@@ -87,7 +87,7 @@ public class AliyunNlsSttService implements SttService {
                 try {
                     existing.client.shutdown();
                 } catch (Exception e) {
-                    log.warn("关闭旧NlsClient失败", e);
+                    log.warn("Falha ao fechar o NlsClient antigo", e);
                 }
             }
             NlsClient newClient = new NlsClient(NLS_URL, currentToken);
@@ -96,7 +96,7 @@ public class AliyunNlsSttService implements SttService {
     }
 
     /**
-     * 清理指定configId的NlsClient缓存
+     * Limpa o cache de NlsClient para o configId especificado
      */
     public static void clearClientCache(Integer configId) {
         if (configId == null) {
@@ -107,7 +107,7 @@ public class AliyunNlsSttService implements SttService {
             try {
                 removed.client.shutdown();
             } catch (Exception e) {
-                log.warn("关闭NlsClient失败", e);
+                log.warn("Falha ao fechar o NlsClient", e);
             }
         }
     }
@@ -120,29 +120,29 @@ public class AliyunNlsSttService implements SttService {
     @Override
     public SttResult stream(Flux<byte[]> audioSink) {
         if (audioSink == null) {
-            log.error("音频数据流为空");
+            log.error("Fluxo de dados de áudio vazio");
             return SttResult.textOnly("");
         }
 
-        // 用于收集识别结果
+        // Usado para coletar o resultado do reconhecimento
         StringBuilder resultBuilder = new StringBuilder();
         CountDownLatch latch = new CountDownLatch(1);
 
-        // 用于标识识别是否完成
+        // Usado para indicar se o reconhecimento foi concluído
         AtomicBoolean recognitionCompleted = new AtomicBoolean(false);
         AtomicBoolean recognitionFailed = new AtomicBoolean(false);
 
-        // 用于存储错误信息
+        // Usado para armazenar informações de erro
         AtomicBoolean[] errorHolder = new AtomicBoolean[]{new AtomicBoolean(false)};
 
         NlsClient client = null;
         SpeechTranscriber transcriber = null;
 
         try {
-            // 获取或复用NlsClient
+            // Obtém ou reutiliza o NlsClient
             client = getOrCreateClient();
 
-            // 创建识别监听器
+            // Cria o listener de reconhecimento
             SpeechTranscriberListener listener = new SpeechTranscriberListener() {
                 @Override
                 public void onTranscriberStart(SpeechTranscriberResponse response) {
@@ -168,14 +168,14 @@ public class AliyunNlsSttService implements SttService {
 
                 @Override
                 public void onTranscriptionComplete(SpeechTranscriberResponse response) {
-                    log.info("NLS实时识别完成 - TaskId: {}", response.getTaskId());
+                    log.info("Reconhecimento em tempo real do NLS concluído - TaskId: {}", response.getTaskId());
                     recognitionCompleted.set(true);
                     latch.countDown();
                 }
 
                 @Override
                 public void onFail(SpeechTranscriberResponse response) {
-                    log.error("NLS实时识别失败 - TaskId: {}, Status: {}, StatusText: {}",
+                    log.error("Falha no reconhecimento em tempo real do NLS - TaskId: {}, Status: {}, StatusText: {}",
                             response.getTaskId(),
                             response.getStatus(),
                             response.getStatusText());
@@ -185,97 +185,97 @@ public class AliyunNlsSttService implements SttService {
                 }
             };
 
-            // 创建语音识别器
+            // Cria o reconhecedor de voz
             transcriber = new SpeechTranscriber(client, listener);
 
-            // 设置AppKey
+            // Define o AppKey
             transcriber.setAppKey(config.getApiKey());
 
-            // 设置音频格式为PCM
+            // Define o formato de áudio como PCM
             transcriber.setFormat(InputFormatEnum.PCM);
 
-            // 设置采样率为16000Hz
+            // Define a taxa de amostragem como 16000Hz
             transcriber.setSampleRate(SampleRateEnum.SAMPLE_RATE_16K);
 
-            // 启用中间结果
+            // Habilita resultados intermediários
             transcriber.setEnableIntermediateResult(true);
 
-            // 启用标点符号
+            // Habilita pontuação
             transcriber.setEnablePunctuation(true);
 
-            // 启动识别
+            // Inicia o reconhecimento
             transcriber.start();
 
-            // 在新线程中发送音频数据
+            // Envia os dados de áudio em uma nova thread
             final SpeechTranscriber finalTranscriber = transcriber;
             Thread sendThread = new Thread(() -> {
                 try {
-                    // 订阅音频流并发送数据
+                    // Assina o fluxo de áudio e envia os dados
                     audioSink.subscribe(
                             audioChunk -> {
                                 if (audioChunk != null && audioChunk.length > 0) {
                                     try {
-                                        // 发送音频数据
+                                        // Envia os dados de áudio
                                         finalTranscriber.send(audioChunk);
                                     } catch (Exception e) {
-                                        log.error("发送音频数据失败", e);
+                                        log.error("Falha ao enviar os dados de áudio", e);
                                     }
                                 }
                             },
                             error -> {
-                                log.error("音频流处理错误", error);
+                                log.error("Erro no processamento do fluxo de áudio", error);
                                 errorHolder[0].set(true);
                                 latch.countDown();
                             },
                             () -> {
                                 try {
-                                    // 音频流结束，停止识别
+                                    // Fim do fluxo de áudio, interrompe o reconhecimento
                                     finalTranscriber.stop();
                                 } catch (Exception e) {
-                                    log.error("停止识别失败", e);
+                                    log.error("Falha ao interromper o reconhecimento", e);
                                 }
                             }
                     );
                 } catch (Exception e) {
-                    log.error("处理音频流时发生错误", e);
+                    log.error("Erro ao processar o fluxo de áudio", e);
                     errorHolder[0].set(true);
                     latch.countDown();
                 }
             });
             sendThread.start();
 
-            // 等待识别完成或超时
+            // Aguarda a conclusão do reconhecimento ou o timeout
             if (!latch.await(RECOGNITION_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
-                log.error("NLS实时识别超时");
+                log.error("Timeout no reconhecimento em tempo real do NLS");
                 return SttResult.textOnly("");
             }
 
-            // 检查识别是否失败
+            // Verifica se o reconhecimento falhou
             if (recognitionFailed.get() || errorHolder[0].get()) {
-                log.error("识别过程中发生错误");
+                log.error("Erro durante o processo de reconhecimento");
                 return SttResult.textOnly("");
             }
 
-            // 返回识别结果
+            // Retorna o resultado do reconhecimento
             String result;
             synchronized (resultBuilder) {
                 result = resultBuilder.toString().trim();
             }
-            log.debug("阿里云NLS识别结果: {}", result);
+            log.debug("Resultado do reconhecimento Alibaba Cloud NLS: {}", result);
             return SttResult.textOnly(result);
 
         } catch (Exception e) {
-            log.error("阿里云NLS实时识别失败", e);
-            // 连接异常时清除缓存，下次调用时重建client
+            log.error("Falha no reconhecimento em tempo real Alibaba Cloud NLS", e);
+            // Em caso de exceção na conexão, limpa o cache; o client será recriado na próxima chamada
             globalClientCache.remove(config.getConfigId());
             return SttResult.textOnly("");
         } finally {
-            // 只关闭transcriber，client由缓存统一管理复用，不在此处shutdown
+            // Fecha apenas o transcriber; o client é gerenciado e reutilizado de forma centralizada pelo cache, sem shutdown aqui
             if (transcriber != null) {
                 try {
                     transcriber.close();
                 } catch (Exception e) {
-                    log.warn("关闭SpeechTranscriber失败", e);
+                    log.warn("Falha ao fechar o SpeechTranscriber", e);
                 }
             }
         }
