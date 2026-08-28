@@ -20,62 +20,62 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.extern.slf4j.Slf4j;
 /**
  *
- * 播放器，负责处理音频播放（下发至终端设备）。
- * 其生命周期大致与ChatSession相当，当没有播放音乐或绘本之类的时候，播放器不用切换。
- * 收到Abort事件时，才是需要主动停止播放的场景。其它时候应该都是自然停止。
- * 需要打断时从ChatSession 找到这个播放器用来打断并清理队列中的资源。
- * 当say goodbye 或工具调用发送友好提示时，也需要 插入播放。
- * 后期可以考虑 通过Composite的模式支持更多 需要播放的音频格式类型。播放器应该是有与终端设备约定的格式的。
- * TODO 所以 后续重构方向应该是将这个播放器做成 针对不同的格式的 播放器。
+ * Player, responsável por processar a reprodução de áudio (envio para o dispositivo terminal).
+ * Seu ciclo de vida é aproximadamente equivalente ao do ChatSession; quando não há música ou livro ilustrado em reprodução, o player não precisa ser trocado.
+ * O único cenário em que é necessário parar a reprodução ativamente é ao receber o evento Abort. Em todos os outros casos, a parada deve ser natural.
+ * Quando é necessário interromper, este player é obtido a partir do ChatSession para interromper a reprodução e limpar os recursos na fila.
+ * Também é necessário inserir uma reprodução ao dizer adeus ou quando uma chamada de ferramenta envia um aviso amigável.
+ * No futuro, pode-se considerar o uso do padrão Composite para suportar mais tipos de formato de áudio a serem reproduzidos. O player deve seguir o formato combinado com o dispositivo terminal.
+ * TODO Portanto, a direção de refatoração futura deve transformar este player em players específicos para diferentes formatos.
  *
- * setCloseAfterChat，只来源于两处，
+ * setCloseAfterChat vem apenas de dois lugares,
  * @see com.xiaozhi.dialogue.llm.tool.function.SessionExitFunction
  * @see Persona#sendGoodbyeMessage()
- * 在SessionExitFunction工作时，这个工具是找不到Player的，即使在ChatSession里也可能是没有被初始化的Player实例的。
- * SessionExitFunction 正常返回一个GoodbyeMessage给到 DialogueService, 然后由DialogueService处理语音合成及播放。
- * sendGoodbyeMessage方法是被 checkInactiveSessions 所设用。
+ * Quando o SessionExitFunction está em execução, essa ferramenta não consegue encontrar o Player; mesmo dentro do ChatSession, a instância de Player pode ainda não ter sido inicializada.
+ * O SessionExitFunction normalmente retorna um GoodbyeMessage ao DialogueService, que então trata a síntese de voz e a reprodução.
+ * O método sendGoodbyeMessage é utilizado por checkInactiveSessions.
  *
  * @see com.xiaozhi.event.ChatAbortedEvent
- * 用户真正关心的是从说完话到开始播音的时间间隔。不是TTS的生成时间。所以Player需要有一个Instant。
+ * O que o usuário realmente se importa é o intervalo de tempo entre terminar de falar e o início da reprodução, não o tempo de geração do TTS. Por isso o Player precisa ter um Instant.
  *
- * 问：是否需要实现Runnable接口？
- * 答：不是所有的Player实现类都需要实现Runnable，也可以通过ExecutorService / ScheduledExecutorService实现，可者聚合多个Player（Composite模式）。
+ * Pergunta: é necessário implementar a interface Runnable?
+ * Resposta: nem todas as classes que implementam Player precisam implementar Runnable; também é possível usar ExecutorService / ScheduledExecutorService, ou agregar múltiplos Players (padrão Composite).
  *
  */
 @Slf4j
 @Data
 public abstract class Player {
-    // 默认情况下，应当是false的。 随着向设备发送的消息而改变状态。
+    // Por padrão, deve ser false. O estado muda conforme as mensagens enviadas ao dispositivo.
     private volatile boolean isPlaying = false;
     /**
-     * 标记当前是否正在进行工具调用。
-     * 工具调用期间（如拍照），
-     * 需要等待工具返回后LLM继续输出。
+     * Indica se uma chamada de ferramenta está em andamento no momento.
+     * Durante a chamada de ferramenta (como tirar uma foto),
+     * é necessário aguardar o retorno da ferramenta para que o LLM continue a gerar saída.
      */
     private volatile boolean toolCalling = false;
     /**
-     * 当前语音发送完毕后，执行的回调（如关闭session）
+     * Callback executado após o envio da fala atual ser concluído (como fechar a session)
      */
     private Runnable functionAfterChat = null;
     protected final ChatSession session;
     protected final OpusProcessor opusProcessor = new OpusProcessor();
     private final MessageSender messageService;
     /**
-     * 可选的 Opus 录制组件：将播放器发送的 Opus 帧同时写入 OGG 文件。
-     * 通过组合模式替代原 PlayerWithOpusFile 的继承方式。
+     * Componente opcional de gravação Opus: grava simultaneamente em um arquivo OGG os frames Opus enviados pelo player.
+     * Substitui, via composição, a herança original de PlayerWithOpusFile.
      */
     @Setter
     @Getter
     private OpusRecorder opusRecorder;
 
     /**
-     * 音频播放器构造方法
+     * Construtor do player de áudio
      * @param session
      * @param messageService
      */
     protected Player(ChatSession session, MessageSender messageService) {
-        Assert.notNull(session, "session不能为空");
-        Assert.notNull(messageService, "messageService不能为空");
+        Assert.notNull(session, "session não pode ser nulo");
+        Assert.notNull(messageService, "messageService não pode ser nulo");
         this.session = session;
         this.messageService = messageService;
     }
@@ -85,7 +85,7 @@ public abstract class Player {
     }
 
     /**
-     * 发送TTS开始消息
+     * Envia a mensagem de início do TTS
      */
     protected void sendStart() {
         if (opusRecorder != null) {
@@ -97,33 +97,33 @@ public abstract class Player {
     }
 
     /**
-     * 发送TTS句子开始消息
+     * Envia a mensagem de início de frase do TTS
      */
     protected void sendSentenceStart( String text) {
         messageService.sendTtsMessage(session, text, "sentence_start");
     }
 
     /**
-     * 发送Opus帧数据
+     * Envia os dados do frame Opus
      */
     protected void sendOpusFrame( byte[] opusFrame)  {
         messageService.sendBinaryMessage(session, opusFrame);
-        // log.info("发送Opus帧数据: {}", opusFrame.length);
+        // log.info("Envia os dados do frame Opus: {}", opusFrame.length);
         if (opusRecorder != null) {
             opusRecorder.onSendOpusFrame(opusFrame);
         }
     }
 
     /**
-     * 发送表情信息。如果句子里没有分析出表情，则默认返回 happy
+     * Envia as informações de emoção. Se nenhuma emoção for identificada na frase, retorna happy por padrão
      */
     protected void sendEmotion( String emotion) {
         messageService.sendEmotion(session, emotion);
     }
 
     /**
-     * 发送停止消息
-     * 此方法不对外暴露，只有播放器能发起停止消息。外部应该通过stop 或其它间接方式停止。
+     * Envia a mensagem de parada
+     * Este método não é exposto externamente; somente o player pode iniciar a mensagem de parada. Externamente, a parada deve ocorrer via stop ou outra forma indireta.
      */
     protected void sendStop() {
         try {
@@ -132,15 +132,15 @@ public abstract class Player {
             }
             messageService.sendTtsMessage(session, null, "stop");
             isPlaying = false;
-            // tts stop 下发后设备切换到聆听状态，服务端同步为 LISTENING
+            // Após o envio de tts stop, o dispositivo muda para o estado de escuta e o servidor sincroniza para LISTENING
             session.transitionTo(DeviceState.LISTENING);
-            // 检查是否需要执行后续操作（如关闭会话）
+            // Verifica se é necessário executar uma ação subsequente (como fechar a sessão)
             if (functionAfterChat != null) {
                 functionAfterChat.run();
             }
         } catch (Exception e) {
-            // sendStop 有可能是由于连接断掉而触发的，所以只打印异常，不再往外抛。
-            log.error("发送停止消息失败", e);
+            // sendStop pode ser disparado devido à queda da conexão, então apenas registra a exceção sem relançá-la.
+            log.error("Falha ao enviar a mensagem de parada", e);
         }
     }
 
@@ -154,10 +154,10 @@ public abstract class Player {
 
         File audioFile = audioPath.toFile();
         if (!audioFile.exists()) {
-            log.error("音频文件不存在: {}", audioPath);
+            log.error("Arquivo de áudio não encontrado: {}", audioPath);
             return;
         }
-        // 分块读取PCM，避免全量加载进内存
+        // Lê o PCM em blocos, evitando carregar tudo na memória
         try {
             List<byte[]> chunks = AudioUtils.readAsPcmChunks(audioPath.toString());
             AtomicBoolean first = new AtomicBoolean(true);
@@ -169,23 +169,23 @@ public abstract class Player {
     }
 
     /**
-     * 检查播放器是否有内容正在播放或待播放。
-     * 基类默认实现等同于isPlaying()，子类可覆盖以包含队列等状态判断。
-     * 用于打断判断，比isPlaying()更全面。
+     * Verifica se o player tem conteúdo em reprodução ou aguardando reprodução.
+     * A implementação padrão da classe base equivale a isPlaying(); as subclasses podem sobrescrever para incluir verificações de estado como a fila.
+     * Usado na decisão de interrupção; mais abrangente que isPlaying().
      */
     public boolean hasContent() {
         return isPlaying;
     }
 
     /**
-     * 用于中断或用户打断时，清理资源。
-     * 但这个对象是否需要被销毁取决于是否需要更换播放器。
-     * 自然说完的时候，内部会控制sendStop，但内部不能调用这个stop方法。
+     * Usado para limpar recursos em caso de interrupção ou quando o usuário interrompe.
+     * Mas se este objeto precisa ser destruído depende de o player precisar ou não ser trocado.
+     * Quando a fala termina naturalmente, o controle interno de sendStop é feito internamente, mas o método stop não pode ser chamado internamente.
      */
     public void stop() {
         isPlaying = false;
-        // 子类（如ScheduledPlayer）会覆盖此方法进行更详细的清理
-        log.info("已取消音频发送任务 - SessionId: {}", session.getSessionId());
+        // Subclasses (como ScheduledPlayer) sobrescrevem este método para uma limpeza mais detalhada
+        log.info("Tarefa de envio de áudio cancelada - SessionId: {}", session.getSessionId());
     }
 
 }

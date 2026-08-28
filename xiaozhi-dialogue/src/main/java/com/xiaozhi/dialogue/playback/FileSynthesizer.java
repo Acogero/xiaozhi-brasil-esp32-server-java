@@ -14,15 +14,15 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 语音合成器，用于非流式TTS（先生成完整音频文件再播放）。
- * 适用于不支持流式输出的TTS Provider（如 SherpaOnnx）。
+ * Sintetizador de voz para TTS não streaming (gera o arquivo de áudio completo antes de reproduzir).
+ * Adequado para Providers de TTS que não suportam saída em streaming (como o SherpaOnnx).
  *
- * 数据流：LLM token流 → SentenceHelper分句 → 逐句调用TTS生成完整音频文件 → 读取PCM → 交给播放器播放
+ * Fluxo de dados: fluxo de tokens do LLM → segmentação em frases pelo SentenceHelper → chamada ao TTS frase a frase gerando o arquivo de áudio completo → leitura do PCM → entrega ao player para reprodução
  */
 @Slf4j
 public class FileSynthesizer extends Synthesizer {
 
-    // 保存LLM输出流的订阅引用，以便在cancel时取消上游订阅
+    // Mantém a referência da assinatura do fluxo de saída do LLM, para poder cancelar a assinatura upstream em cancel
     private volatile Disposable llmDisposable;
 
     public FileSynthesizer(ChatSession session, TtsService ttsService, Player player) {
@@ -42,10 +42,10 @@ public class FileSynthesizer extends Synthesizer {
     }
 
     /**
-     * 将LLM输出的token流转化为语音并推送到播放器。
-     * 使用 SentenceHelper 按标点分句，逐句调用TTS生成完整音频文件后交给播放器。
+     * Converte o fluxo de tokens gerado pelo LLM em voz e o envia ao player.
+     * Usa o SentenceHelper para segmentar por pontuação e, frase a frase, chama o TTS para gerar o arquivo de áudio completo antes de entregá-lo ao player.
      *
-     * @param stringFlux LLM输出的token流
+     * @param stringFlux fluxo de tokens gerado pelo LLM
      */
     @Override
     public void synthesize(Flux<String> stringFlux) {
@@ -63,10 +63,10 @@ public class FileSynthesizer extends Synthesizer {
                             first = false;
                         }
                     } else {
-                        log.error("TTS服务返回空音频文件 - SessionId: {}", chatSession.getSessionId());
+                        log.error("O serviço de TTS retornou um arquivo de áudio vazio - SessionId: {}", chatSession.getSessionId());
                     }
                 } catch (Exception e) {
-                    log.error("TTS合成出错: {} - SessionId: {}", e.getMessage(), chatSession.getSessionId());
+                    log.error("Erro na síntese de TTS: {} - SessionId: {}", e.getMessage(), chatSession.getSessionId());
                 }
                 sink.complete();
             });
@@ -75,12 +75,12 @@ public class FileSynthesizer extends Synthesizer {
     }
 
     /**
-     * 直接合成单个文本
-     * @param text 待合成的文本
+     * Sintetiza diretamente um único texto
+     * @param text texto a ser sintetizado
      */
     @Override
     public void synthesize(String text) {
-        // 委托给 synthesize(Flux) 处理，缓存指标在那里统一记录
+        // Delega para synthesize(Flux), onde as métricas de cache são registradas de forma unificada
         synthesize(Flux.just(text));
     }
 

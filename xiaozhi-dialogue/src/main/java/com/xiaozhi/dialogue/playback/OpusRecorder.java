@@ -29,10 +29,10 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
 /**
- * Opus 音频录制组件：将播放器发送给设备的 Opus 帧同时写入 OGG/Opus 文件。
+ * Componente de gravação de áudio Opus: grava simultaneamente em um arquivo OGG/Opus os frames Opus que o player envia ao dispositivo.
  *
- * 通过组合模式注入 Player，替代原 PlayerWithOpusFile 的继承方式。
- * Player 在 sendOpusFrame/sendStart/sendStop 中回调本组件的对应方法。
+ * Injeta o Player via composição, substituindo a herança original de PlayerWithOpusFile.
+ * O Player chama de volta os métodos correspondentes deste componente em sendOpusFrame/sendStart/sendStop.
  */
 @Slf4j
 public class OpusRecorder {
@@ -101,8 +101,8 @@ public class OpusRecorder {
                 throw new RuntimeException(e);
             }
         } catch (IOException ex) {
-            log.error("无法创建保存Opus音频文件的目录 - SessionId: {}", session.getSessionId());
-            log.error("无法创建保存Opus音频文件的目录", ex);
+            log.error("Não foi possível criar o diretório para salvar o arquivo de áudio Opus - SessionId: {}", session.getSessionId());
+            log.error("Não foi possível criar o diretório para salvar o arquivo de áudio Opus", ex);
         }
     }
 
@@ -112,11 +112,11 @@ public class OpusRecorder {
         }
         try {
             opusFile.close();
-            log.info("Opus音频文件已生成: {}", audioPath);
+            log.info("Arquivo de áudio Opus gerado: {}", audioPath);
             opusFile = null;
             updateMessage();
         } catch (IOException e) {
-            log.error("无法关闭Opus音频文件!", e);
+            log.error("Não foi possível fechar o arquivo de áudio Opus!", e);
         }
     }
 
@@ -134,7 +134,7 @@ public class OpusRecorder {
         try {
             storedPath = storageServiceFactory.getStorageService().upload(audioPath, audioPath.toString());
         } catch (Exception e) {
-            log.warn("上传AI回复音频失败，保留本地路径: {}", audioPath, e);
+            log.warn("Falha ao enviar o áudio da resposta da IA, mantendo o caminho local: {}", audioPath, e);
         }
 
         messageService.updateAssistantAudio(
