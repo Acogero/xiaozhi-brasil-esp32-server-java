@@ -21,10 +21,10 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Redis缓存配置
+ * Configuração de cache Redis
  * <p>
- * 防雪崩策略：每个缓存名的 TTL = 基础时长 + 随机偏移（基础时长的 10%，最多 1 小时）。
- * 随机值在每个 JVM 实例启动时独立生成，多实例部署时同类 key 的 TTL 自然错开。
+ * Estratégia anti-avalanche: o TTL de cada nome de cache = duração base + desvio aleatório (10% da duração base, no máximo 1 hora).
+ * O valor aleatório é gerado de forma independente na inicialização de cada instância JVM; em implantações com múltiplas instâncias, o TTL de chaves do mesmo tipo fica naturalmente escalonado.
  *
  * @author Joey
  */
@@ -32,14 +32,14 @@ import java.util.concurrent.ThreadLocalRandom;
 @EnableCaching
 public class RedisCacheConfig {
 
-    /** 随机偏移上限（秒） */
+    /** Limite máximo do desvio aleatório (segundos) */
     private static final int MAX_JITTER_SECONDS = 3600;
 
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory factory) {
         GenericJackson2JsonRedisSerializer serializer = createSerializer();
 
-        // 默认配置: 1天 + 随机偏移
+        // Configuração padrão: 1 dia + desvio aleatório
         RedisCacheConfiguration defaultConfig = buildConfig(serializer, Duration.ofDays(1));
 
         Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
@@ -57,8 +57,8 @@ public class RedisCacheConfig {
     }
 
     /**
-     * 构建缓存配置，TTL = baseTtl + 随机偏移。
-     * 偏移量 = min(baseTtl 的 10%, MAX_JITTER_SECONDS) 范围内的随机秒数。
+     * Constrói a configuração de cache, TTL = baseTtl + desvio aleatório.
+     * Desvio = número aleatório de segundos dentro do intervalo min(10% de baseTtl, MAX_JITTER_SECONDS).
      */
     private RedisCacheConfiguration buildConfig(GenericJackson2JsonRedisSerializer serializer, Duration baseTtl) {
         long jitterBound = Math.min(baseTtl.toSeconds() / 10, MAX_JITTER_SECONDS);

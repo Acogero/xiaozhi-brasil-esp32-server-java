@@ -9,30 +9,30 @@ import org.springframework.context.annotation.Configuration;
 import java.nio.file.Path;
 
 /**
- * 运行时模型与原生库目录配置。
- * 默认保持当前相对路径约定，生产环境可改为绝对路径降低对工作目录的依赖。
+ * Configuração de diretórios de modelos e bibliotecas nativas em tempo de execução.
+ * Por padrão mantém a convenção de caminho relativo atual; em produção pode ser alterado para caminho absoluto para reduzir a dependência do diretório de trabalho.
  */
 @Configuration
 @ConfigurationProperties(prefix = "xiaozhi.runtime")
 @Data
 public class RuntimePathConfig {
 
-    /** 本地原生库目录 */
+    /** Diretório local de bibliotecas nativas */
     private String nativeLibDir = "lib";
 
-    /** Vosk 模型目录 */
+    /** Diretório do modelo Vosk */
     private String voskModelDir = "models/vosk-model";
 
-    /** Sherpa-ONNX TTS 模型根目录 */
+    /** Diretório raiz dos modelos TTS Sherpa-ONNX */
     private String ttsModelsDir = "models/tts";
 
-    /** 音频输出目录（对话录音、TTS 输出），须以 / 结尾 */
+    /** Diretório de saída de áudio (gravações de diálogo, saída TTS), deve terminar com / */
     private String audioDir = "audio/";
 
-    /** 音乐文件目录 */
+    /** Diretório de arquivos de música */
     private String musicDir = "uploads/music";
 
-    /** 头像目录 */
+    /** Diretório de avatares */
     private String avatarDir = "avatar";
 
     @PostConstruct
