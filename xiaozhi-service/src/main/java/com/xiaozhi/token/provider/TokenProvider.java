@@ -6,7 +6,7 @@ import com.xiaozhi.token.TokenCache;
 import java.util.Collection;
 
 /**
- * 第三方 token 获取策略。
+ * Estratégia de obtenção de token de terceiros.
  */
 public interface TokenProvider {
 

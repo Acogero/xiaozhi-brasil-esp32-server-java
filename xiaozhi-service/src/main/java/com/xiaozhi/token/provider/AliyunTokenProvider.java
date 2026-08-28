@@ -48,8 +48,8 @@ public class AliyunTokenProvider implements TokenProvider {
 
             CommonResponse response = client.getCommonResponse(request);
             if (response.getHttpStatus() != 200) {
-                throw new IllegalStateException("阿里云API返回错误，HTTP状态码: " + response.getHttpStatus()
-                        + ", 响应: " + response.getData());
+                throw new IllegalStateException("A API do Alibaba Cloud retornou erro, código HTTP: " + response.getHttpStatus()
+                        + ", resposta: " + response.getData());
             }
 
             JsonNode root = JsonUtil.OBJECT_MAPPER.readTree(response.getData());
@@ -57,14 +57,14 @@ public class AliyunTokenProvider implements TokenProvider {
             String token = tokenNode.path("Id").asText(null);
             long expireTimeSeconds = tokenNode.path("ExpireTime").asLong(0L);
             if (token == null || expireTimeSeconds <= 0L) {
-                throw new IllegalStateException("阿里云Token响应不完整: " + response.getData());
+                throw new IllegalStateException("Resposta de Token do Alibaba Cloud incompleta: " + response.getData());
             }
             return new TokenCache(token, expireTimeSeconds * 1000L);
         } catch (ClientException e) {
-            log.error("调用阿里云API失败: {}", e.getMessage(), e);
-            throw new IllegalStateException("调用阿里云API失败: " + e.getMessage(), e);
+            log.error("Falha ao chamar a API do Alibaba Cloud: {}", e.getMessage(), e);
+            throw new IllegalStateException("Falha ao chamar a API do Alibaba Cloud: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new IllegalStateException("获取阿里云Token失败: " + e.getMessage(), e);
+            throw new IllegalStateException("Falha ao obter Token do Alibaba Cloud: " + e.getMessage(), e);
         }
     }
 }

@@ -45,7 +45,7 @@ public class CozeTokenProvider implements TokenProvider {
             String jwt = generateJwt(config);
             return requestAccessToken(jwt);
         } catch (Exception e) {
-            throw new IllegalStateException("刷新Coze Token失败: " + e.getMessage(), e);
+            throw new IllegalStateException("Falha ao renovar o Token do Coze: " + e.getMessage(), e);
         }
     }
 
@@ -67,7 +67,7 @@ public class CozeTokenProvider implements TokenProvider {
         String headerJson = JsonUtil.toJson(header);
         String claimsJson = JsonUtil.toJson(claims);
         if (headerJson == null || claimsJson == null) {
-            throw new IllegalStateException("生成Coze JWT失败");
+            throw new IllegalStateException("Falha ao gerar o JWT do Coze");
         }
 
         String encodedHeader = Base64.getUrlEncoder().withoutPadding()
@@ -106,14 +106,14 @@ public class CozeTokenProvider implements TokenProvider {
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(TOKEN_URL, request, String.class);
         if (response.getStatusCode() != HttpStatus.OK || response.getBody() == null) {
-            throw new IllegalStateException("Coze API返回错误，HTTP状态码: " + response.getStatusCode()
-                    + ", 响应: " + response.getBody());
+            throw new IllegalStateException("A API do Coze retornou erro, código HTTP: " + response.getStatusCode()
+                    + ", resposta: " + response.getBody());
         }
 
         JsonNode jsonResponse = JsonUtil.OBJECT_MAPPER.readTree(response.getBody());
         String accessToken = jsonResponse.path("access_token").asText(null);
         if (accessToken == null || accessToken.isEmpty()) {
-            throw new IllegalStateException("响应中未找到access_token字段");
+            throw new IllegalStateException("Campo access_token não encontrado na resposta");
         }
 
         long expiresIn = jsonResponse.path("expires_in").asLong(DEFAULT_DURATION_SECONDS);

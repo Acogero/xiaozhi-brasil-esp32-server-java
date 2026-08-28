@@ -52,7 +52,7 @@ public class TokenService implements TokenResolver {
                 String normalized = normalizeProvider(provider);
                 TokenProvider previous = providerMap.putIfAbsent(normalized, tokenProvider);
                 if (previous != null) {
-                    throw new IllegalStateException("重复的TokenProvider注册: " + normalized);
+                    throw new IllegalStateException("Registro duplicado de TokenProvider: " + normalized);
                 }
             }
         }
@@ -91,7 +91,7 @@ public class TokenService implements TokenResolver {
         if (waited != null && !waited.isExpired()) {
             return waited.getToken();
         }
-        throw new IllegalStateException("获取Token失败，provider=" + config.getProvider() + ", configId=" + config.getConfigId());
+        throw new IllegalStateException("Falha ao obter Token, provider=" + config.getProvider() + ", configId=" + config.getConfigId());
     }
 
     public void removeCache(ConfigBO config) {
@@ -104,7 +104,7 @@ public class TokenService implements TokenResolver {
     private TokenProvider resolveProvider(String provider) {
         TokenProvider tokenProvider = providerMap.get(normalizeProvider(provider));
         if (tokenProvider == null) {
-            throw new IllegalArgumentException("不支持的Token服务提供商: " + provider);
+            throw new IllegalArgumentException("Provedor de serviço de Token não suportado: " + provider);
         }
         return tokenProvider;
     }
@@ -129,7 +129,7 @@ public class TokenService implements TokenResolver {
     private void cacheToken(ConfigBO config, TokenCache tokenCache) {
         String json = JsonUtil.toJson(tokenCache);
         if (json == null) {
-            throw new IllegalStateException("Token缓存序列化失败");
+            throw new IllegalStateException("Falha na serialização do cache de Token");
         }
         long ttlMillis = Math.max(tokenCache.getExpireAt() - System.currentTimeMillis(), 1000L);
         stringRedisTemplate.opsForValue().set(buildTokenKey(config), json, Duration.ofMillis(ttlMillis));
@@ -170,19 +170,19 @@ public class TokenService implements TokenResolver {
 
     private void validateConfig(ConfigBO config) {
         if (config == null) {
-            throw new IllegalArgumentException("Token配置不能为空");
+            throw new IllegalArgumentException("A configuração de Token não pode estar vazia");
         }
         if (!StringUtils.hasText(config.getProvider())) {
-            throw new IllegalArgumentException("Token配置provider不能为空");
+            throw new IllegalArgumentException("O provider da configuração de Token não pode estar vazio");
         }
         if (config.getConfigId() == null) {
-            throw new IllegalArgumentException("Token配置configId不能为空");
+            throw new IllegalArgumentException("O configId da configuração de Token não pode estar vazio");
         }
     }
 
     private void validateToken(TokenCache tokenCache, ConfigBO config) {
         if (tokenCache == null || !StringUtils.hasText(tokenCache.getToken()) || tokenCache.getExpireAt() <= System.currentTimeMillis()) {
-            throw new IllegalStateException("Token无效，provider=" + config.getProvider() + ", configId=" + config.getConfigId());
+            throw new IllegalStateException("Token inválido, provider=" + config.getProvider() + ", configId=" + config.getConfigId());
         }
     }
 

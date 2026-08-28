@@ -1,7 +1,7 @@
 package com.xiaozhi.token;
 
 /**
- * Redis 中缓存的 token 值。
+ * Valor de token armazenado em cache no Redis.
  */
 public class TokenCache {
 
