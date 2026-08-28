@@ -1,7 +1,7 @@
 package com.xiaozhi.common.exception;
 
 /**
- * 密码错误异常
+ * Exceção de senha incorreta
  * 
  * @author Joey
  */

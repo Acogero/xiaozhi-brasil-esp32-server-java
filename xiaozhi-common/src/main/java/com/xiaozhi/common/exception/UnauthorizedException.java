@@ -1,8 +1,8 @@
 package com.xiaozhi.common.exception;
 
 /**
- * 权限不足异常
- * 当用户尝试操作不属于自己的资源时抛出
+ * Exceção de permissão insuficiente
+ * Lançada quando o usuário tenta operar um recurso que não lhe pertence
  * 
  * @author Joey
  */

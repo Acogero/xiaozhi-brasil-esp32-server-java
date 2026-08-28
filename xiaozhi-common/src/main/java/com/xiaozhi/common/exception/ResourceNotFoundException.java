@@ -1,8 +1,8 @@
 package com.xiaozhi.common.exception;
 
 /**
- * 资源不存在异常
- * 当请求的资源（剧本、脚本、角色等）不存在时抛出
+ * Exceção de recurso não encontrado
+ * Lançada quando o recurso solicitado (roteiro, script, papel, etc.) não existe
  * 
  * @author Joey
  */
