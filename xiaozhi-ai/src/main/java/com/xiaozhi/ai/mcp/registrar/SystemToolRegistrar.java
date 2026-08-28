@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 系统全局工具注册器。
- * 注册 {@link ToolsGlobalRegistry#getAllFunctions(ToolSession)} 中的系统工具（PlayMusic、ChangeRole 等）。
+ * Registrador global de ferramentas do sistema.
+ * Registra as ferramentas do sistema presentes em {@link ToolsGlobalRegistry#getAllFunctions(ToolSession)} (PlayMusic, ChangeRole, etc.).
  *
  */
 @Component
