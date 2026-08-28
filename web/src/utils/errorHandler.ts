@@ -2,7 +2,7 @@ import type { App } from 'vue'
 import { message } from 'ant-design-vue'
 import { useEventListener } from '@vueuse/core'
 
-// 错误类型
+// Tipo de erro
 interface ErrorInfo {
   message: string
   stack?: string
@@ -13,51 +13,51 @@ interface ErrorInfo {
   column?: number
 }
 
-// 错误日志收集
+// Coleta de logs de erro
 const errorLogs: ErrorInfo[] = []
 
-// 上报错误到服务器（可选）
+// Reporta o erro ao servidor (opcional)
 function reportError(error: ErrorInfo) {
-  // 这里可以调用后端 API 上报错误
-  console.error('错误上报:', error)
+  // Aqui pode-se chamar a API do backend para reportar o erro
+  console.error('Erro reportado:', error)
 
-  // 示例：发送到后端
+  // Exemplo: enviar para o backend
   // fetch('/api/error/report', {
   //   method: 'POST',
   //   body: JSON.stringify(error)
   // })
 }
 
-// Vue 错误处理器
+// Manipulador de erros do Vue
 export function setupErrorHandler(app: App) {
-  // 1. Vue 组件错误处理
+  // 1. Tratamento de erros de componentes Vue
   app.config.errorHandler = (err: unknown, instance, info) => {
     const error = err instanceof Error ? err : new Error(String(err))
     const errorInfo: ErrorInfo = {
-      message: error.message || '未知错误',
+      message: error.message || 'Erro desconhecido',
       stack: error.stack,
       componentName: instance?.$options.name || instance?.$options.__name,
       propsData: instance?.$props as Record<string, unknown>,
     }
 
-    // 保存错误日志
+    // Salva o log de erro
     errorLogs.push(errorInfo)
 
-    // 上报错误
+    // Reporta o erro
     reportError(errorInfo)
 
-    // 显示错误提示
+    // Exibe o alerta de erro
     message.error({
-      content: `组件错误: ${errorInfo.message}`,
+      content: `Erro de componente: ${errorInfo.message}`,
       duration: 5,
     })
 
-    console.error('Vue 错误:', err, info)
+    console.error('Erro do Vue:', err, info)
   }
 
   if (import.meta.env.DEV) {
     app.config.warnHandler = (msg, instance, trace) => {
-      console.warn('Vue 警告:', msg, trace)
+      console.warn('Aviso do Vue:', msg, trace)
     }
   }
 
@@ -76,41 +76,41 @@ export function setupErrorHandler(app: App) {
       reason?.message?.includes('aborted') ||
       reason?.message?.includes('signal is aborted')
     ) {
-      console.debug('请求已取消（正常行为）:', reason.message)
+      console.debug('Requisição cancelada (comportamento normal):', reason.message)
       return
     }
 
-    // 忽略音频文件加载失败的错误（404）
+    // Ignora erros de falha ao carregar arquivo de áudio (404)
     if (
       reason?.message?.includes('Failed to fetch') &&
       reason?.message?.includes('/audio/') &&
       reason?.message?.includes('404')
     ) {
-      console.debug('音频文件不存在（正常行为）:', reason.message)
+      console.debug('Arquivo de áudio não encontrado (comportamento normal):', reason.message)
       return
     }
 
-    // 忽略音频解码失败（音频过短或格式问题，已在组件内处理）
+    // Ignora falha de decodificação de áudio (áudio muito curto ou problema de formato, já tratado no componente)
     if (reason?.message?.includes('Unable to decode audio data')) {
       return
     }
 
-    // 检测动态导入失败（通常是因为部署了新版本，旧文件已被删除）
+    // Detecta falha de importação dinâmica (geralmente porque uma nova versão foi implantada e os arquivos antigos foram removidos)
     if (
       reason?.message?.includes('Failed to fetch dynamically imported module') ||
       (reason?.message?.includes('Failed to fetch') && reason?.message?.match(/\.js/))
     ) {
-      console.warn('动态模块加载失败，可能是页面版本过期:', reason.message)
+      console.warn('Falha ao carregar módulo dinâmico, a versão da página pode estar desatualizada:', reason.message)
 
       message.warning({
-        content: '页面版本已更新，即将自动刷新...',
+        content: 'A versão da página foi atualizada, atualizando automaticamente...',
         duration: 2,
         onClose: () => {
           window.location.reload()
         }
       })
 
-      // 2秒后自动刷新页面
+      // Atualiza a página automaticamente após 2 segundos
       setTimeout(() => {
         window.location.reload()
       }, 2000)
@@ -119,7 +119,7 @@ export function setupErrorHandler(app: App) {
     }
 
     const errorInfo: ErrorInfo = {
-      message: reason?.message || '未处理的 Promise 错误',
+      message: reason?.message || 'Erro de Promise não tratado',
       stack: reason?.stack,
     }
 
@@ -127,11 +127,11 @@ export function setupErrorHandler(app: App) {
     reportError(errorInfo)
 
     message.error({
-      content: `Promise 错误: ${errorInfo.message}`,
+      content: `Erro de Promise: ${errorInfo.message}`,
       duration: 5,
     })
 
-    console.error('未处理的 Promise 错误:', reason)
+    console.error('Erro de Promise não tratado:', reason)
   })
 
   useEventListener(window, 'error', (event) => {
@@ -155,11 +155,11 @@ export function setupErrorHandler(app: App) {
     reportError(errorInfo)
 
     message.error({
-      content: `脚本错误: ${errorInfo.message}`,
+      content: `Erro de script: ${errorInfo.message}`,
       duration: 5,
     })
 
-    console.error('全局错误:', event.error)
+    console.error('Erro global:', event.error)
   })
 
   useEventListener(
@@ -175,25 +175,25 @@ export function setupErrorHandler(app: App) {
           : ''
         
         const errorInfo: ErrorInfo = {
-          message: `资源加载失败: ${resourceUrl}`,
+          message: `Falha ao carregar recurso: ${resourceUrl}`,
         }
 
         errorLogs.push(errorInfo)
         reportError(errorInfo)
 
-        console.error('资源加载错误:', target)
+        console.error('Erro ao carregar recurso:', target)
       }
     },
     { capture: true }
   )
 }
 
-// 获取错误日志
+// Obtém os logs de erro
 export function getErrorLogs() {
   return errorLogs
 }
 
-// 清空错误日志
+// Limpa os logs de erro
 export function clearErrorLogs() {
   errorLogs.length = 0
 }

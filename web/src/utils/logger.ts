@@ -1,12 +1,12 @@
 /**
- * 统一的日志工具
- * 开发环境输出到控制台，生产环境可以集成日志上报服务
+ * Utilitário de log unificado
+ * Em desenvolvimento, envia saída para o console; em produção, pode ser integrado a um serviço de reporte de logs
  */
 
 const isDev = import.meta.env.DEV
 
 /**
- * 日志级别
+ * Nível de log
  */
 export enum LogLevel {
   DEBUG = 'debug',
@@ -16,21 +16,21 @@ export enum LogLevel {
 }
 
 /**
- * 日志配置
+ * Configuração de log
  */
 interface LoggerConfig {
-  /** 是否启用日志 */
+  /** Se o log está habilitado */
   enabled: boolean
-  /** 最小日志级别 */
+  /** Nível mínimo de log */
   minLevel: LogLevel
-  /** 是否显示时间戳 */
+  /** Se deve exibir o timestamp */
   showTimestamp: boolean
-  /** 是否显示日志级别 */
+  /** Se deve exibir o nível do log */
   showLevel: boolean
 }
 
 /**
- * 默认配置
+ * Configuração padrão
  */
 const defaultConfig: LoggerConfig = {
   enabled: isDev,
@@ -40,7 +40,7 @@ const defaultConfig: LoggerConfig = {
 }
 
 /**
- * 日志级别权重（用于比较）
+ * Peso do nível de log (usado para comparação)
  */
 const levelWeight: Record<LogLevel, number> = {
   [LogLevel.DEBUG]: 0,
@@ -50,7 +50,7 @@ const levelWeight: Record<LogLevel, number> = {
 }
 
 /**
- * 格式化时间戳
+ * Formata o timestamp
  */
 function formatTimestamp(): string {
   const now = new Date()
@@ -58,7 +58,7 @@ function formatTimestamp(): string {
 }
 
 /**
- * 格式化日志前缀
+ * Formata o prefixo do log
  */
 function formatPrefix(level: LogLevel, config: LoggerConfig): string {
   const parts: string[] = []
@@ -75,7 +75,7 @@ function formatPrefix(level: LogLevel, config: LoggerConfig): string {
 }
 
 /**
- * 判断是否应该输出日志
+ * Determina se o log deve ser exibido
  */
 function shouldLog(level: LogLevel, config: LoggerConfig): boolean {
   if (!config.enabled) return false
@@ -83,7 +83,7 @@ function shouldLog(level: LogLevel, config: LoggerConfig): boolean {
 }
 
 /**
- * Logger 类
+ * Classe Logger
  */
 class Logger {
   private config: LoggerConfig
@@ -93,14 +93,14 @@ class Logger {
   }
 
   /**
-   * 更新配置
+   * Atualiza a configuração
    */
   configure(config: Partial<LoggerConfig>) {
     this.config = { ...this.config, ...config }
   }
 
   /**
-   * 调试日志
+   * Log de depuração
    */
   debug(...args: any[]) {
     if (shouldLog(LogLevel.DEBUG, this.config)) {
@@ -110,7 +110,7 @@ class Logger {
   }
 
   /**
-   * 信息日志
+   * Log de informação
    */
   info(...args: any[]) {
     if (shouldLog(LogLevel.INFO, this.config)) {
@@ -120,7 +120,7 @@ class Logger {
   }
 
   /**
-   * 警告日志
+   * Log de aviso
    */
   warn(...args: any[]) {
     if (shouldLog(LogLevel.WARN, this.config)) {
@@ -130,14 +130,14 @@ class Logger {
   }
 
   /**
-   * 错误日志
+   * Log de erro
    */
   error(...args: any[]) {
     if (shouldLog(LogLevel.ERROR, this.config)) {
       const prefix = formatPrefix(LogLevel.ERROR, this.config)
       console.error(prefix, ...args)
       
-      // 在生产环境可以在这里添加错误上报逻辑
+      // Em produção, pode-se adicionar aqui a lógica de reporte de erros
       // if (!isDev) {
       //   reportError(args)
       // }
@@ -145,7 +145,7 @@ class Logger {
   }
 
   /**
-   * 日志分组开始
+   * Início do agrupamento de logs
    */
   group(label: string) {
     if (this.config.enabled) {
@@ -154,7 +154,7 @@ class Logger {
   }
 
   /**
-   * 日志分组结束
+   * Fim do agrupamento de logs
    */
   groupEnd() {
     if (this.config.enabled) {
@@ -163,7 +163,7 @@ class Logger {
   }
 
   /**
-   * 表格输出
+   * Saída em tabela
    */
   table(data: any) {
     if (this.config.enabled && isDev) {
@@ -172,7 +172,7 @@ class Logger {
   }
 
   /**
-   * 性能计时开始
+   * Início da medição de desempenho
    */
   time(label: string) {
     if (this.config.enabled && isDev) {
@@ -181,7 +181,7 @@ class Logger {
   }
 
   /**
-   * 性能计时结束
+   * Fim da medição de desempenho
    */
   timeEnd(label: string) {
     if (this.config.enabled && isDev) {
@@ -191,17 +191,17 @@ class Logger {
 }
 
 /**
- * 默认 logger 实例
+ * Instância padrão do logger
  */
 export const logger = new Logger()
 
 /**
- * 创建命名 logger（用于特定模块）
+ * Cria um logger nomeado (usado para módulos específicos)
  */
 export function createLogger(moduleName: string, config?: Partial<LoggerConfig>): Logger {
   const moduleLogger = new Logger(config)
   
-  // 重写方法，添加模块名前缀
+  // Sobrescreve os métodos, adicionando o prefixo do nome do módulo
   const originalMethods = {
     debug: moduleLogger.debug.bind(moduleLogger),
     info: moduleLogger.info.bind(moduleLogger),
@@ -218,7 +218,7 @@ export function createLogger(moduleName: string, config?: Partial<LoggerConfig>)
 }
 
 /**
- * 快捷方法（兼容老代码）
+ * Métodos de atalho (compatibilidade com código legado)
  */
 export const log = logger.debug.bind(logger)
 export const info = logger.info.bind(logger)

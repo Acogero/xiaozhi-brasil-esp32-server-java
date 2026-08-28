@@ -1,43 +1,43 @@
 /**
- * 日期时间工具函数
+ * Funções utilitárias de data e hora
  */
 
 /**
- * 格式化日期为本地日期字符串
- * @param dateString - ISO日期字符串
- * @param defaultValue - 默认值
- * @returns 格式化后的日期字符串
+ * Formata a data para uma string de data local
+ * @param dateString - String de data no formato ISO
+ * @param defaultValue - Valor padrão
+ * @returns String de data formatada
  */
 export function formatDate(dateString?: string, defaultValue: string = '-'): string {
   if (!dateString) return defaultValue
   try {
     return new Date(dateString).toLocaleDateString()
   } catch (error) {
-    console.error('日期格式化失败:', error)
+    console.error('Falha ao formatar data:', error)
     return defaultValue
   }
 }
 
 /**
- * 格式化日期时间为本地日期时间字符串
- * @param dateString - ISO日期字符串
- * @param defaultValue - 默认值
- * @returns 格式化后的日期时间字符串
+ * Formata a data e hora para uma string de data e hora local
+ * @param dateString - String de data no formato ISO
+ * @param defaultValue - Valor padrão
+ * @returns String de data e hora formatada
  */
 export function formatDateTime(dateString?: string, defaultValue: string = '-'): string {
   if (!dateString) return defaultValue
   try {
     return new Date(dateString).toLocaleString()
   } catch (error) {
-    console.error('日期时间格式化失败:', error)
+    console.error('Falha ao formatar data e hora:', error)
     return defaultValue
   }
 }
 
 /**
- * 获取相对时间描述（如：刚刚、5分钟前、1小时前）
- * @param dateString - ISO日期字符串
- * @returns 相对时间描述
+ * Obtém a descrição de tempo relativo (ex: agora mesmo, há 5 minutos, há 1 hora)
+ * @param dateString - String de data no formato ISO
+ * @returns Descrição de tempo relativo
  */
 export function getRelativeTime(dateString?: string): string {
   if (!dateString) return '-'
@@ -52,14 +52,14 @@ export function getRelativeTime(dateString?: string): string {
     const hours = Math.floor(minutes / 60)
     const days = Math.floor(hours / 24)
     
-    if (seconds < 60) return '刚刚'
-    if (minutes < 60) return `${minutes}分钟前`
-    if (hours < 24) return `${hours}小时前`
-    if (days < 7) return `${days}天前`
+    if (seconds < 60) return 'agora mesmo'
+    if (minutes < 60) return `há ${minutes} minutos`
+    if (hours < 24) return `há ${hours} horas`
+    if (days < 7) return `há ${days} dias`
     
     return formatDate(dateString)
   } catch (error) {
-    console.error('相对时间计算失败:', error)
+    console.error('Falha ao calcular tempo relativo:', error)
     return '-'
   }
 }

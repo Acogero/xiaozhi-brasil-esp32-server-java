@@ -1,37 +1,37 @@
 /**
- * 资源 URL 处理工具
+ * Utilitário de tratamento de URL de recursos
  */
 
 /**
- * 获取资源URL（处理相对路径）
- * 参考 Vue2 项目的实现
+ * Obtém a URL do recurso (trata caminhos relativos)
+ * Referência à implementação do projeto Vue2
  */
 export function getResourceUrl(path?: string): string | undefined {
   if (!path) return undefined
   
-  // 如果已经是完整URL，直接返回
+  // Se já for uma URL completa, retorna diretamente
   if (path.startsWith('http://') || path.startsWith('https://')) {
     return path
   }
   
-  // 确保URL以/开头
+  // Garante que a URL comece com /
   if (!path.startsWith('/')) {
     path = '/' + path
   }
 
-  // 使用完整的后端地址（开发和生产环境都需要）
+  // Usa o endereço completo do backend (necessário tanto em desenvolvimento quanto em produção)
   const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8091'
 
   if (backendUrl) {
-    // 移除开头的斜杠，因为我们要将完整的URL传给组件
+    // Remove a barra inicial, pois vamos passar a URL completa para o componente
     if (path.startsWith('/')) {
       path = path.substring(1)
     }
 
-    // 构建完整的URL
+    // Constrói a URL completa
     return `${backendUrl}/${path}`
   }
 
-  // 如果没有配置后端URL，返回相对路径
+  // Se a URL do backend não estiver configurada, retorna o caminho relativo
   return path
 }

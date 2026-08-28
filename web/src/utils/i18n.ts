@@ -1,9 +1,9 @@
 import { i18n } from '@/locales'
 
 /**
- * 获取路由标题的翻译
- * @param routeName 路由名称
- * @returns 翻译后的标题
+ * Obtém a tradução do título da rota
+ * @param routeName Nome da rota
+ * @returns Título traduzido
  */
 export function getRouteTitle(routeName: string): string {
   const routeTitleMap: Record<string, string> = {
@@ -32,20 +32,20 @@ export function getRouteTitle(routeName: string): string {
     return i18n.global.t(translationKey)
   }
   
-  // 如果没有找到对应的翻译，返回原始名称
+  // Se não encontrar a tradução correspondente, retorna o nome original
   return routeName
 }
 
 /**
- * 获取父级菜单的翻译
- * @param parentName 父级名称
- * @returns 翻译后的父级名称
+ * Obtém a tradução do menu pai
+ * @param parentName Nome do menu pai
+ * @returns Nome do menu pai traduzido
  */
 export function getParentTitle(parentName: string): string {
   const parentTitleMap: Record<string, string> = {
-    '角色管理': 'router.parent.roleManagement',
-    '配置管理': 'router.parent.configManagement',
-    '设置': 'router.parent.settings',
+    'Gerenciamento de Personas': 'router.parent.roleManagement',
+    'Gerenciamento de Configurações': 'router.parent.configManagement',
+    'Configurações': 'router.parent.settings',
   }
 
   const translationKey = parentTitleMap[parentName]
