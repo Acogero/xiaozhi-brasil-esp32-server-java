@@ -7,12 +7,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 /**
- * ConfigDO / ConfigBO ↔ AiConfig 聚合根转换器。
+ * Conversor entre ConfigDO / ConfigBO ↔ raiz de agregação AiConfig.
  */
 @Component
 public class ConfigConverter {
 
-    /** DO → 聚合根（重建） */
+    /** DO → raiz de agregação (reconstrução) */
     public AiConfig toDomain(ConfigDO d) {
         if (d == null) return null;
         return AiConfig.reconstitute(
@@ -26,7 +26,7 @@ public class ConfigConverter {
                 d.getCreateTime(), d.getUpdateTime());
     }
 
-    /** 聚合根 → DO（持久化） */
+    /** Raiz de agregação → DO (persistência) */
     public ConfigDO toDO(AiConfig c) {
         ConfigDO d = new ConfigDO();
         d.setConfigId(c.getConfigId());
@@ -48,7 +48,7 @@ public class ConfigConverter {
         return d;
     }
 
-    /** BO → 聚合根（供 AppService 在 update 时构建更新参数） */
+    /** BO → raiz de agregação (usado pelo AppService para construir parâmetros de atualização no update) */
     public AiConfig toDomain(ConfigBO bo) {
         if (bo == null) return null;
         return AiConfig.reconstitute(
@@ -62,7 +62,7 @@ public class ConfigConverter {
                 null, null);
     }
 
-    /** 聚合根 → BO（供查询路径复用） */
+    /** Raiz de agregação → BO (reutilizado no caminho de consulta) */
     public ConfigBO toBO(AiConfig c) {
         if (c == null) return null;
         ConfigBO bo = new ConfigBO();

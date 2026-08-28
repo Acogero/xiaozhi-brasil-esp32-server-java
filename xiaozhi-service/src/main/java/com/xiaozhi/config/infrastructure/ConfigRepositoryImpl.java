@@ -19,9 +19,9 @@ import org.springframework.util.StringUtils;
 import java.util.Optional;
 
 /**
- * AiConfig 聚合根仓储实现。
+ * Implementação do repositório da raiz de agregação AiConfig.
  * <p>
- * 维护"唯一默认"不变式：save 时若检测到 DEFAULT_CHANGED 信号，先批量清除同类其他默认，再保存。
+ * Mantém o invariante "único padrão": ao salvar, se o sinal DEFAULT_CHANGED for detectado, primeiro limpa em lote os outros padrões do mesmo tipo e depois salva.
  */
 @Repository
 public class ConfigRepositoryImpl implements ConfigRepository {
@@ -82,7 +82,7 @@ public class ConfigRepositoryImpl implements ConfigRepository {
         });
     }
 
-    // ── 私有辅助 ──────────────────────────────────────────────────────────────
+    // ── Auxiliares privados ─────────────────────────────────────────────────
 
     private void resetDefault(Integer userId, String configType, String modelType, Integer excludeId) {
         LambdaUpdateWrapper<ConfigDO> w = new LambdaUpdateWrapper<ConfigDO>()

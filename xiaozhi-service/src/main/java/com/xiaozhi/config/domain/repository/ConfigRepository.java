@@ -5,24 +5,24 @@ import com.xiaozhi.config.domain.AiConfig;
 import java.util.Optional;
 
 /**
- * AiConfig 聚合根仓储接口（领域层定义，基础设施层实现）。
+ * Interface de repositório da raiz de agregação AiConfig (definida na camada de domínio, implementada na infraestrutura).
  * <p>
- * save() 时自动维护"同 userId + configType + modelType 下唯一默认"不变式。
+ * save() mantém automaticamente o invariante "único padrão por userId + configType + modelType".
  */
 public interface ConfigRepository {
 
-    /** 按 configId 加载聚合根 */
+    /** Carrega a raiz de agregação pelo configId */
     Optional<AiConfig> findById(Integer configId);
 
     /**
-     * 持久化聚合根（新建或更新）。
-     * <p>若聚合根携带 DEFAULT_CHANGED 信号，实现需先 resetDefault 再保存，然后清空缓存。
+     * Persiste a raiz de agregação (criação ou atualização).
+     * <p>Se a raiz de agregação carregar o sinal DEFAULT_CHANGED, a implementação deve chamar resetDefault antes de salvar e depois limpar o cache.
      */
     void save(AiConfig config);
 
     /**
-     * 软删除配置（state=disabled, isDefault=0）并清除缓存。
-     * <p>实际执行 {@link AiConfig#disable()} 后由此方法完成持久化。
+     * Exclusão lógica da configuração (state=disabled, isDefault=0) e limpeza do cache.
+     * <p>Executa {@link AiConfig#disable()} e este método conclui a persistência.
      */
     void delete(Integer configId);
 }
