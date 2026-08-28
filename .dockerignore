@@ -1,4 +1,4 @@
-# 版本控制 / IDE
+# Controle de versão / IDE
 .git/
 .github/
 .idea/
@@ -6,24 +6,24 @@
 .windsurf/
 .claude/
 
-# 各模块构建产物
+# Artefatos de build de cada módulo
 **/target/
 **/node_modules/
 
-# 前端（由 Dockerfile-node 单独构建）
+# Frontend (construído separadamente pelo Dockerfile-node)
 web/
 
-# 文档引擎（不需要进入 server 构建）
+# Motor de documentação (não precisa entrar no build do server)
 document_engine/
 
-# 运行时产物
+# Artefatos de runtime
 audio/
 avatar/
 uploads/
 logs/
 data/
 
-# 杂项
+# Diversos
 *.md
 *.log
 .DS_Store

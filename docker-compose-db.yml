@@ -1,6 +1,6 @@
-# 仅数据库服务 - MySQL, Redis
-# 适用于“服务本机运行，数据库容器运行”的开发方式
-# 使用方式: docker compose -f docker-compose-db.yml up -d
+# Apenas os serviços de banco de dados - MySQL, Redis
+# Indicado para o modo de desenvolvimento "serviço rodando localmente, banco de dados em container"
+# Uso: docker compose -f docker-compose-db.yml up -d
 
 services:
   mysql:

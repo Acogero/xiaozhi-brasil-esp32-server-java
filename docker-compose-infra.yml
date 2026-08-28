@@ -6,15 +6,15 @@ services:
     container_name: mysql
     restart: always
     ports:
-      - "3306:3306"  # 本地通过 3306 访问 MySQL
+      - "3306:3306"  # Acesso local ao MySQL pela porta 3306
     environment:
-      # 这些变量与 Dockerfile-mysql 中的 ENV 保持一致，仅作显式声明
+      # Estas variáveis são consistentes com o ENV do Dockerfile-mysql; declaradas aqui apenas de forma explícita
       MYSQL_ROOT_PASSWORD: abc123456
       MYSQL_DATABASE: xiaozhi
       MYSQL_USER: xiaozhi
       MYSQL_PASSWORD: 123456
     volumes:
-      - mysql_data:/var/lib/mysql   # 持久化数据
+      - mysql_data:/var/lib/mysql   # Dados persistentes
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "xiaozhi", "-p123456"]
       interval: 10s
@@ -38,7 +38,7 @@ services:
     container_name: redis
     restart: always
     ports:
-      - "6379:6379"  # 本地通过 6379 访问 Redis
+      - "6379:6379"  # Acesso local ao Redis pela porta 6379
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
       - redis_data:/data

@@ -4,11 +4,11 @@ services:
       context: .
       dockerfile: Dockerfile-mysql
     ports:
-      - "3306:3306"  # 修改为 3306 或其他未使用的端口
+      - "3306:3306"  # Altere para 3306 ou outra porta não utilizada
     networks:
       - app-network
     volumes:
-      - mysql_data:/var/lib/mysql  # 持久化数据
+      - mysql_data:/var/lib/mysql  # Dados persistentes
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "xiaozhi", "-p123456"]
       interval: 10s
@@ -39,7 +39,7 @@ services:
         - VOSK_MODEL_SIZE=${VOSK_MODEL_SIZE:-small}
         - TTS_MODEL=${TTS_MODEL:-vits-melo-tts-zh_en}
         - DOWNLOAD_PROXY=${BUILD_PROXY:-}
-      # 添加构建缓存设置
+      # Configuração de cache de build adicionada
       cache_from:
         - eclipse-temurin:21-jre
     depends_on:
@@ -55,7 +55,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=xiaozhi
       - SPRING_DATASOURCE_PASSWORD=123456
       - HOST_IP=${HOST_IP:-}
-    restart: always  # 自动重启
+    restart: always  # Reinício automático
     deploy:
       resources:
         limits:
@@ -134,5 +134,5 @@ networks:
     name: xiaozhi-network
 
 volumes:
-  mysql_data:  # 持久化数据卷
-  redis_data:  # 持久化Redis数据
+  mysql_data:  # Volume de dados persistente
+  redis_data:  # Dados persistentes do Redis

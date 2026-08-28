@@ -1,4 +1,4 @@
-# 忽略编译和构建目录
+# Ignorar diretórios de compilação e build
 target/
 lib/
 /com/
@@ -8,7 +8,7 @@ out/
 gen/
 dist/
 avatar/
-# 忽略特定格式的文件
+# Ignorar arquivos de formatos específicos
 /uploads/
 /audio/
 /data/
@@ -21,13 +21,13 @@ models/
 *.pid
 .vite
 
-# 忽略 IDE 相关文件
+# Ignorar arquivos relacionados à IDE
 .idea/
 *.iml
 *.ipr
 *.iws
 
-# 忽略 Maven 和 Gradle 缓存
+# Ignorar cache do Maven e do Gradle
 .mvn/
 .mvn/wrapper/
 .gradle/

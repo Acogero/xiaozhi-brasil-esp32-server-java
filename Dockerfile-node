@@ -4,17 +4,17 @@ WORKDIR /node
 
 COPY . .
 
-# 安装所有依赖并构建
+# Instalar todas as dependências e realizar o build
 RUN npm config set registry https://registry.npmmirror.com && \
     npm install && \
     npm run build
 
-# 生产阶段
+# Estágio de produção
 FROM nginx:alpine
 
 COPY --from=builder /node/dist /usr/share/nginx/html
 
-# nginx 配置：SPA路由 + 反向代理API
+# Configuração do nginx: roteamento SPA + proxy reverso da API
 RUN echo 'server { \
     listen 8084; \
     root /usr/share/nginx/html; \

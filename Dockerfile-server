@@ -1,15 +1,15 @@
 # Use Eclipse Temurin for both build and runtime stages
 FROM eclipse-temurin:21-jdk AS builder
 
-# 构建参数
-# Vosk模型大小: small(~50MB) 或 standard(~1.3GB)
+# Argumentos de build
+# Tamanho do modelo Vosk: small(~50MB) ou standard(~1.3GB)
 ARG VOSK_MODEL_SIZE=small
-# TTS本地模型，默认 vits-melo-tts-zh_en（中英文），设为 none 则不下载
+# Modelo TTS local, padrão vits-melo-tts-zh_en (chinês/inglês); defina como none para não baixar
 ARG TTS_MODEL=vits-melo-tts-zh_en
-# 模型下载代理（仅用于 curl，不影响 apt-get）
+# Proxy para download de modelos (usado apenas pelo curl, não afeta o apt-get)
 ARG DOWNLOAD_PROXY=
 
-# 安装必要的构建工具
+# Instalar ferramentas de build necessárias
 RUN apt-get update && apt-get install -y --no-install-recommends \
     maven \
     wget \
@@ -20,10 +20,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /build
 
-# 复制项目本地仓库（sherpa-onnx 等未发布到 Maven Central 的依赖）
+# Copiar o repositório local do projeto (dependências como sherpa-onnx, não publicadas no Maven Central)
 COPY repo/ ./repo/
 
-# 先复制所有 pom.xml 以利用 Docker 缓存（依赖不变时跳过下载）
+# Copiar primeiro todos os pom.xml para aproveitar o cache do Docker (pula o download quando as dependências não mudam)
 COPY pom.xml ./
 COPY xiaozhi-common/pom.xml  ./xiaozhi-common/
 COPY xiaozhi-service/pom.xml ./xiaozhi-service/
@@ -31,40 +31,40 @@ COPY xiaozhi-ai/pom.xml      ./xiaozhi-ai/
 COPY xiaozhi-dialogue/pom.xml ./xiaozhi-dialogue/
 COPY xiaozhi-server/pom.xml  ./xiaozhi-server/
 
-# 预下载依赖（单独一层，源码变更时不重复下载）
+# Pré-baixar dependências (camada separada; não é baixado novamente quando o código-fonte muda)
 RUN mvn -Dmaven.repo.local=/root/.m2/repository dependency:go-offline -DexcludeGroupIds=com.xiaozhi || true
 
-# 复制所有模块源代码
+# Copiar o código-fonte de todos os módulos
 COPY xiaozhi-common/src  ./xiaozhi-common/src
 COPY xiaozhi-service/src ./xiaozhi-service/src
 COPY xiaozhi-ai/src      ./xiaozhi-ai/src
 COPY xiaozhi-dialogue/src ./xiaozhi-dialogue/src
 COPY xiaozhi-server/src  ./xiaozhi-server/src
 
-# 构建整个多模块项目
+# Compilar todo o projeto multi-módulo
 RUN mvn -Dmaven.repo.local=/root/.m2/repository package -DskipTests
 
-# 提取项目版本号（从根 pom 的 xiaozhi-parent）
+# Extrair o número de versão do projeto (do xiaozhi-parent no pom raiz)
 RUN APP_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec 2>/dev/null || \
         grep '<version>' pom.xml | head -3 | tail -1 | sed -e 's/.*<version>//' -e 's/<\/version>.*//' -e 's/[[:space:]]//g') && \
     echo "APP_VERSION=${APP_VERSION}" > /build/app_version.env && \
     cat /build/app_version.env
 
 # ============================================================
-# 下载模型和原生库
-# 脚本会自动跳过已存在的文件，支持 Docker 缓存
+# Baixar modelos e bibliotecas nativas
+# O script pula automaticamente arquivos já existentes, com suporte a cache do Docker
 # ============================================================
 COPY scripts/ ./scripts/
 
 RUN mkdir -p /build/models /build/lib && \
-    echo ">>> 下载原生库和 VAD 模型 ..." && \
+    echo ">>> Baixando bibliotecas nativas e modelo VAD ..." && \
     http_proxy="${DOWNLOAD_PROXY}" https_proxy="${DOWNLOAD_PROXY}" \
         TARGET_PLATFORM=linux-x64 bash scripts/download_base.sh all && \
-    echo ">>> 下载 Vosk STT 模型 (${VOSK_MODEL_SIZE}) ..." && \
+    echo ">>> Baixando modelo Vosk STT (${VOSK_MODEL_SIZE}) ..." && \
     http_proxy="${DOWNLOAD_PROXY}" https_proxy="${DOWNLOAD_PROXY}" \
         bash scripts/download_stt.sh "$VOSK_MODEL_SIZE" && \
     if [ "$TTS_MODEL" != "none" ] && [ -n "$TTS_MODEL" ]; then \
-        echo ">>> 下载 TTS 模型 (${TTS_MODEL}) ..." && \
+        echo ">>> Baixando modelo TTS (${TTS_MODEL}) ..." && \
         case "$TTS_MODEL" in \
             matcha-icefall-zh-en) \
                 http_proxy="${DOWNLOAD_PROXY}" https_proxy="${DOWNLOAD_PROXY}" \
@@ -74,12 +74,12 @@ RUN mkdir -p /build/models /build/lib && \
                     bash scripts/download_tts.sh vits-melo ;; \
         esac; \
     else \
-        echo ">>> 跳过 TTS 模型下载 (TTS_MODEL=none)"; \
+        echo ">>> Pulando download do modelo TTS (TTS_MODEL=none)"; \
     fi && \
     bash scripts/download_models.sh status
 
 # ============================================================
-# 公共运行时基础镜像
+# Imagem base de runtime compartilhada
 # ============================================================
 FROM eclipse-temurin:21-jre AS runtime-base
 
@@ -101,8 +101,8 @@ COPY --from=builder /build/lib /app/lib
 ENV LD_LIBRARY_PATH=/app/lib:$LD_LIBRARY_PATH
 
 # ============================================================
-# xiaozhi-server（管理后台 API，端口 8091）
-# 构建: docker build --target server ...
+# xiaozhi-server (API do painel administrativo, porta 8091)
+# Build: docker build --target server ...
 # ============================================================
 FROM runtime-base AS server
 
@@ -122,8 +122,8 @@ java -Xms512m -Xmx1024m \\\n\
 CMD ["/bin/bash", "/app/start.sh"]
 
 # ============================================================
-# xiaozhi-dialogue（设备对话服务，端口 8092）
-# 构建: docker build --target dialogue ...
+# xiaozhi-dialogue (serviço de diálogo do dispositivo, porta 8092)
+# Build: docker build --target dialogue ...
 # ============================================================
 FROM runtime-base AS dialogue
 
