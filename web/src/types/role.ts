@@ -1,18 +1,18 @@
 import type { PageQueryParams } from './api'
 
-// 模型类型
+// Tipo de modelo
 export type ModelType = 'llm' | 'agent'
 
-// 语音提供商类型
+// Tipo de provedor de voz
 export type VoiceProvider = 'edge' | 'aliyun' | 'aliyun-nls' | 'volcengine' | 'xfyun' | 'minimax' | 'tencent' | 'sherpa-onnx'
 
-// 语音性别
+// Gênero da voz
 export type VoiceGender = '' | 'male' | 'female'
 
-// 记忆类型
+// Tipo de memória
 export type MemoryType = 'window' | 'summary'
 
-// 角色数据
+// Dados da função (role)
 export interface Role {
   createTime?: string
   updateTime?: string
@@ -37,11 +37,11 @@ export interface Role {
   vadSilenceMs?: number
   modelProvider?: string
   ttsProvider?: string
-  isDefault?: string | number // 服务器返回字符串 '1' 或 '0'，前端可能转为数字
+  isDefault?: string | number // O servidor retorna string '1' ou '0', o frontend pode converter para número
   totalDevice?: number
-  ttsPitch?: number // 语音音调(0.5-2.0)
-  ttsSpeed?: number // 语音语速(0.5-2.0)
-  memoryType?: MemoryType // 记忆类型
+  ttsPitch?: number // Tom de voz (0.5-2.0)
+  ttsSpeed?: number // Velocidade de voz (0.5-2.0)
+  memoryType?: MemoryType // Tipo de memória
 }
 
 export interface RoleQueryParams extends PageQueryParams {
@@ -88,30 +88,30 @@ export interface RoleFormData {
   roleName: string
   roleDesc?: string
   avatar?: string
-  isDefault: boolean | number | string // 支持布尔值、数字和字符串（提交时转为 '1' 或 '0'）
+  isDefault: boolean | number | string // Suporta booleano, número e string (convertido para '1' ou '0' ao enviar)
   state?: string
-  // 模型相关
+  // Relacionado ao modelo
   modelType: ModelType
   modelId?: number
   temperature?: number
   topP?: number
-  // 语音识别相关
+  // Relacionado ao reconhecimento de voz
   sttId: number
   vadSpeechTh?: number
   vadSilenceTh?: number
   vadEnergyTh?: number
   vadSilenceMs?: number
-  // 语音合成相关
+  // Relacionado à síntese de voz
   voiceName?: string
   ttsId?: number
   gender?: VoiceGender
   ttsPitch?: number
   ttsSpeed?: number
-  // 记忆类型
+  // Tipo de memória
   memoryType?: MemoryType
 }
 
-// 测试语音参数
+// Parâmetros de teste de voz
 export interface TestVoiceParams {
   voiceName: string
   ttsId: number

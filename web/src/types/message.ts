@@ -1,12 +1,12 @@
 import type { PageQueryParams } from './api'
 
 /**
- * 消息发送方
+ * Remetente da mensagem
  */
 export type MessageSender = 'user' | 'assistant' | 'system'
 
 /**
- * 消息信息接口（对齐后端 MessageResp）
+ * Interface de informações da mensagem (alinhada ao MessageResp do backend)
  */
 export interface Message {
   messageId: number
@@ -19,18 +19,18 @@ export interface Message {
   messageType?: string
   toolCalls?: string
   sessionId?: string
-  /** 消息来源: 'web' | 'device' */
+  /** Origem da mensagem: 'web' | 'device' */
   source?: string
   roleId?: number
   roleName?: string
   createTime?: string
   updateTime?: string
-  // 前端扩展字段（非后端返回）
+  // Campos de extensão do frontend (não retornados pelo backend)
   audioLoadError?: boolean
 }
 
 /**
- * 会话信息接口（对齐后端 ConversationResp）
+ * Interface de informações da conversa (alinhada ao ConversationResp do backend)
  */
 export interface Conversation {
   sessionId: string
@@ -41,7 +41,7 @@ export interface Conversation {
 }
 
 /**
- * 消息查询参数（对齐后端 MessagePageReq）
+ * Parâmetros de consulta de mensagem (alinhados ao MessagePageReq do backend)
  */
 export interface MessageQueryParams extends PageQueryParams {
   deviceId?: string
@@ -52,15 +52,15 @@ export interface MessageQueryParams extends PageQueryParams {
   startTime?: string
   endTime?: string
   sessionId?: string
-  /** 消息来源过滤: 'web' | 'device' */
+  /** Filtro de origem da mensagem: 'web' | 'device' */
   source?: string
 }
 
 /**
- * 会话查询参数（对齐后端 ConversationPageReq）
+ * Parâmetros de consulta de conversa (alinhados ao ConversationPageReq do backend)
  */
 export interface ConversationQueryParams extends PageQueryParams {
   roleId?: number
-  /** 消息来源过滤: 'web' | 'device' */
+  /** Filtro de origem da mensagem: 'web' | 'device' */
   source?: string
 }

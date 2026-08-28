@@ -1,11 +1,11 @@
 /**
- * 配置类型
+ * Tipo de configuração
  */
 export type ConfigType = 'llm' | 'stt' | 'tts' | 'agent' | 'oss'
 export type ModelType = 'chat' | 'vision' | 'intent' | 'embedding'
 
 /**
- * 配置信息接口
+ * Interface de informações de configuração
  */
 export interface Config {
   configId?: number
@@ -14,10 +14,10 @@ export interface Config {
   configName: string
   configDesc?: string
   modelType?: ModelType
-  isDefault?: string | boolean // 1-默认 0-非默认，表单中使用boolean
+  isDefault?: string | boolean // 1-padrão 0-não padrão, o formulário usa boolean
   state?: string
   createTime?: string
-  // API相关字段
+  // Campos relacionados à API
   appId?: string
   apiKey?: string
   apiSecret?: string
@@ -25,14 +25,14 @@ export interface Config {
   sk?: string
   apiUrl?: string
   enableThinking?: boolean
-  // 支持动态字段
+  // Suporte a campos dinâmicos
   [key: string]: any
 }
 
 import type { PageQueryParams } from './api'
 
 /**
- * 配置查询参数
+ * Parâmetros de consulta de configuração
  */
 export interface ConfigQueryParams extends PageQueryParams {
   configType: ConfigType
@@ -43,7 +43,7 @@ export interface ConfigQueryParams extends PageQueryParams {
 }
 
 /**
- * 配置字段定义
+ * Definição de campo de configuração
  */
 export interface ConfigField {
   name: string
@@ -55,11 +55,11 @@ export interface ConfigField {
   help?: string
   suffix?: string
   defaultUrl?: string
-  options?: Array<{ label: string; value: string }>  // 下拉选项（当 inputType 为 'select' 时使用）
+  options?: Array<{ label: string; value: string }>  // Opções do select (usado quando inputType é 'select')
 }
 
 /**
- * 配置类型信息
+ * Informações do tipo de configuração
  */
 export interface ConfigTypeInfo {
   label: string
@@ -69,7 +69,7 @@ export interface ConfigTypeInfo {
 }
 
 /**
- * 模型选项
+ * Opção de modelo
  */
 export interface ModelOption {
   value: string
@@ -77,7 +77,7 @@ export interface ModelOption {
 }
 
 /**
- * LLM 工厂模型信息
+ * Informações do modelo da fábrica LLM
  */
 export interface LLMModel {
   llm_name: string
@@ -88,7 +88,7 @@ export interface LLMModel {
 }
 
 /**
- * LLM 工厂信息
+ * Informações da fábrica LLM
  */
 export interface LLMFactory {
   name: string

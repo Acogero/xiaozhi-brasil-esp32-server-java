@@ -1,11 +1,11 @@
 /**
- * 智能体相关类型定义
+ * Definições de tipos relacionados ao agente inteligente
  */
 
 import type { PageQueryParams } from './api'
 
 /**
- * 智能体查询参数
+ * Parâmetros de consulta do agente inteligente
  */
 export interface AgentQueryParams extends PageQueryParams {
   provider: string
@@ -13,7 +13,7 @@ export interface AgentQueryParams extends PageQueryParams {
 }
 
 /**
- * 智能体数据
+ * Dados do agente inteligente
  */
 export interface Agent {
   configId: number
@@ -43,7 +43,7 @@ export interface Agent {
 }
 
 /**
- * 平台配置表单
+ * Formulário de configuração da plataforma
  */
 export interface PlatformConfig {
   configId?: number
@@ -73,7 +73,7 @@ export interface PlatformConfig {
 }
 
 /**
- * 平台选项
+ * Opções da plataforma
  */
 export interface ProviderOption {
   label: string
@@ -81,7 +81,7 @@ export interface ProviderOption {
 }
 
 /**
- * 表单项配置
+ * Configuração do item de formulário
  */
 export interface FormItem {
   field: string
@@ -92,7 +92,7 @@ export interface FormItem {
 }
 
 /**
- * 平台表单项映射
+ * Mapeamento de itens de formulário por plataforma
  */
 export type PlatformFormItems = {
   [key: string]: FormItem[]
