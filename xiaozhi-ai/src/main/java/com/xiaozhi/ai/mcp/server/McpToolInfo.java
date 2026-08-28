@@ -1,7 +1,7 @@
 package com.xiaozhi.ai.mcp.server;
 
 /**
- * MCP 工具信息
+ * Informações da ferramenta MCP
  */
 public class McpToolInfo {
 
