@@ -19,63 +19,63 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 提示词模板控制器
+ * Controller de modelos de prompt
  */
 @RestController
 @RequestMapping("/api/template")
-@Tag(name = "提示词模板管理", description = "提示词模板相关操作")
+@Tag(name = "Gerenciamento de modelos de prompt", description = "Operações relacionadas a modelos de prompt")
 public class TemplateController extends BaseController {
 
     @Resource
     private TemplateAppService templateAppService;
 
     /**
-     * 查询模板列表
+     * Consultar lista de modelos
      */
     @GetMapping("")
     @ResponseBody
     @SaCheckPermission("system:prompt-template:api:list")
-    @Operation(summary = "根据条件查询角色模板", description = "返回模板列表")
+    @Operation(summary = "Consulta modelos de papel de acordo com os filtros", description = "Retorna a lista de modelos")
     public ApiResponse<?> list(@Valid TemplatePageReq req) {
         return ApiResponse.success(templateAppService.page(req, StpUtil.getLoginIdAsInt()));
     }
 
     /**
-     * 添加模板
+     * Adicionar modelo
      */
     @PostMapping("")
     @ResponseBody
     @SaCheckPermission("system:prompt-template:api:create")
-    @AuditLog(module = "模板管理", operation = "创建模板")
-    @Operation(summary = "添加角色模板", description = "添加新的提示词模板")
+    @AuditLog(module = "Gerenciamento de modelos", operation = "Criar modelo")
+    @Operation(summary = "Adicionar modelo de papel", description = "Adiciona um novo modelo de prompt")
     public ApiResponse<?> create(@Valid @RequestBody TemplateCreateReq req) {
         return ApiResponse.success(templateAppService.create(req, StpUtil.getLoginIdAsInt()));
     }
 
     /**
-     * 修改模板
+     * Editar modelo
      */
     @PutMapping("/{templateId}")
     @ResponseBody
     @SaCheckPermission("system:prompt-template:api:update")
     @CheckOwner(resource = "template", id = "#templateId")
-    @AuditLog(module = "模板管理", operation = "更新模板")
-    @Operation(summary = "更新角色模板", description = "更新提示词模板信息")
+    @AuditLog(module = "Gerenciamento de modelos", operation = "Atualizar modelo")
+    @Operation(summary = "Atualizar modelo de papel", description = "Atualiza as informações do modelo de prompt")
     public ApiResponse<?> update(@PathVariable Integer templateId, @Valid @RequestBody TemplateUpdateReq req) {
         return ApiResponse.success(templateAppService.update(templateId, req));
     }
 
     /**
-     * 删除模板
+     * Excluir modelo
      */
     @DeleteMapping("/{templateId}")
     @ResponseBody
     @SaCheckPermission("system:prompt-template:api:delete")
     @CheckOwner(resource = "template", id = "#templateId")
-    @AuditLog(module = "模板管理", operation = "删除模板")
-    @Operation(summary = "删除角色模板", description = "删除提示词模板（逻辑删除）")
+    @AuditLog(module = "Gerenciamento de modelos", operation = "Excluir modelo")
+    @Operation(summary = "Excluir modelo de papel", description = "Exclui o modelo de prompt (exclusão lógica)")
     public ApiResponse<?> delete(@PathVariable Integer templateId) {
         templateAppService.delete(templateId);
-        return ApiResponse.success("删除成功");
+        return ApiResponse.success("Excluído com sucesso");
     }
 }

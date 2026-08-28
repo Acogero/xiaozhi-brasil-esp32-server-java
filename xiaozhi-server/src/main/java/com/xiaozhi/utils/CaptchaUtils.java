@@ -6,8 +6,8 @@ import jakarta.annotation.Resource;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 验证码发送工具类
- * 统一管理邮件和短信验证码发送
+ * Classe utilitária de envio de código de verificação
+ * Gerencia de forma unificada o envio de código de verificação por e-mail e SMS
  * 
  * @author Joey
  */
@@ -22,11 +22,11 @@ public class CaptchaUtils {
     private SmsUtils smsUtils;
     
     /**
-     * 验证码类型枚举
+     * Enum de tipo de código de verificação
      */
     public enum CaptchaType {
-        EMAIL("邮箱"),
-        SMS("短信");
+        EMAIL("E-mail"),
+        SMS("SMS");
         
         private final String description;
         
@@ -40,7 +40,7 @@ public class CaptchaUtils {
     }
     
     /**
-     * 验证码发送结果
+     * Resultado do envio do código de verificação
      */
     public static class CaptchaResult {
         private boolean success;
@@ -52,7 +52,7 @@ public class CaptchaUtils {
         }
         
         public static CaptchaResult success() {
-            return new CaptchaResult(true, "发送成功");
+            return new CaptchaResult(true, "Enviado com sucesso");
         }
         
         public static CaptchaResult error(String message) {
@@ -69,120 +69,120 @@ public class CaptchaUtils {
     }
     
     /**
-     * 发送邮箱验证码
+     * Enviar código de verificação por e-mail
      * 
-     * @param email 邮箱地址
-     * @param code 验证码
-     * @return 发送结果
+     * @param email endereço de e-mail
+     * @param code código de verificação
+     * @return resultado do envio
      */
     public CaptchaResult sendEmailCaptcha(String email, String code) {
         try {
-            // 验证邮箱格式
+            // Valida o formato do e-mail
             if (!isValidEmail(email)) {
-                log.warn("邮箱格式不正确: {}", email);
-                return CaptchaResult.error("邮箱格式不正确");
+                log.warn("Formato de e-mail inválido: {}", email);
+                return CaptchaResult.error("Formato de e-mail inválido");
             }
             
-            // 验证验证码
+            // Valida o código de verificação
             if (!isValidCode(code)) {
-                log.warn("验证码格式不正确: {}", code);
-                return CaptchaResult.error("验证码格式不正确");
+                log.warn("Formato do código de verificação inválido: {}", code);
+                return CaptchaResult.error("Formato do código de verificação inválido");
             }
             
-            // 发送邮件
+            // Envia o e-mail
             boolean success = emailUtils.sendCaptchaEmail(email, code);
             
             if (success) {
-                log.info("邮箱验证码发送成功: {}", email);
+                log.info("Código de verificação enviado por e-mail com sucesso: {}", email);
                 return CaptchaResult.success();
             } else {
-                log.error("邮箱验证码发送失败: {}", email);
-                return CaptchaResult.error("邮件发送失败，请检查邮箱配置");
+                log.error("Falha ao enviar código de verificação por e-mail: {}", email);
+                return CaptchaResult.error("Falha ao enviar e-mail, verifique a configuração de e-mail");
             }
             
         } catch (Exception e) {
-            log.error("发送邮箱验证码异常: {}", e.getMessage(), e);
-            return CaptchaResult.error("发送失败，请稍后重试");
+            log.error("Exceção ao enviar código de verificação por e-mail: {}", e.getMessage(), e);
+            return CaptchaResult.error("Falha no envio, tente novamente mais tarde");
         }
     }
     
     /**
-     * 发送短信验证码
+     * Enviar código de verificação por SMS
      * 
-     * @param phoneNumber 手机号
-     * @param code 验证码
-     * @return 发送结果
+     * @param phoneNumber número de celular
+     * @param code código de verificação
+     * @return resultado do envio
      */
     public CaptchaResult sendSmsCaptcha(String phoneNumber, String code) {
         try {
-            // 验证手机号格式
+            // Valida o formato do número de celular
             if (!isValidPhoneNumber(phoneNumber)) {
-                log.warn("手机号格式不正确: {}", phoneNumber);
-                return CaptchaResult.error("手机号格式不正确");
+                log.warn("Formato de número de celular inválido: {}", phoneNumber);
+                return CaptchaResult.error("Formato de número de celular inválido");
             }
             
-            // 验证验证码
+            // Valida o código de verificação
             if (!isValidCode(code)) {
-                log.warn("验证码格式不正确: {}", code);
-                return CaptchaResult.error("验证码格式不正确");
+                log.warn("Formato do código de verificação inválido: {}", code);
+                return CaptchaResult.error("Formato do código de verificação inválido");
             }
             
-            // 发送短信
+            // Envia o SMS
             boolean success = smsUtils.sendVerificationCodeSms(phoneNumber, code);
             
             if (success) {
-                log.info("短信验证码发送成功: {}", phoneNumber);
+                log.info("Código de verificação enviado por SMS com sucesso: {}", phoneNumber);
                 return CaptchaResult.success();
             } else {
-                log.error("短信验证码发送失败: {}", phoneNumber);
-                return CaptchaResult.error("短信发送失败，请稍后重试");
+                log.error("Falha ao enviar código de verificação por SMS: {}", phoneNumber);
+                return CaptchaResult.error("Falha no envio do SMS, tente novamente mais tarde");
             }
             
         } catch (Exception e) {
-            log.error("发送短信验证码异常: {}", e.getMessage(), e);
-            return CaptchaResult.error("短信发送失败，请联系管理员");
+            log.error("Exceção ao enviar código de verificação por SMS: {}", e.getMessage(), e);
+            return CaptchaResult.error("Falha no envio do SMS, entre em contato com o administrador");
         }
     }
     
     /**
-     * 验证邮箱格式
+     * Valida o formato do e-mail
      * 
-     * @param email 邮箱地址
-     * @return 是否有效
+     * @param email endereço de e-mail
+     * @return se é válido
      */
     public boolean isValidEmail(String email) {
         if (email == null || email.isEmpty()) {
             return false;
         }
-        // 邮箱格式验证：包含@符号且@后面有.
+        // Validação do formato do e-mail: contém o símbolo @ e um ponto após o @
         return email.matches("^[^@]+@[^@]+\\.[^@]+$");
     }
     
     /**
-     * 验证手机号格式
+     * Valida o formato do número de celular
      * 
-     * @param phoneNumber 手机号
-     * @return 是否有效
+     * @param phoneNumber número de celular
+     * @return se é válido
      */
     public boolean isValidPhoneNumber(String phoneNumber) {
         if (phoneNumber == null || phoneNumber.isEmpty()) {
             return false;
         }
-        // 中国大陆手机号格式验证：11位数字，以1开头
+        // Validação de formato de celular chinês: 11 dígitos, começando com 1
         return phoneNumber.matches("^1\\d{10}$");
     }
     
     /**
-     * 验证验证码格式
+     * Valida o formato do código de verificação
      * 
-     * @param code 验证码
-     * @return 是否有效
+     * @param code código de verificação
+     * @return se é válido
      */
     private boolean isValidCode(String code) {
         if (code == null || code.isEmpty()) {
             return false;
         }
-        // 验证码通常是4-6位数字或字母
+        // O código de verificação normalmente tem de 4 a 6 dígitos ou letras
         return code.matches("^[0-9A-Za-z]{4,6}$");
     }
 }

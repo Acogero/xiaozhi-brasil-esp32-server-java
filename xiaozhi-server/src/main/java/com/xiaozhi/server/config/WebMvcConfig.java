@@ -35,13 +35,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/**")
                 .order(100);
 
-        // 登录、注册、验证码等端点限流
+        // Limitação de taxa para endpoints de login, cadastro, código de verificação etc.
         registry.addInterceptor(rateLimitInterceptor)
                 .addPathPatterns(
                         "/api/user/login",
                         "/api/user/tel-login",
                         "/api/user/wx-login",
-                        "/api/user",                    // 注册 POST
+                        "/api/user",                    // cadastro POST
                         "/api/user/resetPassword",
                         "/api/user/sendEmailCaptcha",
                         "/api/user/sendSmsCaptcha"
@@ -70,26 +70,26 @@ public class WebMvcConfig implements WebMvcConfigurer {
                     .addResourceLocations(uploadsPath);
 
         } catch (Exception e) {
-            log.error("添加资源失败", e);
+            log.error("Falha ao adicionar recurso", e);
         }
     }
 
     /**
-     * 配置路径匹配参数
+     * Configura os parâmetros de correspondência de caminho
      */
     @Override
-    @SuppressWarnings("deprecation") // 暂时抑制过时警告
+    @SuppressWarnings("deprecation") // Suprime temporariamente o aviso de depreciação
     public void configurePathMatch(PathMatchConfigurer configurer) {
-        // 使用推荐的方法设置尾部斜杠匹配
+        // Usa o método recomendado para configurar a correspondência de barra final
         configurer.setUseTrailingSlashMatch(true);
     }
 
     /**
-     * 配置异步请求支持
+     * Configura o suporte a requisições assíncronas
      */
     @Override
     public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
-        // 设置异步请求超时时间为120秒，比SSE的60秒超时更长
+        // Define o tempo limite da requisição assíncrona em 120 segundos, maior que o timeout de 60 segundos do SSE
         configurer.setDefaultTimeout(120000L);
     }
 }

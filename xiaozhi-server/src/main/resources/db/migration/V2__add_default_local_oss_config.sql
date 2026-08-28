@@ -6,8 +6,8 @@ SELECT
     ),
     'oss',
     'local',
-    '默认本地存储',
-    '未配置云存储时默认使用本地存储',
+    'Armazenamento local padrão',
+    'Usa armazenamento local por padrão quando o armazenamento em nuvem não está configurado',
     '1',
     '1'
 FROM DUAL

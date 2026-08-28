@@ -8,12 +8,12 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 /**
- * Agent 领域应用服务。
+ * Serviço de aplicação do domínio Agent.
  * <p>
- * 职责：编排 Controller → Domain Service 之间的流程，包括：
+ * Responsabilidade: orquestra o fluxo entre o Controller e o Domain Service, incluindo:
  * <ul>
- *   <li>Req/Resp ↔ BO 转换</li>
- *   <li>跨领域校验</li>
+ *   <li>Conversão Req/Resp ↔ BO</li>
+ *   <li>Validações entre domínios</li>
  * </ul>
  */
 @Service

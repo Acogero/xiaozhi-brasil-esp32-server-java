@@ -1,5 +1,5 @@
--- sys_config 增加 enableThinking 字段，用于控制模型是否启用思考模式
+-- Adiciona o campo enableThinking em sys_config, usado para controlar se o modo de raciocínio (thinking) do modelo está habilitado
 ALTER TABLE `sys_config`
     ADD COLUMN `enableThinking` TINYINT(1) DEFAULT NULL
-    COMMENT '是否启用思考模式'
+    COMMENT 'Se o modo de raciocínio (thinking) está habilitado'
     AFTER `isDefault`;

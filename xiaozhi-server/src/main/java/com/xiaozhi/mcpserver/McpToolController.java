@@ -21,7 +21,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/mcpTool")
-@Tag(name = "MCP工具管理", description = "MCP工具启用/禁用相关操作")
+@Tag(name = "Gerenciamento de ferramentas MCP", description = "Operações de ativação/desativação de ferramentas MCP")
 public class McpToolController {
 
     @Resource
@@ -33,36 +33,36 @@ public class McpToolController {
     @PatchMapping("/role/{roleId}/tools")
     @SaCheckPermission("system:role:mcp-tools:api:update")
     @CheckOwner(resource = "role", id = "#roleId")
-    @AuditLog(module = "MCP工具管理", operation = "切换角色工具状态")
-    @Operation(summary = "切换角色工具状态", description = "启用或禁用指定角色的某个工具")
+    @AuditLog(module = "Gerenciamento de ferramentas MCP", operation = "Alternar status de ferramenta do papel")
+    @Operation(summary = "Alternar status de ferramenta do papel", description = "Ativa ou desativa uma ferramenta específica de um papel")
     public ApiResponse<?> toggleRoleToolStatus(@PathVariable Integer roleId, @Valid @RequestBody McpRoleToolStatusReq req) {
         mcpToolExcludeService.toggleRoleToolStatus(roleId, req.getToolName(), req.getServerName(), req.getEnabled());
-        return ApiResponse.success("操作成功");
+        return ApiResponse.success("Operação realizada com sucesso");
     }
 
     @PostMapping("/role/{roleId}/exclude-tools")
     @SaCheckPermission("system:role:mcp-tools:api:update")
     @CheckOwner(resource = "role", id = "#roleId")
-    @AuditLog(module = "MCP工具管理", operation = "批量设置角色排除工具")
-    @Operation(summary = "批量设置角色排除工具", description = "批量设置指定角色需要排除的工具列表")
+    @AuditLog(module = "Gerenciamento de ferramentas MCP", operation = "Definir ferramentas excluídas do papel em lote")
+    @Operation(summary = "Definir ferramentas excluídas do papel em lote", description = "Define em lote a lista de ferramentas excluídas do papel informado")
     public ApiResponse<?> batchSetRoleExcludeTools(@PathVariable Integer roleId, @Valid @RequestBody McpRoleExcludeToolsReq req) {
         mcpToolExcludeService.batchSetRoleExcludeTools(roleId, req.getExcludeTools(), req.getServerName());
-        return ApiResponse.success("批量设置成功");
+        return ApiResponse.success("Configuração em lote realizada com sucesso");
     }
 
     @PatchMapping("/global/tools")
     @SaCheckPermission("system:config:mcpServer:api:update")
-    @AuditLog(module = "MCP工具管理", operation = "切换全局工具状态")
-    @Operation(summary = "切换全局工具状态", description = "启用或禁用全局工具")
+    @AuditLog(module = "Gerenciamento de ferramentas MCP", operation = "Alternar status de ferramenta global")
+    @Operation(summary = "Alternar status de ferramenta global", description = "Ativa ou desativa uma ferramenta global")
     public ApiResponse<?> toggleGlobalToolStatus(@Valid @RequestBody McpGlobalToolStatusReq req) {
         mcpToolExcludeService.toggleGlobalToolStatus(req.getToolName(), req.getServerName(), req.getEnabled());
-        return ApiResponse.success("操作成功");
+        return ApiResponse.success("Operação realizada com sucesso");
     }
 
     @GetMapping("/role/{roleId}/disabled-tools")
     @SaCheckPermission("system:role:mcp-tools:api:list")
     @CheckOwner(resource = "role", id = "#roleId != null && #roleId > 0 ? #roleId : null")
-    @Operation(summary = "获取禁用的工具列表", description = "获取指定角色和全局禁用的工具列表")
+    @Operation(summary = "Obter lista de ferramentas desativadas", description = "Obtém a lista de ferramentas desativadas do papel informado e as desativadas globalmente")
     public ApiResponse<?> getDisabledTools(@PathVariable Integer roleId) {
         List<String> roleDisabled = roleId != null && roleId > 0 ? mcpToolExcludeService.getRoleDisabledTools(roleId) : List.of();
         List<String> globalDisabled = mcpToolExcludeService.getGlobalDisabledTools();
@@ -76,7 +76,7 @@ public class McpToolController {
 
     @GetMapping("/system-global")
     @SaCheckPermission("system:role:mcp-tools:api:system-global")
-    @Operation(summary = "获取系统全局工具列表", description = "获取系统中所有可用的全局工具列表")
+    @Operation(summary = "Obter lista de ferramentas globais do sistema", description = "Obtém a lista de todas as ferramentas globais disponíveis no sistema")
     public ApiResponse<?> getSystemGlobalTools() {
         return ApiResponse.success(mcpToolQueryService.getSystemGlobalToolSummaries());
     }

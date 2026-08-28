@@ -17,15 +17,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 配置领域应用服务。
+ * Serviço de aplicação do domínio de configuração.
  * <p>
- * 职责：编排 Controller → Domain Service 之间的流程，包括：
+ * Responsabilidade: orquestra o fluxo entre o Controller e o Domain Service, incluindo:
  * <ul>
- *   <li>Req/Resp ↔ BO 转换</li>
- *   <li>跨领域业务规则校验（embedding 模型绑定记忆检查）</li>
- *   <li>副作用协调（Redis 广播配置变更）</li>
+ *   <li>Conversão Req/Resp ↔ BO</li>
+ *   <li>Validação de regras de negócio entre domínios (checagem de vínculo do modelo de embedding com a memória)</li>
+ *   <li>Coordenação de efeitos colaterais (broadcast de mudança de configuração via Redis)</li>
  * </ul>
- * Controller 应只做参数绑定和权限校验，所有业务编排逻辑归此类。
+ * O Controller deve apenas vincular parâmetros e validar permissões; toda a lógica de orquestração de negócio pertence a esta classe.
  */
 @Service
 public class ConfigAppService {
@@ -60,10 +60,10 @@ public class ConfigAppService {
     public ConfigResp update(Integer configId, ConfigUpdateReq req) {
         ConfigBO existing = configService.getBO(configId);
         if (existing == null) {
-            throw new ResourceNotFoundException("配置不存在或无权访问");
+            throw new ResourceNotFoundException("Configuração não encontrada ou sem permissão de acesso");
         }
         AiConfig config = configRepository.findById(configId)
-                .orElseThrow(() -> new ResourceNotFoundException("配置不存在或无权访问"));
+                .orElseThrow(() -> new ResourceNotFoundException("Configuração não encontrada ou sem permissão de acesso"));
         config.update(configConvert.toBO(req));
         configRepository.save(config);
         ConfigBO updated = configService.getBO(configId);
@@ -74,7 +74,7 @@ public class ConfigAppService {
     public void delete(Integer configId) {
         ConfigBO existing = configService.getBO(configId);
         if (existing == null) {
-            throw new ResourceNotFoundException("配置不存在或无权访问");
+            throw new ResourceNotFoundException("Configuração não encontrada ou sem permissão de acesso");
         }
         configRepository.delete(configId);
     }

@@ -1,4 +1,4 @@
--- 删除 sys_message 中指标列
+-- Remove as colunas de métricas da tabela sys_message
 ALTER TABLE `sys_message`
   DROP COLUMN `tokens`,
   DROP COLUMN `sttDuration`,

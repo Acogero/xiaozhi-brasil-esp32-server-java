@@ -59,7 +59,7 @@ class FileUploadControllerTest extends ControllerTestSupport {
 
         mockMvc.perform(multipart("/api/file/upload").file(file).param("type", "image"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.message").value("上传成功"))
+            .andExpect(jsonPath("$.message").value("Upload realizado com sucesso"))
             .andExpect(jsonPath("$.data.relativePath").value("uploads/image/avatar.png"))
             .andExpect(jsonPath("$.data.url").value("https://server.test/uploads/image/avatar.png"));
     }
@@ -70,7 +70,7 @@ class FileUploadControllerTest extends ControllerTestSupport {
 
         mockMvc.perform(multipart("/api/file/upload").file(file).param("type", "script"))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.message").value("不支持的文件类型分类: script"));
+            .andExpect(jsonPath("$.message").value("Categoria de tipo de arquivo não suportada: script"));
     }
 
     @Test
@@ -82,6 +82,6 @@ class FileUploadControllerTest extends ControllerTestSupport {
 
         mockMvc.perform(multipart("/api/file/upload").file(file).param("type", "image"))
             .andExpect(status().isInternalServerError())
-            .andExpect(jsonPath("$.message").value("文件上传失败，请稍后重试"));
+            .andExpect(jsonPath("$.message").value("Falha no upload do arquivo, tente novamente mais tarde"));
     }
 }

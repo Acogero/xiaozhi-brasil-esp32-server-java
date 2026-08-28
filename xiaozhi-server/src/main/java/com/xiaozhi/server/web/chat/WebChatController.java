@@ -13,27 +13,27 @@ import reactor.core.publisher.Flux;
 import java.util.Map;
 
 /**
- * Web 聊天 API：通过 SSE 提供流式文本对话。
+ * API de chat Web: fornece diálogo de texto em streaming via SSE.
  */
 @RestController
 @RequestMapping("/api/chat")
-@Tag(name = "Web 聊天", description = "Web 端文本聊天相关操作")
+@Tag(name = "Chat Web", description = "Operações de chat de texto via Web")
 public class WebChatController {
 
     @Resource
     private WebChatService webChatService;
 
     /**
-     * 开启聊天会话。
-     * 不传 {@code sessionId} 时创建新会话；传入已有 sessionId 时尝试续接（会校验归属）。
+     * Abre uma sessão de chat.
+     * Quando {@code sessionId} não é informado, cria uma nova sessão; quando um sessionId existente é informado, tenta retomá-la (com verificação de posse).
      *
-     * @param roleId    角色 ID
-     * @param sessionId 可选，续接的会话 ID
+     * @param roleId    ID do papel
+     * @param sessionId opcional, ID da sessão a ser retomada
      * @return sessionId
      */
     @PostMapping("/open")
     @SaCheckPermission("system:chat:api:open")
-    @Operation(summary = "开启聊天会话", description = "创建或续接 Web 聊天会话并返回 sessionId")
+    @Operation(summary = "Abrir sessão de chat", description = "Cria ou retoma uma sessão de chat Web e retorna o sessionId")
     public Map<String, String> open(@RequestParam Integer roleId,
                                     @RequestParam(required = false) String sessionId) {
         Integer userId = StpUtil.getLoginIdAsInt();
@@ -42,25 +42,25 @@ public class WebChatController {
     }
 
     /**
-     * 流式聊天（SSE）
+     * Chat em streaming (SSE)
      *
-     * @param sessionId 会话ID
-     * @param text      用户消息
-     * @return AI 回复文本流
+     * @param sessionId ID da sessão
+     * @param text      mensagem do usuário
+     * @return fluxo de texto da resposta da IA
      */
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @SaCheckPermission("system:chat:api:stream")
-    @Operation(summary = "流式聊天", description = "通过 SSE 返回 AI 回复 Token 流，包含 thinking 和 content 两种类型")
+    @Operation(summary = "Chat em streaming", description = "Retorna o fluxo de tokens da resposta da IA via SSE, com os tipos thinking e content")
     public Flux<ChatToken> stream(@RequestParam String sessionId, @RequestParam String text) {
         return webChatService.chatStream(sessionId, text);
     }
 
     /**
-     * 关闭聊天会话
+     * Fecha a sessão de chat
      */
     @PostMapping("/close")
     @SaCheckPermission("system:chat:api:close")
-    @Operation(summary = "关闭聊天会话", description = "关闭 Web 聊天会话并释放资源")
+    @Operation(summary = "Encerrar sessão de chat", description = "Encerra a sessão de chat Web e libera os recursos")
     public Map<String, String> close(@RequestParam String sessionId) {
         webChatService.closeSession(sessionId);
         return Map.of("status", "closed");

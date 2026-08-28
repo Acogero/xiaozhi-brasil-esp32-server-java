@@ -53,7 +53,7 @@ class DeviceControllerTest extends ControllerTestSupport {
     void queryReturnsPagedDevicesForCurrentUser() throws Exception {
         DeviceResp resp = new DeviceResp();
         resp.setDeviceId("dev-1");
-        resp.setDeviceName("客厅音箱");
+        resp.setDeviceName("Caixa de som da sala");
         PageResp<DeviceResp> pageResp = new PageResp<>(List.of(resp), 1L, 1, 10);
         when(deviceAppService.page(any(DevicePageReq.class), eq(7))).thenReturn(pageResp);
 
@@ -61,7 +61,7 @@ class DeviceControllerTest extends ControllerTestSupport {
             mockMvc.perform(get("/api/device")
                     .param("pageNo", "1")
                     .param("pageSize", "10")
-                    .param("deviceName", "客厅"))
+                    .param("deviceName", "Sala"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(ResultStatus.SUCCESS))
                 .andExpect(jsonPath("$.data.list[0].deviceId").value("dev-1"));
@@ -69,7 +69,7 @@ class DeviceControllerTest extends ControllerTestSupport {
 
         ArgumentCaptor<DevicePageReq> captor = ArgumentCaptor.forClass(DevicePageReq.class);
         verify(deviceAppService).page(captor.capture(), eq(7));
-        assertThat(captor.getValue().getDeviceName()).isEqualTo("客厅");
+        assertThat(captor.getValue().getDeviceName()).isEqualTo("Sala");
     }
 
     @Test
@@ -108,14 +108,14 @@ class DeviceControllerTest extends ControllerTestSupport {
 
     @Test
     void otaReturnsBadRequestWhenDeviceIdInvalid() throws Exception {
-        when(deviceAppService.handleOta(any())).thenThrow(new IllegalArgumentException("设备ID不正确"));
+        when(deviceAppService.handleOta(any())).thenThrow(new IllegalArgumentException("ID do dispositivo incorreto"));
 
         mockMvc.perform(post("/api/device/ota")
                 .header("Device-Id", "bad-device")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.error").value("设备ID不正确"));
+            .andExpect(jsonPath("$.error").value("ID do dispositivo incorreto"));
     }
 
     @Test

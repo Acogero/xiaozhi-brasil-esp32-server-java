@@ -26,19 +26,19 @@ import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 文件上传控制器
+ * Controller de upload de arquivos
  * 
  * @author Joey
  */
 @Slf4j
 @RestController
 @RequestMapping("/api/file")
-@Tag(name = "文件上传控制器", description = "文件上传相关操作")
+@Tag(name = "Controller de upload de arquivos", description = "Operações relacionadas a upload de arquivos")
 public class FileUploadController {
-    /** 允许的文件类型分类（防止路径遍历） */
+    /** Categorias de tipo de arquivo permitidas (previne path traversal) */
     private static final Set<String> ALLOWED_TYPES = Set.of("common", "image", "audio", "video", "document", "avatar");
 
-    /** 允许的文件扩展名白名单 */
+    /** Lista de extensões de arquivo permitidas */
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of(
             ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg",
             ".mp3", ".wav", ".ogg", ".opus", ".flac", ".aac", ".m4a",
@@ -55,53 +55,53 @@ public class FileUploadController {
     private ServerAddressProvider serverAddressProvider;
 
     /**
-     * 通用文件上传方法
+     * Método genérico de upload de arquivo
      * 
-     * @param file 上传的文件
-     * @param type 文件类型（可选，用于分类存储）
-     * @return 文件访问URL
+     * @param file arquivo enviado
+     * @param type tipo de arquivo (opcional, usado para organizar o armazenamento)
+     * @return URL de acesso ao arquivo
      */
     @PostMapping("/upload")
     @ResponseBody
     @SaCheckPermission("system:file:api:upload")
-    @Operation(summary = "文件上传", description = "如果有配置腾讯云对象存储的话默认会存储到对象存储中")
+    @Operation(summary = "Upload de arquivo", description = "Se o armazenamento de objetos da Tencent Cloud estiver configurado, o arquivo será armazenado nele por padrão")
     public ApiResponse<?> uploadFile(
-            @Parameter(description = "上传的文件") @RequestParam("file") MultipartFile file,
-            @Parameter(description = "文件类型") @RequestParam(value = "type", required = false, defaultValue = "common") String type) {
+            @Parameter(description = "Arquivo enviado") @RequestParam("file") MultipartFile file,
+            @Parameter(description = "Tipo de arquivo") @RequestParam(value = "type", required = false, defaultValue = "common") String type) {
 
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("上传文件不能为空");
+            throw new IllegalArgumentException("O arquivo enviado não pode estar vazio");
         }
 
-        // 检查文件大小
+        // Verifica o tamanho do arquivo
         StorageService.assertAllowed(file);
 
-        // 防止路径遍历：type 必须在白名单中
+        // Previne path traversal: type precisa estar na lista permitida
         if (!ALLOWED_TYPES.contains(type)) {
-            throw new IllegalArgumentException("不支持的文件类型分类: " + type);
+            throw new IllegalArgumentException("Categoria de tipo de arquivo não suportada: " + type);
         }
 
-        // 验证文件名和扩展名
+        // Valida o nome do arquivo e a extensão
         String originalFilename = file.getOriginalFilename();
         if (!StringUtils.hasText(originalFilename) || !originalFilename.contains(".")) {
-            throw new IllegalArgumentException("文件名无效或缺少扩展名");
+            throw new IllegalArgumentException("Nome de arquivo inválido ou sem extensão");
         }
         String extension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
         if (!ALLOWED_EXTENSIONS.contains(extension)) {
-            throw new IllegalArgumentException("不支持的文件扩展名: " + extension);
+            throw new IllegalArgumentException("Extensão de arquivo não suportada: " + extension);
         }
 
-        // 验证 MIME 类型与扩展名一致性
+        // Valida se o tipo MIME é consistente com a extensão
         String contentType = file.getContentType();
         if (contentType != null && !isContentTypeMatchExtension(contentType, extension)) {
-            throw new IllegalArgumentException("文件MIME类型与扩展名不匹配");
+            throw new IllegalArgumentException("O tipo MIME do arquivo não corresponde à extensão");
         }
 
-        // 构建文件存储路径，按日期和类型分类
+        // Monta o caminho de armazenamento do arquivo, organizado por data e tipo
         String datePath = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
         String relativePath = type + "/" + datePath;
 
-        // 生成唯一文件名
+        // Gera um nome de arquivo único
         String fileName = UUID.randomUUID().toString().replaceAll("-", "") + extension;
 
         StorageService storageService = storageServiceFactory.getStorageService();
@@ -109,13 +109,13 @@ public class FileUploadController {
         try {
             filePathOrUrl = storageService.upload(file, relativePath, fileName);
         } catch (IOException e) {
-            log.error("文件上传失败: {}", e.getMessage(), e);
-            throw new OperationFailedException("文件上传失败，请稍后重试", e);
+            log.error("Falha no upload do arquivo: {}", e.getMessage(), e);
+            throw new OperationFailedException("Falha no upload do arquivo, tente novamente mais tarde", e);
         }
 
-        log.info("文件上传成功（{}）: {}", storageService.getProvider(), filePathOrUrl);
+        log.info("Upload do arquivo concluído ({}): {}", storageService.getProvider(), filePathOrUrl);
 
-        // 计算文件哈希值
+        // Calcula o hash do arquivo
         String fileHash = FileHashUtil.calculateSha256(file);
 
         Map<String, Object> data = new HashMap<>();
@@ -123,7 +123,7 @@ public class FileUploadController {
         data.put("newFileName", fileName);
         data.put("hash", fileHash);
 
-        // 判断是否是完整 URL（云存储返回 https URL，本地返回相对路径）
+        // Verifica se é uma URL completa (armazenamento em nuvem retorna URL https, local retorna caminho relativo)
         if (filePathOrUrl.startsWith("http://") || filePathOrUrl.startsWith("https://")) {
             data.put("url", filePathOrUrl);
         } else {
@@ -132,11 +132,11 @@ public class FileUploadController {
             data.put("relativePath", filePathOrUrl);
         }
 
-        return ApiResponse.success("上传成功", data);
+        return ApiResponse.success("Upload realizado com sucesso", data);
     }
 
     /**
-     * 验证 MIME 类型与文件扩展名是否匹配
+     * Verifica se o tipo MIME corresponde à extensão do arquivo
      */
     private boolean isContentTypeMatchExtension(String contentType, String extension) {
         String ct = contentType.toLowerCase();

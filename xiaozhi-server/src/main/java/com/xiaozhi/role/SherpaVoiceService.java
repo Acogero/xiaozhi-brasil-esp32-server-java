@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Sherpa-ONNX 本地音色扫描服务。
+ * Serviço de varredura de vozes locais do Sherpa-ONNX.
  * <p>
- * 扫描配置的本地 TTS 模型目录，自动识别模型类型（Kokoro / Matcha / VITS）和 speaker。
+ * Varre o diretório local dos modelos de TTS configurados, identificando automaticamente o tipo de modelo (Kokoro / Matcha / VITS) e o speaker.
  */
 public interface SherpaVoiceService {
 
     /**
-     * 扫描本地 TTS 模型目录，返回所有可用的 sherpa-onnx 音色列表。
+     * Varre o diretório local dos modelos de TTS e retorna a lista de vozes sherpa-onnx disponíveis.
      */
     List<Map<String, Object>> listVoices();
 }

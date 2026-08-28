@@ -10,17 +10,17 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 /**
- * Message 领域应用服务。
+ * Serviço de aplicação do domínio Message.
  * <p>
- * 职责：编排 Controller → Domain Service 之间的流程，包括：
+ * Responsabilidade: orquestra o fluxo entre o Controller e o Domain Service, incluindo:
  * <ul>
- *   <li>Req/Resp ↔ BO 转换</li>
- *   <li>跨领域校验</li>
+ *   <li>Conversão Req/Resp ↔ BO</li>
+ *   <li>Validações entre domínios</li>
  * </ul>
  * <p>
- * 注：UserMessage 的元数据（时间戳/说话人/情绪）已由 {@code MessageMetadataBO} 以结构化方式
- * 存在 sys_message.metadata 的 JSON 列中，{@code message} 列本身就是用户裸文本，前端直接展示无需剥离。
- * 投影拼前缀由 {@code Conversation} 层在送 LLM 前按需做。
+ * Nota: os metadados do UserMessage (timestamp/interlocutor/emoção) já são representados de forma estruturada por {@code MessageMetadataBO}
+ * e armazenados na coluna JSON sys_message.metadata; a coluna {@code message} já é o texto puro do usuário, exibido diretamente pelo frontend sem necessidade de tratamento.
+ * A montagem do prefixo de projeção é feita pela camada {@code Conversation} conforme necessário, antes de enviar ao LLM.
  */
 @Service
 public class MessageAppService {

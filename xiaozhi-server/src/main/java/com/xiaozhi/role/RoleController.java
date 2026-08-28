@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import java.nio.file.Path;
 
 /**
- * 角色管理
+ * Gerenciamento de papéis
  * 
  * @author Joey
  * 
@@ -36,7 +36,7 @@ import java.nio.file.Path;
 @Slf4j
 @RestController
 @RequestMapping("/api/role")
-@Tag(name = "角色管理", description = "角色相关操作")
+@Tag(name = "Gerenciamento de papéis", description = "Operações relacionadas a papéis")
 public class RoleController extends BaseController {
 
     @Resource
@@ -52,7 +52,7 @@ public class RoleController extends BaseController {
     private ConfigService configService;
 
     /**
-     * 角色查询
+     * Consulta de papéis
      *
      * @param req
      * @return roleList
@@ -60,72 +60,72 @@ public class RoleController extends BaseController {
     @GetMapping("")
     @ResponseBody
     @SaCheckPermission("system:role:api:list")
-    @Operation(summary = "根据条件查询角色信息", description = "返回角色信息列表")
+    @Operation(summary = "Consulta informações de papéis de acordo com os filtros", description = "Retorna a lista de papéis")
     public ApiResponse<?> list(@Valid RolePageReq req) {
         return ApiResponse.success(roleAppService.page(req, StpUtil.getLoginIdAsInt()));
     }
 
     /**
-     * 角色信息更新
+     * Atualização das informações do papel
      *
-     * @param roleId 角色ID
-     * @param param 更新参数
+     * @param roleId ID do papel
+     * @param param parâmetros de atualização
      * @return
      */
     @PutMapping("/{roleId}")
     @ResponseBody
     @SaCheckPermission("system:role:api:update")
     @CheckOwner(resource = "role", id = "#roleId")
-    @AuditLog(module = "角色管理", operation = "更新角色")
+    @AuditLog(module = "Gerenciamento de papéis", operation = "Atualizar papel")
     @CheckOwner(resource = "config", id = "#param.modelId")
     @CheckOwner(resource = "config", id = "#param.sttId != null && #param.sttId > 0 ? #param.sttId : null")
     @CheckOwner(resource = "config", id = "#param.ttsId != null && #param.ttsId > 0 ? #param.ttsId : null")
-    @Operation(summary = "更新角色信息", description = "更新语音助手角色配置")
+    @Operation(summary = "Atualizar informações do papel", description = "Atualizar configuração do papel do assistente de voz")
     public ApiResponse<?> update(@PathVariable Integer roleId, @Valid @RequestBody RoleUpdateReq param) {
         return ApiResponse.success(roleAppService.update(roleId, param));
     }
 
     /**
-     * 添加角色
+     * Adicionar papel
      *
-     * @param param 添加参数
+     * @param param parâmetros de criação
      */
     @PostMapping("")
     @ResponseBody
     @SaCheckPermission("system:role:api:create")
-    @AuditLog(module = "角色管理", operation = "创建角色")
+    @AuditLog(module = "Gerenciamento de papéis", operation = "Criar papel")
     @CheckOwner(resource = "config", id = "#param.modelId")
     @CheckOwner(resource = "config", id = "#param.sttId != null && #param.sttId > 0 ? #param.sttId : null")
     @CheckOwner(resource = "config", id = "#param.ttsId != null && #param.ttsId > 0 ? #param.ttsId : null")
-    @Operation(summary = "添加角色信息", description = "添加新的语音助手角色")
+    @Operation(summary = "Adicionar informações do papel", description = "Adiciona um novo papel de assistente de voz")
     public ApiResponse<?> create(@Valid @RequestBody RoleCreateReq param) {
         return ApiResponse.success(roleAppService.create(param, StpUtil.getLoginIdAsInt()));
     }
 
     /**
-     * 删除角色
+     * Excluir papel
      *
-     * @param roleId 角色ID
+     * @param roleId ID do papel
      * @return
      */
     @DeleteMapping("/{roleId}")
     @ResponseBody
     @SaCheckPermission("system:role:api:delete")
     @CheckOwner(resource = "role", id = "#roleId")
-    @AuditLog(module = "角色管理", operation = "删除角色")
-    @Operation(summary = "删除角色信息", description = "删除指定的语音助手角色")
+    @AuditLog(module = "Gerenciamento de papéis", operation = "Excluir papel")
+    @Operation(summary = "Excluir informações do papel", description = "Exclui o papel do assistente de voz informado")
     public ApiResponse<?> delete(@PathVariable Integer roleId) {
         roleAppService.delete(roleId);
-        return ApiResponse.success("删除成功");
+        return ApiResponse.success("Excluído com sucesso");
     }
 
     /**
-     * 扫描配置的本地 TTS 模型目录，动态返回所有可用的 sherpa-onnx 音色列表
+     * Varre o diretório local dos modelos de TTS configurados e retorna dinamicamente a lista de vozes sherpa-onnx disponíveis
      */
     @GetMapping("/sherpaVoices")
     @ResponseBody
     @SaCheckPermission("system:role:api:list")
-    @Operation(summary = "获取本地 sherpa-onnx 音色列表", description = "扫描配置的本地 TTS 模型目录，自动识别模型类型和 speaker")
+    @Operation(summary = "Obtém a lista de vozes locais do sherpa-onnx", description = "Varre o diretório local dos modelos de TTS configurados, identificando automaticamente o tipo de modelo e o speaker")
     public ApiResponse<?> listSherpaVoices() {
         return ApiResponse.success(sherpaVoiceService.listVoices());
     }
@@ -134,16 +134,16 @@ public class RoleController extends BaseController {
     @ResponseBody
     @SaCheckPermission("system:role:api:list")
     @CheckOwner(resource = "config", id = "#param.provider != 'edge' ? #param.ttsId : null")
-    @Operation(summary = "测试语音合成", description = "测试指定配置的语音合成效果")
+    @Operation(summary = "Testar síntese de voz", description = "Testa o resultado da síntese de voz da configuração informada")
     public ApiResponse<?> testAudio(@Valid TestVoiceReq param) {
         ConfigBO config = null;
         if (!param.getProvider().equals("edge")) {
             if (param.getTtsId() == null) {
-                throw new IllegalArgumentException("非 edge 提供方必须指定语音配置");
+                throw new IllegalArgumentException("Provedores que não sejam "edge" precisam ter uma configuração de voz definida");
             }
             config = configService.getBO(param.getTtsId());
             if (config == null) {
-                throw new ResourceNotFoundException("语音配置不存在或无权访问");
+                throw new ResourceNotFoundException("Configuração de voz não encontrada ou sem permissão de acesso");
             }
         }
 
@@ -151,13 +151,13 @@ public class RoleController extends BaseController {
             Path audioFilePath = ttsService.getTtsService(config, param.getVoiceName(), param.getTtsPitch(), param.getTtsSpeed())
                     .textToSpeech(param.getMessage());
 
-            return ApiResponse.success("操作成功", audioFilePath != null ? audioFilePath.toString() : null);
+            return ApiResponse.success("Operação realizada com sucesso", audioFilePath != null ? audioFilePath.toString() : null);
         } catch (IndexOutOfBoundsException e) {
             log.error(e.getMessage(), e);
-            throw new IllegalStateException("请先到语音合成配置页面配置对应Key", e);
+            throw new IllegalStateException("Configure a chave correspondente na página de configuração de síntese de voz", e);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new OperationFailedException("测试语音合成失败", e);
+            throw new OperationFailedException("Falha ao testar a síntese de voz", e);
         }
     }
 }

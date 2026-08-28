@@ -1,5 +1,5 @@
--- 将 TTS 语速/音调字段从 FLOAT 调整为 DOUBLE，与 Java 侧 Double 保持一致，避免隐式精度降级。
+-- Altera os campos de velocidade/tom da TTS de FLOAT para DOUBLE, mantendo consistência com o tipo Double do lado Java e evitando perda implícita de precisão.
 
 ALTER TABLE `sys_role`
-    MODIFY COLUMN `ttsPitch` DOUBLE DEFAULT 1.0 COMMENT '语音音调',
-    MODIFY COLUMN `ttsSpeed` DOUBLE DEFAULT 1.0 COMMENT '语音语速';
+    MODIFY COLUMN `ttsPitch` DOUBLE DEFAULT 1.0 COMMENT 'Tom de voz',
+    MODIFY COLUMN `ttsSpeed` DOUBLE DEFAULT 1.0 COMMENT 'Velocidade da fala';

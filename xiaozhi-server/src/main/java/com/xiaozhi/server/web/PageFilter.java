@@ -1,7 +1,7 @@
 package com.xiaozhi.server.web;
 
 /**
- * 分页信息
+ * Informações de paginação
  */
 public class PageFilter {
     private Integer start = 1;

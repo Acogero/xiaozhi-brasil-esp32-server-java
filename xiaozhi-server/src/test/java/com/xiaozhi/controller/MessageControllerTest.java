@@ -66,12 +66,12 @@ class MessageControllerTest extends ControllerTestSupport {
 
     @Test
     void deleteReturnsNotFoundWhenMessageMissing() throws Exception {
-        doThrow(new ResourceNotFoundException("消息不存在或无权访问")).when(messageAppService).delete(5);
+        doThrow(new ResourceNotFoundException("Mensagem não encontrada ou sem permissão de acesso")).when(messageAppService).delete(5);
 
         mockMvc.perform(delete("/api/message/5"))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.code").value(ResultStatus.NOT_FOUND))
-            .andExpect(jsonPath("$.message").value("消息不存在或无权访问"));
+            .andExpect(jsonPath("$.message").value("Mensagem não encontrada ou sem permissão de acesso"));
     }
 
     @Test
@@ -81,6 +81,6 @@ class MessageControllerTest extends ControllerTestSupport {
         mockMvc.perform(delete("/api/message").param("deviceId", "dev-1"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(ResultStatus.SUCCESS))
-            .andExpect(jsonPath("$.message").value("删除成功，共删除3条消息"));
+            .andExpect(jsonPath("$.message").value("Exclusão concluída, total de 3 mensagem(ns) excluída(s)"));
     }
 }

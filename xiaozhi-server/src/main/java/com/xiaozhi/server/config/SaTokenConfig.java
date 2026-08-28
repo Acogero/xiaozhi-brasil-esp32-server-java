@@ -12,7 +12,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * Sa-Token 配置类
+ * Classe de configuração do Sa-Token
  *
  * @author Joey
  */
@@ -25,23 +25,23 @@ public class SaTokenConfig implements WebMvcConfigurer {
     }
 
     /**
-     * 注册Sa-Token拦截器
+     * Registra o interceptor do Sa-Token
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // 注册Sa-Token拦截器，拦截所有API请求
-        // 不需要登录的接口请使用 @SaIgnore 注解标注
+        // Registra o interceptor do Sa-Token, interceptando todas as requisições da API
+        // Endpoints que não exigem login devem ser marcados com a anotação @SaIgnore
         registry.addInterceptor(new SaInterceptor(handle -> StpUtil.checkLogin()) {
                     @Override
                     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-                        // CORS 预检请求（OPTIONS）直接放行，不检查登录状态
+                        // Requisições de preflight CORS (OPTIONS) são liberadas diretamente, sem verificar login
                         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
                             return true;
                         }
-                        // 其他请求正常处理
+                        // Demais requisições seguem o processamento normal
                         return super.preHandle(request, response, handler);
                     }
-                }.isAnnotation(true))  // 开启注解鉴权功能，支持 @SaIgnore 等注解
+                }.isAnnotation(true))  // Habilita a autenticação baseada em anotações, com suporte a @SaIgnore etc.
                 .addPathPatterns("/api/**");
     }
 }

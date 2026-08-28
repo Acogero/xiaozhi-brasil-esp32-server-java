@@ -61,7 +61,7 @@ class RoleControllerTest extends ControllerTestSupport {
     void listReturnsPagedRolesForCurrentUser() throws Exception {
         RoleResp roleResp = new RoleResp();
         roleResp.setRoleId(1);
-        roleResp.setRoleName("管理员");
+        roleResp.setRoleName("Administrador");
         PageResp<RoleResp> pageResp = new PageResp<>(List.of(roleResp), 1L, 1, 10);
 
         when(roleAppService.page(any(RolePageReq.class), eq(7))).thenReturn(pageResp);
@@ -85,7 +85,7 @@ class RoleControllerTest extends ControllerTestSupport {
     @Test
     void createUsesCurrentUserAndReturnsCreatedRole() throws Exception {
         RoleCreateReq req = new RoleCreateReq();
-        req.setRoleName("新角色");
+        req.setRoleName("Novo papel");
 
         RoleResp roleResp = new RoleResp();
         roleResp.setRoleId(9);
@@ -114,34 +114,34 @@ class RoleControllerTest extends ControllerTestSupport {
                         """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(ResultStatus.BAD_REQUEST))
-                .andExpect(jsonPath("$.message").value("角色名称不能为空"));
+                .andExpect(jsonPath("$.message").value("O nome do papel não pode estar vazio"));
         }
     }
 
     @Test
     void updateReturnsConflictWhenServiceThrowsIllegalState() throws Exception {
         RoleUpdateReq req = new RoleUpdateReq();
-        req.setRoleName("更新后角色");
+        req.setRoleName("Papel após atualização");
 
         when(roleAppService.update(eq(9), any(RoleUpdateReq.class)))
-            .thenThrow(new IllegalStateException("更新角色失败"));
+            .thenThrow(new IllegalStateException("Falha ao atualizar papel"));
 
         mockMvc.perform(put("/api/role/9")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(req)))
             .andExpect(status().isConflict())
             .andExpect(jsonPath("$.code").value(ResultStatus.CONFLICT))
-            .andExpect(jsonPath("$.message").value("更新角色失败"));
+            .andExpect(jsonPath("$.message").value("Falha ao atualizar papel"));
     }
 
     @Test
     void deleteReturnsNotFoundWhenRoleMissing() throws Exception {
-        doThrow(new ResourceNotFoundException("角色不存在或无权访问")).when(roleAppService).delete(9);
+        doThrow(new ResourceNotFoundException("Papel não encontrado ou sem permissão de acesso")).when(roleAppService).delete(9);
 
         mockMvc.perform(delete("/api/role/9"))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.code").value(ResultStatus.NOT_FOUND))
-            .andExpect(jsonPath("$.message").value("角色不存在或无权访问"));
+            .andExpect(jsonPath("$.message").value("Papel não encontrado ou sem permissão de acesso"));
     }
 
     @Test

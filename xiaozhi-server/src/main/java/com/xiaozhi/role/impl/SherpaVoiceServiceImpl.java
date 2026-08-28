@@ -13,7 +13,7 @@ import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * Sherpa-ONNX 本地音色扫描服务实现。
+ * Implementação do serviço de varredura de vozes locais do Sherpa-ONNX.
  */
 @Slf4j
 @Service
@@ -43,7 +43,7 @@ public class SherpaVoiceServiceImpl implements SherpaVoiceService {
         List<Map<String, Object>> voices = new ArrayList<>();
         String dirName = modelDir.getName();
 
-        // 检测模型类型
+        // Detecta o tipo de modelo
         boolean isKokoro = new File(modelDir, "voices.bin").exists();
         boolean isMatcha = false;
         if (!isKokoro) {
@@ -61,7 +61,7 @@ public class SherpaVoiceServiceImpl implements SherpaVoiceService {
         if (isKokoro) {
             List<String> speakerNames = readKokoroSpeakers(new File(modelDir, "voices.bin"));
             if (speakerNames.isEmpty()) {
-                // 读取失败，默认给8个
+                // Falha na leitura, define 8 por padrão
                 for (int i = 0; i < 8; i++) {
                     voices.add(buildVoice(dirName, "kokoro", i, "Speaker-" + i));
                 }
@@ -73,10 +73,10 @@ public class SherpaVoiceServiceImpl implements SherpaVoiceService {
         } else if (isMatcha) {
             voices.add(buildVoice(dirName, "matcha", 0, dirName));
         } else {
-            // VITS：多 speaker 模型通过目录名判断
+            // VITS: modelos com múltiplos speakers são identificados pelo nome do diretório
             boolean isMultiSpeaker = dirName.contains("aishell3") || dirName.contains("vctk");
             if (isMultiSpeaker) {
-                // 多 speaker VITS，默认列出前10个，用户可自行扩充
+                // VITS com múltiplos speakers: lista os 10 primeiros por padrão; o usuário pode expandir
                 for (int i = 0; i < 10; i++) {
                     voices.add(buildVoice(dirName, "vits", i, "Speaker-" + i));
                 }
@@ -97,8 +97,8 @@ public class SherpaVoiceServiceImpl implements SherpaVoiceService {
     }
 
     /**
-     * 读取 Kokoro voices.bin 中的 speaker 名称列表。
-     * 文件格式：每个名称以 \0 结尾连续存储。
+     * Lê a lista de nomes de speaker do arquivo voices.bin do Kokoro.
+     * Formato do arquivo: cada nome é armazenado sequencialmente, terminado por \0.
      */
     private List<String> readKokoroSpeakers(File voicesBin) {
         List<String> names = new ArrayList<>();
@@ -116,13 +116,13 @@ public class SherpaVoiceServiceImpl implements SherpaVoiceService {
                     start = i + 1;
                 }
             }
-            // 处理末尾没有 \0 的情况
+            // Trata o caso em que não há \0 no final
             if (start < data.length) {
                 String name = new String(data, start, data.length - start, StandardCharsets.UTF_8).trim();
                 if (!name.isEmpty()) names.add(name);
             }
         } catch (IOException e) {
-            log.warn("读取 voices.bin 失败: {}", voicesBin.getAbsolutePath());
+            log.warn("Falha ao ler voices.bin: {}", voicesBin.getAbsolutePath());
         }
         return names;
     }

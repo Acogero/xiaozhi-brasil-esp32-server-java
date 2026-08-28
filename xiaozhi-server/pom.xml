@@ -8,15 +8,15 @@
     </parent>
     <artifactId>xiaozhi-server</artifactId>
     <name>xiaozhi-server</name>
-    <description>启动器 + Controller，聚合所有模块</description>
+    <description>Inicializador + Controller, agrega todos os módulos</description>
 
     <dependencies>
-        <!-- 核心服务层（含业务逻辑、事件、BO） -->
+        <!-- Camada de serviço principal (lógica de negócio, eventos, BO) -->
         <dependency>
             <groupId>com.xiaozhi</groupId>
             <artifactId>xiaozhi-service</artifactId>
         </dependency>
-        <!-- AI 能力（TTS/STT/Vision/LLM factory） -->
+        <!-- Recursos de IA (TTS/STT/Vision/LLM factory) -->
         <dependency>
             <groupId>com.xiaozhi</groupId>
             <artifactId>xiaozhi-ai</artifactId>
@@ -31,7 +31,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
-        <!-- Flyway 数据库版本管理 -->
+        <!-- Flyway - gerenciamento de versão do banco de dados -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
@@ -40,7 +40,7 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-mysql</artifactId>
         </dependency>
-        <!-- 阿里云短信 -->
+        <!-- SMS Alibaba Cloud -->
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>dysmsapi20170525</artifactId>
@@ -86,7 +86,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <!-- 工作目录设为项目根，保证 models/ lib/ 等相对路径正确 -->
+                    <!-- Define o diretório de trabalho como a raiz do projeto, garantindo que os caminhos relativos de models/ lib/ etc. funcionem corretamente -->
                     <workingDirectory>${project.parent.basedir}</workingDirectory>
                     <jvmArguments>-Djava.library.path=${project.parent.basedir}/lib</jvmArguments>
                 </configuration>

@@ -55,7 +55,7 @@ class ConfigControllerTest extends ControllerTestSupport {
     void listReturnsPagedConfigsForCurrentUser() throws Exception {
         ConfigResp resp = new ConfigResp();
         resp.setConfigId(3);
-        resp.setConfigName("默认TTS");
+        resp.setConfigName("TTS padrão");
         PageResp<ConfigResp> pageResp = new PageResp<>(List.of(resp), 1L, 1, 10);
         when(configAppService.page(any(ConfigPageReq.class), eq(7))).thenReturn(pageResp);
 
@@ -83,7 +83,7 @@ class ConfigControllerTest extends ControllerTestSupport {
         mockMvc.perform(put("/api/config/11")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                    {"configName":"新配置"}
+                    {"configName":"Nova configuração"}
                     """))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(ResultStatus.SUCCESS))
@@ -102,18 +102,18 @@ class ConfigControllerTest extends ControllerTestSupport {
                     .content(toJson(req)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(ResultStatus.BAD_REQUEST))
-                .andExpect(jsonPath("$.message").value("配置名称不能为空"));
+                .andExpect(jsonPath("$.message").value("O nome da configuração não pode estar vazio"));
         }
     }
 
     @Test
     void deleteReturnsNotFoundWhenConfigMissing() throws Exception {
-        doThrow(new ResourceNotFoundException("配置不存在或无权访问"))
+        doThrow(new ResourceNotFoundException("Configuração não encontrada ou sem permissão de acesso"))
             .when(configAppService).delete(9);
 
         mockMvc.perform(delete("/api/config/9"))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.code").value(ResultStatus.NOT_FOUND))
-            .andExpect(jsonPath("$.message").value("配置不存在或无权访问"));
+            .andExpect(jsonPath("$.message").value("Configuração não encontrada ou sem permissão de acesso"));
     }
 }

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- 引入Spring Boot默认配置 -->
+    <!-- Importa a configuração padrão do Spring Boot -->
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
     
-    <!-- 定义日志文件存储位置 -->
+    <!-- Define o local de armazenamento dos arquivos de log -->
     <property name="LOG_HOME" value="./logs" />
     
-    <!-- 控制台输出配置 -->
+    <!-- Configuração de saída no console -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{30}:%line) - %msg%n</pattern>
@@ -14,7 +14,7 @@
         </encoder>
     </appender>
     
-    <!-- 文件输出配置 - 所有日志 -->
+    <!-- Configuração de saída em arquivo - todos os logs -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_HOME}/xiaozhi-server.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
@@ -29,7 +29,7 @@
         </encoder>
     </appender>
     
-    <!-- 文件输出配置 - 仅错误日志 -->
+    <!-- Configuração de saída em arquivo - apenas logs de erro -->
     <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_HOME}/xiaozhi-server-error.log</file>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -47,10 +47,10 @@
         </encoder>
     </appender>
     
-    <!-- 抑制 Spring Data 仓库扫描 INFO 日志 -->
+    <!-- Suprime os logs INFO de varredura de repositórios do Spring Data -->
     <logger name="org.springframework.data.repository.config.RepositoryConfigurationDelegate" level="WARN" />
     
-    <!-- 开发环境配置 -->
+    <!-- Configuração do ambiente de desenvolvimento -->
     <springProfile name="dev">
         <root level="INFO">
             <appender-ref ref="CONSOLE" />
@@ -63,7 +63,7 @@
         <logger name="org.springframework.web" level="INFO" />
         <logger name="com.alibaba.dashscope.protocol.okhttp" level="WARN" />
         
-        <!-- 添加以下配置以捕获 Spring AI 和 HTTP 客户端相关的详细日志 -->
+        <!-- Adiciona a configuração abaixo para capturar logs detalhados do Spring AI e do cliente HTTP -->
         <logger name="org.springframework.ai" level="TRACE" />
         <logger name="i.m.client.transport" level="TRACE" />
         <logger name="org.springframework.web.reactive" level="TRACE" />
@@ -71,12 +71,12 @@
         <logger name="com.xiaozhi.dialogue.llm.tool" level="TRACE" />
     </springProfile>
 
-    <!-- 生产环境配置 -->
+    <!-- Configuração do ambiente de produção -->
     <springProfile name="prod">
         <root level="INFO">
             <appender-ref ref="FILE" />
             <appender-ref ref="ERROR_FILE" />
-            <!-- 生产环境通常也保留控制台输出，以便在容器环境中查看日志 -->
+            <!-- Em produção, geralmente também se mantém a saída no console, para facilitar a visualização de logs em ambientes containerizados -->
             <appender-ref ref="CONSOLE" />
         </root>
         <logger name="com.xiaozhi" level="INFO" />
@@ -85,7 +85,7 @@
         <logger name="com.alibaba.dashscope.protocol.okhttp" level="WARN" />
     </springProfile>
     
-    <!-- 默认配置（如果没有指定profile） -->
+    <!-- Configuração padrão (caso nenhum profile seja especificado) -->
     <root level="INFO">
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="FILE" />

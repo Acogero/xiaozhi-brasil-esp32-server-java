@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/memory")
-@Tag(name = "记忆管理", description = "管理聊天相关的摘要记忆与长期记忆")
+@Tag(name = "Gerenciamento de memória", description = "Gerencia a memória resumida e a memória de longo prazo relacionadas ao chat")
 public class MemoryController extends BaseController {
 
     @Resource
@@ -33,7 +33,7 @@ public class MemoryController extends BaseController {
     @SaCheckPermission("system:role:memory:summary:api:list")
     @CheckOwner(resource = "role", id = "#roleId")
     @CheckOwner(resource = "device", id = "#deviceId")
-    @Operation(summary = "查询指定角色的摘要记忆", description = "返回摘要记忆列表，可按设备 ID 筛选")
+    @Operation(summary = "Consulta a memória resumida do papel informado", description = "Retorna a lista de memórias resumidas, podendo ser filtrada por ID do dispositivo")
     public ApiResponse<?> querySummary(@PathVariable Integer roleId,
                                       @PathVariable String deviceId,
                                       @RequestParam(defaultValue = "1") Integer pageNo,
@@ -45,8 +45,8 @@ public class MemoryController extends BaseController {
     @SaCheckPermission("system:role:memory:summary:api:delete")
     @CheckOwner(resource = "role", id = "#roleId")
     @CheckOwner(resource = "device", id = "#deviceId")
-    @AuditLog(module = "记忆管理", operation = "删除摘要记忆")
-    @Operation(summary = "批量删除指定角色的摘要记忆", description = "根据角色 ID 和设备 ID 批量删除摘要记忆")
+    @AuditLog(module = "Gerenciamento de memória", operation = "Excluir memória resumida")
+    @Operation(summary = "Exclui em lote a memória resumida do papel informado", description = "Exclui em lote a memória resumida com base no ID do papel e no ID do dispositivo")
     public ApiResponse<?> deleteSummary(@PathVariable Integer roleId,
                                        @PathVariable String deviceId,
                                        @RequestParam(required = false) Long id) {

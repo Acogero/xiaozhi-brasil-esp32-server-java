@@ -31,7 +31,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * 全局异常处理器
+ * Manipulador global de exceções
  */
 @Slf4j
 @RestControllerAdvice
@@ -39,63 +39,63 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UsernameNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleUsernameNotFoundException(UsernameNotFoundException e, WebRequest request) {
-        log.warn("用户名不存在异常: {}", e.getMessage(), e);
-        return ApiResponse.badRequest("用户名不存在");
+        log.warn("Exceção de nome de usuário não encontrado: {}", e.getMessage(), e);
+        return ApiResponse.badRequest("Nome de usuário não encontrado");
     }
 
     @ExceptionHandler(UserPasswordNotMatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleUserPasswordNotMatchException(UserPasswordNotMatchException e, WebRequest request) {
-        log.warn("用户密码不匹配异常: {}", e.getMessage(), e);
-        return ApiResponse.badRequest("用户密码不正确");
+        log.warn("Exceção de senha incorreta: {}", e.getMessage(), e);
+        return ApiResponse.badRequest("Senha incorreta");
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ApiResponse<?> handleUnauthorizedException(UnauthorizedException e, WebRequest request) {
-        log.warn("权限不足: {}", e.getMessage());
+        log.warn("Permissão insuficiente: {}", e.getMessage());
         return ApiResponse.forbidden(e.getMessage());
     }
 
     @ExceptionHandler(NotLoginException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ApiResponse<?> handleNotLoginException(NotLoginException e, WebRequest request) {
-        return ApiResponse.unauthorized("登录已过期，请重新登录");
+        return ApiResponse.unauthorized("Login expirado, faça login novamente");
     }
 
     @ExceptionHandler(NotPermissionException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ApiResponse<?> handleNotPermissionException(NotPermissionException e, WebRequest request) {
-        log.warn("权限不足: {}", e.getMessage());
-        return ApiResponse.forbidden("权限不足");
+        log.warn("Permissão insuficiente: {}", e.getMessage());
+        return ApiResponse.forbidden("Permissão insuficiente");
     }
 
     @ExceptionHandler(NotRoleException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ApiResponse<?> handleNotRoleException(NotRoleException e, WebRequest request) {
-        log.warn("角色权限不足: {}", e.getMessage());
-        return ApiResponse.forbidden("角色权限不足");
+        log.warn("Permissão do papel insuficiente: {}", e.getMessage());
+        return ApiResponse.forbidden("Permissão do papel insuficiente");
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiResponse<?> handleResourceNotFoundException(ResourceNotFoundException e, WebRequest request) {
-        log.warn("资源不存在: {}", e.getMessage());
+        log.warn("Recurso não encontrado: {}", e.getMessage());
         return ApiResponse.notFound(e.getMessage());
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiResponse<?> handleNoResourceFoundException(NoResourceFoundException e, WebRequest request) {
-        log.warn("静态资源找不到: {}", e.getResourcePath());
-        return ApiResponse.notFound("请求的资源不存在");
+        log.warn("Recurso estático não encontrado: {}", e.getResourcePath());
+        return ApiResponse.notFound("O recurso solicitado não existe");
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiResponse<?> handleNoHandlerFoundException(NoHandlerFoundException e, HttpServletRequest request) {
-        log.warn("请求路径不存在: {} {}", e.getHttpMethod(), e.getRequestURL());
-        return ApiResponse.notFound("请求的接口不存在");
+        log.warn("Caminho da requisição não encontrado: {} {}", e.getHttpMethod(), e.getRequestURL());
+        return ApiResponse.notFound("O endpoint solicitado não existe");
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -104,15 +104,15 @@ public class GlobalExceptionHandler {
         HttpRequestMethodNotSupportedException e,
         HttpServletRequest request
     ) {
-        log.warn("请求方法不支持: {} {}, 支持的方法: {}", e.getMethod(), request.getRequestURI(), e.getSupportedHttpMethods());
-        return ApiResponse.error(HttpStatus.METHOD_NOT_ALLOWED.value(), "请求方法不支持");
+        log.warn("Método de requisição não suportado: {} {}, métodos suportados: {}", e.getMethod(), request.getRequestURI(), e.getSupportedHttpMethods());
+        return ApiResponse.error(HttpStatus.METHOD_NOT_ALLOWED.value(), "Método de requisição não suportado");
     }
 
     @ExceptionHandler(AsyncRequestTimeoutException.class)
     @ResponseStatus(HttpStatus.REQUEST_TIMEOUT)
     public ApiResponse<?> handleAsyncRequestTimeoutException(AsyncRequestTimeoutException e, WebRequest request) {
-        log.warn("异步请求超时: {}", request.getDescription(false));
-        return ApiResponse.error(HttpStatus.REQUEST_TIMEOUT.value(), "请求超时，请稍后重试");
+        log.warn("Tempo limite da solicitação assíncrona: {}", request.getDescription(false));
+        return ApiResponse.error(HttpStatus.REQUEST_TIMEOUT.value(), "Tempo limite da requisição excedido, tente novamente mais tarde");
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
@@ -121,8 +121,8 @@ public class GlobalExceptionHandler {
         BindingResult bindingResult = e instanceof MethodArgumentNotValidException methodArgumentNotValidException
             ? methodArgumentNotValidException.getBindingResult()
             : ((BindException) e).getBindingResult();
-        String message = extractBindingMessage(bindingResult, "请求参数不合法");
-        log.warn("请求参数校验失败: {}", message);
+        String message = extractBindingMessage(bindingResult, "Parâmetros da requisição inválidos");
+        log.warn("Falha na validação dos parâmetros da requisição: {}", message);
         return ApiResponse.badRequest(message);
     }
 
@@ -133,65 +133,65 @@ public class GlobalExceptionHandler {
             .map(violation -> violation.getMessage())
             .filter(StringUtils::hasText)
             .findFirst()
-            .orElse("请求参数不合法");
-        log.warn("约束校验失败: {}", message);
+            .orElse("Parâmetros da requisição inválidos");
+        log.warn("Falha na validação de restrição: {}", message);
         return ApiResponse.badRequest(message);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
-        log.warn("请求缺少参数: {}", e.getParameterName());
-        return ApiResponse.badRequest("缺少必要参数: " + e.getParameterName());
+        log.warn("Parâmetro ausente na requisição: {}", e.getParameterName());
+        return ApiResponse.badRequest("Parâmetro obrigatório ausente: " + e.getParameterName());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
-        log.warn("参数类型不匹配: {}", e.getName(), e);
-        return ApiResponse.badRequest("参数类型不合法: " + e.getName());
+        log.warn("Tipo de parâmetro incompatível: {}", e.getName(), e);
+        return ApiResponse.badRequest("Tipo de parâmetro inválido: " + e.getName());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        log.warn("请求体解析失败: {}", e.getMessage());
-        return ApiResponse.badRequest("请求体格式不正确");
+        log.warn("Falha ao analisar o corpo da requisição: {}", e.getMessage());
+        return ApiResponse.badRequest("Formato do corpo da requisição inválido");
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleIllegalArgumentException(IllegalArgumentException e, WebRequest request) {
-        log.warn("参数错误: {}", e.getMessage(), e);
-        return ApiResponse.badRequest(defaultMessage(e.getMessage(), "请求参数不合法"));
+        log.warn("Parâmetro inválido: {}", e.getMessage(), e);
+        return ApiResponse.badRequest(defaultMessage(e.getMessage(), "Parâmetros da requisição inválidos"));
     }
 
     @ExceptionHandler(IllegalStateException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiResponse<?> handleIllegalStateException(IllegalStateException e, WebRequest request) {
-        log.warn("业务状态冲突: {}", e.getMessage(), e);
-        return ApiResponse.conflict(defaultMessage(e.getMessage(), "当前状态不允许此操作"));
+        log.warn("Conflito de estado de negócio: {}", e.getMessage(), e);
+        return ApiResponse.conflict(defaultMessage(e.getMessage(), "O estado atual não permite esta operação"));
     }
 
     @ExceptionHandler(OperationFailedException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiResponse<?> handleOperationFailedException(OperationFailedException e, WebRequest request) {
-        log.error("业务操作失败: {}", e.getMessage(), e);
-        return ApiResponse.serverError(defaultMessage(e.getMessage(), "操作失败，请稍后重试"));
+        log.error("Falha na operação de negócio: {}", e.getMessage(), e);
+        return ApiResponse.serverError(defaultMessage(e.getMessage(), "Falha na operação, tente novamente mais tarde"));
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiResponse<?> handleRuntimeException(RuntimeException e, WebRequest request) {
-        log.error("业务异常: {}", e.getMessage(), e);
-        return ApiResponse.serverError("服务器错误，请联系管理员");
+        log.error("Exceção de negócio: {}", e.getMessage(), e);
+        return ApiResponse.serverError("Erro no servidor, entre em contato com o administrador");
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiResponse<?> handleException(Exception e, WebRequest request) {
-        log.error("系统异常: {}", e.getMessage(), e);
-        return ApiResponse.serverError("服务器错误，请联系管理员");
+        log.error("Exceção do sistema: {}", e.getMessage(), e);
+        return ApiResponse.serverError("Erro no servidor, entre em contato com o administrador");
     }
 
     private String extractBindingMessage(BindingResult bindingResult, String fallback) {

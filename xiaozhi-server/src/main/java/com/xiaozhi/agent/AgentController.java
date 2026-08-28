@@ -17,28 +17,28 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 智能体管理
+ * Gerenciamento de agentes
  * 
  * @author Joey
  */
 @RestController
 @RequestMapping("/api/agent")
-@Tag(name = "智能体管理", description = "Coze、Dify智能体相关操作")
+@Tag(name = "Gerenciamento de agentes", description = "Operações relacionadas a agentes Coze e Dify")
 public class AgentController extends BaseController {
 
     @Resource
     private AgentAppService agentAppService;
 
     /**
-     * 查询智能体列表
+     * Consultar lista de agentes
      *
-     * @param req 查询条件
-     * @return 智能体列表
+     * @param req condições de busca
+     * @return lista de agentes
      */
     @GetMapping("")
     @ResponseBody
     @SaCheckPermission("system:config:agent:api:list")
-    @Operation(summary = "根据条件查询智能体", description = "返回智能体列表信息，会自动查询平台当前存在的智能体并同步本地配置")
+    @Operation(summary = "Consulta agentes de acordo com os filtros", description = "Retorna a lista de agentes; consulta automaticamente os agentes existentes na plataforma e sincroniza a configuração local")
     public ApiResponse<?> list(@Valid AgentPageReq req) {
         return ApiResponse.success(agentAppService.page(req, StpUtil.getLoginIdAsInt()));
     }

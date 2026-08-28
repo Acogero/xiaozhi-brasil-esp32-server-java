@@ -34,8 +34,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.extern.slf4j.Slf4j;
 /**
- * Web 聊天服务：为纯文本 Web 客户端提供流式 AI 对话能力。
- * 轻量级实现，不涉及 STT/TTS/Player 等音频组件
+ * Serviço de chat Web: fornece diálogo com IA em streaming para clientes Web somente texto.
+ * Implementação leve, sem envolver componentes de áudio como STT/TTS/Player
  */
 @Slf4j
 @Service
@@ -53,19 +53,19 @@ public class WebChatService {
     private int maxMessages;
 
     /**
-     * sessionId → Conversation 映射
+     * Mapeamento sessionId → Conversation
      */
     private final ConcurrentHashMap<String, Conversation> conversations = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ChatModel> chatModels = new ConcurrentHashMap<>();
 
     /**
-     * 开启一个 Web 聊天会话。
-     * 当 {@code resumeSessionId} 为空时创建新会话；非空时尝试续接已有会话。
-     * 续接时会校验归属（userId一致 且 source='web'），防止误用设备会话或跨用户访问。
+     * Abre uma sessão de chat Web.
+     * Quando {@code resumeSessionId} é nulo, cria uma nova sessão; quando informado, tenta retomar uma sessão existente.
+     * Ao retomar, verifica a posse (mesmo userId e source='web'), evitando uso indevido de sessões de dispositivo ou acesso entre usuários.
      *
-     * @param userId           当前登录用户ID
-     * @param roleId           角色ID
-     * @param resumeSessionId  续接的会话 ID，可为 null
+     * @param userId           ID do usuário logado
+     * @param roleId           ID do papel
+     * @param resumeSessionId  ID da sessão a retomar, pode ser null
      * @return sessionId
      */
     public String openSession(Integer userId, Integer roleId, String resumeSessionId) {
@@ -73,7 +73,7 @@ public class WebChatService {
 
         RoleBO role = roleService.getBO(roleId);
         if (role == null) {
-            throw new IllegalArgumentException("角色不存在: " + roleId);
+            throw new IllegalArgumentException("Papel não encontrado: " + roleId);
         }
 
         String sessionId;
@@ -84,7 +84,7 @@ public class WebChatService {
             sessionId = UUID.randomUUID().toString();
         }
 
-        // 初始化 Conversation：Web 场景始终按 sessionId 加载（新会话为空，续接会拉到历史）。
+        // Inicializa a Conversation: no cenário Web, sempre carrega por sessionId (nova sessão fica vazia, retomada traz o histórico).
         Conversation conversation = MessageWindowConversation.builder()
                 .chatMemory(chatMemory)
                 .maxMessages(maxMessages)
@@ -97,65 +97,65 @@ public class WebChatService {
                 .build();
         conversations.put(sessionId, conversation);
 
-        // 初始化 ChatModel
+        // Inicializa o ChatModel
         ChatModel chatModel = chatModelFactory.getChatModel(role);
         chatModels.put(sessionId, chatModel);
 
-        log.info("Web 聊天会话已创建: sessionId={}, userId={}, roleId={}, resume={}",
+        log.info("Sessão de chat Web criada: sessionId={}, userId={}, roleId={}, resume={}",
                 sessionId, userId, roleId, StringUtils.hasText(resumeSessionId));
         return sessionId;
     }
 
     /**
-     * 创建新会话的便捷重载。
+     * Sobrecarga de conveniência para criar uma nova sessão.
      */
     public String openSession(Integer userId, Integer roleId) {
         return openSession(userId, roleId, null);
     }
 
     /**
-     * 校验待续接的 sessionId 归属于当前用户的 Web 会话。
-     * 存在不匹配时抛出 IllegalArgumentException。
+     * Verifica se o sessionId a ser retomado pertence a uma sessão Web do usuário atual.
+     * Lança IllegalArgumentException em caso de divergência.
      */
     private void assertSessionOwnedByUser(String sessionId, Integer userId) {
         List<MessageBO> recent = messageService.listHistory(sessionId, 1);
         if (recent.isEmpty()) {
-            throw new IllegalArgumentException("会话不存在或已清除: " + sessionId);
+            throw new IllegalArgumentException("Sessão não encontrada ou já foi limpa: " + sessionId);
         }
         MessageBO first = recent.get(0);
         if (!MessageBO.SOURCE_WEB.equals(first.getSource())) {
-            throw new IllegalArgumentException("仅支持续接 Web 来源的会话: " + sessionId);
+            throw new IllegalArgumentException("Só é possível retomar sessões originadas na Web: " + sessionId);
         }
         if (!userId.equals(first.getUserId())) {
-            throw new IllegalArgumentException("会话不属于当前用户: " + sessionId);
+            throw new IllegalArgumentException("A sessão não pertence ao usuário atual: " + sessionId);
         }
     }
 
     /**
-     * 流式聊天：接收用户文本，返回 AI 回复的 ChatToken 流（包含思考过程和正式回复），
-     * 并在完成时持久化 user/assistant 两条消息。
+     * Chat em streaming: recebe o texto do usuário e retorna o fluxo de ChatToken da resposta da IA (incluindo o processo de raciocínio e a resposta final),
+     * persistindo as mensagens de user e assistant ao final.
      *
-     * @param sessionId 会话 ID
-     * @param text      用户输入文本
-     * @return ChatToken 流，前端可根据 type 区分 thinking/content
+     * @param sessionId ID da sessão
+     * @param text      texto informado pelo usuário
+     * @return fluxo de ChatToken; o frontend pode diferenciar thinking/content pelo campo type
      */
     public Flux<ChatToken> chatStream(String sessionId, String text) {
         Conversation conversation = conversations.get(sessionId);
         ChatModel chatModel = chatModels.get(sessionId);
         if (conversation == null || chatModel == null) {
-            return Flux.error(new IllegalStateException("会话不存在或已过期: " + sessionId));
+            return Flux.error(new IllegalStateException("Sessão não encontrada ou expirada: " + sessionId));
         }
 
-        // Web 场景：裸文本 UserMessage + 时间戳 metadata；
-        // Conversation 投影层会在送 LLM 前拼出 [时间戳] 文本 的前缀。
-        // 无 speaker/emotion，故不挂 MessageMetadataBO。
+        // Cenário Web: UserMessage em texto puro + metadata com timestamp;
+        // A camada de projeção da Conversation monta o prefixo [timestamp] texto antes de enviar ao LLM.
+        // Sem speaker/emotion, portanto não anexa MessageMetadataBO.
         LocalDateTime userCreatedAt = LocalDateTime.now();
         Instant userInstant = userCreatedAt.atZone(ZoneId.systemDefault()).toInstant();
         UserMessage userMessage = new UserMessage(text);
         MessageTimeMetadata.setTimeMillis(userMessage, userInstant);
         conversation.add(userMessage);
 
-        // Web 场景无位置
+        // Cenário Web não possui posição
         List<Message> messages = conversation.messages(ConversationContext.EMPTY);
 
         Prompt prompt = new Prompt(messages);
@@ -178,7 +178,7 @@ public class WebChatService {
                     return Flux.fromIterable(tokens);
                 })
                 .doOnNext(token -> {
-                    // 只累积正式回复内容，思考过程不持久化
+                    // Acumula apenas o conteúdo da resposta final; o processo de raciocínio não é persistido
                     if (token.isContent()) {
                         fullResponse.append(token.text());
                     }
@@ -189,15 +189,15 @@ public class WebChatService {
                     }
                     String reply = fullResponse.toString();
                     conversation.add(new AssistantMessage(reply));
-                    // 持久化裸文本（元数据由 Conversation 投影层按需拼前缀，DB 保持干净）
+                    // Persiste o texto puro (o prefixo é montado pela camada de projeção da Conversation quando necessário, mantendo o banco limpo)
                     persistTurn(conversation, text, userCreatedAt, reply, LocalDateTime.now());
                 })
-                .doOnError(e -> log.error("Web 聊天流式响应失败: sessionId={}", sessionId, e));
+                .doOnError(e -> log.error("Falha na resposta em streaming do chat Web: sessionId={}", sessionId, e));
     }
 
     /**
-     * 将一轮 Web 对话的 user + assistant 两条消息写入数据库（source='web'）。
-     * 单独提出方便出错时不影响流式完成。
+     * Grava no banco as mensagens de user + assistant de uma rodada de diálogo Web (source='web').
+     * Extraído em método separado para que um erro aqui não afete a conclusão do streaming.
      */
     private void persistTurn(Conversation conversation, String userText, LocalDateTime userCreatedAt,
                              String assistantText, LocalDateTime assistantCreatedAt) {
@@ -206,7 +206,7 @@ public class WebChatService {
             MessageBO assistantBO = buildMessageBO(conversation, MessageBO.SENDER_ASSISTANT, assistantText, assistantCreatedAt);
             messageService.saveAll(List.of(userBO, assistantBO));
         } catch (Exception e) {
-            log.error("Web 聊天消息持久化失败: sessionId={}", conversation.sessionId(), e);
+            log.error("Falha ao persistir mensagem do chat Web: sessionId={}", conversation.sessionId(), e);
         }
     }
 
@@ -225,16 +225,16 @@ public class WebChatService {
     }
 
     /**
-     * 关闭 Web 聊天会话，释放资源
+     * Fecha a sessão de chat Web, liberando recursos
      */
     public void closeSession(String sessionId) {
         conversations.remove(sessionId);
         chatModels.remove(sessionId);
-        log.info("Web 聊天会话已关闭: sessionId={}", sessionId);
+        log.info("Sessão de chat Web encerrada: sessionId={}", sessionId);
     }
 
     /**
-     * 检查会话是否存在
+     * Verifica se a sessão existe
      */
     public boolean hasSession(String sessionId) {
         return conversations.containsKey(sessionId);

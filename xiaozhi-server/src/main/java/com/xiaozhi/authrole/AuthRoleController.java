@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth-role")
-@Tag(name = "后台权限角色", description = "后台权限角色相关操作")
+@Tag(name = "Papel de permissão", description = "Operações relacionadas a papéis de permissão")
 public class AuthRoleController extends BaseController {
 
     @Resource
@@ -31,7 +31,7 @@ public class AuthRoleController extends BaseController {
     @GetMapping("")
     @ResponseBody
     @SaCheckPermission("system:auth-role:api:list")
-    @Operation(summary = "根据条件查询后台权限角色", description = "返回后台权限角色列表")
+    @Operation(summary = "Consulta papéis de permissão de acordo com os filtros", description = "Retorna a lista de papéis de permissão")
     public ApiResponse<?> list(@Valid AuthRolePageReq req) {
         return ApiResponse.success(authRoleAppService.page(req));
     }
@@ -39,7 +39,7 @@ public class AuthRoleController extends BaseController {
     @GetMapping("/{authRoleId}/permissions")
     @ResponseBody
     @SaCheckPermission("system:auth-role:api:detail")
-    @Operation(summary = "获取后台权限角色授权配置", description = "返回角色权限树和已选权限")
+    @Operation(summary = "Obter configuração de permissões do papel de permissão", description = "Retorna a árvore de permissões do papel e as permissões já selecionadas")
     public ApiResponse<?> getPermissionConfig(@PathVariable Integer authRoleId) {
         return ApiResponse.success(authRoleAppService.getPermissionConfig(authRoleId));
     }
@@ -47,8 +47,8 @@ public class AuthRoleController extends BaseController {
     @PutMapping("/{authRoleId}/permissions")
     @ResponseBody
     @SaCheckPermission("system:auth-role:api:assign")
-    @AuditLog(module = "权限管理", operation = "更新角色权限")
-    @Operation(summary = "更新后台权限角色授权配置", description = "保存角色已选权限")
+    @AuditLog(module = "Gerenciamento de permissões", operation = "Atualizar permissões do papel")
+    @Operation(summary = "Atualizar as permissões do papel de permissão", description = "Salva as permissões selecionadas do papel")
     public ApiResponse<?> assignPermissions(
         @PathVariable Integer authRoleId,
         @RequestBody(required = false) List<Integer> permissionIds
